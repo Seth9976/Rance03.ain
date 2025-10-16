@@ -1,0 +1,171 @@
+void SceneCamp::init(ref CampBackGround bg, int imageType)
+{
+	this.bg_ <- bg;
+	this.state_ = 0;
+	this.clicked_ = -1;
+	this.imageType_ = imageType;
+	this.initButton();
+	this.cpView_.init();
+	this.icon_.init(this.onClickMirrorPiece);
+	this.hpView_.init(5200);
+	this.memoView_.init(g_gameFlagMap.getString("俺のメモ"));
+	this.btnExit_.init("システム／ボタン／幅１７０", "キャンプをたたむ", "", true);
+	this.btnExit_.setPos(840, 494);
+	this.btnSystem_.init("システム／ボタン／メニュー", "", "", false);
+	this.btnSystem_.setPos(950, 692);
+	this.btnSystem_.setClickCallback(this.onClickSystemMenuButton, 0);
+	this.btnSaveLion_.init("セーブライオン", this.getSaveLionCount);
+	this.btnSaveLion_.setPos(694, 494);
+	this.btnSaveLion_.setClickCallback(this.onClickSaveLion, 1);
+}
+
+void SceneCamp::onClickMirrorPiece()
+{
+	this.onClick(5);
+}
+
+void SceneCamp::onClickSaveLion(int index)
+{
+	DialogInfomation info;
+	info.setCaption("吠えろセーブライオン！");
+	info.setMessage("セーブライオンをひとつ消費して、|ここでセーブ画面を開きます|がおー");
+	info.setPictureImageName("システム／ダイアログ／写真／セーブライオン");
+	info.setAnswerTypeYesNo(true);
+	if (openDialog(info) == 0)
+	{
+		if (g_playerCommonParam.getItemCount("セーブライオン") > 0)
+		{
+			g_playerCommonParam.decItem("セーブライオン");
+		}
+		else
+		{
+			g_playerCommonParam.decItem("養殖セーブライオン");
+		}
+		this.onClick(4);
+	}
+}
+
+int SceneCamp::getSaveLionCount()
+{
+	return g_playerCommonParam.getItemCount("セーブライオン") + g_playerCommonParam.getItemCount("養殖セーブライオン");
+}
+
+void SceneCamp::onClickSystemMenuButton(int index)
+{
+	openSystemMenu(false);
+}
+
+void SceneCamp::run()
+{
+	this.fadeObject(true);
+}
+
+void SceneCamp::fadeObject(bool val)
+{
+	if (val)
+	{
+		this.bg_.fadeIn(true, NULL);
+	}
+	else if (this.clicked_ == -1 || this.clicked_ == 3)
+	{
+		this.bg_.fadeIn(false, NULL);
+	}
+	this.fadeButton(val);
+	this.icon_.fadeIn(val);
+	this.hpView_.fadeIn(val);
+	this.cpView_.fadeIn(val);
+	this.memoView_.fadeIn(val);
+	this.btnExit_.fadeIn(val);
+	this.btnSystem_.fadeIn(val);
+	this.btnSaveLion_.fadeIn(val, NULL);
+	this.state_ = val ? 1 : 3;
+	this.timer_.setTimer(250, this.onFinishFading);
+}
+
+void SceneCamp::fadeButton(bool val)
+{
+	int i;
+	for (i = 0; i < this.btn_.Numof(); ++i)
+	{
+		this.btn_[i].fadeIn(val, i * 100);
+	}
+}
+
+bool SceneCamp::update()
+{
+	if (this.state_ == 2)
+	{
+		if (g_mouse.isClick(1) || this.clicked_ != -1 || this.btnExit_.isClick())
+		{
+			if (g_mouse.isClick(1))
+			{
+				playCancel();
+			}
+			this.fadeObject(false);
+		}
+	}
+	if (g_mouse.getWheel() > 0)
+	{
+		openBackLog();
+	}
+	return this.state_ != 4;
+}
+
+void SceneCamp::onFinishFading()
+{
+	if (this.state_ == 1)
+	{
+		this.state_ = 2;
+	}
+	else
+	{
+		this.state_ = 4;
+	}
+}
+
+void SceneCamp::initButton()
+{
+	this.btn_[0].init("システム／キャンプ／パーティ編成", "パーティ編成", this.onClick, 0);
+	this.btn_[1].init("システム／キャンプ／アイテムを使う", "アイテムを使う", this.onClick, 1);
+	this.btn_[2].init("システム／キャンプ／ウィリスを呼ぶ", "ウィリスを呼ぶ", this.onClick, 2);
+	this.btn_[3].init("システム／キャンプ／帰り木を使う", "帰り木を使う", this.onClick, 3);
+	this.btn_[0].setPos(718, 155);
+	this.btn_[1].setPos(718, 300);
+	this.btn_[2].setPos(868, 205);
+	this.btn_[3].setPos(868, 351);
+	this.setButtonEnable();
+}
+
+void SceneCamp::setButtonEnable()
+{
+	this.btn_[2].setEnable(g_playerCommonParam.isEnableLevelGod());
+	this.btn_[3].setEnable(g_playerCommonParam.isEnableExitDungeon());
+	this.btn_[1].setEnable(g_playerCommonParam.isEnableItem());
+}
+
+void SceneCamp::onClick(int id)
+{
+	if (id == 3)
+	{
+		DialogInfomation info;
+		info.setCaption("帰り木を天に掲げた！");
+		info.setMessage("ダンジョンから脱出するぞ");
+		info.setPictureImageName("システム／ダイアログ／写真／帰り木");
+		info.setAnswerTypeYesNo(true);
+		if (openDialog(info) == 1)
+		{
+			return;
+		}
+		else
+		{
+			g_sysSound.play(6, "効果音／帰り木");
+		}
+	}
+	this.clicked_ = id;
+}
+
+int SceneCamp::getNextScene()
+{
+	return this.clicked_;
+}
+

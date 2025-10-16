@@ -1,0 +1,33 @@
+void TestGameTimer::setTimer(int time, DG_GeneralCallback cb)
+{
+	this.cb_ = cb;
+	this.timerCb_.setTimer(time, this.onFinish);
+}
+
+void TestGameTimer::onFinish()
+{
+	this.cb_();
+}
+
+void test_Game_Timer()
+{
+	array@TestGameTimer t[10];
+	LocalTimer timer;
+	while (true)
+	{
+		if (timer.getTime() > 100)
+		{
+			timer.reset();
+			int index = RAND(t.Numof()) - 1;
+			t[index].setTimer(RAND(200) + 50, "test_Game_TimerCallback");
+		}
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+}
+
+void test_Game_TimerCallback()
+{
+	pass("finish timer(callback)");
+}
+

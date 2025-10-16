@@ -1,0 +1,601 @@
+string 制御／戦闘終了メッセージ(string playerId, string skillId, ref array@string monsterIdList)
+{
+	pass("asdfkopko");
+	string msg;
+	if (制御／戦闘終了メッセージ／モンスター("トーマ", monsterIdList) && playerId == "ランス")
+	{
+		msg = "終わりだ、鉄球親父が！";
+	}
+	else if (制御／戦闘終了メッセージ／モンスター("アイゼル", monsterIdList) && playerId == "ランス")
+	{
+		msg = "くたばれ顔だけ野郎！";
+	}
+	else if (制御／戦闘終了メッセージ／モンスター("ノスt3", monsterIdList) && playerId == "ランス")
+	{
+		msg = "死ね、化け物じじい！";
+	}
+	else if (制御／戦闘終了メッセージ／モンスター("ジル", monsterIdList) && playerId == "ランス")
+	{
+		msg = "俺の勝ちだ、魔王！";
+	}
+	else if ((制御／戦闘終了メッセージ／モンスター("ヘルマン歩兵q", monsterIdList) || 制御／戦闘終了メッセージ／モンスター("ヘルマン歩兵群q", monsterIdList) || 制御／戦闘終了メッセージ／モンスター("ヘルマン弩兵q", monsterIdList) || 制御／戦闘終了メッセージ／モンスター("ヘルマン弩兵群q", monsterIdList) || 制御／戦闘終了メッセージ／モンスター("ヘルマン工兵q", monsterIdList) || 制御／戦闘終了メッセージ／モンスター("ヘルマン術兵q", monsterIdList) || 制御／戦闘終了メッセージ／モンスター("ヘルマン騎士q", monsterIdList) || 制御／戦闘終了メッセージ／モンスター("ヘルマン士官q", monsterIdList) || 制御／戦闘終了メッセージ／モンスター("ヘルマン操兵q", monsterIdList)) && playerId == "リア")
+	{
+		msg = "あんた達に、容赦はないわ";
+	}
+	else if ((制御／戦闘終了メッセージ／モンスター("ヘルマン歩兵q", monsterIdList) || 制御／戦闘終了メッセージ／モンスター("ヘルマン歩兵群q", monsterIdList) || 制御／戦闘終了メッセージ／モンスター("ヘルマン弩兵q", monsterIdList) || 制御／戦闘終了メッセージ／モンスター("ヘルマン弩兵群q", monsterIdList) || 制御／戦闘終了メッセージ／モンスター("ヘルマン工兵q", monsterIdList) || 制御／戦闘終了メッセージ／モンスター("ヘルマン術兵q", monsterIdList) || 制御／戦闘終了メッセージ／モンスター("ヘルマン騎士q", monsterIdList) || 制御／戦闘終了メッセージ／モンスター("ヘルマン士官q", monsterIdList) || 制御／戦闘終了メッセージ／モンスター("ヘルマン操兵q", monsterIdList)) && playerId == "マリス")
+	{
+		msg = "償いなさい、死を以て";
+	}
+	else if (制御／戦闘終了メッセージ／モンスター("アイゼル", monsterIdList) && playerId == "志津香")
+	{
+		msg = "……終わりよ、これで……";
+	}
+	else
+	{
+		switch (playerId)
+		{
+		case "３号":
+			switch (RAND(9))
+			{
+			case 1:
+				msg = "チューリップ最高！";
+				break;
+			case 2:
+				msg = "計算通り……なんてね";
+				break;
+			case 3:
+				msg = "これが科学の力よ！";
+				break;
+			case 4:
+				msg = "科学ばんざーい！";
+				break;
+			case 5:
+				msg = "さあ次いきましょ次！";
+				break;
+			case 6:
+				msg = "どっかーん！";
+				break;
+			case 7:
+				msg = "ほれぼれする出来ね！";
+				break;
+			case 8:
+				msg = "はぁん……うっとり";
+				break;
+			case 9:
+				msg = "もっと改良したいわね";
+				break;
+			}
+			break;
+		case "ランス":
+			switch (RAND(9))
+			{
+			case 1:
+				msg = "がははははははは！";
+				break;
+			case 2:
+				msg = "がははは、俺様最強！";
+				break;
+			case 3:
+				msg = "ふん、楽勝だ";
+				break;
+			case 4:
+				msg = "相手が悪かったな！";
+				break;
+			case 5:
+				msg = "金も経験値もゲットだ！";
+				break;
+			case 6:
+				msg = "身の程を知れ！";
+				break;
+			case 7:
+				msg = "雑魚は雑魚だな";
+				break;
+			case 8:
+				msg = "がははははははは！";
+				break;
+			case 9:
+				msg = "がははは、俺様最強！";
+				break;
+			}
+			break;
+		case "シィル":
+			switch (RAND(9))
+			{
+			case 1:
+				msg = "はぁ……やりました！";
+				break;
+			case 2:
+				msg = "成仏ください……なむなむ";
+				break;
+			case 3:
+				msg = "やった、ランス様！";
+				break;
+			case 4:
+				msg = "ランス様、燃えました！";
+				break;
+			case 5:
+				msg = "はぁはぁ、なんとか……";
+				break;
+			case 6:
+				msg = "し、シィルちゃん勝利";
+				break;
+			case 7:
+				msg = "よく燃えました！";
+				break;
+			case 8:
+				msg = "うまくいきました！";
+				break;
+			case 9:
+				msg = "次はもっとがんばります";
+				break;
+			}
+			break;
+		case "リア":
+			switch (RAND(3))
+			{
+			case 1:
+				msg = "リアの勝ちぃ！";
+				break;
+			case 2:
+				msg = "ダーリンの為に勝ったわ！";
+				break;
+			case 3:
+				msg = "見ててくれた、ダーリン？";
+				break;
+			}
+			break;
+		case "マリス":
+			switch (RAND(9))
+			{
+			case 1:
+				msg = "リア様、いかがでしたか";
+				break;
+			case 2:
+				msg = "片付きました、お騒がせを";
+				break;
+			case 3:
+				msg = "はい";
+				break;
+			case 4:
+				msg = "この勝利をリア様に";
+				break;
+			case 5:
+				msg = "全てはリア様の為に";
+				break;
+			case 6:
+				msg = "それでは次へ";
+				break;
+			case 7:
+				msg = "リア様に仇なす者は……";
+				break;
+			case 8:
+				msg = "失礼して後始末を";
+				break;
+			case 9:
+				msg = "失礼、返り血が";
+				break;
+			}
+			break;
+		case "かなみ":
+			switch (RAND(6))
+			{
+			case 1:
+				msg = "ふぅ……これでよし";
+				break;
+			case 2:
+				msg = "あ、危なかった……";
+				break;
+			case 3:
+				msg = "た、倒れてくれた……？";
+				break;
+			case 4:
+				msg = "先を急ぎましょう";
+				break;
+			case 5:
+				msg = "成敗！";
+				break;
+			case 6:
+				msg = "リア様の為、リーザスの為";
+				break;
+			}
+			break;
+		case "フェリス":
+			switch (RAND(6))
+			{
+			case 1:
+				msg = "はあ……やっと終わった";
+				break;
+			case 2:
+				msg = "片付いたわ、これでいい？";
+				break;
+			case 3:
+				msg = "あんまり酷使させないで";
+				break;
+			case 4:
+				msg = "閑職のほうがましだったわ";
+				break;
+			case 5:
+				msg = "悪魔づかいの荒い……";
+				break;
+			case 6:
+				msg = "……たわいない";
+				break;
+			}
+			break;
+		case "マリア":
+			switch (RAND(9))
+			{
+			case 1:
+				msg = "チューリップ最高！";
+				break;
+			case 2:
+				msg = "計算通り……なんてね";
+				break;
+			case 3:
+				msg = "これが科学の力よ！";
+				break;
+			case 4:
+				msg = "科学ばんざーい！";
+				break;
+			case 5:
+				msg = "さあ次いきましょ次！";
+				break;
+			case 6:
+				msg = "どっかーん！";
+				break;
+			case 7:
+				msg = "ほれぼれする出来ね！";
+				break;
+			case 8:
+				msg = "はぁん……うっとり";
+				break;
+			case 9:
+				msg = "もっと改良したいわね";
+				break;
+			}
+			break;
+		case "志津香":
+			switch (RAND(3))
+			{
+			case 1:
+				msg = "はい、片付いた";
+				break;
+			case 2:
+				msg = "勝ったわ";
+				break;
+			case 3:
+				msg = "ふん……余裕よ";
+				break;
+			}
+			break;
+		case "ミリ":
+			switch (RAND(3))
+			{
+			case 1:
+				msg = "仕留めたぜ";
+				break;
+			case 2:
+				msg = "勝った勝った、祝杯だ";
+				break;
+			case 3:
+				msg = "ふいー、生き残った、か";
+				break;
+			}
+			break;
+		case "ミル":
+			switch (RAND(6))
+			{
+			case 1:
+				msg = "いえーい、幻獣最強！";
+				break;
+			case 2:
+				msg = "幻、獣、最、強、だっ！";
+				break;
+			case 3:
+				msg = "ほらほら、一人前でしょ？";
+				break;
+			case 4:
+				msg = "ふふーん、ふふふふーん！";
+				break;
+			case 5:
+				msg = "やったったー！";
+				break;
+			case 6:
+				msg = "ねーちゃんに追いつけ！";
+				break;
+			}
+			break;
+		case "セル":
+			switch (RAND(3))
+			{
+			case 1:
+				msg = "罪深き者に、裁きを";
+				break;
+			case 2:
+				msg = "迷える魂よ、安かれ……";
+				break;
+			case 3:
+				msg = "これもALICE様の教え";
+				break;
+			}
+			break;
+		case "バレス":
+			switch (RAND(9))
+			{
+			case 1:
+				msg = "うむ、これでよし";
+				break;
+			case 2:
+				msg = "盤上、我が策の通り";
+				break;
+			case 3:
+				msg = "老兵は死なず去らずじゃ";
+				break;
+			case 4:
+				msg = "ほっほっほ";
+				break;
+			case 5:
+				msg = "年の功で勝ったかの";
+				break;
+			case 6:
+				msg = "さて、次戦はどう指すか";
+				break;
+			case 7:
+				msg = "この戦もそろそろ終局……";
+				break;
+			case 8:
+				msg = "鮮やかに決まったのう";
+				break;
+			case 9:
+				msg = "悪手は見逃さん";
+				break;
+			}
+			break;
+		case "スー":
+			switch (RAND(6))
+			{
+			case 1:
+				msg = "仕留メタ、ゴハンダ！";
+				break;
+			case 2:
+				msg = "丸焼キ蒸シ焼キ土瓶蒸シ";
+				break;
+			case 3:
+				msg = "食ウゾ！";
+				break;
+			case 4:
+				msg = "見テタカ、らんす";
+				break;
+			case 5:
+				msg = "エヘヘ……スゴイカ？";
+				break;
+			case 6:
+				msg = "狩ッタ狩ッタ";
+				break;
+			}
+			break;
+		case "リック":
+			switch (RAND(3))
+			{
+			case 1:
+				msg = "敵戦力、殲滅しました";
+				break;
+			case 2:
+				msg = "次の戦闘に備えます";
+				break;
+			case 3:
+				msg = "我を忘れてしまいました";
+				break;
+			}
+			break;
+		case "メナド":
+			switch (RAND(3))
+			{
+			case 1:
+				msg = "ボクなりに頑張ってみたよ";
+				break;
+			case 2:
+				msg = "どうだった、かな？";
+				break;
+			case 3:
+				msg = "やったよ、大勝利！";
+				break;
+			}
+			break;
+		case "ユラン":
+			switch (RAND(6))
+			{
+			case 1:
+				msg = "もう終わりかい？";
+				break;
+			case 2:
+				msg = "退屈だね……";
+				break;
+			case 3:
+				msg = "いつも通りさ、観客以外は";
+				break;
+			case 4:
+				msg = "お楽しみ頂けたかな";
+				break;
+			case 5:
+				msg = "いいタイムだったかな";
+				break;
+			case 6:
+				msg = "私の剣、見えたかい？";
+				break;
+			}
+			break;
+		case "レイラ":
+			switch (RAND(6))
+			{
+			case 1:
+				msg = "勝負あり、ね";
+				break;
+			case 2:
+				msg = "とどめ貰っちゃったわね";
+				break;
+			case 3:
+				msg = "親衛隊長の剣は甘くないわ";
+				break;
+			case 4:
+				msg = "ふぅ……もうおしまい？";
+				break;
+			case 5:
+				msg = "ちょっと手間取ったかしら";
+				break;
+			case 6:
+				msg = "この程度？";
+				break;
+			}
+			break;
+		case "ジュリア":
+			switch (RAND(6))
+			{
+			case 1:
+				msg = "えい、やあ、とお！";
+				break;
+			case 2:
+				msg = "きゃーん、頑張ったよ！";
+				break;
+			case 3:
+				msg = "ジュリア大勝利なのだ！";
+				break;
+			case 4:
+				msg = "勝利のポーズ！";
+				break;
+			case 5:
+				msg = "どうだったアテンちゃん？";
+				break;
+			case 6:
+				msg = "じゃあまた着替えるね";
+				break;
+			}
+			break;
+		case "アテン":
+			switch (RAND(6))
+			{
+			case 1:
+				msg = "はぁ、やっと終わった？";
+				break;
+			case 2:
+				msg = "めんどくさ……";
+				break;
+			case 3:
+				msg = "そろそろ帰して……";
+				break;
+			case 4:
+				msg = "なんか……だるい、かも";
+				break;
+			case 5:
+				msg = "帰りのバスの時間が……";
+				break;
+			case 6:
+				msg = "今のは参考になった、かな";
+				break;
+			}
+			break;
+		case "ネカイ":
+			switch (RAND(9))
+			{
+			case 1:
+				msg = "もーらっちゃった♪";
+				break;
+			case 2:
+				msg = "んふふ♪";
+				break;
+			case 3:
+				msg = "おねーさんって万能なの";
+				break;
+			case 4:
+				msg = "あらら、早いわね";
+				break;
+			case 5:
+				msg = "MVP手当とかないの？";
+				break;
+			case 6:
+				msg = "さてさて、ルート開始っと";
+				break;
+			case 7:
+				msg = "おつおつ♪";
+				break;
+			case 8:
+				msg = "お化粧直してきていい？";
+				break;
+			case 9:
+				msg = "おねーさん、うぃーん！";
+				break;
+			}
+			break;
+		case "バーニング":
+			switch (RAND(6))
+			{
+			case 1:
+				msg = "この勝利を天国のあいつに";
+				break;
+			case 2:
+				msg = "また……生き残ったか……";
+				break;
+			case 3:
+				msg = "……貴様は腐った蜜柑だ！";
+				break;
+			case 4:
+				msg = "罷り通った！";
+				break;
+			case 5:
+				msg = "燃え尽きるまで……";
+				break;
+			case 6:
+				msg = "貴様に俺の焔は消せん";
+				break;
+			}
+			break;
+		case "イェリコ":
+			switch (RAND(9))
+			{
+			case 1:
+				msg = "あくはゆるさん！";
+				break;
+			case 2:
+				msg = "追い討ちぱんちぱんち！";
+				break;
+			case 3:
+				msg = "こ、こわくなかったぞ！";
+				break;
+			case 4:
+				msg = "みんなだらしないぞ！";
+				break;
+			case 5:
+				msg = "ひぐ、こわくなんか……";
+				break;
+			case 6:
+				msg = "よし、ほろびたな！";
+				break;
+			case 7:
+				msg = "こらー、ほんきでくんな！";
+				break;
+			case 8:
+				msg = "せいぎはかつんだぞ！";
+				break;
+			case 9:
+				msg = "ごほうびをよこせ！";
+				break;
+			}
+			break;
+		}
+	}
+	return msg;
+}
+
+bool 制御／戦闘終了メッセージ／モンスター(string targetId, array@string monsterIdList)
+{
+	int i;
+	for (i = 0; i < monsterIdList.Numof(); ++i)
+	{
+		if (monsterIdList[i] == targetId)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+

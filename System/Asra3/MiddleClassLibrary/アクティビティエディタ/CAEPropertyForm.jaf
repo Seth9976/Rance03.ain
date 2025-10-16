@@ -1,0 +1,363 @@
+CAEPropertyForm::CAEPropertyForm()
+{
+}
+
+CAEPropertyForm::~CAEPropertyForm()
+{
+	this.Release();
+}
+
+int CAEPropertyForm::Create()
+{
+	this.Release();
+	this.m_LayoutBox = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿レイアウトタイプ設定(this.m_LayoutBox, 0);
+	this.m_PropertyLayoutBoxID = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿親設定(this.m_PropertyLayoutBoxID, this.m_LayoutBox);
+	string PartsTypeName;
+	this.SetTitle("", "");
+	this.m_ComboBox.Create();
+	this.m_ComboBox.SetBoxHeight(50);
+	this.m_ComboBox.AddSelectedEvent(this.SelectedEvent);
+	this.m_ChangeTypeButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(this.m_ChangeTypeButton, "種類を変更する");
+	Ｐ＿マージン設定(this.m_ChangeTypeButton, 3, 3, 0, 0);
+	AFL_Parts_AddMouseLClickEvent(this.m_ChangeTypeButton, this.ClickChangeTypeEvent);
+	this.m_Separate = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿フォント設定(this.m_Separate, 0, 12, 100, 100, 100, 0.0, 0, 0, 0, 0.0, 1);
+	Ｐ＿テキスト設定(this.m_Separate, "== == ==", 1);
+	Ｐ＿マージン設定(this.m_Separate, 3, 3, 0, 0);
+	this.m_VScroll = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿縦スクロールバー＿上ボタン高さ設定(this.m_VScroll, 16);
+	Ｐ＿縦スクロールバー＿下ボタン高さ設定(this.m_VScroll, 16);
+	PartsEngine.SetComponentOriginPosMode(this.m_VScroll, 3);
+	AFL_Parts_AddScrollEvent(this.m_VScroll, this.ScrolledEvent);
+	Ｐ＿縦スクロールバー＿全体量設定(this.m_VScroll, 0);
+	Ｐ＿座標設定(this.m_VScroll, 420.0, 0.0);
+	Ｐ＿レイアウトボックス＿追加(this.m_LayoutBox, this.m_VScroll);
+	Ｐ＿Ｚ座標設定(this.m_VScroll, 2);
+	AFL_Parts_AddMouseWheelEvent(this.m_ChangeTypeButton, this.MouseWheelEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_PropertyLayoutBoxID, this.MouseWheelEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_VScroll, this.MouseWheelEvent);
+	this.m_Clip = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿構築手順＿初期化(this.m_Clip, 1);
+	Ｐ＿構築手順＿作成(this.m_Clip, 420, 350, 1);
+	Ｐ＿構築ビルド(this.m_Clip, 1);
+	Ｐ＿親設定(this.m_Clip, this.m_LayoutBox);
+	Ｐ＿表示設定(this.m_Clip, false);
+	Ｐ＿アルファクリッパー設定(this.m_PropertyLayoutBoxID, this.m_Clip);
+	Ｐ＿表示設定(this.m_LayoutBox, false);
+	Ｐ＿表示設定(this.m_ComboBox.GetPartsNumber(), false);
+	Ｐ＿表示設定(this.m_ChangeTypeButton, false);
+	Ｐ＿表示設定(this.m_Separate, false);
+	Ｐ＿縦スクロールバー＿サイズ設定(this.m_VScroll, 16, 350);
+	Ｐ＿縦スクロールバー＿表示量設定(this.m_VScroll, 350);
+	this.m_ComboBox.SetSize(404, 18);
+	Ｐ＿ボタン＿サイズ設定(this.m_ChangeTypeButton, 404, 20);
+	return this.m_LayoutBox;
+}
+
+void CAEPropertyForm::SetInstanceTree(ref CAEInstanceItemList InstanceList)
+{
+	this.m_InstanceItemList <- InstanceList;
+}
+
+void CAEPropertyForm::Release()
+{
+	PARTS_ReleaseWithInit(this.m_VScroll);
+	PARTS_ReleaseWithInit(this.m_Separate);
+	PARTS_ReleaseWithInit(this.m_ChangeTypeButton);
+	PARTS_ReleaseWithInit(this.m_PropertyLayoutBoxID);
+	PARTS_ReleaseWithInit(this.m_TypeListBox);
+	PARTS_ReleaseWithInit(this.m_LayoutBox);
+	PARTS_ReleaseWithInit(this.m_Clip);
+	this.m_ComboBox.Release();
+	this.ReleasePropertyPanel();
+	this.m_Item <- NULL;
+	this.m_InstanceItemList <- NULL;
+}
+
+void CAEPropertyForm::ReleasePropertyPanel()
+{
+	this.m_PropertyPlainParts.Release();
+	this.m_PropertyRadioButtonBox.Release();
+	this.m_PropertyLayoutBox.Release();
+	this.m_PropertyMultilineTextBox.Release();
+	this.m_PropertyComboBox.Release();
+	this.m_PropertyListBox.Release();
+	this.m_PropertyTextBox.Release();
+	this.m_PropertyHScrollBar.Release();
+	this.m_PropertyVScrollBar.Release();
+	this.m_PropertyCheckBox.Release();
+	this.m_PropertyButton.Release();
+	this.m_PropertyPlain.Release();
+}
+
+void CAEPropertyForm::ScrolledEvent(int ID, int Pos, int Total)
+{
+	Ｐ＿座標設定(this.m_PropertyLayoutBoxID, 0.0, -Pos);
+}
+
+void CAEPropertyForm::SetComponent(ref CAEInstanceItem Item)
+{
+	if (this.m_Item === Item)
+	{
+		return;
+	}
+	this.m_ScrollPos = Ｐ＿縦スクロールバー＿スクロール位置取得(this.m_VScroll);
+	this.ReleasePropertyPanel();
+	Ｐ＿レイアウトボックス＿全解放(this.m_PropertyLayoutBoxID);
+	Ｐ＿表示設定(this.m_ComboBox.GetPartsNumber(), false);
+	Ｐ＿表示設定(this.m_ChangeTypeButton, false);
+	Ｐ＿表示設定(this.m_Separate, false);
+	Ｐ＿縦スクロールバー＿全体量設定(this.m_VScroll, 0);
+	this.m_Item <- NULL;
+	if (Item === NULL)
+	{
+		this.SetTitle("", "");
+		return;
+	}
+	this.m_Item <- Item;
+	Ｐ＿表示設定(this.m_Separate, true);
+	Ｐ＿表示設定(this.m_ChangeTypeButton, true);
+	Ｐ＿表示設定(this.m_ComboBox.GetPartsNumber(), true);
+	this.m_ComboBox.ClearItem();
+	this.m_ComboBox.AddItem("通常");
+	int ComponentType = PARTS_GetComponentType(Item.GetID(), 1);
+	this.SetTitle(PARTS_GetComponentTypeName(ComponentType), Item.GetName());
+	if (10 <= ComponentType)
+	{
+		this.m_ComboBox.AddItem("オンカーソル");
+		this.m_ComboBox.AddItem("キーダウン");
+	}
+	this.m_ComboBox.Select(Item.GetState() - 1);
+}
+
+void CAEPropertyForm::SetPlainPanel(ref CAEInstanceItem Item)
+{
+	this.m_PropertyPlain.Init(this.m_PropertyLayoutBoxID, Item, this.m_InstanceItemList);
+	this.m_PropertyPlain.AddMouseWheelEvent(this.MouseWheelEvent);
+	this.m_PropertyPlain.AddResizePanelEvent(this.ResizePanel);
+}
+
+void CAEPropertyForm::SetButtonPanel(ref CAEInstanceItem Item)
+{
+	this.m_PropertyButton.Init(this.m_PropertyLayoutBoxID, Item);
+	this.m_PropertyButton.AddMouseWheelEvent(this.MouseWheelEvent);
+}
+
+void CAEPropertyForm::SetCheckBoxPanel(ref CAEInstanceItem Item)
+{
+	this.m_PropertyCheckBox.Init(this.m_PropertyLayoutBoxID, Item);
+	this.m_PropertyCheckBox.AddMouseWheelEvent(this.MouseWheelEvent);
+}
+
+void CAEPropertyForm::SetVScrollBarPanel(ref CAEInstanceItem Item)
+{
+	this.m_PropertyVScrollBar.Init(this.m_PropertyLayoutBoxID, Item);
+	this.m_PropertyVScrollBar.AddMouseWheelEvent(this.MouseWheelEvent);
+}
+
+void CAEPropertyForm::SetHScrollBarPanel(ref CAEInstanceItem Item)
+{
+	this.m_PropertyHScrollBar.Init(this.m_PropertyLayoutBoxID, Item);
+	this.m_PropertyHScrollBar.AddMouseWheelEvent(this.MouseWheelEvent);
+}
+
+void CAEPropertyForm::SetTextBoxPanel(ref CAEInstanceItem Item)
+{
+	this.m_PropertyTextBox.Init(this.m_PropertyLayoutBoxID, Item);
+	this.m_PropertyTextBox.AddMouseWheelEvent(this.MouseWheelEvent);
+}
+
+void CAEPropertyForm::SetListBoxPanel(ref CAEInstanceItem Item)
+{
+	this.m_PropertyListBox.Init(this.m_PropertyLayoutBoxID, Item);
+	this.m_PropertyListBox.AddMouseWheelEvent(this.MouseWheelEvent);
+}
+
+void CAEPropertyForm::SetComboBoxPanel(ref CAEInstanceItem Item)
+{
+	this.m_PropertyComboBox.Init(this.m_PropertyLayoutBoxID, Item);
+	this.m_PropertyComboBox.AddMouseWheelEvent(this.MouseWheelEvent);
+}
+
+void CAEPropertyForm::SetMultilineTextBoxPanel(ref CAEInstanceItem Item)
+{
+	this.m_PropertyMultilineTextBox.Init(this.m_PropertyLayoutBoxID, Item);
+	this.m_PropertyMultilineTextBox.AddMouseWheelEvent(this.MouseWheelEvent);
+}
+
+void CAEPropertyForm::SetLayoutBoxPanel(ref CAEInstanceItem Item)
+{
+	this.m_PropertyLayoutBox.Init(this.m_PropertyLayoutBoxID, Item);
+	this.m_PropertyLayoutBox.AddMouseWheelEvent(this.MouseWheelEvent);
+}
+
+void CAEPropertyForm::SetRadioButtonBoxPanel(ref CAEInstanceItem Item)
+{
+	this.m_PropertyRadioButtonBox.Init(this.m_PropertyLayoutBoxID, Item, this.m_InstanceItemList);
+	this.m_PropertyRadioButtonBox.AddMouseWheelEvent(this.MouseWheelEvent);
+}
+
+void CAEPropertyForm::SetPlainPartsPanel(ref CAEInstanceItem Item, int State)
+{
+	this.m_PropertyPlainParts.Init(this.m_PropertyLayoutBoxID, Item, State);
+	this.m_PropertyPlainParts.AddMouseWheelEvent(this.MouseWheelEvent);
+}
+
+void CAEPropertyForm::ResizePanel()
+{
+	float Rate = Ｐ＿縦スクロールバー＿スクロールレート取得(this.m_VScroll);
+	int Height = AFL_Parts_GetHeight(this.m_PropertyLayoutBoxID, 1);
+	Ｐ＿縦スクロールバー＿全体量設定(this.m_VScroll, Height);
+}
+
+void CAEPropertyForm::MouseWheelEvent(int ID, int Forward, int Back)
+{
+	int Pos = Ｐ＿縦スクロールバー＿スクロール位置取得(this.m_VScroll);
+	Ｐ＿縦スクロールバー＿スクロール位置設定(this.m_VScroll, (Pos - Forward * 36) + Back * 36);
+}
+
+void CAEPropertyForm::ClickChangeTypeEvent(int ID, int MouseX, int MouseY)
+{
+	this.m_SelectType = -1;
+	CAEDialog Dialog;
+	if (!Dialog.ShowDialogOKCancelWithComponent("パーツの種類を選択してください", this.CreateContentEvent))
+	{
+		PARTS_ReleaseWithInit(this.m_TypeListBox);
+		return;
+	}
+	PARTS_ReleaseWithInit(this.m_TypeListBox);
+	if (this.m_SelectType == -1)
+	{
+		return;
+	}
+	int PartsState = this.m_ComboBox.SelectedIndex() + 1;
+	this.m_Item.SetType(this.m_SelectType, PartsState);
+	int PartsNumber = this.m_ComboBox.GetPartsNumber();
+	int Index = this.m_ComboBox.SelectedIndex();
+	ref CAEInstanceItem Item = this.m_Item;
+	this.SetComponent(NULL);
+	this.SetComponent(Item);
+	this.SelectedEvent(PartsNumber, Index);
+}
+
+void CAEPropertyForm::CreateContentEvent(int LayoutBox)
+{
+	int PartsState = this.m_ComboBox.SelectedIndex() + 1;
+	PARTS_ReleaseWithInit(this.m_TypeListBox);
+	this.m_TypeListBox = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿リストボックス＿サイズ設定(this.m_TypeListBox, 300, 256);
+	Ｐ＿リストボックス＿行高さ設定(this.m_TypeListBox, 22);
+	Ｐ＿マージン設定(this.m_TypeListBox, 8, 8, 0, 0);
+	AFL_Parts_AddSelectedEvent(this.m_TypeListBox, this.SelectTypeEvent);
+	if (PartsState == 1)
+	{
+		Ｐ＿リストボックス＿アイテム追加(this.m_TypeListBox, "ボタン");
+		Ｐ＿リストボックス＿アイテム追加(this.m_TypeListBox, "チェックボックス");
+		Ｐ＿リストボックス＿アイテム追加(this.m_TypeListBox, "縦スクロールバー");
+		Ｐ＿リストボックス＿アイテム追加(this.m_TypeListBox, "横スクロールバー");
+		Ｐ＿リストボックス＿アイテム追加(this.m_TypeListBox, "テキストボックス");
+		Ｐ＿リストボックス＿アイテム追加(this.m_TypeListBox, "リストボックス");
+		Ｐ＿リストボックス＿アイテム追加(this.m_TypeListBox, "コンボボックス");
+		Ｐ＿リストボックス＿アイテム追加(this.m_TypeListBox, "マルチラインテキストボックス");
+		Ｐ＿リストボックス＿アイテム追加(this.m_TypeListBox, "ラジオボタンボックス");
+		Ｐ＿リストボックス＿アイテム追加(this.m_TypeListBox, "レイアウトボックス");
+	}
+	Ｐ＿リストボックス＿アイテム追加(this.m_TypeListBox, "ＣＧパーツ");
+	Ｐ＿リストボックス＿アイテム追加(this.m_TypeListBox, "ループＣＧパーツ");
+	Ｐ＿リストボックス＿アイテム追加(this.m_TypeListBox, "テキストパーツ");
+	Ｐ＿リストボックス＿アイテム追加(this.m_TypeListBox, "横ゲージパーツ");
+	Ｐ＿リストボックス＿アイテム追加(this.m_TypeListBox, "縦ゲージパーツ");
+	Ｐ＿リストボックス＿アイテム追加(this.m_TypeListBox, "数字パーツ");
+	if (PartsState == 1)
+	{
+		Ｐ＿リストボックス＿アイテム追加(this.m_TypeListBox, "矩形パーツ");
+	}
+	Ｐ＿リストボックス＿アイテム追加(this.m_TypeListBox, "構築パーツ");
+	if (PartsState == 1)
+	{
+		Ｐ＿リストボックス＿アイテム追加(this.m_TypeListBox, "ＣＧ判定パーツ");
+	}
+	Ｐ＿リストボックス＿アイテム追加(this.m_TypeListBox, "フラットパーツ");
+	Ｐ＿レイアウトボックス＿追加(LayoutBox, this.m_TypeListBox);
+}
+
+void CAEPropertyForm::SelectTypeEvent(int ID, int Index)
+{
+	string ComponentName = Ｐ＿リストボックス＿アイテム取得(this.m_TypeListBox, Index);
+	this.m_SelectType = PARTS_GetComponentTypeID(ComponentName);
+}
+
+void CAEPropertyForm::SelectedEvent(int ID, int Index)
+{
+	if (this.m_Item === NULL)
+	{
+		return;
+	}
+	if (Index == -1)
+	{
+		return;
+	}
+	int PartsState = Index + 1;
+	this.ReleasePropertyPanel();
+	Ｐ＿レイアウトボックス＿追加(this.m_PropertyLayoutBoxID, this.m_ComboBox.GetPartsNumber());
+	Ｐ＿レイアウトボックス＿追加(this.m_PropertyLayoutBoxID, this.m_ChangeTypeButton);
+	this.SetPlainPanel(this.m_Item);
+	Ｐ＿レイアウトボックス＿追加(this.m_PropertyLayoutBoxID, this.m_Separate);
+	int GUIType = this.m_Item.GetType(PartsState);
+	switch (GUIType)
+	{
+	case 0:
+		this.SetButtonPanel(this.m_Item);
+		break;
+	case 1:
+		this.SetCheckBoxPanel(this.m_Item);
+		break;
+	case 2:
+		this.SetVScrollBarPanel(this.m_Item);
+		break;
+	case 3:
+		this.SetHScrollBarPanel(this.m_Item);
+		break;
+	case 4:
+		this.SetTextBoxPanel(this.m_Item);
+		break;
+	case 5:
+		this.SetListBoxPanel(this.m_Item);
+		break;
+	case 6:
+		this.SetComboBoxPanel(this.m_Item);
+		break;
+	case 7:
+		this.SetMultilineTextBoxPanel(this.m_Item);
+		break;
+	case 8:
+		this.SetLayoutBoxPanel(this.m_Item);
+		break;
+	case 9:
+		this.SetRadioButtonBoxPanel(this.m_Item);
+		break;
+	default:
+		if (10 <= GUIType)
+		{
+			this.SetPlainPartsPanel(this.m_Item, PartsState);
+			this.m_Item.SetState(PartsState);
+		}
+		break;
+	}
+	int Height = AFL_Parts_GetHeight(this.m_PropertyLayoutBoxID, 1);
+	Ｐ＿縦スクロールバー＿全体量設定(this.m_VScroll, Height);
+	Ｐ＿縦スクロールバー＿スクロール位置設定(this.m_VScroll, this.m_ScrollPos);
+	this.m_ScrollPos = 0;
+}
+
+void CAEPropertyForm::SetTitle(string PartsTypeName, string PartsName)
+{
+	if (PartsTypeName.Empty())
+	{
+		PartsTypeName = "プロパティフォーム";
+	}
+}
+

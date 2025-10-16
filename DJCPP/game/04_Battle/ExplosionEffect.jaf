@@ -1,0 +1,49 @@
+ExplosionEffect::ExplosionEffect()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+	this.isLoop_ = true;
+}
+
+void ExplosionEffect::init(int x, int y)
+{
+	int i;
+	for (i = 0; i < this.line_.Numof(); ++i)
+	{
+		this.line_[i].init(1);
+		this.line_[i].setCenter(x, y);
+		this.line_[i].setZ(29900);
+	}
+	this.circleEffect_.init("システム／エフェクト／円／仮");
+	this.circleEffect_.setPos(x, y);
+	this.circleEffect_.setMaxScaling(200.0);
+	this.circleEffect_.setZ(29900);
+}
+
+void ExplosionEffect::run(int delay)
+{
+	this.cbTimer_.setTimer(delay, this.innerRun);
+}
+
+void ExplosionEffect::innerRun()
+{
+	this.circleEffect_.run(0);
+	int i;
+	for (i = 0; i < this.line_.Numof(); ++i)
+	{
+		this.line_[i].run();
+	}
+	if (this.isLoop_)
+	{
+		this.cbTimer_.setTimer(1000, this.innerRun);
+	}
+}
+
+void ExplosionEffect::update()
+{
+}
+
+void ExplosionEffect::stopLoop()
+{
+	this.isLoop_ = false;
+}
+

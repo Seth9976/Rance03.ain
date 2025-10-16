@@ -1,0 +1,51 @@
+int AFL_Sound_GetLength(string DataName)
+{
+	return KiwiSoundEngine.GetLengthFromFile(DataName);
+}
+
+int AFL_BGM_GetPlayLength()
+{
+	return g_BGM.GetLength();
+}
+
+int AFL_BGM_GetPlayPos()
+{
+	return g_BGM.GetPos();
+}
+
+int AFL_BGM_Seek(int MilliSecond)
+{
+	return g_BGM.Seek(MilliSecond);
+}
+
+void AFL_BGM_Play(string BGMName, float Volume, int TotalTime)
+{
+	g_BGM.PlayBGM(BGMName, 0, 1, TotalTime, Volume);
+}
+
+void AFL_BGM_BeginFade(float Volume, int TotalTime, int FadeType)
+{
+	g_BGM.SetVolume(Volume);
+	g_BGM.FadeWithVolumeCap(TotalTime, g_BGMVolumeCapManager.GetCurrentBGMVolumeCapRate(), FadeType);
+}
+
+void AFL_BGM_SetLoop(bool Loop)
+{
+	g_BGM.SetLoop(Loop);
+}
+
+void AFL_SystemSE_Play(string SeName, int ID)
+{
+	SYS_PlaySystemSE(ID, SeName);
+}
+
+void AFL_SystemSE_Stop(int ID)
+{
+	SYS_StopSystemSE(ID);
+}
+
+bool AFL_SystemSE_IsPlay(int ID)
+{
+	return SYS_IsPlaySystemSE(ID);
+}
+

@@ -1,0 +1,28 @@
+void PlayerSkillOpenLevel::init(string skillId, string playerId, int index, int openLevel)
+{
+	this.skillId_ = skillId;
+	this.playerId_ = playerId;
+	this.index_ = index;
+	this.openLevel_ = openLevel;
+}
+
+string PlayerSkillOpenLevel::getSkillId()
+{
+	return this.skillId_;
+}
+
+string PlayerSkillOpenLevel::getPlayerId()
+{
+	return this.playerId_;
+}
+
+int PlayerSkillOpenLevel::getIndex()
+{
+	return this.index_;
+}
+
+int PlayerSkillOpenLevel::getOpenLevel()
+{
+	return this.openLevel_;
+}
+

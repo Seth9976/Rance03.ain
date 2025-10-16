@@ -1,0 +1,41 @@
+void SceneGameOver::init()
+{
+	this.partsBg_.init("イベント／その他／ゲームオーバー０１", 0);
+}
+
+void SceneGameOver::onFinishFadeIn()
+{
+	this.state_ = 1;
+}
+
+void SceneGameOver::onFinishFadeOut()
+{
+	this.state_ = 3;
+}
+
+void SceneGameOver::run()
+{
+	this.partsBg_.setShow(true);
+	PartsMotion m;
+	m = getStandardMotion(0);
+	m.setTime(700);
+	this.partsBg_.runMotion(m, this.onFinishFadeIn);
+	this.state_ = 0;
+}
+
+bool SceneGameOver::update()
+{
+	if (g_mouse.isClick(0) || g_mouse.isClick(1))
+	{
+		PartsMotion m;
+		m = getStandardMotion(1);
+		m.setTime(700);
+		this.partsBg_.runMotion(m, this.onFinishFadeOut);
+	}
+	if (this.state_ == 3)
+	{
+		system.Reset();
+	}
+	return true;
+}
+

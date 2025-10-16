@@ -1,0 +1,28 @@
+void StandBackgroundFillInfomation::init(string id, int r, int g, int b)
+{
+	this.id_ = id;
+	this.r_ = r;
+	this.g_ = g;
+	this.b_ = b;
+}
+
+string StandBackgroundFillInfomation::getId()
+{
+	return this.id_;
+}
+
+int StandBackgroundFillInfomation::getR()
+{
+	return this.r_;
+}
+
+int StandBackgroundFillInfomation::getG()
+{
+	return this.g_;
+}
+
+int StandBackgroundFillInfomation::getB()
+{
+	return this.b_;
+}
+

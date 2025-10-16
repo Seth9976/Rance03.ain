@@ -1,0 +1,30 @@
+void Ｓ＿コンフィグ()
+{
+	Ａ＿サウンド状態保存(false);
+	if (g_ConfigViewFunction.Numof() != 0)
+	{
+		g_ConfigViewFunction();
+	}
+	else
+	{
+		SYS_OpenConfig();
+	}
+	SYS_コンフィグセーブ();
+	g_MessageWindowManager.UpdateMulColor();
+	g_MessageWindowManager.UpdateAlpha();
+	g_MessageTextView.DrawAll(g_MessageTextModel);
+	++g_NumofOpenConfig;
+	SYS_情報集計データセーブ();
+	Ａ＿サウンド状態復帰();
+}
+
+int Ａ＿コンフィグ表示回数取得()
+{
+	return g_NumofOpenConfig;
+}
+
+void Ｓ＿コンフィグ＿関数登録(FTConfigView ConfigViewFunction)
+{
+	g_ConfigViewFunction = ConfigViewFunction;
+}
+

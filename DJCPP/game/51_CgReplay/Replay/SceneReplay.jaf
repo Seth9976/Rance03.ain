@@ -1,0 +1,101 @@
+void SceneReplay::init()
+{
+	this.isFinish_ = false;
+	this.pageCount_ = (g_replay.Numof() + 11) / 12;
+	this.initThumbnailList();
+	this.initButton();
+}
+
+void SceneReplay::initThumbnailList()
+{
+	this.list_.init(false);
+	this.list_.setOnClickCallback(this.onClickThumbnailButton);
+}
+
+void SceneReplay::initButton()
+{
+	this.btnExit_.init("システム／ボタン／幅１７０", "閉じる", "", true);
+	this.btnExit_.setPos(839, 691);
+	this.btnExit_.setClickCallback(this.onClickButtonExit, 0);
+}
+
+void SceneReplay::onClickButtonExit(int index)
+{
+	this.fadeIn(false, this.onFinish);
+}
+
+void SceneReplay::run()
+{
+	this.fadeIn(true, NULL);
+}
+
+void SceneReplay::fadeIn(bool val, DG_GeneralCallback cb)
+{
+	this.list_.fadeIn(val, NULL);
+	this.btnExit_.fadeIn(val);
+	if (cb.Numof() != 0)
+	{
+		this.timerCb_.setTimer(300, cb);
+	}
+}
+
+void SceneReplay::onFinish()
+{
+	this.isFinish_ = true;
+}
+
+bool SceneReplay::update()
+{
+	if (g_mouse.isClick(1))
+	{
+		playCancel();
+		this.fadeIn(false, this.onFinish);
+	}
+	return !this.isFinish_;
+}
+
+void SceneReplay::onClickThumbnailButton(int index)
+{
+	array@string ev;
+	array@string name;
+	this.clickedIndex_ = index;
+	g_replay[index].getAvailableEventList(ev, name);
+	if (ev.Numof() > 1)
+	{
+		int result = openReplayDialog(name);
+		if (result != -1)
+		{
+			this.runEventFuncName_ = ev[result];
+		}
+	}
+	else
+	{
+		this.runEventFuncName_ = ev[0];
+	}
+	if (this.runEventFuncName_ != "")
+	{
+		this.fadeIn(false, this.onFinishSelection);
+	}
+}
+
+void SceneReplay::onFinishSelection()
+{
+	string key = "回想%02d" % (this.clickedIndex_ + 1);
+	g_globalGameFlag.setInt(key, g_globalGameFlag.getInt(key) + 1);
+	if (g_saveDataManager.replaySave())
+	{
+		setGameMode(false);
+		DG_GeneralCallback cb;
+		cb = this.runEventFuncName_;
+		cb();
+		restoreGameMode();
+		g_saveDataManager.replayLoad();
+		cb.Clear();
+	}
+	else
+	{
+		this.runEventFuncName_ = "";
+		this.fadeIn(true, NULL);
+	}
+}
+

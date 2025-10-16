@@ -1,0 +1,75 @@
+BattleResultMessage::BattleResultMessage()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+	this.isInitialized_ = false;
+}
+
+void BattleResultMessage::init()
+{
+	g_battleResult.getBattleEndMessage(this.msg_);
+	if (!this.msg_.Empty())
+	{
+		this.initParts();
+	}
+}
+
+void BattleResultMessage::update()
+{
+}
+
+void BattleResultMessage::fadeIn(bool val, unknown_delegate onFinish)
+{
+	if (!this.isInitialized_)
+	{
+		return;
+	}
+	this.setPartsShow();
+	PartsMotion m;
+	if (val)
+	{
+		m.setMove(0, 768, 0, 768 - this.parts_[0].getHeight(), 1);
+	}
+	else
+	{
+		m.setMove(0, 768 - this.parts_[0].getHeight(), 0, 768, 1);
+	}
+	this.parent_.runMotion(m, NULL);
+}
+
+void BattleResultMessage::initParts()
+{
+	this.isInitialized_ = true;
+	array@string msg;
+	g_battleResult.getBattleEndMessage(msg);
+	this.parts_.Alloc(msg.Numof() + 1);
+	this.parts_[0].initAsPlaneImage(1024, msg.Numof() * 40, 0, 0, 0, 255);
+	this.parts_[0].setAlpha(128.0);
+	int i;
+	for (i = 0; i < msg.Numof(); ++i)
+	{
+		this.parts_[1 + i].initAsText(msg[i], 24, true, 256, 255, 255, 255);
+	}
+	createPartsGroup(this.parent_, this.parts_, 3760);
+	this.setPartsPos();
+}
+
+void BattleResultMessage::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void BattleResultMessage::setPartsPos()
+{
+	int i;
+	for (i = 1; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setPos(512.0, (i - 1) * 40 + (40 - this.parts_[i].getHeight()) / 2);
+		this.parts_[i].setOrigin(8);
+	}
+}
+

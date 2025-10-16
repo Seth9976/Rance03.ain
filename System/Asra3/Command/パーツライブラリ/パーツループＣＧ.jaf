@@ -1,0 +1,40 @@
+void Ｐ＿ループＣＧ設定(int パーツ番号, string 基本ＣＧ名, int 開始番号, int 枚数, int 時間, int 状態)
+{
+	if (!PartsEngine.Parts_SetLoopCG(パーツ番号, 基本ＣＧ名, 開始番号, 枚数, 時間, 状態))
+	{
+		PARTS_Warning("Ｐ＿ループＣＧ設定(パーツ番号 = %d, 基本ＣＧ名 = %s, 開始番号 = %d, 枚数 = %d, 時間 = %d, 状態 = %d)\n" % パーツ番号 % 基本ＣＧ名 % 開始番号 % 枚数 % 時間 % 状態);
+	}
+}
+
+void Ｐ＿ループＣＧ表示範囲設定(int パーツ番号, int Ｘ, int Ｙ, int 幅, int 高さ, int 状態)
+{
+	PartsEngine.Parts_SetLoopCGSurfaceArea(パーツ番号, Ｘ, Ｙ, 幅, 高さ, 状態);
+}
+
+void Ｐ＿ループＣＧ表示範囲取得(int パーツ番号, ref int Ｘ, ref int Ｙ, ref int 幅, ref int 高さ, int 状態)
+{
+	PartsEngine.GetLoopCGSurfaceArea(パーツ番号, Ｘ, Ｙ, 幅, 高さ, 状態);
+}
+
+string Ｐ＿ループＣＧ名取得(int パーツ番号, int 状態)
+{
+	string Out;
+	PartsEngine.GetLoopCGCGName(Out, パーツ番号, 状態);
+	return Out;
+}
+
+int Ｐ＿ループＣＧ開始番号取得(int パーツ番号, int 状態)
+{
+	return PartsEngine.GetLoopCGStartNo(パーツ番号, 状態);
+}
+
+int Ｐ＿ループＣＧ枚数取得(int パーツ番号, int 状態)
+{
+	return PartsEngine.GetLoopCGNumofCG(パーツ番号, 状態);
+}
+
+int Ｐ＿ループＣＧ切り替え時間取得(int パーツ番号, int 状態)
+{
+	return PartsEngine.Parts_GetLoopCGTimeParCG(パーツ番号, 状態);
+}
+

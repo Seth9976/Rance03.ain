@@ -1,0 +1,115 @@
+void test_ExLoading_Item()
+{
+	int i;
+	for (i = 0; i < g_item.Numof(); ++i)
+	{
+		string n = "id:%s name:%s desc:%s type:%d targetType:%d price:%d iconImageName:%s, skillId:%s" % g_item[i].getId() % g_item[i].getName() % g_item[i].getDesc() % g_item[i].getType() % g_item[i].getTargetType() % g_item[i].getPrice() % g_item[i].getIconImageName() % g_item[i].getSkillId();
+		pass(n);
+	}
+}
+
+void test_Item_View()
+{
+	test_Player_CommonParam();
+	array@ItemView view;
+	view.Alloc(g_item.Numof());
+	int i;
+	for (i = 0; i < view.Numof(); ++i)
+	{
+		view[i].init(g_item[i].getId(), true);
+		view[i].setPos(100, 10 + 160 * i, true);
+		view[i].setOnClickCallback("test_Item_Callback", i);
+		view[i].fadeIn(true, i * 50);
+	}
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		if (g_mouse.isClick(0))
+		{
+		}
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+}
+
+void test_Item_Callback(int id)
+{
+	pass("clicked: %d" % id);
+}
+
+void test_ExLoading_Shop()
+{
+	int i;
+	for (i = 0; i < g_shop.Numof(); ++i)
+	{
+		string n = "id:%s name:%s imageName:%s" % g_shop[i].getId() % g_shop[i].getName() % g_shop[i].getImageName();
+		pass(n);
+	}
+}
+
+void test_Item_ListView()
+{
+	array@string item[10];
+	int i;
+	for (i = 0; i < item.Numof(); ++i)
+	{
+		item[i] = g_item[i % g_item.Numof()].getId();
+	}
+	ItemListView list;
+	list.init(item, true);
+	list.fadeIn(true, NULL);
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+}
+
+void test_Scene_Shop()
+{
+	debugPlayerJoinAll();
+	test_Party_Organize();
+	ＥＶ／武器屋／ラジール／入る／汎用();
+	g_playerCommonParam.setGold(9999999);
+	int i;
+	for (i = 0; i < g_item.Numof(); ++i)
+	{
+		g_shop[0].addItem(g_item[i].getId());
+	}
+	openShop(g_shop[0].getId(), "仮ショップ名");
+}
+
+void test_Scene_Item()
+{
+	openItem();
+}
+
+void test_Item_NarrowDownButtons()
+{
+	ItemNarrowDownButton btn;
+	array@string n;
+	int i;
+	for (i = 0; i < g_item.Numof(); ++i)
+	{
+		n.PushBack(g_item[i].getId());
+	}
+	btn.init(n, NULL);
+	btn.fadeIn(true, NULL);
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+}
+

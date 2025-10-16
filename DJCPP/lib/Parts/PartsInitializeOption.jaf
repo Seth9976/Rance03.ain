@@ -1,0 +1,25 @@
+PartsInitializeOption::PartsInitializeOption()
+{
+}
+
+void PartsInitializeOption::setSleepLevel(int val)
+{
+	if (val < 0)
+	{
+		this.sleepLevel_.Erase(this.sleepLevel_.Numof() - 1);
+	}
+	else
+	{
+		this.sleepLevel_.PushBack(val);
+	}
+}
+
+int PartsInitializeOption::getSleepLevel()
+{
+	if (this.sleepLevel_.Empty())
+	{
+		return 0;
+	}
+	return this.sleepLevel_[this.sleepLevel_.Numof() - 1];
+}
+

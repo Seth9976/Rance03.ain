@@ -1,0 +1,131 @@
+void Ｐ＿チェックボックス＿ボタンサイズ設定(int パーツ番号, int 幅, int 高さ)
+{
+	PartsEngine.SetCheckBoxSize(パーツ番号, 幅, 高さ);
+}
+
+int Ｐ＿チェックボックス＿ボタン幅取得(int パーツ番号)
+{
+	return PartsEngine.GetCheckBoxButtonWidth(パーツ番号);
+}
+
+int Ｐ＿チェックボックス＿ボタン高さ取得(int パーツ番号)
+{
+	return PartsEngine.GetCheckBoxButtonHeight(パーツ番号);
+}
+
+void Ｐ＿チェックボックス＿チェック状態設定(int パーツ番号, bool チェック)
+{
+	PartsEngine.CheckBoxChecked(パーツ番号, チェック);
+}
+
+bool Ｐ＿チェックボックス＿チェック状態取得(int パーツ番号)
+{
+	return PartsEngine.IsCheckBoxChecked(パーツ番号);
+}
+
+void Ｐ＿チェックボックス＿色設定(int パーツ番号, int 赤, int 緑, int 青)
+{
+	PartsEngine.SetCheckBoxColor(パーツ番号, 赤, 緑, 青);
+}
+
+int Ｐ＿チェックボックス＿赤色取得(int パーツ番号)
+{
+	return PartsEngine.GetCheckBoxR(パーツ番号);
+}
+
+int Ｐ＿チェックボックス＿緑色取得(int パーツ番号)
+{
+	return PartsEngine.GetCheckBoxG(パーツ番号);
+}
+
+int Ｐ＿チェックボックス＿青色取得(int パーツ番号)
+{
+	return PartsEngine.GetCheckBoxB(パーツ番号);
+}
+
+void Ｐ＿チェックボックス＿フォント設定(int パーツ番号, int 種類, int サイズ, int 赤, int 緑, int 青, float 太字幅, int 縁取り赤, int 縁取り緑, int 縁取り青, float 縁取り幅)
+{
+	PartsEngine.SetCheckBoxFontProperty(パーツ番号, 種類, サイズ, 赤, 緑, 青, 太字幅, 縁取り赤, 縁取り緑, 縁取り青, 縁取り幅);
+}
+
+void Ｐ＿チェックボックス＿フォント取得(int パーツ番号, ref int 種類, ref int サイズ, ref int 赤, ref int 緑, ref int 青, ref float 太字幅, ref int 縁取り赤, ref int 縁取り緑, ref int 縁取り青, ref float 縁取り幅)
+{
+	PartsEngine.GetCheckBoxFontProperty(パーツ番号, 種類, サイズ, 赤, 緑, 青, 太字幅, 縁取り赤, 縁取り緑, 縁取り青, 縁取り幅);
+}
+
+void Ｐ＿チェックボックス＿ＣＧ名設定(int パーツ番号, string ＣＧ名)
+{
+	PartsEngine.SetCheckBoxCGName(パーツ番号, ＣＧ名);
+}
+
+string Ｐ＿チェックボックス＿ＣＧ名取得(int パーツ番号)
+{
+	string Name;
+	PartsEngine.GetCheckBoxCGName(パーツ番号, Name);
+	return Name;
+}
+
+void Ｐ＿チェックボックス＿フラット名設定(int パーツ番号, string ＣＧ名)
+{
+	PartsEngine.SetCheckBoxFlatName(パーツ番号, ＣＧ名);
+}
+
+string Ｐ＿チェックボックス＿フラット名取得(int パーツ番号)
+{
+	string Name;
+	PartsEngine.GetCheckBoxFlatName(パーツ番号, Name);
+	return Name;
+}
+
+void Ｐ＿チェックボックス＿テキスト設定(int パーツ番号, string テキスト)
+{
+	PartsEngine.SetCheckBoxText(パーツ番号, テキスト);
+}
+
+string Ｐ＿チェックボックス＿テキスト取得(int パーツ番号)
+{
+	string Text;
+	PartsEngine.GetCheckBoxText(パーツ番号, Text);
+	return Text;
+}
+
+void Ｐ＿チェックボックス＿テキスト位置設定(int パーツ番号, int 位置)
+{
+	PartsEngine.SetCheckBoxTextOriginPosMode(パーツ番号, 位置);
+}
+
+int Ｐ＿チェックボックス＿テキスト位置取得(int パーツ番号)
+{
+	return PartsEngine.GetCheckBoxTextOriginPosMode(パーツ番号);
+}
+
+void Ｐ＿チェックボックス＿ボタンモード設定(int パーツ番号, bool オン)
+{
+	PartsEngine.SetCheckBoxButtonMode(パーツ番号, オン);
+}
+
+bool Ｐ＿チェックボックス＿ボタンモード設定取得(int パーツ番号)
+{
+	return PartsEngine.IsCheckBoxButtonMode(パーツ番号);
+}
+
+void Ｐ＿チェックボックス＿文字間隔設定(int パーツ番号, int 間隔)
+{
+	PartsEngine.SetCheckBoxCharSpace(パーツ番号, 間隔);
+}
+
+int Ｐ＿チェックボックス＿文字間隔取得(int パーツ番号)
+{
+	return PartsEngine.GetCheckBoxCharSpace(パーツ番号);
+}
+
+void Ｐ＿チェックボックス＿行間隔設定(int パーツ番号, int 間隔)
+{
+	PartsEngine.SetCheckBoxLineSpace(パーツ番号, 間隔);
+}
+
+int Ｐ＿チェックボックス＿行間隔取得(int パーツ番号)
+{
+	return PartsEngine.GetCheckBoxLineSpace(パーツ番号);
+}
+

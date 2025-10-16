@@ -1,0 +1,402 @@
+void test_Soundtest()
+{
+	array@string music;
+	music.PushBack("音楽／システム／レベル神");
+	music.PushBack("音楽／ダンジョン／不思議");
+	music.PushBack("音楽／ダンジョン／普通");
+	music.PushBack("音楽／戦闘／通常");
+	music.PushBack("音楽／ＡＤＶ／のんき");
+	music.PushBack("音楽／ＡＤＶ／アリスのテーマ");
+	music.PushBack("音楽／ＡＤＶ／エロ");
+	music.PushBack("音楽／ＡＤＶ／パティ");
+	music.PushBack("音楽／ＡＤＶ／ミリー");
+	music.PushBack("音楽／ＡＤＶ／ロイヤルチェイサー");
+	music.PushBack("音楽／ＡＤＶ／香港マカオ");
+	music.PushBack("音楽／ＡＤＶ／魔人");
+	array@string fx;
+	fx.PushBack("効果音／お腹");
+	fx.PushBack("効果音／お金");
+	fx.PushBack("効果音／はばたき");
+	fx.PushBack("効果音／ひっぱたく");
+	fx.PushBack("効果音／ふすま");
+	fx.PushBack("効果音／ぶつかる");
+	fx.PushBack("効果音／アラーム");
+	fx.PushBack("効果音／エロ１");
+	fx.PushBack("効果音／エロ１ループ");
+	fx.PushBack("効果音／エロ２");
+	fx.PushBack("効果音／エロ２ループ");
+	fx.PushBack("効果音／エロ３");
+	fx.PushBack("効果音／エロ３ループ");
+	fx.PushBack("効果音／エロ４");
+	fx.PushBack("効果音／エロ４ループ");
+	fx.PushBack("効果音／カメラ");
+	fx.PushBack("効果音／カメラ連続");
+	fx.PushBack("効果音／カートを引く");
+	fx.PushBack("効果音／コンピュータ");
+	fx.PushBack("効果音／コールブザー");
+	fx.PushBack("効果音／ジェットコースター");
+	fx.PushBack("効果音／スイッチ");
+	fx.PushBack("効果音／セクハラ");
+	fx.PushBack("効果音／チューリップ");
+	fx.PushBack("効果音／ツルハシ");
+	fx.PushBack("効果音／ドアベル");
+	fx.PushBack("効果音／ドットマトリクスプリンター");
+	fx.PushBack("効果音／ドリル");
+	fx.PushBack("効果音／ノック");
+	fx.PushBack("効果音／ヒビ");
+	fx.PushBack("効果音／ブザー");
+	fx.PushBack("効果音／プレッシャー");
+	fx.PushBack("効果音／メカ起動");
+	fx.PushBack("効果音／乾杯");
+	fx.PushBack("効果音／人間下ろす");
+	fx.PushBack("効果音／倒れる巨大");
+	fx.PushBack("効果音／出血");
+	fx.PushBack("効果音／刺す");
+	fx.PushBack("効果音／剣を抜く");
+	fx.PushBack("効果音／剣を構える");
+	fx.PushBack("効果音／包丁");
+	fx.PushBack("効果音／叩きつける");
+	fx.PushBack("効果音／呼び鈴");
+	fx.PushBack("効果音／呼び鈴２");
+	fx.PushBack("効果音／呼び鈴２連続");
+	fx.PushBack("効果音／咆哮");
+	fx.PushBack("効果音／喊声");
+	fx.PushBack("効果音／喊声遠く");
+	fx.PushBack("効果音／土砂崩れ");
+	fx.PushBack("効果音／地揺れ");
+	fx.PushBack("効果音／地面に叩きつける");
+	fx.PushBack("効果音／地鳴りループ");
+	fx.PushBack("効果音／堅い物を叩く");
+	fx.PushBack("効果音／天罰");
+	fx.PushBack("効果音／射精");
+	fx.PushBack("効果音／岩石");
+	fx.PushBack("効果音／崩落");
+	fx.PushBack("効果音／巨人一歩");
+	fx.PushBack("効果音／巨人歩く");
+	fx.PushBack("効果音／布を裂く");
+	fx.PushBack("効果音／弓矢");
+	fx.PushBack("効果音／弓矢連続");
+	fx.PushBack("効果音／弾ける（水）");
+	fx.PushBack("効果音／心臓");
+	fx.PushBack("効果音／必殺技");
+	fx.PushBack("効果音／情報屋入店");
+	fx.PushBack("効果音／戦争音ループ");
+	fx.PushBack("効果音／戦争音遠いループ");
+	fx.PushBack("効果音／戦車走る");
+	fx.PushBack("効果音／扉ガチャ");
+	fx.PushBack("効果音／扉軋み");
+	fx.PushBack("効果音／扉閉じる");
+	fx.PushBack("効果音／扉閉じる（強）");
+	fx.PushBack("効果音／扉開く");
+	fx.PushBack("効果音／扉開く（強）");
+	fx.PushBack("効果音／手を拍つ");
+	fx.PushBack("効果音／手裏剣弾かれる");
+	fx.PushBack("効果音／手裏剣投げ");
+	fx.PushBack("効果音／抱きつく");
+	fx.PushBack("効果音／掴む");
+	fx.PushBack("効果音／斬る");
+	fx.PushBack("効果音／机を叩く");
+	fx.PushBack("効果音／歩き去る");
+	fx.PushBack("効果音／歩み寄る");
+	fx.PushBack("効果音／殴る");
+	fx.PushBack("効果音／殴る＋蹴る");
+	fx.PushBack("効果音／殺到（大勢）");
+	fx.PushBack("効果音／水から上がる");
+	fx.PushBack("効果音／液体流れる");
+	fx.PushBack("効果音／火を付ける");
+	fx.PushBack("効果音／炎魔法");
+	fx.PushBack("効果音／炒め物");
+	fx.PushBack("効果音／焼き肉");
+	fx.PushBack("効果音／爆発（大）");
+	fx.PushBack("効果音／爆発（遠）");
+	fx.PushBack("効果音／物音（ごとごと）");
+	fx.PushBack("効果音／物音（Ｇハニー）");
+	fx.PushBack("効果音／発車メロディー");
+	fx.PushBack("効果音／着地");
+	fx.PushBack("効果音／着地２");
+	fx.PushBack("効果音／空振り");
+	fx.PushBack("効果音／空振り（複数）");
+	fx.PushBack("効果音／空振り（重）");
+	fx.PushBack("効果音／空間展開");
+	fx.PushBack("効果音／紅色破壊光線");
+	fx.PushBack("効果音／結界");
+	fx.PushBack("効果音／落ちる（紙）");
+	fx.PushBack("効果音／落雷");
+	fx.PushBack("効果音／藍色破壊光線");
+	fx.PushBack("効果音／衣擦れ");
+	fx.PushBack("効果音／衣擦れ２");
+	fx.PushBack("効果音／警報");
+	fx.PushBack("効果音／走っていく（大勢）");
+	fx.PushBack("効果音／走ってくる");
+	fx.PushBack("効果音／走ってくる（大勢）");
+	fx.PushBack("効果音／走り去る");
+	fx.PushBack("効果音／蹄");
+	fx.PushBack("効果音／蹴る");
+	fx.PushBack("効果音／蹴る（２回）");
+	fx.PushBack("効果音／軋む");
+	fx.PushBack("効果音／軍靴");
+	fx.PushBack("効果音／転がる");
+	fx.PushBack("効果音／転がる（重）");
+	fx.PushBack("効果音／連打コンボ");
+	fx.PushBack("効果音／連撃（剣）");
+	fx.PushBack("効果音／連続爆発");
+	fx.PushBack("効果音／部屋を荒らす");
+	fx.PushBack("効果音／金的");
+	fx.PushBack("効果音／鍔迫り合い");
+	fx.PushBack("効果音／鍔迫り合い（斧）");
+	fx.PushBack("効果音／鍔迫り合い（２回）");
+	fx.PushBack("効果音／鍔迫り斬り");
+	fx.PushBack("効果音／鎖");
+	fx.PushBack("効果音／鎧弾く連続");
+	fx.PushBack("効果音／鏡割れる");
+	fx.PushBack("効果音／開ける");
+	fx.PushBack("効果音／闇魔法");
+	fx.PushBack("効果音／電撃");
+	fx.PushBack("効果音／電車発車");
+	fx.PushBack("効果音／電車走る");
+	fx.PushBack("効果音／風ループ");
+	fx.PushBack("効果音／骨折れる");
+	fx.PushBack("効果音／鬼畜アタック");
+	fx.PushBack("効果音／魔法");
+	fx.PushBack("効果音／鳴き声（モンスター）");
+	fx.PushBack("効果音／黒色破壊光線");
+	int i;
+	選択肢(0, "フェードインアウトテスト", 0);
+	選択肢(1, "クロスフェードテスト", 0);
+	選択肢(2, "ボリュームキャップテスト", 0);
+	選択肢(3, "効果音テスト", 0);
+	switch (テスト選択())
+	{
+	case 0:
+		while (true)
+		{
+			■音楽(music[i % music.Numof()], 0);
+			++i;
+			キー待ち(false);
+			■音楽停止(3000);
+			キー待ち(false);
+		}
+		break;
+	case 1:
+		while (true)
+		{
+			string next = music[RAND(music.Numof()) - 1];
+			■音楽(next, 1500);
+			キー待ち(false);
+		}
+		break;
+	case 2:
+		■音楽(music[0], 0);
+		while (true)
+		{
+			VOICE("テスト／サウンド");
+			'TEST' A;
+			キー待ち(false);
+		}
+		break;
+	case 3:
+		■音楽(music[0], 0);
+		while (true)
+		{
+			■効果音(fx[i % fx.Numof()]);
+			++i;
+			キー待ち(false);
+		}
+		break;
+	}
+}
+
+void test_ScrollCgView()
+{
+	array@string n;
+	n.PushBack("イベント／その他／タイトル０１");
+	n.PushBack("イベント／リア／祈る０１");
+	n.PushBack("イベント／その他／タイトル０１");
+	n.PushBack("イベント／リア／祈る０１");
+	ScrollCgView view;
+	view.init(n);
+	view.fadeIn(true);
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+}
+
+void test_Button_ThumbnailClickCallback(int index)
+{
+	pass("click:%d" % index);
+}
+
+void test_Scene_AdvEditor()
+{
+	openAdvEditor();
+}
+
+void test_Scene_StandViewer()
+{
+	string key = "立ち絵オフセット";
+	int c = EX_Height(key);
+	int i;
+	for (i = 0; i < c; ++i)
+	{
+		string cg = EX_RA2String(key, i, "name", "");
+		openStandViewer(cg);
+	}
+}
+
+void test_Scene_AdvObjectListSelector()
+{
+	SceneAdvObjectListSelector scene;
+	scene.init(1, "");
+	scene.run();
+	runScene(scene.update);
+}
+
+void test_Scene_Cg()
+{
+	openCg();
+}
+
+void test_Scene_Replay()
+{
+	openReplay();
+}
+
+void test_MusicInfo()
+{
+	int count = g_musicInfo.Numof();
+	int i;
+	pass("%d" % count);
+	for (i = 0; i < count; ++i)
+	{
+		string n = "%s %s" % g_musicInfo[i].getId() % g_musicInfo[i].getSongName();
+		pass(n);
+	}
+}
+
+void test_Music_PanelView()
+{
+	MusicPanelView time;
+	time.init();
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		if (g_mouse.isClick(0))
+		{
+			if (g_music.getPlayingMusicId() == "")
+			{
+				g_music.play("", -2147483648, false);
+				time.start();
+			}
+			else
+			{
+				g_music.play("", -2147483648, false);
+				time.stop();
+			}
+		}
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+}
+
+void test_Music()
+{
+	int i;
+	for (i = 0; i < 100; ++i)
+	{
+		音楽(SYS_Sound_GetFileName(i), -1, -1);
+		キー待ち(false);
+	}
+}
+
+void test_Scene_Music()
+{
+	openMusic();
+}
+
+void test_SaveObjectList()
+{
+	SaveObjectList list;
+	list.init(true);
+	list.setOnClickCallback("test_SaveObjectListCallback");
+	while (true)
+	{
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+}
+
+void test_SaveObjectListCallback(int id)
+{
+	pass("clicked:%d" % id);
+}
+
+void test_Scene_Save()
+{
+	openSave();
+}
+
+void test_Scene_Load()
+{
+	openLoad();
+}
+
+void test_Scene_CgSwipeView()
+{
+	array@string n;
+	n.PushBack("イベント／その他／タイトル０１");
+	n.PushBack("イベント／リア／祈る０１");
+	n.PushBack("イベント／その他／タイトル０１");
+	n.PushBack("イベント／リア／祈る０１");
+	openCgSwipeView(n);
+}
+
+void test_Scene_GameOver()
+{
+	openGameOver();
+}
+
+void test_EXLoading_MirrorPiece()
+{
+	int i;
+	for (i = 0; i < g_mirrorPiece.Numof(); ++i)
+	{
+		string n = "%s %s %s" % g_mirrorPiece[i].getCgName(0) % g_mirrorPiece[i].getCompleteCgName() % g_mirrorPiece[i].getAdvFunctionName();
+		pass(n);
+	}
+}
+
+void test_Scene_MirrorPiece()
+{
+	openMirrorPiece();
+}
+
+void test_Scene_AliceLogo()
+{
+	openLogo();
+}
+
+void test_Scene_Enquite()
+{
+	openEnquite();
+}
+
+void test_OmakeMode_ThumbnailList()
+{
+	ThumbnailList list;
+	list.init(true);
+	while (true)
+	{
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+}
+

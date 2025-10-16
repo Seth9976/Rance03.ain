@@ -1,0 +1,79 @@
+TreasureBoxParam::TreasureBoxParam()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void TreasureBoxParam::init(string itemId)
+{
+	ref Item item = getItemFromId(itemId);
+	if (item !== NULL)
+	{
+		this.itemName_ = item.getName();
+	}
+	this.initParts();
+	this.setPartsPos();
+}
+
+void TreasureBoxParam::initParts()
+{
+	this.parts_[0].init("システム／戦闘／宝箱情報", 0);
+	if (this.itemName_ != "")
+	{
+		NumberPartsInfomation n;
+		n.setSameWidth(35);
+		this.parts_[1].initAsNumber("システム／数字／幅３５／白", n);
+		this.parts_[2].init("システム／戦闘／宝箱／パーセント", 0);
+		this.parts_[3].initAsText(this.itemName_, 30, true, 256, 255, 255, 255);
+	}
+	createPartsGroup(this.parent_, this.parts_, 3000);
+}
+
+void TreasureBoxParam::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void TreasureBoxParam::setPartsPos()
+{
+	this.parts_[0].setPos(0.0, 0.0);
+	this.parts_[1].setPos(141.0, 125.0);
+	this.parts_[2].setPos(141.0, 125.0);
+	this.parts_[1].setOrigin(1);
+	this.parts_[2].setOrigin(1);
+	this.parts_[3].setPos(141.0, 130.0);
+	this.parts_[3].setOrigin(8);
+}
+
+void TreasureBoxParam::update()
+{
+}
+
+void TreasureBoxParam::setParam(int num)
+{
+	this.num_ = num;
+	this.parts_[1].setNumber(this.num_);
+	int width = ("%d" % this.num_).Length() * 35 + this.parts_[2].getWidth();
+	this.parts_[1].setPos(141 - width / 2, 125.0);
+	this.parts_[2].setPos((141 + width / 2) - this.parts_[2].getWidth(), 125.0);
+}
+
+void TreasureBoxParam::fadeIn(bool val)
+{
+	this.setPartsShow();
+	PartsMotion m;
+	if (val)
+	{
+		m.setMove(-300, 0, 0, 0, 1);
+	}
+	else
+	{
+		m.setMove(0, 0, -300, 0, 1);
+	}
+	this.parent_.runMotion(m, NULL);
+}
+

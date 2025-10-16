@@ -1,0 +1,168 @@
+CAEPropertyComboBox::CAEPropertyComboBox()
+{
+	this.Init(0, NULL);
+}
+
+CAEPropertyComboBox::~CAEPropertyComboBox()
+{
+	this.Release();
+}
+
+void CAEPropertyComboBox::Init(int LayoutID, ref CAEInstanceItem Item)
+{
+	this.Release();
+	if (Item === NULL)
+	{
+		return;
+	}
+	this.m_Item <- Item;
+	this.m_Panel.Init(LayoutID);
+	this.m_Panel.AddKeyDownEvent(this.KeyDownEvent);
+	this.m_Panel.AddMouseWheelEvent(this.MouseWheelEvent);
+	this.m_Panel.AddChangeTextEvent(this.ChangeTextEvent);
+	this.m_Panel.AddMouseClickEvent(this.MouseLClickEvent);
+	int ID = this.m_Item.GetID();
+	float 太字幅;
+	float 縁取り幅;
+	int 種類;
+	int サイズ;
+	int 赤;
+	int 緑;
+	int 青;
+	int 縁取り赤;
+	int 縁取り緑;
+	int 縁取り青;
+	Ｐ＿コンボボックス＿フォント取得(ID, 種類, サイズ, 赤, 緑, 青, 太字幅, 縁取り赤, 縁取り緑, 縁取り青, 縁取り幅);
+	this.m_Panel.AddTextBoxItem("幅", string(AFL_Parts_GetWidth(ID, 1)), false);
+	this.m_Panel.AddTextBoxItem("高さ", string(AFL_Parts_GetHeight(ID, 1)), false);
+	this.m_Panel.AddTextBoxItem("マージン幅", string(Ｐ＿コンボボックス＿マージン幅取得(ID)), false);
+	this.m_Panel.AddTextBoxItem("マージン高さ", string(Ｐ＿コンボボックス＿マージン高さ取得(ID)), false);
+	this.m_Panel.AddTextBoxItem("ＣＧ名", Ｐ＿コンボボックス＿ＣＧ名取得(ID), true);
+	this.m_Panel.AddTextBoxItem("テキスト", Ｐ＿コンボボックス＿テキスト取得(ID), true);
+	this.m_Panel.AddButtonItem("フォント", "%s, サイズ[%d]" % PARTS_GetFontName(種類) % サイズ);
+}
+
+void CAEPropertyComboBox::Release()
+{
+	this.m_dgMouseWheelEvent.Clear();
+	this.m_dgKeyDownEvent.Clear();
+	this.m_Item <- NULL;
+	this.m_Panel.Release();
+}
+
+void CAEPropertyComboBox::KeyDownEvent(int ID, int KeyID)
+{
+	this.m_dgKeyDownEvent(ID, KeyID);
+}
+
+void CAEPropertyComboBox::MouseWheelEvent(int ID, int Forward, int Back)
+{
+	this.m_dgMouseWheelEvent(ID, Forward, Back);
+}
+
+void CAEPropertyComboBox::ChangeTextEvent(int ID)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	if (Item.GetLabel() == "幅")
+	{
+		Ｐ＿コンボボックス＿サイズ設定(PartsID, Item.GetTextBoxInt(), AFL_Parts_GetHeight(PartsID, 1));
+	}
+	else if (Item.GetLabel() == "高さ")
+	{
+		Ｐ＿コンボボックス＿サイズ設定(PartsID, AFL_Parts_GetWidth(PartsID, 1), Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "マージン幅")
+	{
+		Ｐ＿コンボボックス＿マージン設定(PartsID, Item.GetTextBoxInt(), Ｐ＿コンボボックス＿マージン高さ取得(PartsID));
+	}
+	else if (Item.GetLabel() == "マージン高さ")
+	{
+		Ｐ＿コンボボックス＿マージン設定(PartsID, Ｐ＿コンボボックス＿マージン幅取得(PartsID), Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "ＣＧ名")
+	{
+		Ｐ＿コンボボックス＿ＣＧ名設定(PartsID, Item.GetTextBoxText());
+	}
+	else if (Item.GetLabel() == "テキスト")
+	{
+		Ｐ＿コンボボックス＿テキスト設定(PartsID, Item.GetTextBoxText());
+	}
+}
+
+void CAEPropertyComboBox::MouseLClickEvent(int ID, int MouseX, int MouseY)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	if (Item.GetLabel() == "フォント")
+	{
+		float 太字幅;
+		float 縁取り幅;
+		int 種類;
+		int サイズ;
+		int 赤;
+		int 緑;
+		int 青;
+		int 縁取り赤;
+		int 縁取り緑;
+		int 縁取り青;
+		Ｐ＿コンボボックス＿フォント取得(PartsID, 種類, サイズ, 赤, 緑, 青, 太字幅, 縁取り赤, 縁取り緑, 縁取り青, 縁取り幅);
+		CASCharSpriteProperty Font;
+		Font.SetType(種類);
+		Font.SetSize(サイズ);
+		Font.SetColor(CF_CASColor(赤, 緑, 青, 255));
+		Font.SetBoldWeight(太字幅);
+		Font.SetEdgeWeight(縁取り幅);
+		Font.SetEdgeColor(CF_CASColor(縁取り赤, 縁取り緑, 縁取り青, 255));
+		CAESelectFontDialog Form;
+		Form.Show(ID, MouseX, MouseY, Font, this.ChangedFontEvent);
+	}
+}
+
+void CAEPropertyComboBox::ChangedFontEvent(int ID, ref CASCharSpriteProperty Font)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	CASColor Color;
+	Color = Font.GetColor();
+	CASColor EdgeColor;
+	EdgeColor = Font.GetEdgeColor();
+	if (Item.GetLabel() == "フォント")
+	{
+		Ｐ＿コンボボックス＿フォント設定(PartsID, Font.GetType(), Font.GetSize(), Color.GetR(), Color.GetG(), Color.GetB(), Font.GetBoldWeight(), EdgeColor.GetR(), EdgeColor.GetG(), EdgeColor.GetB(), Font.GetEdgeWeight());
+		Item.SetButtonText("%s, サイズ[%d]" % PARTS_GetFontName(Font.GetType()) % Font.GetSize());
+	}
+}
+
+void CAEPropertyComboBox::AddKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent += DelegateObject;
+}
+
+void CAEPropertyComboBox::EraseKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent -= DelegateObject;
+}
+
+void CAEPropertyComboBox::AddMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent += DelegateObject;
+}
+
+void CAEPropertyComboBox::EraseMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent -= DelegateObject;
+}
+

@@ -1,0 +1,65 @@
+MemoView::MemoView()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void MemoView::init(string memoText)
+{
+	array@string n;
+	splitToken(n, memoText, "|");
+	int c = Math.Min(2, n.Numof());
+	this.parts_[0].init("システム／キャンプ／メモ", 0);
+	int i;
+	for (i = 0; i < c; ++i)
+	{
+		this.parts_[1 + i].initAsText(n[i], 32, false, 256, 254, 246, 230);
+	}
+	createPartsGroup(this.parent_, this.parts_, 4100);
+	this.setPartsPos();
+}
+
+void MemoView::initParts()
+{
+}
+
+void MemoView::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void MemoView::setPartsPos()
+{
+	this.parts_[0].setPos(-19.0, -50.0);
+	int i;
+	for (i = 0; i < 2; ++i)
+	{
+		this.parts_[1 + i].setPos(97.0, 58 + i * 26);
+	}
+}
+
+void MemoView::update()
+{
+}
+
+void MemoView::fadeIn(bool val)
+{
+	this.setPartsShow();
+	PartsMotion m;
+	if (val)
+	{
+		m.setMove(0, -400, 0, 0, 2);
+		m.setTime(300);
+	}
+	else
+	{
+		m.setMove(0, 0, 0, -400, 1);
+		m.setTime(100);
+	}
+	this.parent_.runMotion(m, NULL);
+}
+

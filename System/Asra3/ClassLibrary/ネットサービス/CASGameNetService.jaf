@@ -1,0 +1,289 @@
+CASGameNetService::CASGameNetService()
+{
+	this.m_UserIDFileID = 826366246;
+	this.m_ServerURL = "http://game.lan.alicesoft.com/gamename/";
+}
+
+void CASGameNetService::SetServerURL(string ServerURL)
+{
+	this.m_ServerURL = ServerURL;
+}
+
+bool CASGameNetService::IsExistUserID()
+{
+	string UserIDFileName = this.GetUserIDFileName();
+	if (!system.ExistFile(UserIDFileName))
+	{
+		return false;
+	}
+	int UserID;
+	if (!this.LoadUserIDFile(UserID))
+	{
+		return false;
+	}
+	this.SetUserID(UserID);
+	return true;
+}
+
+bool CASGameNetService::BeginCreateUserID()
+{
+	if (this.IsExistUserID())
+	{
+		return false;
+	}
+	string URL = this.m_ServerURL + "createuserid.php";
+	string Param;
+	if (!HTTPDownloader.Post(URL, Param))
+	{
+		return false;
+	}
+	return true;
+}
+
+bool CASGameNetService::IsEndCreateUserID()
+{
+	if (HTTPDownloader.IsRun())
+	{
+		return false;
+	}
+	return true;
+}
+
+void CASGameNetService::StopCreateUserID()
+{
+	HTTPDownloader.Stop();
+}
+
+bool CASGameNetService::EndCreateUserID()
+{
+	for (; ; )
+	{
+		if (!HTTPDownloader.IsRun())
+		{
+			break;
+		}
+		AFL_View_Update(true);
+	}
+	int ReadSize = HTTPDownloader.GetReadSize();
+	if (ReadSize <= 0)
+	{
+		return false;
+	}
+	string ResultText;
+	if (!HTTPDownloader.ReadString(ResultText))
+	{
+		return false;
+	}
+	if (ResultText.Empty())
+	{
+		return false;
+	}
+	if (!HTTPDownloader.DecodeString(ResultText))
+	{
+		return false;
+	}
+	if (!HTTPDownloader.UTF8ToSJIS(ResultText))
+	{
+		return false;
+	}
+	if (ResultText.GetPart(0, 6) == "ERROR=")
+	{
+		return false;
+	}
+	if (ResultText.GetPart(0, 7) != "USERID=")
+	{
+		return false;
+	}
+	int UserID = ResultText.GetPart(7, ResultText.Length()).Int();
+	if (!this.SaveUserIDFile(UserID))
+	{
+		return false;
+	}
+	this.SetUserID(UserID);
+	return true;
+}
+
+string CASGameNetService::GetUserIDFileName()
+{
+	return system.GetSaveFolderName() + "\\" + "NetUserID.vsf";
+}
+
+bool CASGameNetService::LoadUserIDFile(ref int UserID)
+{
+	string UserIDFileName = this.GetUserIDFileName();
+	if (!VSFile.OpenForRead(UserIDFileName))
+	{
+		return false;
+	}
+	int ID;
+	if (!VSFile.ReadInt(ID))
+	{
+		VSFile.Close();
+		return false;
+	}
+	if (ID != this.m_UserIDFileID)
+	{
+		VSFile.Close();
+		return false;
+	}
+	int Version;
+	if (!VSFile.ReadInt(Version))
+	{
+		VSFile.Close();
+		return false;
+	}
+	if (Version != 0)
+	{
+		VSFile.Close();
+		return false;
+	}
+	if (!VSFile.ReadInt(UserID))
+	{
+		VSFile.Close();
+		return false;
+	}
+	if (!VSFile.Close())
+	{
+		return false;
+	}
+	return true;
+}
+
+bool CASGameNetService::SaveUserIDFile(int UserID)
+{
+	string UserIDFileName = this.GetUserIDFileName();
+	if (!VSFile.OpenForWrite(UserIDFileName))
+	{
+		return false;
+	}
+	if (!VSFile.WriteInt(this.m_UserIDFileID))
+	{
+		VSFile.Close();
+		return false;
+	}
+	if (!VSFile.WriteInt(0))
+	{
+		VSFile.Close();
+		return false;
+	}
+	if (!VSFile.WriteInt(UserID))
+	{
+		VSFile.Close();
+		return false;
+	}
+	if (!VSFile.Close())
+	{
+		return false;
+	}
+	return true;
+}
+
+void CASGameNetService::SetUserID(int UserID)
+{
+	this.m_UserID = UserID;
+}
+
+string CASGameNetService::TransDelimiter(string Text)
+{
+	if (Text.Empty())
+	{
+		return "";
+	}
+	string Result;
+	for (; ; )
+	{
+		int HitIndex = Text.Find(",");
+		if (HitIndex == -1)
+		{
+			Result += Text;
+			break;
+		}
+		Result += Text.GetPart(0, HitIndex);
+		Result += "，";
+		Text = Text.GetPart(HitIndex + 1, Text.Length());
+	}
+	return Result;
+}
+
+bool CASGameNetService::BeginSendCommand(string Command, array@string ParamList)
+{
+	if (!this.IsExistUserID())
+	{
+		return false;
+	}
+	string URL = this.m_ServerURL + Command + ".php";
+	string Param = "%d" % this.m_UserID;
+	int n;
+	for (n = 0; n < ParamList.Numof(); n++)
+	{
+		Param += "," + this.TransDelimiter(ParamList[n]);
+	}
+	if (!HTTPDownloader.SJISToUTF8(Param))
+	{
+		return false;
+	}
+	if (!HTTPDownloader.EncodeString(Param))
+	{
+		return false;
+	}
+	if (!HTTPDownloader.Post(URL, "param=" + Param))
+	{
+		return false;
+	}
+	return true;
+}
+
+bool CASGameNetService::IsEndSendCommand()
+{
+	if (HTTPDownloader.IsRun())
+	{
+		return false;
+	}
+	return true;
+}
+
+void CASGameNetService::StopSendCommand()
+{
+	HTTPDownloader.Stop();
+}
+
+bool CASGameNetService::EndSendCommand(ref string Result)
+{
+	for (; ; )
+	{
+		if (!HTTPDownloader.IsRun())
+		{
+			break;
+		}
+		AFL_View_Update(true);
+	}
+	int ReadSize = HTTPDownloader.GetReadSize();
+	if (ReadSize <= 0)
+	{
+		return false;
+	}
+	string ResultText;
+	if (!HTTPDownloader.ReadString(ResultText))
+	{
+		return false;
+	}
+	if (ResultText.Empty())
+	{
+		return false;
+	}
+	if (!HTTPDownloader.DecodeString(ResultText))
+	{
+		return false;
+	}
+	if (!HTTPDownloader.UTF8ToSJIS(ResultText))
+	{
+		return false;
+	}
+	if (ResultText.GetPart(0, 6) == "ERROR=")
+	{
+		return false;
+	}
+	Result = ResultText;
+	return true;
+}
+

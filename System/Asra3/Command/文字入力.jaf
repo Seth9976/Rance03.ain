@@ -1,0 +1,86 @@
+void 文字入力エリア(int Ｉ番号, int Ｘ, int Ｙ, int Ｚ, string ＣＧ名)
+{
+	if (Ｉ番号 != 0)
+	{
+		SYS_ASSERTE_AREA_ID(Ｉ番号);
+		SYS_文字入力エリア(Ｉ番号, Ｘ, Ｙ, Ｚ, ＣＧ名);
+		return;
+	}
+	for (Ｉ番号 = 1; Ｉ番号 < 40; ++Ｉ番号)
+	{
+		SYS_文字入力エリア(Ｉ番号, Ｘ, Ｙ, Ｚ, ＣＧ名);
+	}
+}
+
+void 文字入力エリア２(int Ｉ番号, int 幅, int 高, int 塗Ｒ, int 塗Ｇ, int 塗Ｂ, int 塗率, int 枠タイプ, int 枠Ｒ, int 枠Ｇ, int 枠Ｂ)
+{
+	if (幅 != -2147483648 && 高 != -2147483648)
+	{
+		SYS_ASSERTE_SIZE(幅, 高);
+	}
+	if (Ｉ番号 != 0)
+	{
+		SYS_ASSERTE_AREA_ID(Ｉ番号);
+		SYS_文字入力エリア２(Ｉ番号, 幅, 高, 塗Ｒ, 塗Ｇ, 塗Ｂ, 塗率, 枠タイプ, 枠Ｒ, 枠Ｇ, 枠Ｂ);
+		return;
+	}
+	for (Ｉ番号 = 1; Ｉ番号 < 40; ++Ｉ番号)
+	{
+		SYS_文字入力エリア２(Ｉ番号, 幅, 高, 塗Ｒ, 塗Ｇ, 塗Ｂ, 塗率, 枠タイプ, 枠Ｒ, 枠Ｇ, 枠Ｂ);
+	}
+}
+
+void 文字入力エリア文字(int Ｉ番号, int サイズ, int フォント, int Ｒ, int Ｇ, int Ｂ, int Ｘ, int Ｙ)
+{
+	if (Ｉ番号 != 0)
+	{
+		SYS_ASSERTE_AREA_ID(Ｉ番号);
+		SYS_文字入力エリア文字(Ｉ番号, サイズ, フォント, Ｒ, Ｇ, Ｂ, Ｘ, Ｙ);
+		return;
+	}
+	for (Ｉ番号 = 1; Ｉ番号 < 40; ++Ｉ番号)
+	{
+		SYS_文字入力エリア文字(Ｉ番号, サイズ, フォント, Ｒ, Ｇ, Ｂ, Ｘ, Ｙ);
+	}
+}
+
+void 文字入力エリア文字飾り(int Ｉ番号, int 上太さ, int 右太さ, int 下太さ, int 左太さ, int Ｒ, int Ｇ, int Ｂ)
+{
+	if (Ｉ番号 != 0)
+	{
+		SYS_ASSERTE_AREA_ID(Ｉ番号);
+		SYS_文字入力エリア文字飾り(Ｉ番号, 上太さ, 右太さ, 下太さ, 左太さ, Ｒ, Ｇ, Ｂ);
+		return;
+	}
+	for (Ｉ番号 = 1; Ｉ番号 < 40; ++Ｉ番号)
+	{
+		SYS_文字入力エリア文字飾り(Ｉ番号, 上太さ, 右太さ, 下太さ, 左太さ, Ｒ, Ｇ, Ｂ);
+	}
+}
+
+void 文字入力エリアクリッピング文字数設定(int nIndex, int nMaxLengthSJIS)
+{
+	if (nIndex != 0)
+	{
+		SYS_ASSERTE_AREA_ID(nIndex);
+		SYS_文字入力エリアクリッピング文字数設定(nIndex, nMaxLengthSJIS);
+	}
+	else
+	{
+		for (nIndex = 1; nIndex < 40; nIndex++)
+		{
+			SYS_文字入力エリアクリッピング文字数設定(nIndex, nMaxLengthSJIS);
+		}
+	}
+}
+
+void 文字入力(int Ｉ番号, ref string tx)
+{
+	SYS_文字入力(Ｉ番号, tx, true);
+}
+
+void 半角文字入力(int Ｉ番号, ref string tx)
+{
+	SYS_文字入力(Ｉ番号, tx, false);
+}
+

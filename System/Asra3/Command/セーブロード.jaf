@@ -1,0 +1,57 @@
+void Ｓ＿セーブ()
+{
+	Ａ＿サウンド状態保存(false);
+	CSampleSaveView SampleSaveView;
+	SampleSaveView.Run();
+	Ａ＿サウンド状態復帰();
+}
+
+void Ｓ＿ロード()
+{
+	Ａ＿サウンド状態保存(false);
+	CSampleLoadView SampleLoadView;
+	SampleLoadView.Run();
+	Ａ＿サウンド状態復帰();
+}
+
+void Ｓ＿簡易セーブ()
+{
+	if (AFL_GetConfigQuickSaveConfirm())
+	{
+	}
+	SYS_セーブ実行(-1, _ゲーム時間, "");
+}
+
+void Ｓ＿簡易ロード()
+{
+	if (AFL_GetConfigQuickSaveConfirm())
+	{
+	}
+	if (!system.ExistSaveFile(SYS_セーブファイル名(-1)))
+	{
+		return;
+	}
+	CASTimer Timer;
+	Timer.Reset();
+	while (Timer.Get() < 300)
+	{
+		AFL_View_Update(true);
+	}
+	SYS_ロード実行(-1);
+}
+
+bool クイックセーブファイル存在確認()
+{
+	return g_bExistQuickSaveFile;
+}
+
+void 共有セーブ()
+{
+	SYS_共有セーブ();
+}
+
+void ゲーム時間(string ゲーム時間文字列)
+{
+	_ゲーム時間 = ゲーム時間文字列;
+}
+

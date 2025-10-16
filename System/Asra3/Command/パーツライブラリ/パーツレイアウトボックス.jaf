@@ -1,0 +1,112 @@
+void Ｐ＿レイアウトボックス＿レイアウトタイプ設定(int パーツ番号, int 種類)
+{
+	PartsEngine.SetLayoutBoxLayoutType(パーツ番号, 種類);
+}
+
+int Ｐ＿レイアウトボックス＿レイアウトタイプ取得(int パーツ番号)
+{
+	return PartsEngine.GetLayoutBoxLayoutType(パーツ番号);
+}
+
+void Ｐ＿レイアウトボックス＿折り返し設定(int パーツ番号, bool 許可, float サイズ)
+{
+	PartsEngine.SetLayoutBoxReturn(パーツ番号, 許可, サイズ);
+}
+
+bool Ｐ＿レイアウトボックス＿折り返し設定取得(int パーツ番号)
+{
+	return PartsEngine.IsLayoutBoxReturn(パーツ番号);
+}
+
+float Ｐ＿レイアウトボックス＿折り返しサイズ取得(int パーツ番号)
+{
+	return PartsEngine.GetLayoutBoxReturnSize(パーツ番号);
+}
+
+void Ｐ＿レイアウトボックス＿折り返しサイズレート設定(int パーツ番号, bool 許可)
+{
+	PartsEngine.SetLayoutBoxReturnSizeForRate(パーツ番号, 許可);
+}
+
+bool Ｐ＿レイアウトボックス＿折り返しサイズレート設定取得(int パーツ番号)
+{
+	return PartsEngine.IsLayoutBoxReturnSizeForRate(パーツ番号);
+}
+
+void Ｐ＿レイアウトボックス＿配置設定(int パーツ番号, int 配置種類)
+{
+	PartsEngine.SetLayoutBoxAlign(パーツ番号, 配置種類);
+}
+
+int Ｐ＿レイアウトボックス＿配置設定取得(int パーツ番号)
+{
+	return PartsEngine.GetLayoutBoxAlign(パーツ番号);
+}
+
+bool Ｐ＿レイアウトボックス＿存在確認(int パーツ番号, int 番号)
+{
+	PARTS_SetComponentType(パーツ番号, 8, 1);
+	return Ｐ＿子存在確認(パーツ番号, 番号);
+}
+
+void Ｐ＿レイアウトボックス＿全解放(int パーツ番号)
+{
+	PARTS_SetComponentType(パーツ番号, 8, 1);
+	Ｐ＿子全解放(パーツ番号);
+}
+
+void Ｐ＿レイアウトボックス＿追加(int パーツ番号, int 番号)
+{
+	PARTS_SetComponentType(パーツ番号, 8, 1);
+	Ｐ＿子追加(パーツ番号, 番号);
+}
+
+void Ｐ＿レイアウトボックス＿挿入(int パーツ番号, int インデックス, int 番号)
+{
+	PARTS_SetComponentType(パーツ番号, 8, 1);
+	Ｐ＿子挿入(パーツ番号, インデックス, 番号);
+}
+
+void Ｐ＿レイアウトボックス＿解放(int パーツ番号, int 番号)
+{
+	PARTS_SetComponentType(パーツ番号, 8, 1);
+	Ｐ＿子解放(パーツ番号, 番号);
+}
+
+int Ｐ＿レイアウトボックス＿個数取得(int パーツ番号)
+{
+	PARTS_SetComponentType(パーツ番号, 8, 1);
+	return Ｐ＿子数取得(パーツ番号);
+}
+
+int Ｐ＿レイアウトボックス＿番号取得(int パーツ番号, int インデックス)
+{
+	PARTS_SetComponentType(パーツ番号, 8, 1);
+	return Ｐ＿子取得(パーツ番号, インデックス);
+}
+
+void Ｐ＿レイアウトボックス＿パディング設定(int パーツ番号, int 上パディング, int 下パディング, int 左パディング, int 右パディング)
+{
+	PartsEngine.SetLayoutBoxPadding(パーツ番号, 上パディング, 下パディング, 左パディング, 右パディング);
+}
+
+int Ｐ＿レイアウトボックス＿上パディング取得(int パーツ番号)
+{
+	return PartsEngine.GetLayoutBoxPaddingTop(パーツ番号);
+}
+
+int Ｐ＿レイアウトボックス＿下パディング取得(int パーツ番号)
+{
+	return PartsEngine.GetLayoutBoxPaddingBottom(パーツ番号);
+}
+
+int Ｐ＿レイアウトボックス＿左パディング取得(int パーツ番号)
+{
+	return PartsEngine.GetLayoutBoxPaddingLeft(パーツ番号);
+}
+
+int Ｐ＿レイアウトボックス＿右パディング取得(int パーツ番号)
+{
+	return PartsEngine.GetLayoutBoxPaddingRight(パーツ番号);
+}
+

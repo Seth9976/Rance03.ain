@@ -1,0 +1,309 @@
+VerticalScroller::VerticalScroller()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+	this.state_ = 0;
+}
+
+void VerticalScroller::init(int x, int y, int width, int height, int virtualHeight, int wheelScrollPixel, bool isVertical)
+{
+	this.x_ = x;
+	this.y_ = y;
+	this.width_ = width;
+	this.height_ = height;
+	this.virtualScrollSize_ = virtualHeight;
+	this.wheelScrollPixel_ = wheelScrollPixel;
+	this.isVertical_ = isVertical;
+	this.wheelScrollTime_ = 300;
+	this.motionType_ = 1;
+	this.parent_.initAsDummy();
+	this.parent_.setShow(true);
+}
+
+void VerticalScroller::setScrollType(int time, int type)
+{
+	this.wheelScrollTime_ = time;
+	this.motionType_ = type;
+}
+
+void VerticalScroller::changeVirtualHeight(int virtualHeight)
+{
+	this.virtualScrollSize_ = Math.Max(0, virtualHeight);
+	if (this.virtualScrollSize_ == 0)
+	{
+		if (this.getRealPosition() < 0.0)
+		{
+			this.state_ = 6;
+			this.rpWheelStartPos_ = this.getRealPosition();
+			this.rpWheelEndPos_ = 0;
+			this.timer_.reset();
+		}
+	}
+	else if (this.getRealPosition() < -this.virtualScrollSize_)
+	{
+		this.state_ = 6;
+		this.rpWheelStartPos_ = this.getRealPosition();
+		this.rpWheelEndPos_ = -this.virtualScrollSize_;
+		this.timer_.reset();
+	}
+}
+
+int VerticalScroller::getPartsNumber()
+{
+	return this.parent_.getPartsNumber();
+}
+
+void VerticalScroller::update()
+{
+	if (this.virtualScrollSize_ == 0 && this.state_ != 6)
+	{
+		return;
+	}
+	switch (this.state_)
+	{
+	case 4:
+		if (this.timer_.getTime() < this.rollOverTime_)
+		{
+			float val = getMotionValue(1, this.rpRollOverStart_, this.rpRollOverDest_, float(this.timer_.getTime()) / float(this.rollOverTime_));
+			if (this.setValiableRangeF(val))
+			{
+				this.state_ = 0;
+			}
+			this.setRealPosition(val);
+		}
+		else
+		{
+			this.setRealPosition(this.rpRollOverDest_);
+			this.state_ = 0;
+		}
+	case 0:
+		if (g_mouse.onDown(0) && g_mouse.getFocusedObjectId() == -1)
+		{
+			if (this.isInRect())
+			{
+				this.state_ = 1;
+				this.rpDragStartX_ = g_mouse.getX();
+				this.rpDragStartY_ = g_mouse.getY();
+				this.rpDragStartParentPartsPos_ = this.getRealPosition();
+			}
+		}
+		if (g_mouse.getWheel() != 0 && this.isInRect())
+		{
+			this.startWheel(g_mouse.getWheel() < 0);
+		}
+		break;
+	case 5:
+		if (g_mouse.getWheel() != 0 && this.isInRect())
+		{
+			this.startWheel(g_mouse.getWheel() < 0);
+		}
+		if (this.timer_.getTime() < this.wheelScrollTime_)
+		{
+			float val = getMotionValue(this.motionType_, this.rpWheelStartPos_, this.rpWheelEndPos_, float(this.timer_.getTime()) / float(this.wheelScrollTime_));
+			this.setRealPosition(val);
+		}
+		else
+		{
+			this.setRealPosition(this.rpWheelEndPos_);
+			this.state_ = 0;
+		}
+		break;
+	case 1:
+		if (!g_mouse.isDown(0))
+		{
+			this.state_ = 0;
+			this.snap();
+		}
+		if (Math.Abs(this.rpDragStartX_ - g_mouse.getX()) > 10 || Math.Abs(this.rpDragStartY_ - g_mouse.getY()) > 10)
+		{
+			this.state_ = 2;
+			g_mouse.setNextMouseUpIgnore();
+		}
+		break;
+	case 2:
+		int d = this.getDragDistance();
+		int pos = this.rpDragStartParentPartsPos_ + d;
+		this.setValiableRange(pos);
+		this.setRealPosition(pos);
+		if (!g_mouse.isDown(0))
+		{
+			this.state_ = 0;
+			this.rollOverValue_ = this.getMouseAccelaration();
+			if (Math.Abs(this.rollOverValue_) > 2)
+			{
+				this.timer_.reset();
+				this.rollOverTime_ = 100 + Math.Min(Math.Abs(this.rollOverValue_) * 50, 1000);
+				this.rpRollOverStart_ = this.getRealPosition();
+				this.rpRollOverDest_ = this.getNearlySnapPosition(this.rpRollOverStart_ + this.rollOverValue_ * 50);
+				this.state_ = 4;
+			}
+			else
+			{
+				this.snap();
+			}
+		}
+		break;
+	case 6:
+		if (this.timer_.getTime() < this.wheelScrollTime_)
+		{
+			float val = getMotionValue(this.motionType_, this.rpWheelStartPos_, this.rpWheelEndPos_, float(this.timer_.getTime()) / float(this.wheelScrollTime_));
+			this.setRealPosition(val);
+		}
+		else
+		{
+			this.setRealPosition(this.rpWheelEndPos_);
+			this.state_ = 0;
+		}
+		break;
+	}
+}
+
+void VerticalScroller::startWheel(bool isBackward)
+{
+	this.rpWheelStartPos_ = this.getRealPosition();
+	if (isBackward && this.rpWheelStartPos_ == -this.virtualScrollSize_)
+	{
+		return;
+	}
+	if (!isBackward && this.rpWheelStartPos_ == 0)
+	{
+		return;
+	}
+	if (this.state_ == 5)
+	{
+		this.rpWheelEndPos_ = this.rpWheelEndPos_ + (isBackward ? -this.wheelScrollPixel_ : this.wheelScrollPixel_);
+	}
+	else
+	{
+		this.rpWheelEndPos_ = this.rpWheelStartPos_ + (isBackward ? -this.wheelScrollPixel_ : this.wheelScrollPixel_);
+	}
+	this.rpWheelEndPos_ = this.getNearlySnapPosition(this.rpWheelEndPos_);
+	this.setValiableRange(this.rpWheelEndPos_);
+	this.timer_.reset();
+	this.state_ = 5;
+}
+
+void VerticalScroller::setValiableRange(ref int value)
+{
+	if (value > 0)
+	{
+		value = 0;
+	}
+	if (value < -this.virtualScrollSize_)
+	{
+		value = -this.virtualScrollSize_;
+	}
+}
+
+bool VerticalScroller::setValiableRangeF(ref float value)
+{
+	bool isAdjusted = false;
+	if (value > 0.0)
+	{
+		isAdjusted = true;
+		value = 0.0;
+	}
+	if (value < -this.virtualScrollSize_)
+	{
+		isAdjusted = true;
+		value = -this.virtualScrollSize_;
+	}
+	return isAdjusted;
+}
+
+float VerticalScroller::getNearlySnapPosition(int val)
+{
+	float v = float(val) / float(this.wheelScrollPixel_);
+	int vv = roundOff(v) * this.wheelScrollPixel_;
+	return vv;
+}
+
+void VerticalScroller::setRealPosition(float value)
+{
+	if (this.isVertical_)
+	{
+		this.parent_.setPos(0.0, value);
+	}
+	else
+	{
+		this.parent_.setPos(value, 0.0);
+	}
+}
+
+float VerticalScroller::getRealPosition()
+{
+	if (this.isVertical_)
+	{
+		return this.parent_.getY();
+	}
+	return this.parent_.getX();
+}
+
+bool VerticalScroller::isInRect()
+{
+	int mx = g_mouse.getX();
+	int my = g_mouse.getY();
+	return this.x_ <= mx && mx <= this.x_ + this.width_ && this.y_ <= my && my <= this.y_ + this.height_;
+}
+
+void VerticalScroller::setPos(float pos)
+{
+	int v = -pos;
+	this.setValiableRange(v);
+	this.setRealPosition(-pos);
+}
+
+int VerticalScroller::getDragDistance()
+{
+	if (this.isVertical_)
+	{
+		return g_mouse.getY() - this.rpDragStartY_;
+	}
+	return g_mouse.getX() - this.rpDragStartX_;
+}
+
+float VerticalScroller::getMouseAccelaration()
+{
+	if (this.isVertical_)
+	{
+		return g_mouse.getAccelarationY();
+	}
+	return g_mouse.getAccelarationX();
+}
+
+void VerticalScroller::scrollTo(float pos)
+{
+	this.rpWheelStartPos_ = this.getRealPosition();
+	this.rpWheelEndPos_ = -pos;
+	this.setValiableRange(this.rpWheelEndPos_);
+	this.timer_.reset();
+	this.state_ = 5;
+}
+
+void VerticalScroller::snap()
+{
+	this.rpWheelStartPos_ = this.getRealPosition();
+	this.rpWheelEndPos_ = this.getNearlySnapPosition(this.rpWheelStartPos_);
+	this.timer_.reset();
+	this.state_ = 5;
+}
+
+float VerticalScroller::getMoveToDestination()
+{
+	if (this.state_ == 5)
+	{
+		return this.rpWheelEndPos_;
+	}
+	return this.getRealPosition();
+}
+
+float VerticalScroller::getCurrentPosition()
+{
+	int v = -this.getRealPosition();
+	return Math.MinF(Math.MaxF(0.0, v), this.virtualScrollSize_);
+}
+
+void VerticalScroller::forceWheel(bool isBackward)
+{
+	this.startWheel(isBackward);
+}
+

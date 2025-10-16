@@ -1,0 +1,15 @@
+void test_Scene_Title()
+{
+	openTitle();
+}
+
+void test_NetworkConnection()
+{
+	openNetworkConnection();
+}
+
+void test_EnquiteSendValue()
+{
+	g_enquiteSender.checkValue();
+}
+

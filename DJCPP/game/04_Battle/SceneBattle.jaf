@@ -1,0 +1,794 @@
+SceneBattle::SceneBattle()
+{
+	this.isFinish_ = false;
+}
+
+void SceneBattle::init(BattleInfomation info)
+{
+	this.battleBackGroundId_ = info.getBattleBackGroundId();
+	info.getMonsterId(this.monsterIds_);
+	this.battleModel_.setCallbackOnEraseMonster(this.onEraseMonster);
+	this.battleModel_.setCallbackOnChangeMonster(this.onChangeMonster);
+	this.battleModel_.setCallbackOnAddMonster(this.onAddMonster);
+	this.battleModel_.init(this.monsterIds_);
+	this.playerViewGroup_.init();
+	this.monsterViewGroup_.init(this.battleModel_, this.battleBackGroundId_);
+	this.btnSystem_.init();
+	this.btnSystem_.setOnClickCallback(this.onClickBattleSystemButton);
+	this.selector_.init();
+	this.selector_.setOnChangeHoverIndex(this.onChangeSkillSelectorHoverIndex);
+	this.log_.init();
+	this.bg_.init(this.battleBackGroundId_, info.getEffectFlatName());
+	this.tutorialView_.init(g_party.getCount());
+	this.treasureBox_.init(g_battleResult.getItemId());
+	this.treasureBox_.setParam(g_battleResult.getItemProbability());
+}
+
+void SceneBattle::run()
+{
+	this.battleModel_.run();
+	this.fadeObject(true, this.onFinishFadeIn);
+	this.playBattleJoinVoice();
+}
+
+void SceneBattle::onFinishFadeIn()
+{
+	this.setControlEnable(false);
+	this.selector_.updateCoolTime();
+	this.monsterViewGroup_.showName(this.startBattle);
+}
+
+void SceneBattle::fadeObject(bool val, DG_GeneralCallback cb)
+{
+	this.selector_.fadeIn(val);
+	this.bg_.fadeIn(val);
+	this.log_.fadeIn(val);
+	if (!this.bg_.isUseFlat())
+	{
+		this.treasureBox_.fadeIn(val);
+	}
+	this.playerViewGroup_.fadeIn(val);
+	if (val)
+	{
+		this.monsterViewGroup_.resetPosition(NULL);
+	}
+	this.timerFadeIn_.setTimer(val ? 1000 : 350, cb);
+}
+
+void SceneBattle::startBattle()
+{
+	if (this.isMonsterSurprizeAttack())
+	{
+		this.setControlEnable(false);
+		this.startMonsterAction();
+	}
+	else
+	{
+		g_sysSound.play(6, "効果音／プレイヤーターン");
+		this.innerOpenFlat("システム／戦闘／プレイヤーターン", 200);
+		this.tutorialView_.fadeIn(true);
+		this.setControlEnable(true);
+	}
+	this.callOnBattleStartCallback();
+	this.playerViewGroup_.updateHp();
+}
+
+bool SceneBattle::update()
+{
+	return !this.isFinish_;
+}
+
+void SceneBattle::onClickBattleSystemButton(int id)
+{
+	this.tutorialView_.fadeIn(false);
+	switch (id)
+	{
+	case 0:
+		this.setControlEnable(false);
+		this.startPlayerAction();
+		break;
+	case 1:
+		g_gameObjectManager.pushScene();
+		FullScreenFlat flat;
+		array@string ids;
+		array@string allIds;
+		this.selector_.getAvailableIdList(ids);
+		g_party.getSkillIdList(allIds);
+		g_sysSound.playLoop("ループ効果音／ポナンちゃん考え中");
+		flat.init("システム／オート戦闘／思考", "", false);
+		flat.run(1.0);
+		this.ponanChang_.call(this.battleModel_, this.turn_, ids, allIds);
+		g_sysSound.stopLoop(0);
+		g_sysSound.play(6, "効果音／ポナンちゃん結果");
+		this.ponanChang_.playVoice();
+		flat.init("システム／オート戦闘／決定", "", false);
+		flat.run(1.0);
+		flat.join(-2147483648);
+		this.ponanChang_.selectSkillSelector(this.selector_);
+		allIds.Free();
+		ids.Free();
+		g_gameObjectManager.popScene();
+		g_playerCommonParam.useItem("オート");
+		this.btnSystem_.updateState();
+		break;
+	}
+}
+
+void SceneBattle::allSelect()
+{
+	int i;
+	for (i = 0; i < 8; ++i)
+	{
+		if (!this.selector_.isSelected(i))
+		{
+			this.selector_.select(i);
+		}
+	}
+}
+
+void SceneBattle::startPlayerAction()
+{
+	this.usedSkillId_.Free();
+	this.selector_.getSelectedIdList(this.playerAttackSkillList_);
+	if (!this.playerAttackSkillList_.Empty())
+	{
+		this.playerTurnHandling();
+	}
+	else
+	{
+		this.battleModel_.callCheckBonusOnFinishPlayerTurn(false);
+		this.startMonsterAction();
+	}
+}
+
+void SceneBattle::playerTurnHandling()
+{
+	string id = this.playerAttackSkillList_[0];
+	ref PlayerSkill s = getPlayerSkillFromId(id);
+	string playerId = s.getPlayerId();
+	this.shakeMode_ = 0;
+	this.selector_.hideSelected(id);
+	this.playerViewGroup_.setFocus(playerId);
+	int kind;
+	this.battleModel_.setPlayerAction(id);
+	this.usedSkillId_.PushBack(id);
+	this.log_.setBufferingMode(true);
+	this.battleModel_.processPlayerAction(this.targets_, kind);
+	switch (kind)
+	{
+	case 0:
+		this.monsterViewGroup_.setFocusByTargetInfomation(this.targets_);
+		int index = this.getPlayerAttackMessageIndex();
+		if (index != -1)
+		{
+			this.shakeMode_ = 2;
+			this.showPopupMessage(playerId, this.targets_[index].getMessage());
+		}
+		else
+		{
+			this.shakeMode_ = this.targets_.Numof() > 1 ? 1 : 0;
+			this.timer_.setTimer(400, this.showPlayerAttackDamage);
+		}
+		break;
+	case 1:
+		this.timer_.setTimer(400, this.showPlayerHeal);
+		break;
+	case 2:
+		this.timer_.setTimer(400, this.showPlayerBuff);
+		break;
+	}
+}
+
+void SceneBattle::showPlayerBuff()
+{
+	if (this.targets_[0].getPlayerSkillId() == "ヒキコモリオン6")
+	{
+		g_sysSound.playVoice(35917);
+	}
+	else
+	{
+		this.playVoice(3, this.targets_[0].getSourceId());
+	}
+	this.playerViewGroup_.showBuffEffect(this.targets_, this.onFinishShowPlayerAction);
+	this.log_.setBufferingMode(false);
+}
+
+void SceneBattle::onFinishShowPlayerAction()
+{
+	this.bg_.blackOut(false);
+	this.playerViewGroup_.setFocus("");
+	this.makeReadyNextPlayerAction();
+}
+
+void SceneBattle::showPopupMessage(string playerId, string msg)
+{
+	int msgIndex = this.getPlayerAttackMessageIndex();
+	this.bg_.blackOut(true);
+	this.playerViewGroup_.showPopupMessage(playerId, msg, this.onFinishShowPopupMessage);
+	int num = getVoiceFinderFromId(playerId).getFromText(msg);
+	g_sysSound.playVoice(num);
+	g_sysSound.play(3, "効果音／クリティカル暗転");
+}
+
+int SceneBattle::getPlayerAttackMessageIndex()
+{
+	int msgIndex = -1;
+	int i;
+	for (i = 0; i < this.targets_.Numof(); ++i)
+	{
+		if (this.targets_[i].getMessage() != "")
+		{
+			msgIndex = i;
+		}
+	}
+	return msgIndex;
+}
+
+void SceneBattle::onFinishShowPopupMessage()
+{
+	this.showPlayerAttackDamage();
+}
+
+void SceneBattle::showPlayerAttackDamage()
+{
+	this.playerViewGroup_.updateBuffView();
+	if (this.getPlayerAttackMessageIndex() == -1)
+	{
+		string sId = this.targets_[0].getPlayerSkillId();
+		switch (sId)
+		{
+		case "剣攻撃6":
+			g_sysSound.playVoice(35733);
+			break;
+		case "幻夢剣6":
+			g_sysSound.playVoice(35786);
+			break;
+		default:
+			this.playVoice(2, this.targets_[0].getSourceId());
+		}
+	}
+	this.bg_.shake(this.shakeMode_);
+	this.log_.setBufferingMode(false);
+	string ef = this.getCurrentPlayerActionEffectName();
+	this.monsterViewGroup_.showDamage(this.targets_, ef, this.onFinishShowPlayerAction);
+}
+
+string SceneBattle::getCurrentPlayerActionEffectName()
+{
+	string name;
+	ref PlayerSkill s = getPlayerSkillFromId(this.playerAttackSkillList_[0]);
+	if (s.getFlatName() != "")
+	{
+		name = s.getFlatName();
+	}
+	else
+	{
+		PlayerSkillAttribute attr;
+		attr = getPlayerSkillAttributeFromId(s.getAttributeId());
+		name = attr.getFlatName();
+	}
+	return "戦闘エフェクト/" + name;
+}
+
+string SceneBattle::getCurrentMonsterActionEffectName()
+{
+	string name;
+	if (this.currentMonsterAttack_.getFlatName() != "")
+	{
+		name = this.currentMonsterAttack_.getFlatName();
+	}
+	else
+	{
+		ref MonsterAttackAttribute attr = getMonsterAttackAttributeFromId(this.currentMonsterAttack_.getAttributeId());
+		name = attr.getFlatName();
+	}
+	return "戦闘エフェクト/" + name;
+}
+
+void SceneBattle::showPlayerHeal()
+{
+	this.playVoice(3, this.targets_[0].getSourceId());
+	this.log_.setBufferingMode(false);
+	this.playerViewGroup_.showHeal(this.targets_, this.onFinishShowPlayerAction);
+}
+
+void SceneBattle::makeReadyNextPlayerAction()
+{
+	this.monsterViewGroup_.resetFocus();
+	bool isUpdated = this.battleModel_.updateMonsterList();
+	if (isUpdated)
+	{
+		this.monsterViewGroup_.resetPosition(this.showMonsterNameDelayed);
+	}
+	else
+	{
+		this.checkPlayerNextAction();
+	}
+}
+
+void SceneBattle::showMonsterNameDelayed()
+{
+	this.monsterViewGroup_.showName(this.checkPlayerNextAction);
+}
+
+void SceneBattle::checkPlayerNextAction()
+{
+	if (this.battleModel_.isNoMonster())
+	{
+		this.battleModel_.callCheckBonusOnFinishPlayerTurn(true);
+		this.setResultParam();
+		this.updateCoolTime(this.usedSkillId_);
+		this.clearPlayerBuff();
+		this.fadeObject(false, this.onFinishFadeOut);
+	}
+	else
+	{
+		this.playerNextAction();
+	}
+}
+
+void SceneBattle::setResultParam()
+{
+	string sId = this.playerAttackSkillList_[0];
+	string pId = getPlayerSkillFromId(sId).getPlayerId();
+	DG_GetBattleResultCallback fn;
+	fn = EX_String("戦闘終了メッセージ設定関数", "");
+	g_battleResult.setFinalAttacker(pId);
+	g_battleResult.setResultMessage(fn(pId, sId, this.monsterIds_));
+}
+
+void SceneBattle::playerNextAction()
+{
+	this.playerAttackSkillList_.Erase(0);
+	if (this.playerAttackSkillList_.Empty())
+	{
+		if (this.isSkipMonsterAttack())
+		{
+			this.updateCoolTime(this.usedSkillId_);
+			this.selector_.clearOrder();
+			this.selector_.updateCoolTime();
+			this.turnEnd();
+		}
+		else
+		{
+			this.battleModel_.callCheckBonusOnFinishPlayerTurn(false);
+			this.startMonsterAction();
+		}
+	}
+	else
+	{
+		this.playerTurnHandling();
+	}
+}
+
+void SceneBattle::startMonsterAction()
+{
+	this.battleModel_.loadMonsterAttackList(this.currentMonsterAttack_);
+	this.updateCoolTime(this.usedSkillId_);
+	this.selector_.clearOrder();
+	this.selector_.updateCoolTime();
+	if (this.battleModel_.isEmptyMonsterAttack())
+	{
+		this.turnEnd();
+	}
+	else
+	{
+		g_sysSound.play(6, "効果音／エネミーターン");
+		this.innerOpenFlat("システム／戦闘／エネミーターン", 500);
+		this.monsterTurnHandling();
+	}
+}
+
+void SceneBattle::monsterTurnHandling()
+{
+	int kind;
+	this.log_.setBufferingMode(true);
+	this.battleModel_.processMonsterAction(this.targets_, kind);
+	int src;
+	if (this.targets_.Numof() > 0)
+	{
+		src = this.targets_[0].getSourceIndex();
+	}
+	switch (kind)
+	{
+	case 0:
+		this.monsterViewGroup_.showAttack(src, this.showMonsterAttackDamage, true);
+		break;
+	case 2:
+		this.monsterViewGroup_.showAttack(src, this.showMonsterHeal, false);
+		break;
+	case 3:
+		this.monsterViewGroup_.showAttack(src, this.showMonsterBuff, false);
+		break;
+	default:
+		this.log_.setBufferingMode(true);
+		this.monsterNextAction();
+		break;
+	}
+}
+
+void SceneBattle::showMonsterBuff()
+{
+	this.log_.setBufferingMode(false);
+	this.monsterViewGroup_.showBuffEffect(this.targets_, this.getCurrentMonsterActionEffectName(), this.onFinishShowMonsterAction);
+}
+
+void SceneBattle::showMonsterAttackDamage()
+{
+	this.bg_.shake(this.targets_.Numof() > 0 ? 1 : 0);
+	this.log_.setBufferingMode(false);
+	this.playerViewGroup_.showDamage(this.targets_, this.getCurrentMonsterActionEffectName(), this.onFinishShowMonsterAction);
+	this.selector_.updateShowState();
+	this.playDamageVoice();
+}
+
+void SceneBattle::playBattleJoinVoice()
+{
+	array@string pId;
+	getAlivePlayerList(pId);
+	if (pId.Numof() == 1)
+	{
+		this.playVoice(0, pId[0]);
+	}
+	else
+	{
+		int index;
+		int num;
+		string text;
+		index = RAND(pId.Numof()) - 1;
+		this.playVoice(0, pId[index]);
+		pId.Erase(index);
+		index = RAND(pId.Numof()) - 1;
+		this.afterPlayerId_ = pId[index];
+		this.voiceCb_.setTimer(1500, this.playBattleJoinVoiceAfter);
+	}
+}
+
+void SceneBattle::playHastleVoice(ref array@string pId)
+{
+	if (pId.Empty())
+	{
+		return;
+	}
+	this.playVoice(6, pId[RAND(pId.Numof()) - 1]);
+}
+
+void SceneBattle::playBattleJoinVoiceAfter()
+{
+	this.playVoice(1, this.afterPlayerId_);
+}
+
+void SceneBattle::playVoice(int type, string pId)
+{
+	string text;
+	int num = getVoiceFinderFromId(pId).getFromType(type, text);
+	if (type == 0 || type == 1 || type == 6)
+	{
+		g_battleLog.add("%s「%s」" % getPlayerFromId(pId).getShortName() % text, 0);
+	}
+	g_sysSound.playVoice(num);
+}
+
+void SceneBattle::playDamageVoice()
+{
+	array@string dead;
+	array@string alive;
+	int i;
+	for (i = 0; i < this.targets_.Numof(); ++i)
+	{
+		string pId = this.targets_[i].getTargetId();
+		if (getPlayerFromId(pId).getHp() == 0)
+		{
+			dead.PushBack(pId);
+		}
+		else
+		{
+			alive.PushBack(pId);
+		}
+	}
+	shuffleIds(dead);
+	shuffleIds(alive);
+	int count;
+	while (dead.Numof() > 0 && count < 2)
+	{
+		this.playVoice(5, dead[0]);
+		dead.Erase(0);
+		++count;
+	}
+	while (alive.Numof() > 0 && count < 2)
+	{
+		this.playVoice(4, alive[0]);
+		alive.Erase(0);
+		++count;
+	}
+}
+
+void SceneBattle::showMonsterHeal()
+{
+	this.log_.setBufferingMode(false);
+	string ef = this.getCurrentMonsterActionEffectName();
+	this.monsterViewGroup_.showHeal(this.targets_, ef, this.onFinishShowMonsterAction);
+}
+
+void SceneBattle::onFinishShowMonsterAction()
+{
+	this.monsterNextAction();
+}
+
+void SceneBattle::monsterNextAction()
+{
+	if (this.isPlayerDeadAll())
+	{
+		g_music.fadeOut(200);
+		this.monsterViewGroup_.fadeOut();
+		this.fadeObject(false, this.onFinishFadeOut);
+		return;
+	}
+	this.battleModel_.popMonsterAttack(this.currentMonsterAttack_);
+	if (this.battleModel_.isEmptyMonsterAttack())
+	{
+		this.turnEnd();
+	}
+	else
+	{
+		this.monsterTurnHandling();
+	}
+}
+
+void SceneBattle::turnEnd()
+{
+	this.playerViewGroup_.joinDeadMotion();
+	if (g_playerCommonParam.getHelperCount() > 0 && this.isExistDeadPlayer())
+	{
+		this.processAddHelper();
+	}
+	this.turnEndPostProcess();
+}
+
+void SceneBattle::turnEndPostProcess()
+{
+	g_sysSound.play(6, "効果音／プレイヤーターン");
+	this.innerOpenFlat("システム／戦闘／プレイヤーターン", 200);
+	this.setControlEnable(true);
+	g_battleResult.countDownItemProbability();
+	this.treasureBox_.setParam(g_battleResult.getItemProbability());
+	++this.turn_;
+	this.battleModel_.setTurn(this.turn_);
+	this.monsterViewGroup_.setNewTurn(this.turn_);
+}
+
+bool SceneBattle::isExistDeadPlayer()
+{
+	array@string ids;
+	g_party.getPlayerIdList(ids);
+	int i;
+	for (i = 0; i < ids.Numof(); ++i)
+	{
+		if (getPlayerFromId(ids[i]).getHp() == 0)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void SceneBattle::processAddHelper()
+{
+	this.eraseDeadPlayerSkillFromParty();
+	this.addHelperSkill();
+	this.selector_.reset();
+	this.selector_.setShowMoveOff();
+	this.selector_.updateCoolTime();
+	this.playerViewGroup_.resetPos();
+	this.playerViewGroup_.addHelper();
+	this.btnSystem_.updateState();
+}
+
+void SceneBattle::addHelperSkill()
+{
+	array@string pIds;
+	getUnOrganizedPlayer(pIds);
+	shuffleIds(pIds);
+	int empty = g_party.getMaxCount() - g_party.getCount();
+	int cnt = Math.Min(pIds.Numof(), empty);
+	cnt = Math.Min(g_playerCommonParam.getHelperCount(), cnt);
+	array@string hastlePlayerIds;
+	while (cnt > 0 && !pIds.Empty())
+	{
+		array@string skills;
+		ref Player p = getPlayerFromId(pIds[0]);
+		p.getAttackSkillIdList(skills);
+		g_battleLog.add("%sがハッスルして飛び出した！" % p.getShortName(), 4);
+		hastlePlayerIds.PushBack(p.getId());
+		int addCount = this.getCountRandom(Math.Min(cnt, skills.Numof()));
+		LotterySystem lot;
+		int i;
+		for (i = 0; i < skills.Numof(); ++i)
+		{
+			lot.addStringKey(skills[i], p.getHelperSkillProbabilityById(skills[i]));
+		}
+		for (i = 0; i < addCount; ++i)
+		{
+			g_party.add(lot.drawString(true));
+		}
+		g_playerCommonParam.decHelperCount(addCount);
+		cnt -= addCount;
+		pIds.Erase(0);
+	}
+	this.playHastleVoice(hastlePlayerIds);
+}
+
+int SceneBattle::getCountRandom(int cnt)
+{
+	if (cnt <= 0)
+	{
+		return 0;
+	}
+	if (cnt == 1)
+	{
+		return 1;
+	}
+	LotterySystem lot;
+	string key = "ハッスルスキル数確率情報";
+	int i;
+	for (i = 0; i < 4; ++i)
+	{
+		int prob = EX_IA2Int(key, cnt, "prob%d" % (i + 1), 0);
+		lot.addIntKey(i + 1, prob);
+	}
+	return lot.drawInt(false);
+}
+
+void SceneBattle::eraseDeadPlayerSkillFromParty()
+{
+	int i;
+	while (i < 8)
+	{
+		string sId = g_party.getAttackSkillId(i);
+		if (sId == "")
+		{
+			break;
+		}
+		string pId = getPlayerSkillFromId(sId).getPlayerId();
+		if (getPlayerFromId(pId).getHp() == 0)
+		{
+			g_party.erase(i);
+		}
+		else
+		{
+			++i;
+		}
+	}
+}
+
+void SceneBattle::callOnBattleStartCallback()
+{
+}
+
+void SceneBattle::setControlEnable(bool val)
+{
+	this.selector_.setEnable(val);
+	this.btnSystem_.fadeIn(val);
+}
+
+void SceneBattle::updateCoolTime(array@string usedSkill)
+{
+	this.decCoolTime();
+	int i;
+	for (i = 0; i < usedSkill.Numof(); ++i)
+	{
+		string pId = getPlayerSkillFromId(usedSkill[i]).getPlayerId();
+		ref Player p = getPlayerFromId(pId);
+		string cancelId = p.getCoolTimeCancelSkillId();
+		if (cancelId != usedSkill[i])
+		{
+			p.setCoolTime(usedSkill[i]);
+		}
+		else
+		{
+			p.setCoolTimeCancelSkillId("");
+		}
+	}
+}
+
+void SceneBattle::decCoolTime()
+{
+	int i;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		g_player[i].decCoolTime();
+	}
+}
+
+bool SceneBattle::isSkipMonsterAttack()
+{
+	DG_IsSkipMonsterAttack fn;
+	fn = EX_String("敵攻撃スキップ判定関数", "");
+	if (fn.Numof() == 0)
+	{
+		return false;
+	}
+	return fn();
+}
+
+bool SceneBattle::isPlayerDeadAll()
+{
+	array@string pIds;
+	g_party.getPlayerIdList(pIds);
+	int i;
+	for (i = 0; i < pIds.Numof(); ++i)
+	{
+		if (getPlayerFromId(pIds[i]).getHp() > 0)
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+void SceneBattle::onAddMonster(ref MonsterInstance instance)
+{
+	this.monsterViewGroup_.add(instance);
+}
+
+void SceneBattle::onEraseMonster(int index)
+{
+	this.monsterViewGroup_.erase(index);
+}
+
+void SceneBattle::onChangeMonster(int index, ref MonsterInstance instance)
+{
+}
+
+bool SceneBattle::getBattleResult()
+{
+	return !this.isPlayerDeadAll();
+}
+
+bool SceneBattle::isMonsterSurprizeAttack()
+{
+	DG_IsMonsterSurprizeAttack fn;
+	fn = EX_String("敵ふいうち判定関数", "");
+	if (fn.Numof() == 0)
+	{
+		return false;
+	}
+	return fn(this.monsterIds_);
+}
+
+void SceneBattle::clearPlayerBuff()
+{
+	int i;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		g_player[i].clearBuff();
+	}
+}
+
+void SceneBattle::onFinishFadeOut()
+{
+	this.isFinish_ = true;
+}
+
+void SceneBattle::onChangeSkillSelectorHoverIndex(int index)
+{
+	if (index != -1)
+	{
+		ref PlayerSkill s = getPlayerSkillFromId(g_party.getAttackSkillId(index));
+		ref PlayerSkillAttribute attr = getPlayerSkillAttributeFromId(s.getAttributeId());
+		if (attr.getAttackKind() == 0)
+		{
+			this.monsterViewGroup_.setTarget(s.getTargetType(), true);
+			return;
+		}
+	}
+	this.monsterViewGroup_.setTarget(2, false);
+}
+
+void SceneBattle::innerOpenFlat(string name, int time)
+{
+	this.turnFlat_.init(name, "", false);
+	this.turnFlat_.run(1.3);
+	this.turnFlat_.join(1000);
+}
+

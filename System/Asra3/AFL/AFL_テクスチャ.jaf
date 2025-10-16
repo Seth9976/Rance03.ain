@@ -1,0 +1,10 @@
+void AFL_CombineTexture()
+{
+	ChipmunkSpriteEngine.CombineTexture();
+}
+
+void AFL_ReleaseCombinedTexture()
+{
+	ChipmunkSpriteEngine.ReleaseCombinedTexture();
+}
+

@@ -1,0 +1,77 @@
+void SceneDungeonViewer2::init(string dungeonId)
+{
+	ref Dungeon d = getDungeonFromId(dungeonId);
+	this.depth_ = d.getDepth();
+	this.width_ = d.getWidth();
+	this.card_.Alloc(this.depth_ * this.width_);
+	this.isDrag_ = false;
+	this.x_ = this.y_ = 0.0;
+	int i;
+	for (i = 0; i < this.depth_; ++i)
+	{
+		int j;
+		for (j = 0; j < this.width_; ++j)
+		{
+			ref DungeonLine dl = d.getDungeonLine(i);
+			this.card_[i * this.width_ + j].init(dl.getDungeonCard(j), this.onClick, 0, d.getShadowR(), d.getShadowG(), d.getShadowB());
+		}
+	}
+	this.updatePos();
+}
+
+void SceneDungeonViewer2::updatePos()
+{
+	int i;
+	for (i = 0; i < this.depth_; ++i)
+	{
+		int j;
+		for (j = 0; j < this.width_; ++j)
+		{
+			this.card_[i * this.width_ + j].setLocalPos((this.x_ + j) - this.width_ / 2, this.y_ + i);
+		}
+	}
+}
+
+void SceneDungeonViewer2::run()
+{
+}
+
+bool SceneDungeonViewer2::update()
+{
+	if (this.isDrag_)
+	{
+		float dx = (g_mouse.getX() - this.mouseDownX_) / 100.0;
+		this.x_ = this.dragStartX_ + dx;
+		this.updatePos();
+		if (!g_mouse.isDown(0))
+		{
+			this.isDrag_ = false;
+		}
+	}
+	else if (!this.isDrag_ && g_mouse.onDown(0))
+	{
+		this.isDrag_ = true;
+		this.dragStartX_ = this.x_;
+		this.mouseDownX_ = g_mouse.getX();
+	}
+	if (g_mouse.getWheel() > 0)
+	{
+		this.y_ = Math.MinF(0.0, this.y_ + 0.5);
+		this.updatePos();
+	}
+	else if (g_mouse.getWheel() < 0)
+	{
+		this.y_ = Math.MaxF(-this.depth_ + 1, this.y_ - 0.5);
+		this.updatePos();
+	}
+	if (g_mouse.isClick(1))
+	{
+		return false;
+	}
+	return true;
+}
+
+void SceneDungeonViewer2::onClick(int clickId)
+{
+}
+

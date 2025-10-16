@@ -1,0 +1,35 @@
+void PlayerSkillAttribute::init(string id)
+{
+	string key = "プレイヤー攻撃属性情報";
+	this.id_ = id;
+	this.name_ = EX_SA2String(key, this.id_, "name", "");
+	this.imageName_ = EX_SA2String(key, this.id_, "imageName", "");
+	this.attackKind_ = EX_SA2Int(key, this.id_, "type", 0);
+	this.flatName_ = EX_SA2String(key, this.id_, "flatName", "");
+}
+
+string PlayerSkillAttribute::getId()
+{
+	return this.id_;
+}
+
+string PlayerSkillAttribute::getName()
+{
+	return this.name_;
+}
+
+int PlayerSkillAttribute::getAttackKind()
+{
+	return this.attackKind_;
+}
+
+string PlayerSkillAttribute::getImageName()
+{
+	return this.imageName_;
+}
+
+string PlayerSkillAttribute::getFlatName()
+{
+	return this.flatName_;
+}
+

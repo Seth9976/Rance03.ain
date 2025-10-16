@@ -1,0 +1,32 @@
+void PartsFloatingLayout::reset(int x, int y, bool isLeftAlign)
+{
+	this.sx_ = x;
+	this.sy_ = y;
+	this.x_ = this.sx_;
+	this.y_ = this.sy_;
+	this.isLeftAlign_ = isLeftAlign;
+}
+
+void PartsFloatingLayout::add(ref Parts p)
+{
+	p.setPos(this.x_, this.y_);
+	if (this.isLeftAlign_)
+	{
+		p.setOrigin(7);
+		this.x_ += p.getWidth();
+	}
+	else
+	{
+		p.setOrigin(9);
+		this.x_ -= p.getWidth();
+	}
+	this.lineMaxHeight_ = Math.Max(this.lineMaxHeight_, p.getHeight());
+}
+
+void PartsFloatingLayout::br()
+{
+	this.x_ = this.sx_;
+	this.y_ += this.lineMaxHeight_;
+	this.lineMaxHeight_ = 0;
+}
+

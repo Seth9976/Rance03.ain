@@ -1,0 +1,305 @@
+CAEProjectForm::CAEProjectForm()
+{
+}
+
+CAEProjectForm::~CAEProjectForm()
+{
+	this.Release();
+	this.m_CreateClick.Clear();
+	this.m_LoadClick.Clear();
+	this.m_SaveClick.Clear();
+	this.m_SaveAsClick.Clear();
+	this.m_RunClick.Clear();
+}
+
+int CAEProjectForm::Create()
+{
+	this.Release();
+	this.m_LayoutBox = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿レイアウトタイプ設定(this.m_LayoutBox, 1);
+	this.m_TitleLabel = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿フォント設定(this.m_TitleLabel, 0, 12, 0, 0, 0, 0.0, 0, 0, 0, 0.0, 1);
+	Ｐ＿マージン設定(this.m_TitleLabel, 3, 3, 1, 1);
+	Ｐ＿レイアウトボックス＿追加(this.m_LayoutBox, this.m_TitleLabel);
+	this.m_ButtonLayoutBox = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿配置設定(this.m_ButtonLayoutBox, 1);
+	Ｐ＿レイアウトボックス＿レイアウトタイプ設定(this.m_ButtonLayoutBox, 2);
+	Ｐ＿レイアウトボックス＿折り返し設定(this.m_ButtonLayoutBox, true, 420.0);
+	Ｐ＿レイアウトボックス＿追加(this.m_LayoutBox, this.m_ButtonLayoutBox);
+	this.m_CreateButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿サイズ設定(this.m_CreateButton, 40, 20);
+	Ｐ＿ボタン＿テキスト設定(this.m_CreateButton, "新規");
+	Ｐ＿マージン設定(this.m_CreateButton, 3, 3, 1, 1);
+	AFL_Parts_AddMouseLClickEvent(this.m_CreateButton, this.MouseLClickEvent);
+	Ｐ＿レイアウトボックス＿追加(this.m_ButtonLayoutBox, this.m_CreateButton);
+	this.m_LoadButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿サイズ設定(this.m_LoadButton, 80, 20);
+	Ｐ＿ボタン＿テキスト設定(this.m_LoadButton, "読み込み");
+	Ｐ＿マージン設定(this.m_LoadButton, 3, 3, 1, 1);
+	AFL_Parts_AddMouseLClickEvent(this.m_LoadButton, this.MouseLClickEvent);
+	Ｐ＿レイアウトボックス＿追加(this.m_ButtonLayoutBox, this.m_LoadButton);
+	this.m_SaveButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿サイズ設定(this.m_SaveButton, 80, 20);
+	Ｐ＿ボタン＿テキスト設定(this.m_SaveButton, "書き出し");
+	Ｐ＿マージン設定(this.m_SaveButton, 3, 3, 1, 1);
+	AFL_Parts_AddMouseLClickEvent(this.m_SaveButton, this.MouseLClickEvent);
+	Ｐ＿レイアウトボックス＿追加(this.m_ButtonLayoutBox, this.m_SaveButton);
+	this.m_SaveAsButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿サイズ設定(this.m_SaveAsButton, 150, 20);
+	Ｐ＿ボタン＿テキスト設定(this.m_SaveAsButton, "別名で書き出し");
+	Ｐ＿マージン設定(this.m_SaveAsButton, 3, 3, 1, 1);
+	AFL_Parts_AddMouseLClickEvent(this.m_SaveAsButton, this.MouseLClickEvent);
+	Ｐ＿レイアウトボックス＿追加(this.m_ButtonLayoutBox, this.m_SaveAsButton);
+	this.m_EndButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿サイズ設定(this.m_EndButton, 80, 20);
+	Ｐ＿ボタン＿テキスト設定(this.m_EndButton, "終了(F4)");
+	Ｐ＿マージン設定(this.m_EndButton, 3, 3, 1, 1);
+	AFL_Parts_AddMouseLClickEvent(this.m_EndButton, this.MouseLClickEvent);
+	Ｐ＿レイアウトボックス＿追加(this.m_ButtonLayoutBox, this.m_EndButton);
+	this.m_RunButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿サイズ設定(this.m_RunButton, 80, 20);
+	Ｐ＿ボタン＿テキスト設定(this.m_RunButton, "実行(F5)");
+	Ｐ＿マージン設定(this.m_RunButton, 3, 3, 1, 1);
+	AFL_Parts_AddMouseLClickEvent(this.m_RunButton, this.MouseLClickEvent);
+	Ｐ＿レイアウトボックス＿追加(this.m_ButtonLayoutBox, this.m_RunButton);
+	this.m_ResetPosButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿サイズ設定(this.m_ResetPosButton, 120, 20);
+	Ｐ＿ボタン＿テキスト設定(this.m_ResetPosButton, "全体移動初期化");
+	Ｐ＿マージン設定(this.m_ResetPosButton, 3, 3, 1, 1);
+	AFL_Parts_AddMouseLClickEvent(this.m_ResetPosButton, this.MouseLClickEvent);
+	Ｐ＿レイアウトボックス＿追加(this.m_ButtonLayoutBox, this.m_ResetPosButton);
+	this.m_EndTypeLayoutBox = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿配置設定(this.m_EndTypeLayoutBox, 1);
+	Ｐ＿レイアウトボックス＿レイアウトタイプ設定(this.m_EndTypeLayoutBox, 1);
+	Ｐ＿レイアウトボックス＿追加(this.m_LayoutBox, this.m_EndTypeLayoutBox);
+	this.m_EndTypeRButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿チェックボックス＿フォント設定(this.m_EndTypeRButton, 0, 12, 0, 0, 0, 0.0, 0, 0, 0, 0.0);
+	Ｐ＿チェックボックス＿テキスト設定(this.m_EndTypeRButton, "右クリックでアクティビティを終了する");
+	Ｐ＿マージン設定(this.m_EndTypeRButton, 1, 1, 3, 3);
+	Ｐ＿レイアウトボックス＿追加(this.m_EndTypeLayoutBox, this.m_EndTypeRButton);
+	this.m_EndTypeSpace = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿チェックボックス＿フォント設定(this.m_EndTypeSpace, 0, 12, 0, 0, 0, 0.0, 0, 0, 0, 0.0);
+	Ｐ＿マージン設定(this.m_EndTypeSpace, 1, 1, 3, 3);
+	Ｐ＿チェックボックス＿テキスト設定(this.m_EndTypeSpace, "スペースキーでアクティビティを終了する");
+	Ｐ＿レイアウトボックス＿追加(this.m_EndTypeLayoutBox, this.m_EndTypeSpace);
+	this.m_EndTypeEscape = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿チェックボックス＿フォント設定(this.m_EndTypeEscape, 0, 12, 0, 0, 0, 0.0, 0, 0, 0, 0.0);
+	Ｐ＿マージン設定(this.m_EndTypeEscape, 1, 1, 3, 3);
+	Ｐ＿チェックボックス＿テキスト設定(this.m_EndTypeEscape, "エスケープキーでアクティビティを終了する");
+	Ｐ＿レイアウトボックス＿追加(this.m_EndTypeLayoutBox, this.m_EndTypeEscape);
+	return this.m_LayoutBox;
+}
+
+void CAEProjectForm::Release()
+{
+	this.m_End = false;
+	PARTS_ReleaseWithInit(this.m_EndTypeEscape);
+	PARTS_ReleaseWithInit(this.m_EndTypeSpace);
+	PARTS_ReleaseWithInit(this.m_EndTypeRButton);
+	PARTS_ReleaseWithInit(this.m_RunButton);
+	PARTS_ReleaseWithInit(this.m_EndButton);
+	PARTS_ReleaseWithInit(this.m_SaveAsButton);
+	PARTS_ReleaseWithInit(this.m_SaveButton);
+	PARTS_ReleaseWithInit(this.m_LoadButton);
+	PARTS_ReleaseWithInit(this.m_CreateButton);
+	PARTS_ReleaseWithInit(this.m_TitleLabel);
+	PARTS_ReleaseWithInit(this.m_EndTypeLayoutBox);
+	PARTS_ReleaseWithInit(this.m_ButtonLayoutBox);
+	PARTS_ReleaseWithInit(this.m_LayoutBox);
+}
+
+void CAEProjectForm::MouseLClickEvent(int ID, int MouseX, int MouseY)
+{
+	if (ID == this.m_CreateButton)
+	{
+		this.m_CreateClick(ID, MouseX, MouseY);
+	}
+	else if (ID == this.m_LoadButton)
+	{
+		this.m_LoadClick(ID, MouseX, MouseY);
+	}
+	else if (ID == this.m_SaveButton)
+	{
+		this.m_SaveClick(ID, MouseX, MouseY);
+	}
+	else if (ID == this.m_SaveAsButton)
+	{
+		this.m_SaveAsClick(ID, MouseX, MouseY);
+	}
+	else if (ID == this.m_EndButton)
+	{
+		this.m_End = true;
+	}
+	else if (ID == this.m_RunButton)
+	{
+		this.m_RunClick(ID, MouseX, MouseY);
+	}
+	else if (ID == this.m_ResetPosButton)
+	{
+		this.m_ResetPosClick(ID, MouseX, MouseY);
+	}
+}
+
+void CAEProjectForm::CreateProject(string Name)
+{
+	this.SetProjectName(Name);
+	this.SetEndTypeClickRButton(false);
+	this.SetEndTypeClickSpace(false);
+	this.SetEndTypeClickEscape(false);
+}
+
+void CAEProjectForm::End(bool EndFlg)
+{
+	this.m_End = EndFlg;
+}
+
+bool CAEProjectForm::IsEnd()
+{
+	return this.m_End;
+}
+
+bool CAEProjectForm::SaveActivity(ref CActivityData ActivityData)
+{
+	if (ActivityData === NULL)
+	{
+		return false;
+	}
+	if (!ActivityData.IsHoldActivity())
+	{
+		return false;
+	}
+	if (this.IsEndTypeClickRButton())
+	{
+		SYS_Activity_SetEndKey(ActivityData.GetActivityName(), 2);
+	}
+	if (this.IsEndTypeClickSpace())
+	{
+		SYS_Activity_SetEndKey(ActivityData.GetActivityName(), 32);
+	}
+	if (this.IsEndTypeClickEscape())
+	{
+		SYS_Activity_SetEndKey(ActivityData.GetActivityName(), 27);
+	}
+	return true;
+}
+
+bool CAEProjectForm::LoadActivity(ref CActivityData ActivityData)
+{
+	if (ActivityData === NULL)
+	{
+		return false;
+	}
+	if (!ActivityData.IsHoldActivity())
+	{
+		return false;
+	}
+	array@int KeyList;
+	SYS_Activity_GetEndKeyList(ActivityData.GetActivityName(), KeyList);
+	this.SetEndTypeClickRButton(KeyList.Find(0, KeyList.Numof(), 2) != -1);
+	this.SetEndTypeClickSpace(KeyList.Find(0, KeyList.Numof(), 32) != -1);
+	this.SetEndTypeClickEscape(KeyList.Find(0, KeyList.Numof(), 27) != -1);
+	return true;
+}
+
+void CAEProjectForm::SetProjectName(string Name)
+{
+	if (this.m_TitleLabel == 0)
+	{
+		return;
+	}
+	Ｐ＿テキスト設定(this.m_TitleLabel, Name, 1);
+}
+
+string CAEProjectForm::GetProjectName()
+{
+	if (this.m_TitleLabel == 0)
+	{
+		return "";
+	}
+	return Ｐ＿テキスト取得(this.m_TitleLabel, 1);
+}
+
+void CAEProjectForm::SetEndTypeClickRButton(bool Enable)
+{
+	if (this.m_EndTypeRButton == 0)
+	{
+		return;
+	}
+	Ｐ＿チェックボックス＿チェック状態設定(this.m_EndTypeRButton, Enable);
+}
+
+bool CAEProjectForm::IsEndTypeClickRButton()
+{
+	if (this.m_EndTypeRButton == 0)
+	{
+		return false;
+	}
+	return Ｐ＿チェックボックス＿チェック状態取得(this.m_EndTypeRButton);
+}
+
+void CAEProjectForm::SetEndTypeClickSpace(bool Enable)
+{
+	if (this.m_EndTypeSpace == 0)
+	{
+		return;
+	}
+	Ｐ＿チェックボックス＿チェック状態設定(this.m_EndTypeSpace, Enable);
+}
+
+bool CAEProjectForm::IsEndTypeClickSpace()
+{
+	if (this.m_EndTypeSpace == 0)
+	{
+		return false;
+	}
+	return Ｐ＿チェックボックス＿チェック状態取得(this.m_EndTypeSpace);
+}
+
+void CAEProjectForm::SetEndTypeClickEscape(bool Enable)
+{
+	if (this.m_EndTypeEscape == 0)
+	{
+		return;
+	}
+	Ｐ＿チェックボックス＿チェック状態設定(this.m_EndTypeEscape, Enable);
+}
+
+bool CAEProjectForm::IsEndTypeClickEscape()
+{
+	if (this.m_EndTypeEscape == 0)
+	{
+		return false;
+	}
+	return Ｐ＿チェックボックス＿チェック状態取得(this.m_EndTypeEscape);
+}
+
+void CAEProjectForm::SetCreateClick(DG_MouseClickHandler DelegateObject)
+{
+	this.m_CreateClick = DelegateObject;
+}
+
+void CAEProjectForm::SetLoadClick(DG_MouseClickHandler DelegateObject)
+{
+	this.m_LoadClick = DelegateObject;
+}
+
+void CAEProjectForm::SetSaveClick(DG_MouseClickHandler DelegateObject)
+{
+	this.m_SaveClick = DelegateObject;
+}
+
+void CAEProjectForm::SetSaveAsClick(DG_MouseClickHandler DelegateObject)
+{
+	this.m_SaveAsClick = DelegateObject;
+}
+
+void CAEProjectForm::SetRunClick(DG_MouseClickHandler DelegateObject)
+{
+	this.m_RunClick = DelegateObject;
+}
+
+void CAEProjectForm::SetResetPosClick(DG_MouseClickHandler DelegateObject)
+{
+	this.m_ResetPosClick = DelegateObject;
+}
+

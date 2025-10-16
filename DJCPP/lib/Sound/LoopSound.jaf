@@ -1,0 +1,32 @@
+void LoopSound::playSound(int soundNumber)
+{
+	if (this.sound_ == soundNumber)
+	{
+		++this.stack_;
+	}
+	else
+	{
+		this.innerPlay(0);
+		this.sound_ = soundNumber;
+		this.stack_ = 1;
+		this.innerPlay(this.sound_);
+	}
+}
+
+void LoopSound::stopSound(int soundNumber)
+{
+	if (this.sound_ == soundNumber)
+	{
+		--this.stack_;
+		if (this.stack_ == 0)
+		{
+			this.innerPlay(0);
+			this.sound_ = 0;
+		}
+	}
+}
+
+void LoopSound::innerPlay(int number)
+{
+}
+

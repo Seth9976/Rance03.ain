@@ -1,0 +1,84 @@
+void SYS_Init_JoystickButtonAssignment()
+{
+	g_JoystickButtonAssignmentTable.Alloc(50);
+	g_JoystickButtonAssignmentTable.Fill(0, g_JoystickButtonAssignmentTable.Numof(), -1);
+	g_JoystickButtonAssignmentTable[0] = SYS_GetDefaultJoystickButtonAssignment(0);
+	g_JoystickButtonAssignmentTable[1] = SYS_GetDefaultJoystickButtonAssignment(1);
+	g_JoystickButtonAssignmentTable[2] = SYS_GetDefaultJoystickButtonAssignment(2);
+	g_JoystickButtonAssignmentTable[3] = SYS_GetDefaultJoystickButtonAssignment(3);
+	g_JoystickButtonAssignmentTable[4] = SYS_GetDefaultJoystickButtonAssignment(4);
+	g_JoystickButtonAssignmentTable[5] = SYS_GetDefaultJoystickButtonAssignment(5);
+	g_JoystickButtonAssignmentTable[6] = SYS_GetDefaultJoystickButtonAssignment(6);
+	g_JoystickButtonAssignmentTable[7] = SYS_GetDefaultJoystickButtonAssignment(7);
+	g_JoystickButtonAssignmentTable[8] = SYS_GetDefaultJoystickButtonAssignment(8);
+	g_JoystickButtonAssignmentTable[15] = SYS_GetDefaultJoystickButtonAssignment(15);
+	g_JoystickButtonAssignmentTable[16] = SYS_GetDefaultJoystickButtonAssignment(16);
+	g_JoystickButtonAssignmentTable[17] = SYS_GetDefaultJoystickButtonAssignment(17);
+	g_JoystickButtonAssignmentTable[18] = SYS_GetDefaultJoystickButtonAssignment(18);
+	g_JoystickButtonAssignmentTable[19] = SYS_GetDefaultJoystickButtonAssignment(19);
+	g_JoystickButtonAssignmentTable[9] = SYS_GetDefaultJoystickButtonAssignment(9);
+	g_JoystickButtonAssignmentTable[10] = SYS_GetDefaultJoystickButtonAssignment(10);
+	g_JoystickButtonAssignmentTable[11] = SYS_GetDefaultJoystickButtonAssignment(11);
+	g_JoystickButtonAssignmentTable[12] = SYS_GetDefaultJoystickButtonAssignment(12);
+	g_JoystickButtonAssignmentTable[20] = SYS_GetDefaultJoystickButtonAssignment(20);
+	g_JoystickButtonAssignmentTable[21] = SYS_GetDefaultJoystickButtonAssignment(21);
+	g_JoystickButtonAssignmentTable[40] = EX_SA2Int("Ｅ＿ジョイパッド＿アサインコード＿ゲーム機能", "JOYBUTTONASSIGN_GAMEFUNCTION01", "デフォルトキー", 0);
+	g_JoystickButtonAssignmentTable[41] = EX_SA2Int("Ｅ＿ジョイパッド＿アサインコード＿ゲーム機能", "JOYBUTTONASSIGN_GAMEFUNCTION02", "デフォルトキー", 0);
+	g_JoystickButtonAssignmentTable[42] = EX_SA2Int("Ｅ＿ジョイパッド＿アサインコード＿ゲーム機能", "JOYBUTTONASSIGN_GAMEFUNCTION03", "デフォルトキー", 0);
+	g_JoystickButtonAssignmentTable[43] = EX_SA2Int("Ｅ＿ジョイパッド＿アサインコード＿ゲーム機能", "JOYBUTTONASSIGN_GAMEFUNCTION04", "デフォルトキー", 0);
+	g_JoystickButtonAssignmentTable[44] = EX_SA2Int("Ｅ＿ジョイパッド＿アサインコード＿ゲーム機能", "JOYBUTTONASSIGN_GAMEFUNCTION05", "デフォルトキー", 0);
+	g_JoystickButtonAssignmentTable[45] = EX_SA2Int("Ｅ＿ジョイパッド＿アサインコード＿ゲーム機能", "JOYBUTTONASSIGN_GAMEFUNCTION06", "デフォルトキー", 0);
+	g_JoystickButtonAssignmentTable[46] = EX_SA2Int("Ｅ＿ジョイパッド＿アサインコード＿ゲーム機能", "JOYBUTTONASSIGN_GAMEFUNCTION07", "デフォルトキー", 0);
+	g_JoystickButtonAssignmentTable[47] = EX_SA2Int("Ｅ＿ジョイパッド＿アサインコード＿ゲーム機能", "JOYBUTTONASSIGN_GAMEFUNCTION08", "デフォルトキー", 0);
+	g_JoystickButtonAssignmentTable[48] = EX_SA2Int("Ｅ＿ジョイパッド＿アサインコード＿ゲーム機能", "JOYBUTTONASSIGN_GAMEFUNCTION09", "デフォルトキー", 0);
+	g_JoystickButtonAssignmentTable[49] = EX_SA2Int("Ｅ＿ジョイパッド＿アサインコード＿ゲーム機能", "JOYBUTTONASSIGN_GAMEFUNCTION10", "デフォルトキー", 0);
+}
+
+int SYS_GetDefaultJoystickButtonAssignment(int JoystickCode)
+{
+	switch (JoystickCode)
+	{
+	case 0:
+		return 1;
+	case 1:
+		return 2;
+	case 2:
+		return 3;
+	case 3:
+		return 4;
+	case 4:
+		return 6;
+	case 5:
+		return 7;
+	case 6:
+		return 5;
+	case 7:
+		return 8;
+	case 8:
+		return 9;
+	case 15:
+		return 10;
+	case 16:
+		return 3;
+	case 17:
+		return 4;
+	case 18:
+		return 11;
+	case 19:
+		return 12;
+	case 9:
+		return 3;
+	case 10:
+		return 4;
+	case 11:
+		return 11;
+	case 12:
+		return 12;
+	case 20:
+		return 5;
+	case 21:
+		return 6;
+	}
+	return -1;
+}
+

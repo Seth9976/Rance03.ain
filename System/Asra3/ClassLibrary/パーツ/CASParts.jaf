@@ -1,0 +1,266 @@
+CASParts::CASParts()
+{
+	this.m_PartsNumber = -1;
+}
+
+CASParts::~CASParts()
+{
+	this.Release();
+}
+
+void CASParts::Create()
+{
+	this.Release();
+	this.m_PartsNumber = PARTS_GetFreeSystemPartsNumber();
+	this.SetPos(0, 0);
+}
+
+void CASParts::Release()
+{
+	if (this.m_PartsNumber == -1)
+	{
+		return;
+	}
+	PARTS_Release(this.m_PartsNumber);
+	this.m_PartsNumber = -1;
+}
+
+bool CASParts::IsExist()
+{
+	return this.m_PartsNumber != -1;
+}
+
+int CASParts::GetPartsNumber()
+{
+	return this.m_PartsNumber;
+}
+
+void CASParts::SetState(int State)
+{
+	AFL_Parts_SetStatus(this.GetPartsNumber(), State);
+}
+
+int CASParts::GetState()
+{
+	return AFL_Parts_GetStatus(this.GetPartsNumber());
+}
+
+void CASParts::SetCG(string CGName, int State)
+{
+	Ｐ＿ＣＧ設定(this.GetPartsNumber(), CGName, State);
+}
+
+void CASParts::SetCGSurfaceArea(int X, int Y, int Width, int Height, int State)
+{
+	Ｐ＿ＣＧ表示範囲設定(this.GetPartsNumber(), X, Y, Width, Height, State);
+}
+
+void CASParts::SetLoopCG(string CGName, int BeginNumber, int Numof, int Time, int State)
+{
+	Ｐ＿ループＣＧ設定(this.GetPartsNumber(), CGName, BeginNumber, Numof, Time, State);
+}
+
+void CASParts::SetText(string Text, int State)
+{
+	Ｐ＿テキスト設定(this.GetPartsNumber(), Text, State);
+}
+
+void CASParts::SetFontProperty(ref CASCharSpriteProperty Property, int State)
+{
+	CASColor Color;
+	Color = Property.GetColor();
+	CASColor EdgeColor;
+	EdgeColor = Property.GetEdgeColor();
+	this.SetFont(Property.GetType(), State);
+	this.SetFontSize(Property.GetSize(), State);
+	this.SetFontBoldWeight(Property.GetBoldWeight(), State);
+	this.SetFontEdgeWeight(Property.GetEdgeWeight(), State);
+	this.SetFontColor(Color.GetR(), Color.GetG(), Color.GetB(), State);
+	this.SetFontEdgeColor(EdgeColor.GetR(), EdgeColor.GetG(), EdgeColor.GetB(), State);
+}
+
+void CASParts::SetFont(int Type, int State)
+{
+	Ｐ＿フォント種類設定(this.GetPartsNumber(), Type, State);
+}
+
+void CASParts::SetFontSize(int Size, int State)
+{
+	Ｐ＿フォントサイズ設定(this.GetPartsNumber(), Size, State);
+}
+
+void CASParts::SetFontBoldWeight(float Weight, int State)
+{
+	Ｐ＿フォント太字幅設定(this.GetPartsNumber(), Weight, State);
+}
+
+void CASParts::SetFontEdgeWeight(float Weight, int State)
+{
+	Ｐ＿フォント縁取り幅設定(this.GetPartsNumber(), Weight, State);
+}
+
+void CASParts::SetFontColor(int ColorR, int ColorG, int ColorB, int State)
+{
+	Ｐ＿フォント色設定(this.GetPartsNumber(), ColorR, ColorG, ColorB, State);
+}
+
+void CASParts::SetFontEdgeColor(int ColorR, int ColorG, int ColorB, int State)
+{
+	Ｐ＿フォント縁取り色設定(this.GetPartsNumber(), ColorR, ColorG, ColorB, State);
+}
+
+void CASParts::SetFontCharSpace(int Space, int State)
+{
+	Ｐ＿テキスト字間隔設定(this.GetPartsNumber(), Space, State);
+}
+
+void CASParts::SetTextSurfaceArea(int X, int Y, int Width, int Height, int State)
+{
+	Ｐ＿テキスト表示範囲設定(this.GetPartsNumber(), X, Y, Width, Height, State);
+}
+
+void CASParts::SetNumeralCG(string CGName, int State)
+{
+	Ｐ＿数字ＣＧ設定(this.GetPartsNumber(), CGName, State);
+}
+
+void CASParts::SetNumeralNumber(int Number, int State)
+{
+	Ｐ＿数字設定(this.GetPartsNumber(), Number, State);
+}
+
+void CASParts::SetRectangleDetection(int Width, int Height)
+{
+	Ｐ＿矩形判定設定(this.GetPartsNumber(), Ｐ＿Ｘ座標取得(this.GetPartsNumber()), Ｐ＿Ｙ座標取得(this.GetPartsNumber()), Width, Height);
+}
+
+void CASParts::SetFlat(string FlatFileName)
+{
+	Ｐ＿フラット設定(this.GetPartsNumber(), FlatFileName, 1);
+}
+
+int CASParts::GetFlatCurrentFrameNumber()
+{
+	return AFL_Parts_GetPartsFlatCurrentFrameNumber(this.GetPartsNumber(), 1);
+}
+
+void CASParts::BackFlatBeginFrame()
+{
+	Ｐ＿フラット開始フレーム移動(this.GetPartsNumber(), 1);
+}
+
+void CASParts::StepFlatFinalFrame()
+{
+	Ｐ＿フラット最終フレームステップ(this.GetPartsNumber(), 1);
+}
+
+bool CASParts::Create3DLayerPluginID(int State)
+{
+	return PartsEngine.Parts_CreateParts3DLayerPluginID(this.GetPartsNumber(), State);
+}
+
+int CASParts::Get3DLayerPluginID(int State)
+{
+	return PartsEngine.Parts_GetParts3DLayerPluginID(this.GetPartsNumber(), State);
+}
+
+bool CASParts::Release3DLayerPluginID(int State)
+{
+	return PartsEngine.Parts_ReleaseParts3DLayerPluginID(this.GetPartsNumber(), State);
+}
+
+void CASParts::SetPos(int X, int Y)
+{
+	Ｐ＿座標設定(this.GetPartsNumber(), X, Y);
+}
+
+void CASParts::SetZ(int Z)
+{
+	Ｐ＿Ｚ座標設定(this.GetPartsNumber(), Z);
+}
+
+void CASParts::SetZByBaseZ(int Z, int BaseZ)
+{
+	AFL_Parts_SetZByBaseZ(this.GetPartsNumber(), Z, BaseZ);
+}
+
+void CASParts::SetShow(bool Show)
+{
+	Ｐ＿表示設定(this.GetPartsNumber(), Show);
+}
+
+void CASParts::SetAlpha(int Alpha)
+{
+	Ｐ＿アルファ値設定(this.GetPartsNumber(), Alpha);
+}
+
+void CASParts::SetAddColor(int Red, int Green, int Blue)
+{
+	Ｐ＿加算色設定(this.GetPartsNumber(), Red, Green, Blue);
+}
+
+void CASParts::SetMultipleColor(int Red, int Green, int Blue)
+{
+	Ｐ＿乗算色設定(this.GetPartsNumber(), Red, Green, Blue);
+}
+
+void CASParts::SetOriginPosMode(int OriginPosMode)
+{
+	Ｐ＿原点座標設定(this.GetPartsNumber(), OriginPosMode);
+}
+
+void CASParts::SetParentParts(ref CASParts ParentParts)
+{
+	Ｐ＿オンカーソル表示連動設定(this.GetPartsNumber(), ParentParts.GetPartsNumber());
+}
+
+void CASParts::SetMessageWindowShowLink(bool ShowLink)
+{
+	Ｐ＿メッセージウィンドウ表示連動設定(this.GetPartsNumber(), ShowLink);
+}
+
+void CASParts::SetClickable(bool Clickable)
+{
+	Ｐ＿クリック可能設定(this.GetPartsNumber(), Clickable);
+}
+
+bool CASParts::IsShow()
+{
+	return Ｐ＿表示設定取得(this.GetPartsNumber());
+}
+
+int CASParts::GetX()
+{
+	return Ｐ＿Ｘ座標取得(this.GetPartsNumber());
+}
+
+int CASParts::GetY()
+{
+	return Ｐ＿Ｙ座標取得(this.GetPartsNumber());
+}
+
+int CASParts::GetAlpha()
+{
+	return Ｐ＿アルファ値取得(this.GetPartsNumber());
+}
+
+int CASParts::GetWidth(int State)
+{
+	return AFL_Parts_GetWidth(this.GetPartsNumber(), State);
+}
+
+int CASParts::GetHeight(int State)
+{
+	return AFL_Parts_GetHeight(this.GetPartsNumber(), State);
+}
+
+void CASParts::SetOnCursorSoundName(string Name)
+{
+	Ｐ＿オンカーソル効果音設定(this.GetPartsNumber(), Name);
+}
+
+void CASParts::SetClickSoundName(string Name)
+{
+	Ｐ＿クリック効果音設定(this.GetPartsNumber(), Name);
+}
+

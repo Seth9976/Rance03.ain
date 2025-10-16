@@ -1,0 +1,44 @@
+void EnquiteNormalPage::init(string activityFileName, string activityName)
+{
+	this.clickedButton_ = -1;
+	this.activityFileName_ = activityFileName;
+	this.activityName_ = activityName;
+	this.initCheckBox();
+	this.btn_[0].init(this.activityName_, "SYS_タイトル画面に戻る", 0);
+	this.btn_[1].init(this.activityName_, "前へボタン", 1);
+	this.btn_[2].init(this.activityName_, "次へボタン", 2);
+	this.btn_[0].setOnClickCallback(this.onClickButton);
+	this.btn_[1].setOnClickCallback(this.onClickButton);
+	this.btn_[2].setOnClickCallback(this.onClickButton);
+}
+
+void EnquiteNormalPage::onClickButton(int id)
+{
+	this.clickedButton_ = id;
+}
+
+void EnquiteNormalPage::initCheckBox()
+{
+	array@string names;
+	getPartsNameByGUIType(names, this.activityName_, 1);
+	this.checkBox_.Alloc(names.Numof());
+	int i;
+	for (i = 0; i < this.checkBox_.Numof(); ++i)
+	{
+		this.checkBox_[i].init(this.activityName_, names[i]);
+		this.checkBox_[i].setCheck(getEnquiteSelectionFromName(names[i]).isChecked());
+		this.checkBox_[i].setOnCheckCallback(this.onCheck);
+	}
+}
+
+void EnquiteNormalPage::onCheck(string partsName, bool isChecked)
+{
+	getEnquiteSelectionFromName(partsName).setChecked(isChecked);
+	pass("%s %d" % partsName % getEnquiteSelectionFromName(partsName).isChecked());
+}
+
+int EnquiteNormalPage::getClickedButton()
+{
+	return this.clickedButton_;
+}
+

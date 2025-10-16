@@ -1,0 +1,92 @@
+ReulstNewSkill::ReulstNewSkill()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void ReulstNewSkill::init(string skillId, int nextLevel)
+{
+	this.skillId_ = skillId;
+	this.nextLevel_ = nextLevel;
+	if (this.skillId_ != "")
+	{
+		if (this.nextLevel_ == -1)
+		{
+			this.view_.init(this.skillId_, 0, 0, 0);
+			this.view_.setState(0);
+			this.info_.init(this.skillId_);
+			this.info_.setViewValue(0.0);
+			this.info_.setPos(261, 618);
+		}
+		else
+		{
+			this.view_.init(this.skillId_, 2, 0, 0);
+			this.view_.setState(3);
+		}
+		this.view_.setPos(140, 605);
+		this.view_.setZ(4150);
+		this.initParts();
+	}
+	this.isNotAvailable_ = this.skillId_.Empty();
+}
+
+void ReulstNewSkill::initParts()
+{
+	if (this.nextLevel_ == -1)
+	{
+		this.parts_[0].init("システム／レベルアップ／スキル獲得", 0);
+		this.parts_[1].initAsFlat("システム／後光");
+	}
+	else
+	{
+		this.parts_[0].init("システム／レベルアップ／スキル非獲得", 0);
+	}
+	createPartsGroup(this.parent_, this.parts_, 4100);
+	this.setPartsPos();
+}
+
+void ReulstNewSkill::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(this.skillId_ != "");
+}
+
+void ReulstNewSkill::setPartsPos()
+{
+	this.parts_[0].setPos(0.0, 463.0);
+	this.parts_[1].setPos(198.0, 659.0);
+}
+
+void ReulstNewSkill::update()
+{
+}
+
+void ReulstNewSkill::fadeIn(bool val)
+{
+	if (this.isNotAvailable_)
+	{
+		return;
+	}
+	this.setPartsShow();
+	if (val)
+	{
+		if (this.nextLevel_ == -1)
+		{
+			this.parts_[1].startFlat(false, 1.0);
+		}
+		PartsMotion m;
+		m.setCgRangeMove(0, 0, 0, 305, 0, 0, 910, 305, 1);
+		m.setTime(500);
+		this.parts_[0].runMotion(m, NULL);
+	}
+	else
+	{
+		this.parent_.runMotion(getStandardMotion(1), NULL);
+	}
+	this.info_.fadeIn(val, NULL);
+	this.view_.fadeIn(val);
+}
+

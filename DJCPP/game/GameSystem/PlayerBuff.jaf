@@ -1,0 +1,45 @@
+void PlayerBuff::init(string id)
+{
+	this.id_ = id;
+	this.loadParam();
+}
+
+void PlayerBuff::loadParam()
+{
+	string key = "プレイヤーバフ情報";
+	this.name_ = EX_SA2String(key, this.id_, "name", "");
+	this.imageName_ = EX_SA2String(key, this.id_, "imageName", "");
+	this.type_ = EX_SA2Int(key, this.id_, "type", 0);
+	this.calcType_ = EX_SA2Int(key, this.id_, "calcType", 0);
+}
+
+string PlayerBuff::getId()
+{
+	return this.id_;
+}
+
+string PlayerBuff::getName()
+{
+	return this.name_;
+}
+
+int PlayerBuff::getType()
+{
+	return this.type_;
+}
+
+string PlayerBuff::getImageName()
+{
+	return this.imageName_;
+}
+
+int PlayerBuff::getCalcType()
+{
+	return this.calcType_;
+}
+
+bool PlayerBuff::isAttackBuff()
+{
+	return this.type_ < 100;
+}
+

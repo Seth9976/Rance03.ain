@@ -1,0 +1,286 @@
+ref MapPlace getMapPlaceFromId(string id)
+{
+	int i;
+	for (i = 0; i < g_mapPlace.Numof(); ++i)
+	{
+		if (g_mapPlace[i].getId() == id)
+		{
+			return g_mapPlace[i];
+		}
+	}
+	return NULL;
+}
+
+ref CardInfomation getCardInfomationFromId(string cardId)
+{
+	int i;
+	for (i = 0; i < g_cardInfomation.Numof(); ++i)
+	{
+		if (g_cardInfomation[i].getId() == cardId)
+		{
+			return g_cardInfomation[i];
+		}
+	}
+	return NULL;
+}
+
+ref Dungeon getDungeonFromId(string dungeonId)
+{
+	int i;
+	for (i = 0; i < g_dungeon.Numof(); ++i)
+	{
+		if (g_dungeon[i].getId() == dungeonId)
+		{
+			return g_dungeon[i];
+		}
+	}
+	return NULL;
+}
+
+ref PlayerSkill getPlayerSkillFromId(string attackSkillId)
+{
+	int l;
+	int r = g_attackSkill.Numof() - 1;
+	int m;
+	while (l <= r)
+	{
+		m = (l + r) / 2;
+		string mId = g_attackSkill[m].getId();
+		if (attackSkillId == mId)
+		{
+			return g_attackSkill[m];
+		}
+		else if (attackSkillId < mId)
+		{
+			r = m - 1;
+		}
+		else
+		{
+			l = m + 1;
+		}
+	}
+	return NULL;
+}
+
+ref Player getPlayerFromId(string characterId)
+{
+	int i;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		if (g_player[i].getId() == characterId)
+		{
+			return g_player[i];
+		}
+	}
+	return NULL;
+}
+
+ref Monster getMonsterFromId(string monsterId)
+{
+	int i;
+	for (i = 0; i < g_monster.Numof(); ++i)
+	{
+		if (g_monster[i].getId() == monsterId)
+		{
+			return g_monster[i];
+		}
+	}
+	return NULL;
+}
+
+ref MonsterAttackAttribute getMonsterAttackAttributeFromId(string attrId)
+{
+	int i;
+	for (i = 0; i < g_monsterAttackAttribute.Numof(); ++i)
+	{
+		if (g_monsterAttackAttribute[i].getId() == attrId)
+		{
+			return g_monsterAttackAttribute[i];
+		}
+	}
+	return NULL;
+}
+
+ref PlayerSkillAttribute getPlayerSkillAttributeFromId(string attrId)
+{
+	int i;
+	for (i = 0; i < g_playerAttackAttribute.Numof(); ++i)
+	{
+		if (g_playerAttackAttribute[i].getId() == attrId)
+		{
+			return g_playerAttackAttribute[i];
+		}
+	}
+	return NULL;
+}
+
+ref PlayerBuff getPlayerBuffFromId(string id)
+{
+	int i;
+	for (i = 0; i < g_playerBuff.Numof(); ++i)
+	{
+		if (g_playerBuff[i].getId() == id)
+		{
+			return g_playerBuff[i];
+		}
+	}
+	return NULL;
+}
+
+ref MonsterBuff getMonsterBuffFromId(string id)
+{
+	int i;
+	for (i = 0; i < g_monsterBuff.Numof(); ++i)
+	{
+		if (g_monsterBuff[i].getId() == id)
+		{
+			return g_monsterBuff[i];
+		}
+	}
+	return NULL;
+}
+
+ref Item getItemFromId(string id)
+{
+	int i;
+	for (i = 0; i < g_item.Numof(); ++i)
+	{
+		if (g_item[i].getId() == id)
+		{
+			return g_item[i];
+		}
+	}
+	pass("ItemId[%s]が見つかりません" % id);
+	return NULL;
+}
+
+ref Shop getShopFromId(string id)
+{
+	int i;
+	for (i = 0; i < g_shop.Numof(); ++i)
+	{
+		if (g_shop[i].getId() == id)
+		{
+			return g_shop[i];
+		}
+	}
+	return NULL;
+}
+
+ref MapEncountMonsterGroup getMapEncountMonsterGroupFromId(string id)
+{
+	int i;
+	for (i = 0; i < g_mapEncountMonsterGroup.Numof(); ++i)
+	{
+		if (g_mapEncountMonsterGroup[i].getId() == id)
+		{
+			return g_mapEncountMonsterGroup[i];
+		}
+	}
+	return NULL;
+}
+
+int getPlayerIndexFromId(string playerId)
+{
+	int i;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		if (g_player[i].getId() == playerId)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+ref BattleBackgroundInfomation getBattleBackGroundInfomationFromId(string id)
+{
+	int i;
+	for (i = 0; i < g_battleBackgroundInfomation.Numof(); ++i)
+	{
+		if (g_battleBackgroundInfomation[i].getId() == id)
+		{
+			return g_battleBackgroundInfomation[i];
+		}
+	}
+	return NULL;
+}
+
+ref ZeroThreeSkill getZeroThreeSkillFromId(string id)
+{
+	int i;
+	for (i = 0; i < g_zeroThreeSkill.Numof(); ++i)
+	{
+		if (g_zeroThreeSkill[i].getId() == id)
+		{
+			return g_zeroThreeSkill[i];
+		}
+	}
+	return NULL;
+}
+
+ref MonsterAttribute getMonsterAttributeFromId(string id)
+{
+	int i;
+	for (i = 0; i < g_monsterAttribute.Numof(); ++i)
+	{
+		if (g_monsterAttribute[i].getId() == id)
+		{
+			return g_monsterAttribute[i];
+		}
+	}
+	return NULL;
+}
+
+ref AdvSelectionButtonInfomation getAdvSelectionButtonInfomationFromId(string id)
+{
+	int i;
+	for (i = 0; i < g_advSelectionButtonInfomation.Numof(); ++i)
+	{
+		if (g_advSelectionButtonInfomation[i].getId() == id)
+		{
+			return g_advSelectionButtonInfomation[i];
+		}
+	}
+	return NULL;
+}
+
+ref MusicInfo getMusicInfoFromId(string id)
+{
+	int i;
+	for (i = 0; i < g_musicInfo.Numof(); ++i)
+	{
+		if (g_musicInfo[i].getId() == id)
+		{
+			return g_musicInfo[i];
+		}
+	}
+	return NULL;
+}
+
+ref EnquiteSelection getEnquiteSelectionFromName(string name)
+{
+	int i;
+	for (i = 0; i < g_enquiteSelection.Numof(); ++i)
+	{
+		if (g_enquiteSelection[i].getCheckBoxName() == name)
+		{
+			return g_enquiteSelection[i];
+		}
+	}
+	return NULL;
+}
+
+ref PlayerVoiceFinder getVoiceFinderFromId(string id)
+{
+	int i;
+	for (i = 0; i < g_voiceFinder.Numof(); ++i)
+	{
+		if (g_voiceFinder[i].getId() == id)
+		{
+			return g_voiceFinder[i];
+		}
+	}
+	return NULL;
+}
+

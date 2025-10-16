@@ -1,0 +1,136 @@
+string SYS_GetDirectoryName(string Path)
+{
+	int FindPos = SYS_FindLast(Path, "\\");
+	if (FindPos == -1)
+	{
+		return "";
+	}
+	return Path.GetPart(0, FindPos);
+}
+
+string SYS_GetFirstDirectoryName(string Path)
+{
+	int FindPos = Path.Find("\\");
+	if (FindPos == -1)
+	{
+		return "";
+	}
+	return Path.GetPart(0, FindPos);
+}
+
+string SYS_GetParentDirectoryName(string Path)
+{
+	return SYS_GetFileName(SYS_GetDirectoryName(Path));
+}
+
+string SYS_GetRelativePath(string Path, string Root)
+{
+	for (; ; )
+	{
+		string FirstDir = SYS_GetFirstDirectoryName(Root);
+		if (FirstDir.Empty() || FirstDir != SYS_GetFirstDirectoryName(Path))
+		{
+			break;
+		}
+		Path = Path.GetPart(FirstDir.Length() + 1, Path.Length());
+		Root = Root.GetPart(FirstDir.Length() + 1, Root.Length());
+	}
+	for (; ; )
+	{
+		string FirstDir = SYS_GetFirstDirectoryName(Root);
+		if (FirstDir.Empty())
+		{
+			break;
+		}
+		Path = "..\\" + Path;
+		Root = Root.GetPart(FirstDir.Length() + 1, Root.Length());
+	}
+	return Path;
+}
+
+bool SYS_IsSubDirectory(string Path, string Root)
+{
+	Root = SYS_GetDirectoryName(Root);
+	return Path.GetPart(0, Root.Length()) == Root;
+}
+
+string SYS_GetFileName(string Path)
+{
+	int FindPos = SYS_FindLast(Path, "\\");
+	if (FindPos == -1)
+	{
+		return Path;
+	}
+	return Path.GetPart(FindPos + 1, Path.Length());
+}
+
+string SYS_GetFileNameWithoutExtension(string Path)
+{
+	string FileName = SYS_GetFileName(Path);
+	int FindPos = SYS_FindLast(FileName, ".");
+	if (FindPos == -1)
+	{
+		return FileName;
+	}
+	return FileName.GetPart(0, FindPos);
+}
+
+string SYS_GetExtension(string Path)
+{
+	string FileName = SYS_GetFileName(Path);
+	int FindPos = SYS_FindLast(FileName, ".");
+	if (FindPos == -1)
+	{
+		return "";
+	}
+	return FileName.GetPart(FindPos + 1, FileName.Length());
+}
+
+string SYS_ChangeExtension(string Path, string Extention)
+{
+	string DirectoryName = SYS_GetDirectoryName(Path);
+	return (DirectoryName.Empty() ? "" : DirectoryName + "\\") + SYS_GetFileNameWithoutExtension(Path) + Extention;
+}
+
+string SYS_AddPunct(string Path)
+{
+	if (Path[Path.Length() - 1] != '\\')
+	{
+		Path.PushBack('\\');
+	}
+	return Path;
+}
+
+string SYS_DeletePunct(string Path)
+{
+	if (Path[Path.Length() - 1] == '\\')
+	{
+		Path.PopBack();
+	}
+	return Path;
+}
+
+string SYS_AddGameFolderPath(string Path)
+{
+	string GameFolderPath;
+	SystemService.GetGameFolderPath(GameFolderPath);
+	return GameFolderPath + Path;
+}
+
+string SYS_DeleteGameFolderPath(string Path)
+{
+	string GameFolderPath;
+	SystemService.GetGameFolderPath(GameFolderPath);
+	int PathLength = Path.Length();
+	int GameFolderPathLength = GameFolderPath.Length();
+	if (PathLength < GameFolderPathLength)
+	{
+		return Path;
+	}
+	if (Path.GetPart(0, GameFolderPathLength) != GameFolderPath)
+	{
+		return Path;
+	}
+	return Path.GetPart(GameFolderPathLength, PathLength - GameFolderPathLength);
+}
+

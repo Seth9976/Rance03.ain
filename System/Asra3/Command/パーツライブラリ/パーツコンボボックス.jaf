@@ -1,0 +1,64 @@
+void Ｐ＿コンボボックス＿サイズ設定(int パーツ番号, int 幅, int 高さ)
+{
+	PartsEngine.SetComboBoxSize(パーツ番号, 幅, 高さ);
+}
+
+void Ｐ＿コンボボックス＿マージン設定(int パーツ番号, int 幅, int 高さ)
+{
+	PartsEngine.SetComboBoxTextMargin(パーツ番号, 幅, 高さ);
+}
+
+int Ｐ＿コンボボックス＿マージン幅取得(int パーツ番号)
+{
+	return PartsEngine.GetComboBoxTextWidthMargin(パーツ番号);
+}
+
+int Ｐ＿コンボボックス＿マージン高さ取得(int パーツ番号)
+{
+	return PartsEngine.GetComboBoxTextHeightMargin(パーツ番号);
+}
+
+void Ｐ＿コンボボックス＿ＣＧ名設定(int パーツ番号, string ＣＧ名)
+{
+	PartsEngine.SetComboBoxCGName(パーツ番号, ＣＧ名);
+}
+
+string Ｐ＿コンボボックス＿ＣＧ名取得(int パーツ番号)
+{
+	string Name;
+	PartsEngine.GetComboBoxCGName(パーツ番号, Name);
+	return Name;
+}
+
+void Ｐ＿コンボボックス＿テキスト設定(int パーツ番号, string テキスト)
+{
+	PartsEngine.SetComboBoxText(パーツ番号, テキスト);
+}
+
+string Ｐ＿コンボボックス＿テキスト取得(int パーツ番号)
+{
+	string Text;
+	PartsEngine.GetComboBoxText(パーツ番号, Text);
+	return Text;
+}
+
+void Ｐ＿コンボボックス＿フォント設定(int パーツ番号, int 種類, int サイズ, int 赤, int 緑, int 青, float 太字幅, int 縁取り赤, int 縁取り緑, int 縁取り青, float 縁取り幅)
+{
+	PartsEngine.SetComboBoxFontProperty(パーツ番号, 種類, サイズ, 赤, 緑, 青, 太字幅, 縁取り赤, 縁取り緑, 縁取り青, 縁取り幅);
+}
+
+void Ｐ＿コンボボックス＿フォント取得(int パーツ番号, ref int 種類, ref int サイズ, ref int 赤, ref int 緑, ref int 青, ref float 太字幅, ref int 縁取り赤, ref int 縁取り緑, ref int 縁取り青, ref float 縁取り幅)
+{
+	PartsEngine.GetComboBoxFontProperty(パーツ番号, 種類, サイズ, 赤, 緑, 青, 太字幅, 縁取り赤, 縁取り緑, 縁取り青, 縁取り幅);
+}
+
+void Ｐ＿コンボボックス＿文字間隔設定(int パーツ番号, int 間隔)
+{
+	PartsEngine.SetComboBoxCharSpace(パーツ番号, 間隔);
+}
+
+int Ｐ＿コンボボックス＿文字間隔取得(int パーツ番号)
+{
+	return PartsEngine.GetComboBoxCharSpace(パーツ番号);
+}
+

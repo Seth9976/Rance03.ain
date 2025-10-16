@@ -1,0 +1,84 @@
+HelperCountView::HelperCountView()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void HelperCountView::init()
+{
+	this.initParts();
+}
+
+void HelperCountView::initParts()
+{
+	this.parts_[0].init("システム／ハッスル", 0);
+	this.parts_[1].initAsNumber("システム／数字／幅１２／ピンク", NULL);
+	this.parts_[2].init("システム／ハッスル／スラッシュ", 0);
+	this.parts_[3].initAsNumber("システム／数字／幅１６／白", NULL);
+	createPartsGroup(this.parent_, this.parts_, 8000);
+	this.setPartsValue();
+	this.setPartsPos();
+}
+
+void HelperCountView::setPartsValue()
+{
+	this.parts_[3].setNumber(g_playerCommonParam.getHelperCount());
+	this.parts_[1].setNumber(g_playerCommonParam.getMaxHelperCount());
+}
+
+void HelperCountView::update()
+{
+}
+
+void HelperCountView::setPos(int x, int y)
+{
+	this.x_ = x;
+	this.y_ = y;
+	this.parent_.setPos(x, y);
+}
+
+void HelperCountView::updateCount()
+{
+	this.setPartsValue();
+}
+
+void HelperCountView::fadeIn(bool val, unknown_delegate onFinish)
+{
+	this.setPartsShow();
+	if (val)
+	{
+		PartsMotion m;
+		m.setMove(this.x_ + 300, this.y_, this.x_, this.y_, 1);
+		m.setAlpha(0, 255, 0);
+		this.parent_.runMotion(m, NULL);
+	}
+	else
+	{
+		PartsMotion m;
+		m.setMove(this.x_, this.y_, this.x_ + 300, this.y_, 1);
+		m.setAlpha(255, 0, 0);
+		this.parent_.runMotion(m, NULL);
+	}
+}
+
+void HelperCountView::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void HelperCountView::setPartsPos()
+{
+	int x = 125;
+	int i;
+	for (i = 1; i <= 3; ++i)
+	{
+		this.parts_[i].setPos(x, 47.0);
+		this.parts_[i].setOrigin(3);
+		x -= this.parts_[i].getWidth();
+	}
+}
+

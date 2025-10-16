@@ -1,0 +1,177 @@
+DamageNumber::DamageNumber()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void DamageNumber::init(int value, string effectName, bool isDamage, bool isCritical, bool isDefence, int resistType)
+{
+	this.release();
+	this.value_ = value;
+	this.isDamage_ = isDamage;
+	this.resistType_ = resistType;
+	this.isDefence_ = isDefence;
+	this.isCritical_ = isCritical;
+	this.effect_.init(effectName);
+	this.initParts();
+	this.initEffect();
+}
+
+void DamageNumber::initEffect()
+{
+}
+
+void DamageNumber::release()
+{
+}
+
+void DamageNumber::update()
+{
+	switch (this.state_)
+	{
+	case 1:
+		if (this.t_.getTime() > 500)
+		{
+			this.fadeOut();
+		}
+		break;
+	}
+}
+
+void DamageNumber::run(int delay, DG_GeneralCallback onFinishCallback)
+{
+	this.onFinishCallback_ = onFinishCallback;
+	this.state_ = 1;
+	this.parent_.setShow(true);
+	this.timerCb_.setTimer(delay, this.startPartsMotion);
+	this.t_.reset();
+}
+
+void DamageNumber::startPartsMotion()
+{
+	PartsMotion m;
+	if (this.isDamage_)
+	{
+		m.setTime(300);
+		m.setShakeLevel(30, 30, 0);
+		this.effect_.run(this.isCritical_ ? 1 : 0);
+	}
+	else
+	{
+		m.setTime(300);
+		m.setKey(16, 255, 0, 0);
+		this.effect_.run(2);
+	}
+	this.parent_.runMotion(m, NULL);
+}
+
+void DamageNumber::initParts()
+{
+	string partsName;
+	if (this.isDamage_)
+	{
+		if (this.isCritical_)
+		{
+			this.numWidth_ = 55;
+			this.numSpan_ = -9;
+			partsName = "システム／数字／クリティカル";
+		}
+		else
+		{
+			this.numWidth_ = 42;
+			this.numSpan_ = -5;
+			partsName = "システム／数字／ダメージ";
+		}
+	}
+	else
+	{
+		this.numWidth_ = 40;
+		this.numSpan_ = -4;
+		partsName = "システム／数字／幅４０／緑";
+	}
+	NumberPartsInfomation n;
+	n.setSameWidth(this.numWidth_);
+	n.setSpan(this.numSpan_);
+	this.parts_[1].initAsNumber(partsName, n);
+	if (this.resistType_ == 1)
+	{
+		this.parts_[0].init("システム／戦闘／弱点", 0);
+	}
+	else
+	{
+		this.parts_[0].init("システム／戦闘／抵抗", 0);
+	}
+	this.parts_[2].init("システム／戦闘／クリティカル", 0);
+	this.parts_[3].init("システム／スキル／モンスター／攻撃／防御", 0);
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setOrigin(8);
+	}
+	createPartsGroup(this.parent_, this.parts_, 3050);
+	this.setPartsShow();
+	this.setPartsPos();
+	this.parts_[1].setNumber(this.value_);
+}
+
+void DamageNumber::setColor()
+{
+	if (this.isDamage_)
+	{
+		this.parts_[1].setMultiColorValue(255, 128, 0);
+	}
+	else
+	{
+		this.parts_[1].setMultiColorValue(0, 255, 128);
+	}
+}
+
+void DamageNumber::setPartsShow()
+{
+	this.parts_[1].setShow(true);
+	this.parts_[0].setShow(this.resistType_ != 0);
+	this.parts_[2].setShow(this.isCritical_);
+	this.parts_[3].setShow(this.isDefence_);
+}
+
+void DamageNumber::fadeOut()
+{
+	this.state_ = 2;
+	PartsMotion m;
+	m.setTime(300);
+	m.setAlpha(255, 0, 0);
+	this.parent_.runMotion(m, this.onFinishFadeOut);
+}
+
+void DamageNumber::onFinishFadeOut()
+{
+	this.state_ = 0;
+	this.onFinishCallback_();
+}
+
+void DamageNumber::setPos(int x, int y, int effectOffsetX, int effectOffsetY)
+{
+	this.x_ = x;
+	this.y_ = y;
+	this.parent_.setPos(this.x_, this.y_);
+	this.effect_.setPos(this.x_ + effectOffsetX, this.y_ + effectOffsetY);
+}
+
+void DamageNumber::setPartsPos()
+{
+	this.parts_[1].setOrigin(5);
+	this.parts_[0].setOrigin(5);
+	this.parts_[2].setOrigin(6);
+	this.parts_[3].setOrigin(5);
+	int keta = int(Math.Log10(this.value_)) + 1;
+	int width = keta * this.numWidth_ + (keta - 1) * this.numSpan_;
+	int height = this.parts_[1].getHeight();
+	this.parts_[2].setPos(width / 2, height / 2);
+	this.parts_[3].setPos(-(width / 2) - 30, 0.0);
+	this.parent_.setPos(this.x_, this.y_);
+}
+
+void DamageNumber::setEffectZ(int z)
+{
+	this.effect_.setZ(z);
+}
+

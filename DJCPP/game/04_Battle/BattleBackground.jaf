@@ -1,0 +1,145 @@
+BattleBackground::BattleBackground()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void BattleBackground::init(string battleBackGroundId, string flatEffectName)
+{
+	this.id_ = battleBackGroundId;
+	this.flatEffectName_ = flatEffectName;
+	this.isBlackOut_ = false;
+	this.initParts();
+	this.initLines();
+}
+
+void BattleBackground::initLines()
+{
+	int i;
+	for (i = 0; i < this.lines_.Numof(); ++i)
+	{
+		this.lines_[i].init(2);
+		this.lines_[i].setCenter(768, 256);
+	}
+}
+
+void BattleBackground::stopLines()
+{
+	int i;
+	for (i = 0; i < this.lines_.Numof(); ++i)
+	{
+		this.lines_[i].setLoopMode(false);
+	}
+}
+
+void BattleBackground::startLines()
+{
+	int i;
+	for (i = 0; i < this.lines_.Numof(); ++i)
+	{
+		this.lines_[i].setLoopMode(true);
+		this.lines_[i].run();
+	}
+}
+
+void BattleBackground::initParts()
+{
+	BattleBackgroundInfomation bg;
+	bg = getBattleBackGroundInfomationFromId(this.id_);
+	this.parts_[0].init(bg.getImageName(), 0);
+	this.parts_[0].setOrigin(5);
+	if (this.flatEffectName_ != "")
+	{
+		this.parts_[1].initAsFlat(this.flatEffectName_);
+	}
+	createPartsGroup(this.parent_, this.parts_, 0);
+	this.parts_[0].setZ(2000.0);
+	this.parts_[1].setZ(2350.0);
+	this.setPartsShow();
+	this.setPartsPos();
+}
+
+void BattleBackground::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void BattleBackground::setPartsPos()
+{
+	this.parts_[0].setPos(512.0, 384.0);
+}
+
+void BattleBackground::update()
+{
+}
+
+void BattleBackground::shake(int mode)
+{
+	if (mode == 1)
+	{
+		PartsMotion m;
+		m.setShakeLevel(50, 0, 0);
+		m.setTime(300);
+		this.parent_.runMotion(m, NULL);
+	}
+	else if (mode == 2)
+	{
+		PartsMotion m;
+		m.setShakeLevel(100, 0, 0);
+		m.setTime(400);
+		this.parent_.runMotion(m, NULL);
+	}
+}
+
+void BattleBackground::fadeIn(bool val)
+{
+	if (val)
+	{
+		PartsMotion m;
+		m.setTime(500);
+		m.setAlpha(0, 255, 0);
+		this.parts_[0].runMotion(m, NULL);
+		this.parts_[1].startFlat(false, 1.0);
+		this.parts_[1].runMotion(m, NULL);
+	}
+	else
+	{
+		PartsMotion m;
+		m.setAlpha(255, 0, 0);
+		this.parts_[0].runMotion(m, NULL);
+		this.parts_[1].runMotion(m, NULL);
+	}
+}
+
+void BattleBackground::blackOut(bool val)
+{
+	if (this.isBlackOut_ == val)
+	{
+		return;
+	}
+	PartsMotion m;
+	if (val)
+	{
+		m.setTime(500);
+		m.setKey(17, 255, 128, 0);
+		this.startLines();
+		this.timer_.setTimer(1000, this.stopLines);
+	}
+	else
+	{
+		m.setTime(300);
+		m.setKey(17, 128, 255, 0);
+	}
+	this.isBlackOut_ = val;
+	this.parts_[0].runMotion(m, NULL);
+}
+
+bool BattleBackground::isUseFlat()
+{
+	return this.flatEffectName_ != "";
+}
+

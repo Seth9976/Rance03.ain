@@ -1,0 +1,134 @@
+MouseInput::MouseInput()
+{
+	this.x_ = 0;
+	this.y_ = 0;
+}
+
+void MouseInput::update()
+{
+	this.updateCursorPos();
+	this.updateAccelaration();
+	this.updateButtonState();
+	if (this.btn_[0].onDown())
+	{
+		this.objectIdOnDown_ = g_gameObjectManager.getFocusedObjectId();
+	}
+	else if (this.btn_[0].isPress())
+	{
+		this.objectIdOnUp_ = g_gameObjectManager.getFocusedObjectId();
+	}
+	this.updateWheel();
+}
+
+void MouseInput::updateCursorPos()
+{
+	this.lastX_ = this.x_;
+	this.lastY_ = this.y_;
+	int x;
+	int y;
+	if (AFL_Mouse_GetPos(x, y))
+	{
+		this.x_ = x;
+		this.y_ = y;
+	}
+	this.isCursorChanged_ = this.lastX_ != this.x_ || this.lastY_ != this.y_;
+}
+
+void MouseInput::updateAccelaration()
+{
+	int dx = this.x_ - this.lastX_;
+	int dy = this.y_ - this.lastY_;
+	this.accelaretionX_ = this.x_ - this.lastX_;
+	this.accelaretionY_ = this.y_ - this.lastY_;
+}
+
+void MouseInput::updateButtonState()
+{
+	this.btn_[0].update(AFL_IsKeyDown(1) || AFL_IsKeyDown(13));
+	this.btn_[1].update(AFL_IsKeyDown(2) || AFL_IsKeyDown(32));
+}
+
+void MouseInput::updateWheel()
+{
+	int fw;
+	int bk;
+	AFL_MouseWheel_GetCount(fw, bk);
+	AFL_MouseWheel_ClearCount();
+	this.wheelVal_ = fw - bk;
+}
+
+void MouseInput::setPos(int x, int y)
+{
+}
+
+void MouseInput::setNextMouseUpIgnore()
+{
+	this.btn_[0].setNextMouseUpIgnore();
+	this.objectIdOnDown_ = -2;
+}
+
+void MouseInput::forceClick(int n)
+{
+	this.btn_[n].forceClick();
+}
+
+bool MouseInput::isCursorChanged()
+{
+	return this.isCursorChanged_;
+}
+
+bool MouseInput::isClick(int button)
+{
+	return this.btn_[button].isPress();
+}
+
+bool MouseInput::isClickWithFocus(int objectId)
+{
+	return this.btn_[0].isPress() && this.objectIdOnDown_ == this.objectIdOnUp_ && objectId == this.objectIdOnDown_ && this.objectIdOnDown_ >= 0;
+}
+
+bool MouseInput::isClickWithNoFocus()
+{
+	return this.btn_[0].isPress() && this.objectIdOnDown_ == -1 && this.objectIdOnUp_ == -1;
+}
+
+bool MouseInput::isDown(int button)
+{
+	return this.btn_[button].isDown();
+}
+
+bool MouseInput::onDown(int button)
+{
+	return this.btn_[button].onDown();
+}
+
+int MouseInput::getX()
+{
+	return this.x_;
+}
+
+int MouseInput::getY()
+{
+	return this.y_;
+}
+
+int MouseInput::getWheel()
+{
+	return this.wheelVal_;
+}
+
+int MouseInput::getFocusedObjectId()
+{
+	return this.objectIdOnDown_;
+}
+
+float MouseInput::getAccelarationX()
+{
+	return this.accelaretionX_;
+}
+
+float MouseInput::getAccelarationY()
+{
+	return this.accelaretionY_;
+}
+

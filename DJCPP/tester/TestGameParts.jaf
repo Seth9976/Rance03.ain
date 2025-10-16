@@ -1,0 +1,1246 @@
+void test_Button_NormalButton()
+{
+	NormalButton btn;
+	btn.init("システム／ボタン／幅２００", "テキスト", "", true);
+	btn.setPos(512, 384);
+	btn.fadeIn(true);
+	g_frameManager.updateFrame();
+	while (!g_mouse.isClick(1))
+	{
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+		if (btn.isClick())
+		{
+			pass("clicked");
+		}
+	}
+	btn.setEnable(false);
+	g_frameManager.updateFrame();
+	while (!g_mouse.isClick(1))
+	{
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+}
+
+void test_Game_FlagMap()
+{
+	g_gameFlagMap.setInt("テストABC", 100);
+	assert(g_gameFlagMap.getInt("テストABC") == 100);
+	g_gameFlagMap.setInt("テストABC", 200);
+	assert(g_gameFlagMap.getInt("テストABC") == 200);
+	g_gameFlagMap.setInt("テストBCD", 456456);
+	assert(g_gameFlagMap.getInt("テストBCD") == 456456);
+	g_gameFlagMap.setString("テストHOGE", "asdfasdf");
+	assert(g_gameFlagMap.getString("テストHOGE") == "asdfasdf");
+}
+
+void test_Map_Chain()
+{
+	MapChain chain;
+	chain.addChain("1", "2", true);
+	chain.addChain("1", "5", true);
+	chain.addChain("1", "4", true);
+	chain.addChain("2", "3", true);
+	chain.addChain("5", "3", true);
+	chain.addChain("6", "3", true);
+	chain.addChain("7", "8", true);
+	int i;
+	for (i = 1; i <= 6; ++i)
+	{
+		string current = "%d" % i;
+		array@string n;
+		chain.getNeighbor(n, current);
+		int j;
+		for (j = 0; j < n.Numof(); ++j)
+		{
+			pass("nord:%s neighbor:%s" % current % n[j]);
+		}
+	}
+	array@string route;
+	pass("1-2");
+	chain.getRoute(route, "1", "2");
+	for (i = 0; i < route.Numof(); ++i)
+	{
+		pass("route: %s" % route[i]);
+	}
+	pass("6-4");
+	chain.getRoute(route, "6", "4");
+	for (i = 0; i < route.Numof(); ++i)
+	{
+		pass("route: %s" % route[i]);
+	}
+	pass("5-6");
+	chain.getRoute(route, "5", "6");
+	for (i = 0; i < route.Numof(); ++i)
+	{
+		pass("route: %s" % route[i]);
+	}
+	pass("4-5");
+	chain.getRoute(route, "4", "5");
+	for (i = 0; i < route.Numof(); ++i)
+	{
+		pass("route: %s" % route[i]);
+	}
+	pass("3-4");
+	chain.getRoute(route, "3", "4");
+	for (i = 0; i < route.Numof(); ++i)
+	{
+		pass("route: %s" % route[i]);
+	}
+	pass("1-7");
+	chain.getRoute(route, "1", "7");
+	for (i = 0; i < route.Numof(); ++i)
+	{
+		pass("route: %s" % route[i]);
+	}
+}
+
+void test_Branch()
+{
+	PartsBranch parts_;
+	parts_.init(0);
+	while (true)
+	{
+		parts_.setPos(512, 384, g_mouse.getX(), g_mouse.getY());
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_Scene_Party()
+{
+	debugPlayerJoinAll();
+	openParty(false);
+}
+
+void test_Party_PlayerStatusView()
+{
+	PlayerStatusView view;
+	array@string n;
+	getAlivePlayerList(n);
+	view.init(n);
+	view.fadeIn(true);
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_Party_PlayerStandView()
+{
+	PlayerStandView view;
+	view.init("ランス");
+	view.setGroupPos(512, 300, true);
+	float n;
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+		view.setVirtualPos(n);
+		if (g_mouse.getWheel() < 0)
+		{
+			n += 0.3;
+		}
+		else if (g_mouse.getWheel() > 0)
+		{
+			n -= 0.3;
+		}
+	}
+}
+
+void test_Party_PlayerStandGroup()
+{
+	PlayerStandGroup grp;
+	debugPlayerJoinAll();
+	grp.init();
+	int n;
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+		if (g_mouse.getWheel() < 0)
+		{
+			n++;
+		}
+		else if (g_mouse.getWheel() > 0)
+		{
+			n--;
+		}
+		grp.setPos(n);
+	}
+}
+
+void test_Button_BalloonButton()
+{
+	BalloonButton btn;
+	btn.init("システム／吹き出し／仮", "仮テキスト", NULL, 0);
+	btn.setPos(100, 100);
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_Player_Button()
+{
+	PlayerButton btn;
+	btn.init("ランス", NULL);
+	btn.setPos(100, 100);
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_Scene_TargetCharacterSelect()
+{
+	int joinCount = 1;
+	while (true)
+	{
+		int i;
+		for (i = 0; i < Math.Min(joinCount, g_player.Numof()); ++i)
+		{
+			g_player[i].setJoin(true);
+		}
+		string r = openTargetPlayerSelect(0);
+		if (r == "")
+		{
+			return;
+		}
+		++joinCount;
+	}
+}
+
+void test_Scene_LevelGod()
+{
+	while (true)
+	{
+		int j;
+		for (j = 0; j < g_player.Numof(); ++j)
+		{
+			g_player[j].setJoin(true);
+			g_player[j].setMaxLevel(999);
+			g_player[j].setExp(10000000);
+		}
+		openLevelGod();
+	}
+}
+
+void test_LevelUpResult()
+{
+	ref LevelUpResult result;
+	result <- new LevelUpResult;
+	制御／プロローグ／初期設定／レベル();
+	getPlayerFromId("ランス").setExp(getPlayerFromId("ランス").getNextExp());
+	result.init("ランス");
+	getPlayerFromId("ランス").levelUp();
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		if (g_mouse.isClick(0))
+		{
+			result <- NULL;
+			result <- new LevelUpResult;
+			getPlayerFromId("ランス").setExp(getPlayerFromId("ランス").getNextExp());
+			result.init("ランス");
+		}
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_VerticalScroller()
+{
+	VerticalScroller vscroll;
+	Parts p;
+	p.init("立ち絵／ありす／基本", 0);
+	p.setShow(true);
+	vscroll.init(0, 0, 1024, 768, p.getHeight(), 100, true);
+	p.setParent(vscroll.getPartsNumber());
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_FloatingLayout()
+{
+	array@string p;
+	p.PushBack("システム／スキル／弱点／物理弱点");
+	p.PushBack("システム／戦闘／バフ／攻撃上昇");
+	p.PushBack("システム／戦闘／背中／ミリ");
+	p.PushBack("システム／マップ／ランス");
+	p.PushBack("システム／所持金");
+	p.PushBack("システム／戦闘／攻撃告知／射程外");
+	p.PushBack("システム／編成／スキル装備");
+	PartsFloatingLayout layout;
+	array@Parts parts;
+	parts.Alloc(p.Numof());
+	int i;
+	for (i = 0; i < parts.Numof(); ++i)
+	{
+		parts[i].init(p[i], 0);
+		parts[i].setShow(true);
+	}
+	layout.reset(100, 100, true);
+	layout.add(parts[0]);
+	layout.add(parts[1]);
+	layout.add(parts[2]);
+	layout.add(parts[3]);
+	layout.br();
+	layout.add(parts[4]);
+	layout.add(parts[5]);
+	layout.br();
+	layout.add(parts[6]);
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_Battle_ResultView()
+{
+	BattleResultView br;
+	array@BattleBonus expBonus;
+	array@BattleBonus goldBonus;
+	int exp;
+	int gold;
+	int prob;
+	string itemId;
+	BattleBonus t;
+	t.init("テストボーナス１", 100);
+	expBonus.PushBack(t);
+	t.init("テストボーナス２", 50);
+	expBonus.PushBack(t);
+	t.init("テストボーナス３", 25);
+	expBonus.PushBack(t);
+	t.init("ゴールドボーナス１", 100);
+	goldBonus.PushBack(t);
+	t.init("ゴールドボーナス２", 50);
+	goldBonus.PushBack(t);
+	exp = 1000;
+	gold = 12345;
+	itemId = g_item[0].getId();
+	br.init(expBonus, goldBonus, exp, gold, itemId);
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_Scene_BattleResult()
+{
+	int n;
+	while (n < 16)
+	{
+		g_battleResult.reset();
+		int p = n & 1;
+		if (p)
+		{
+			g_battleResult.addExpBonus("tesuto1", 30);
+			g_battleResult.addExpBonus("tesuto2", 40);
+			g_battleResult.addExpBonus("tesuto3", 50);
+		}
+		int r = n & 2;
+		if (r)
+		{
+			g_battleResult.addGoldBonus("tesusdfdto1", 30);
+			g_battleResult.addGoldBonus("asdftesuto2", 50);
+			g_battleResult.addGoldBonus("tesusdfdto3", 30);
+			g_battleResult.addGoldBonus("asdftesuto4", 50);
+			g_battleResult.addGoldBonus("tesusdfdto5", 30);
+			g_battleResult.addGoldBonus("asdftesuto6", 50);
+		}
+		g_battleResult.setFinalAttacker("リア");
+		BattleInfomation info;
+		info.setExp(1000);
+		info.setGold(10000);
+		int s = n & 4;
+		if (s)
+		{
+			info.setItem(g_item[0].getId(), 100);
+		}
+		int t = n & 8;
+		if (t)
+		{
+			g_battleResult.addBattleEndMessage("テストメッセージ");
+		}
+		g_battleResult.setInfo(info);
+		openBattleResult();
+		++n;
+	}
+}
+
+void test_Dungeon_PlayerPiece()
+{
+	DungeonPlayerPiece piece;
+	piece.init("ランス", 0);
+	piece.fadeIn(true);
+	int z;
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		if (g_mouse.isClick(0))
+		{
+			if (z == 0)
+			{
+				piece.moveSideWays(RAND(2) - 1);
+				++z;
+			}
+			else if (z == 1)
+			{
+				piece.moveFront();
+				z = 0;
+			}
+		}
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_Dungeon_CenterCursor()
+{
+	DungeonCenterCursor cur;
+	cur.init();
+	int z;
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		if (g_mouse.isClick(0))
+		{
+			if (z == 0)
+			{
+				cur.fadeIn(true);
+				++z;
+			}
+			else if (z == 1)
+			{
+				cur.fadeIn(false);
+				z = 0;
+			}
+		}
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_SkillSelector_All()
+{
+	array@SkillSelector ss;
+	int page = -1;
+	int maxPage = (g_attackSkill.Numof() + 7) / 8 - 1;
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		if (g_mouse.isClick(0))
+		{
+			if (page == maxPage)
+			{
+				page = 0;
+			}
+			else
+			{
+				++page;
+			}
+			int count = 8;
+			if (page == maxPage && g_attackSkill.Numof() % 8 != 0)
+			{
+				count = g_attackSkill.Numof() % 8;
+			}
+			ss.Free();
+			ss.Alloc(count);
+			int i;
+			for (i = 0; i < count; ++i)
+			{
+				ss[i].init(g_attackSkill[page * 8 + i].getId(), g_attackSkill[page * 8 + i].getPlayerId(), i, false);
+				ss[i].fadeIn(true, false);
+			}
+		}
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_Dialog()
+{
+	while (true)
+	{
+		DialogInfomation info;
+		info.setCaption("０１２３４５６７８９０１２３４５６７８９０");
+		info.setMessage("宝箱からアイテムを取得|やったね|アイテムが増えるよ！");
+		info.setItemId(g_item[0].getId());
+		info.setAnswerTypeYesNo(true);
+		int result = openDialog(info);
+		if (result == 1)
+		{
+			return;
+		}
+		DialogInfomation info;
+		info.setCaption("ダメージを食らった");
+		info.setMessage("あｓｄｆ|２行テスト");
+		info.setPictureImageType(2);
+		openDialog(info);
+		DialogInfomation info;
+		info.setCaption("情報だよ");
+		info.setMessage("１行テスト");
+		info.setPictureImageType(0);
+		openDialog(info);
+	}
+}
+
+void test_MessagePopup()
+{
+	MessagePopup popup;
+	popup.init("ああ＾～ こころがぴょんぴょんするんじゃあ～");
+	bool v = true;
+	popup.setPos(512, 384);
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		if (g_mouse.isClick(0))
+		{
+			popup.fadeIn(v);
+			v = v ? false : true;
+			pass("%d" % v);
+		}
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_Adv_SelectionButton()
+{
+	array@string n;
+	n.PushBack("キースギルドへ行く");
+	n.PushBack("自宅へ帰る");
+	n.PushBack("宿屋へ行く");
+	n.PushBack("ラジール屋敷へ行く");
+	n.PushBack("解放軍司令部へ行く");
+	n.PushBack("解放軍司令部へ行く");
+	n.PushBack("ああへ行く");
+	n.PushBack("いい軍司令部へ行く");
+	array@AdvSelectionButton btn;
+	btn.Alloc(n.Numof());
+	int i;
+	for (i = 0; i < btn.Numof(); ++i)
+	{
+		btn[i].init(n[i], i, btn.Numof(), true);
+	}
+	bool b = true;
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		if (g_mouse.isClick(0))
+		{
+			int i;
+			for (i = 0; i < btn.Numof(); ++i)
+			{
+				btn[i].fadeIn(b, i * 50);
+			}
+			b = !b;
+		}
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_testAdvSelection()
+{
+	gameAddAdvSelection(0, "キースギルドへ行く");
+	gameAddAdvSelection(1, "自宅へ帰る");
+	gameAddAdvSelection(2, "宿屋へ行く");
+	gameAddAdvSelection(3, "ラジール屋敷へ行く");
+	gameAddAdvSelection(4, "解放軍司令部へ行く");
+	gameAddAdvSelection(5, "解放軍司令部へ行く");
+	gameAddAdvSelection(6, "ああへ行く");
+	gameAddAdvSelection(7, "いい軍司令部へ行く");
+	gameAddAdvSelection(9, "セーブの碑へ行く");
+	gameAddAdvSelection(10, "ロードの碑へ行く");
+	gameAddAdvSelection(99, "居館一階を出る");
+	g_gameSceneManager.setCurrentPos("居館");
+	int result = gameAdvSelection();
+}
+
+void test_Dungeon_DotView()
+{
+	DungeonDotView dv;
+	dv.init(g_dungeon[0].getId());
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_HVScoller()
+{
+	HVScroller hv;
+	hv.init(1024.0, 768.0, 2048.0, 1536.0);
+	Parts p;
+	p.init("システム／マップ", 0);
+	p.setParent(hv.getPartsNumber());
+	p.setShow(true);
+	while (!g_mouse.isClick(1))
+	{
+		if (g_mouse.isClick(0))
+		{
+			hv.moveFocus(RAND(2048), RAND(1536), NULL);
+		}
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_WorldMap()
+{
+	debugSetMapAllChain();
+	WorldMap wm;
+	wm.init(g_mapPlace[0].getId());
+	wm.fadeIn(true, 1000, NULL);
+	wm.showNewBranch(NULL);
+	while (!g_mouse.isClick(1))
+	{
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_FollowCamera()
+{
+	FollowCamera fc;
+	fc.setPos(0, 0);
+	Parts p;
+	p.init("システム／マップ／ランス", 0);
+	p.setShow(true);
+	while (!g_mouse.isClick(1))
+	{
+		p.setPos(fc.getX(), fc.getY());
+		fc.setFollowPos(g_mouse.getX(), g_mouse.getY());
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_VirtualPositionConverter()
+{
+	float x;
+	float y;
+	float s;
+	float a;
+	int i;
+	for (i = -4; i <= 4; ++i)
+	{
+		convertVirtualPartyPositionToXY(i, x, y, s, a);
+		pass("x:%f, y:%f, s:%f, a:%f" % x % y % s % a);
+	}
+}
+
+void test_ResultMessagePopup()
+{
+	MessagePopup popup;
+	popup.init("テストメッセージ");
+	popup.fadeIn(true);
+	while (!g_mouse.isClick(1))
+	{
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_ResultNewSkill()
+{
+	ReulstNewSkill ns;
+	ns.init("", -1);
+	ns.fadeIn(true);
+	while (!g_mouse.isClick(1))
+	{
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_BattleResult_BonusView()
+{
+	BattleBonus bonus;
+	bonus.init("テストあｓｄｆ", 123);
+	array@BonusView view[8];
+	int i;
+	for (i = 0; i < view.Numof(); ++i)
+	{
+		view[i].init(bonus, false);
+		view[i].setPos(100, 100 + i * 50);
+		view[i].fadeIn(true, 50 * i, NULL);
+	}
+	while (!g_mouse.isClick(1))
+	{
+		if (g_mouse.isClick(0))
+		{
+			int i;
+			for (i = 0; i < view.Numof(); ++i)
+			{
+				view[i].fadeIn(false, 0, NULL);
+			}
+		}
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_BattleResult_BonusGroupView()
+{
+	array@BonusGroupView groupView[2];
+	array@BattleBonus bonus[5];
+	int i;
+	for (i = 0; i < bonus.Numof(); ++i)
+	{
+		bonus[i].init("テスト%d" % i, RAND(100));
+	}
+	groupView[0].init(bonus, 1234, 10, false);
+	groupView[1].init(bonus, 1234, 10, true);
+	groupView[0].fadeIn(true, NULL);
+	groupView[1].fadeIn(true, NULL);
+	while (!g_mouse.isClick(1))
+	{
+		if (g_mouse.isClick(0))
+		{
+			groupView[0].fadeIn(false, NULL);
+			groupView[1].fadeIn(false, NULL);
+		}
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_PartsMovePow()
+{
+	array@Parts p[3];
+	int i;
+	for (i = 0; i < p.Numof(); ++i)
+	{
+		p[i].initAsPlaneImage(50, 50, 255, 255, 255, 255);
+		p[i].setShow(true);
+	}
+	LocalTimer t;
+	t.reset();
+	while (!g_mouse.isClick(1))
+	{
+		if (t.getTime() > 1000)
+		{
+			t.reset();
+		}
+		float tt = t.getTime() / 1000.0;
+		int i;
+		for (i = 0; i < p.Numof(); ++i)
+		{
+			int type;
+			switch (i)
+			{
+			case 0:
+				type = 1;
+				break;
+			case 1:
+				type = 2;
+				break;
+			case 2:
+				type = 7;
+				break;
+			}
+			p[i].setPos(getMotionValue(type, 0.0, 512.0, tt), i * 100);
+		}
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_BattleResult_BonusItemView()
+{
+	BonusItemView view;
+	view.init(g_item[0].getId());
+	view.fadeIn(true, NULL);
+	while (!g_mouse.isClick(1))
+	{
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+testT::testT()
+{
+	this.t = 2;
+}
+
+testT::~testT()
+{
+	this.t = 3;
+}
+
+void test_ReferenceContainer()
+{
+	array@testContainer c;
+	testContainer t;
+	c.Insert(0, t);
+}
+
+void test_testHorizontalLine()
+{
+	array@HorizontalLine line;
+	line.Alloc(50);
+	int i;
+	for (i = 0; i < line.Numof(); ++i)
+	{
+		line[i].init();
+		line[i].setRot(10);
+	}
+	while (!g_mouse.isClick(1))
+	{
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+		int rot = calcAngle(g_mouse.getX() - 512, g_mouse.getY() - 384);
+		int i;
+		for (i = 0; i < line.Numof(); ++i)
+		{
+			line[i].setRot(rot);
+		}
+	}
+}
+
+void test_testEmissionLine()
+{
+	array@EmissionLine line;
+	line.Alloc(50);
+	int i;
+	for (i = 0; i < line.Numof(); ++i)
+	{
+		line[i].init(2);
+		line[i].setLoopMode(true);
+		line[i].setCenter(768, 256);
+		line[i].run();
+	}
+	while (!g_mouse.isClick(1))
+	{
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_testCircleEffect()
+{
+	CircleEffect ef;
+	PhotonEmittor pe;
+	pe.init(30);
+	ef.init("システム／エフェクト／円／仮");
+	array@EmissionLine line;
+	line.Alloc(20);
+	int i;
+	for (i = 0; i < line.Numof(); ++i)
+	{
+		line[i].init(1);
+		line[i].setCenter(512, 384);
+		line[i].setLoopMode(false);
+	}
+	while (!g_mouse.isClick(1))
+	{
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+		if (g_mouse.isClick(0))
+		{
+			ef.setPos(512, 384);
+			ef.setYZRot(-60);
+			ef.setMaxScaling(300 + RAND(100));
+			ef.run(0);
+			pe.setPos(512, 384);
+			pe.run();
+			int i;
+			for (i = 0; i < line.Numof(); ++i)
+			{
+				line[i].run();
+			}
+		}
+	}
+}
+
+void test_testRotateCircle()
+{
+	Parts p;
+	p.init("システム／エフェクト／回転円", 0);
+	p.setShow(true);
+	p.setOrigin(5);
+	p.setPos(512.0, 384.0);
+	PhotonEmittor pe;
+	pe.init(30);
+	while (!g_mouse.isClick(1))
+	{
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+		if (g_mouse.isClick(0))
+		{
+			PartsMotion m;
+			m.setKey(3, 0, 360, 1);
+			m.setAlpha(255, 0, 0);
+			p.runMotion(m, NULL);
+			pe.setPos(512, 384);
+			pe.run();
+		}
+	}
+}
+
+void test_testMiniCircle()
+{
+	Parts p;
+	p.init("システム／エフェクト／円小", 0);
+	p.setShow(true);
+	p.setOrigin(5);
+	p.setPos(512.0, 384.0);
+	PhotonEmittor pe;
+	pe.init(30);
+	while (!g_mouse.isClick(1))
+	{
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+		if (g_mouse.isClick(0))
+		{
+			PartsMotion m;
+			m.setTime(700);
+			m.setScaling(0, 300, 2);
+			m.setAlpha(255, 0, 1);
+			p.runMotion(m, NULL);
+			pe.setPos(512, 384);
+			pe.run();
+		}
+	}
+}
+
+void test_testHScroller()
+{
+	VerticalScroller v;
+	v.init(0, 0, 1024, 768, 300 * g_player.Numof(), 300, false);
+	array@Parts p;
+	p.Alloc(g_player.Numof());
+	int i;
+	for (i = 0; i < p.Numof(); ++i)
+	{
+		p[i].init("システム／立ち絵／%s" % g_player[i].getShortName(), 0);
+		p[i].setShow(true);
+		p[i].setPos(i * 300, 0.0);
+		p[i].setParent(v.getPartsNumber());
+	}
+	while (!g_mouse.isClick(1))
+	{
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_SkillIconView2()
+{
+	array@AttackSkillIconView v[20];
+	int i;
+	for (i = 0; i < v.Numof(); ++i)
+	{
+		v[i].init(g_attackSkill[i].getId(), 0, 0, 0);
+		v[i].setPos(512, 384);
+		v[i].setState(0);
+	}
+	while (!g_mouse.isClick(1))
+	{
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+		float m;
+		int i;
+		for (i = 0; i < v.Numof(); ++i)
+		{
+			v[i].setViewValue(m - i);
+		}
+	}
+}
+
+void test_MapCloud()
+{
+	array@MapCloud c[10];
+	Parts p;
+	p.initAsDummy();
+	p.setShow(true);
+	int i;
+	for (i = 0; i < c.Numof(); ++i)
+	{
+		c[i].init(p.getPartsNumber());
+	}
+	while (!g_mouse.isClick(1))
+	{
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_testCloud()
+{
+	array@Parts p[10];
+	int i;
+	for (i = 0; i < p.Numof(); ++i)
+	{
+		p[i].init("システム／マップ／雲%D" % (i % 4 + 1), 0);
+		p[i].setShow(true);
+		p[i].setOrigin(5);
+	}
+	while (!g_mouse.isClick(1))
+	{
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+		int i;
+		for (i = 0; i < p.Numof(); ++i)
+		{
+			if (!p[i].isMotion())
+			{
+				array@PartsMotion m;
+				test_testCloudGetMotion(m);
+				p[i].setScaling(RAND(50) + 50);
+				p[i].runMotionArray(m, NULL);
+			}
+		}
+	}
+}
+
+void test_testCloudGetMotion(ref array@PartsMotion m)
+{
+	m.Free();
+	m.Alloc(3);
+	int rot = RAND(60) - 30;
+	int x = (512 + RAND(100)) - 50;
+	int y = (384 + RAND(100)) - 50;
+	int mx = 50 + RAND(50);
+	int my = RAND(15);
+	int time = 1000 + RAND(1000);
+	m[0].setTime(time);
+	m[0].setAlpha(0, 128, 0);
+	m[0].setKey(3, 0, rot, 0);
+	m[0].setMove(x, y, x + mx, y + my, 0);
+	m[1].setTime(time);
+	m[1].setKey(3, rot, rot * 2, 0);
+	m[1].setMove(x + mx, y + my, x + mx * 2, y + my * 2, 0);
+	m[2].setTime(time);
+	m[2].setAlpha(128, 0, 0);
+	m[2].setKey(3, rot * 2, rot * 3, 0);
+	m[2].setMove(x + mx * 2, y + my * 2, x + mx * 3, y + my * 3, 0);
+}
+
+void test_SkillIconVirtualHorizontalView()
+{
+	debugPlayerJoinAll();
+	array@SkillIconVirtualHorizontalView v[4];
+	PlayerStandGroup gp;
+	gp.init();
+	array@string pId;
+	int i;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		pId.PushBack(g_player[i].getId());
+	}
+	for (i = 0; i < v.Numof(); ++i)
+	{
+		v[i].init(pId, i);
+	}
+	while (!g_mouse.isClick(1))
+	{
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+		int i;
+		for (i = 0; i < v.Numof(); ++i)
+		{
+			v[i].setFloatingPosition(gp.getFloatingPosition());
+		}
+	}
+}
+
+void test_AttackSkillInfomation()
+{
+	debugPlayerJoinAll();
+	array@AttackSkillInfomation v;
+	array@string n;
+	int i;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		if (g_player[i].isJoin())
+		{
+			n.PushBack(g_player[i].getAttackSkillId(0));
+		}
+	}
+	v.Alloc(n.Numof());
+	for (i = 0; i < v.Numof(); ++i)
+	{
+		v[i].init(n[i]);
+	}
+	PlayerStandGroup gp;
+	gp.init();
+	while (!g_mouse.isClick(1))
+	{
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+		int i;
+		for (i = 0; i < v.Numof(); ++i)
+		{
+			v[i].setViewValue(gp.getFloatingPosition() - i);
+		}
+	}
+}
+
+void test_testBattleEndMessage()
+{
+	g_battleResult.addBattleEndMessage("リアがお茶会を開催！全員のクールタイムがリセット！");
+	g_battleResult.addBattleEndMessage("セルの応急回復の雨！%sは%d回復！");
+	g_battleResult.addBattleEndMessage("シィルの応急ヒール！%sは%d回復！");
+	BattleResultMessage msg;
+	msg.init();
+	msg.fadeIn(true, NULL);
+	while (!g_mouse.isClick(1))
+	{
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_testDungeonSideObject()
+{
+	array@DungeonSideObject obj[3];
+	obj[0].init("システム／ダンジョン／森／左", 0);
+	obj[1].init("システム／ダンジョン／森／右", 1);
+	obj[2].init("システム／ダンジョン／月光／上", 2);
+	bool val = true;
+	while (!g_mouse.isClick(1))
+	{
+		if (g_mouse.isClick(0))
+		{
+			int i;
+			for (i = 0; i < obj.Numof(); ++i)
+			{
+				obj[i].fadeIn(val, NULL);
+			}
+			val = !val;
+		}
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_testDungeonPlayerPieceGroup()
+{
+	debugPlayerJoinAll();
+	int i;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		g_party.add(g_player[i].getAttackSkillId(0));
+	}
+	DungeonPlayerPieceGroup g;
+	g.init(true);
+	while (!g_mouse.isClick(1))
+	{
+		if (g_mouse.isClick(0))
+		{
+			openParty(false);
+			g.updateCharacter();
+		}
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_OmakeMode_Tab()
+{
+	OmakeModeTab tab;
+	tab.init(8, false);
+	tab.setOnClickCallback("test_onClickTab");
+	tab.fadeIn(true, NULL);
+	while (!g_mouse.isClick(1))
+	{
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_onClickTab(int index)
+{
+	pass("%d" % index);
+}
+
+void test_MirrorPieceView()
+{
+	openMirrorPieceView();
+}
+
+void test_openFlat()
+{
+	openFlat("システム／エンカウント");
+}
+
+void test_HelperCountView()
+{
+	HelperCountView v;
+	v.init();
+	v.fadeIn(true, NULL);
+	while (!g_mouse.isClick(1))
+	{
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+

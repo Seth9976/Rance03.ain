@@ -1,0 +1,266 @@
+ItemView::ItemView()
+{
+	this.gameObjectId_ = g_gameObjectManager.addFocusObject(this.update, this.isHover);
+}
+
+void ItemView::init(string itemId, bool isShopMode)
+{
+	this.id_ = itemId;
+	this.isShopMode_ = isShopMode;
+	this.item_ <- getItemFromId(this.id_);
+	this.state_ = 0;
+	this.isInitialized_ = false;
+	this.parent_.initAsDummy();
+	this.parent_.setZ(4500.0);
+}
+
+void ItemView::updateState()
+{
+	if (!this.isInitialized_)
+	{
+		return;
+	}
+	this.updateEnable();
+	this.updateCount();
+	this.setPartsShowState();
+}
+
+void ItemView::updateEnable()
+{
+	if (this.isShopMode_)
+	{
+		this.isClickable_ = !this.isMaxItemCount() && this.isItemBuyable();
+	}
+	else
+	{
+		this.isClickable_ = this.item_.getType() != 2;
+	}
+}
+
+bool ItemView::isMaxItemCount()
+{
+	int count = g_playerCommonParam.getItemCount(this.item_.getId());
+	return count >= this.item_.getMaxCount();
+}
+
+bool ItemView::isItemBuyable()
+{
+	return this.item_.getShopPrice() <= g_playerCommonParam.getGold();
+}
+
+void ItemView::updateCount()
+{
+	this.count_ = g_playerCommonParam.getItemCount(this.id_);
+	this.parts_[10].setNumber(this.count_);
+	this.parts_[11].setNumber(this.count_);
+	Item item;
+	item = getItemFromId(this.id_);
+	bool isMax = item.getMaxCount() == this.count_;
+	this.parts_[10].setShow(!isMax);
+	this.parts_[11].setShow(isMax);
+	this.updateShopPrice();
+}
+
+void ItemView::initParts()
+{
+	this.parts_[0].init("システム／アイテム／ボタン", 0);
+	this.parts_[1].init(this.item_.getIconImageName(), 0);
+	this.parts_[2].init(this.item_.getLabelImageName(), 0);
+	this.parts_[3].initAsText(this.item_.getName(), 26, false, 256, 255, 255, 255);
+	array@string desc;
+	splitToken(desc, this.item_.getDesc(), "|");
+	int i;
+	for (i = 0; i < desc.Numof(); ++i)
+	{
+		this.parts_[4 + i].initAsText(desc[i], 18, false, 256, 32, 5, 5);
+	}
+	this.parts_[10].initAsNumber("システム／数字／幅１７／黄", NULL);
+	this.parts_[11].initAsNumber("システム／数字／幅１７／赤", NULL);
+	if (this.isShopMode_)
+	{
+		this.parts_[8].initAsNumber("システム／数字／幅１７／黄", NULL);
+		this.parts_[9].initAsNumber("システム／数字／幅１７／赤", NULL);
+		this.parts_[7].init("システム／価格", 0);
+	}
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setParent(this.parent_.getPartsNumber());
+	}
+	this.setPartsPos();
+	this.setPartsShow();
+	this.updateShopPrice();
+}
+
+void ItemView::updateShopPrice()
+{
+	this.parts_[8].setNumber(this.item_.getShopPrice());
+	this.parts_[9].setNumber(this.item_.getShopPrice());
+}
+
+void ItemView::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+}
+
+void ItemView::setPartsPos()
+{
+	this.parts_[0].setPos(0.0, 0.0);
+	this.parts_[3].setPos(150.0, 12.0);
+	this.parts_[1].setPos(25.0, 12.0);
+	this.parts_[2].setPos(60.0, 75.0);
+	this.parts_[2].setOrigin(9);
+	this.parts_[4].setPos(150.0, 40.0);
+	this.parts_[5].setPos(150.0, 56.0);
+	this.parts_[6].setPos(150.0, 72.0);
+	this.parts_[10].setOrigin(9);
+	this.parts_[10].setPos(222.0, 93.0);
+	this.parts_[11].setOrigin(9);
+	this.parts_[11].setPos(222.0, 93.0);
+	this.parts_[7].setPos(247.0, 93.0);
+	this.parts_[8].setOrigin(9);
+	this.parts_[8].setPos(393.0, 93.0);
+	this.parts_[9].setOrigin(9);
+	this.parts_[9].setPos(393.0, 93.0);
+}
+
+void ItemView::update()
+{
+	if (!this.isInitialized_)
+	{
+		if (-200 < this.parent_.getScreenY() && this.parent_.getScreenY() < 768)
+		{
+			this.isInitialized_ = true;
+			this.initParts();
+			this.updateState();
+		}
+	}
+	this.updateHover();
+	if (g_mouse.isClickWithFocus(this.gameObjectId_))
+	{
+		this.onClickCallback_(this.clickId_);
+	}
+	if (!this.lastHover_ && this.isHover_)
+	{
+		playCursor();
+	}
+	if (this.isHover_ && g_mouse.onDown(0))
+	{
+		playClick();
+	}
+	this.setPartsShowState();
+	this.lastHover_ = this.isHover_;
+}
+
+void ItemView::setPartsShowState()
+{
+	int n = this.isClickable_ ? 0 : 3;
+	if (this.isHover_)
+	{
+		n = g_mouse.isDown(0) ? 2 : 1;
+	}
+	this.parts_[0].setCgRange(0, n * 132, 508, 132);
+	bool b = this.isItemBuyable();
+	this.parts_[8].setShow(b);
+	this.parts_[9].setShow(!b);
+}
+
+bool ItemView::isHover()
+{
+	this.updateHover();
+	return this.isHover_;
+}
+
+void ItemView::updateHover()
+{
+	this.isHover_ = this.isClickable_ && AFL_Parts_IsPointIn(this.parts_[0].getPartsNumber(), g_mouse.getX(), g_mouse.getY(), 1);
+}
+
+void ItemView::setPos(int x, int y, bool immidiate)
+{
+	if (immidiate)
+	{
+		this.x_ = x;
+		this.y_ = y;
+		this.parent_.setPos(this.x_, this.y_);
+	}
+	else
+	{
+		PartsMotion m;
+		m.setMove(this.x_, this.y_, x, y, 1);
+		this.parent_.runMotion(m, NULL);
+		this.x_ = x;
+		this.y_ = y;
+	}
+}
+
+void ItemView::setOnClickCallback(DG_ItemViewClickCallback cb, int clickId)
+{
+	this.onClickCallback_ = cb;
+	this.clickId_ = clickId;
+}
+
+void ItemView::setParent(int partsNumber)
+{
+	this.parent_.setParent(partsNumber);
+}
+
+void ItemView::setClipper(int partsNumber)
+{
+	this.parent_.setAlphaClipperParts(partsNumber);
+}
+
+void ItemView::fadeIn(bool val, int delay)
+{
+	this.parent_.setShow(true);
+	if (val)
+	{
+		if (this.state_ == 2 || this.state_ == 1)
+		{
+			return;
+		}
+	}
+	else if (this.state_ == 0 || this.state_ == 3)
+	{
+		return;
+	}
+	if (val)
+	{
+		this.state_ = 1;
+		array@PartsMotion m[2];
+		int w = 450;
+		m[0].setTime(delay);
+		m[0].setMove(-w, this.y_, -w, this.y_, 1);
+		m[1].setTime(250);
+		m[1].setMove(-w, this.y_, this.x_, this.y_, 1);
+		this.parent_.runMotionArray(m, this.onFinishFadeIn);
+	}
+	else
+	{
+		this.state_ = 1;
+		PartsMotion m;
+		m.setTime(150);
+		m.setMove(this.x_, this.y_, -450, this.y_, 1);
+		this.parent_.runMotion(m, this.onFinishFadeOut);
+	}
+	this.isShow_ = val;
+}
+
+void ItemView::onFinishFadeIn()
+{
+	this.state_ = 2;
+}
+
+void ItemView::onFinishFadeOut()
+{
+	this.state_ = 0;
+}
+
+string ItemView::getId()
+{
+	return this.id_;
+}
+

@@ -1,0 +1,33 @@
+void SceneAliceLogo::init()
+{
+	this.fsImage_[0].init("システム／アリスロゴ");
+	this.fsImage_[1].init("システム／注意");
+}
+
+void SceneAliceLogo::run()
+{
+	this.fsImage_[0].run(this.onFinishFadeOut);
+}
+
+bool SceneAliceLogo::update()
+{
+	if (g_mouse.isClick(0))
+	{
+		g_globalTimer.setScaling(5.0);
+	}
+	return this.current_ != 4;
+}
+
+void SceneAliceLogo::onFinishFadeOut()
+{
+	this.current_ = 2;
+	g_globalTimer.setScaling(1.0);
+	this.fsImage_[1].run(this.onFinishFadeOutAll);
+}
+
+void SceneAliceLogo::onFinishFadeOutAll()
+{
+	g_globalTimer.setScaling(1.0);
+	this.current_ = 4;
+}
+

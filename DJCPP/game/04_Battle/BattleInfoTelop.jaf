@@ -1,0 +1,165 @@
+BattleInfoTelop::BattleInfoTelop()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+	this.parent_.initAsDummy();
+	this.parent_.setZ(2630.0);
+}
+
+void BattleInfoTelop::init(string msg, int sx, int sy, int ex, int ey)
+{
+	this.msg_ = msg;
+	this.sx_ = sx;
+	this.sy_ = sy;
+	this.ex_ = ex;
+	this.ey_ = ey;
+	this.parts_.Free();
+	this.vPos_.Free();
+	this.viewLength_ = getDest(this.sx_, this.sy_, this.ex_, this.ey_);
+	this.vTextLength_ = this.getTextWidth() / this.viewLength_;
+	int count = int(1.0 / this.vTextLength_) + 2;
+	this.parts_.Alloc(count);
+	this.vPos_.Alloc(count);
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].initAsText(this.msg_, 26, false, 256, 180, 64, 64);
+	}
+	this.setRot();
+	this.setParent();
+	for (i = 0; i < this.vPos_.Numof(); ++i)
+	{
+		this.vPos_[i] = 0.2 + this.vTextLength_ * (i - 1);
+	}
+	this.t_.reset();
+	this.updatePos(true);
+}
+
+void BattleInfoTelop::update()
+{
+	this.updatePos(false);
+}
+
+void BattleInfoTelop::setParent()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setParent(this.parent_.getPartsNumber());
+	}
+}
+
+int BattleInfoTelop::getTextWidth()
+{
+	Parts p;
+	p.initAsText(this.msg_, 26, false, 256, 180, 64, 64);
+	return p.getWidth();
+}
+
+void BattleInfoTelop::setRot()
+{
+	this.rot_ = calcAngle(this.sx_ - this.ex_, this.sy_ - this.ey_);
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setXYRot(this.rot_);
+	}
+}
+
+void BattleInfoTelop::fadeIn(bool val, DG_GeneralCallback onFinish)
+{
+	this.updateViewState();
+	this.parent_.setShow(true);
+	PartsMotion m;
+	if (val)
+	{
+		m.setMove(0, 40, 0, 0, 1);
+		m.setAlpha(0, 255, 0);
+	}
+	else
+	{
+		m.setMove(0, 0, 0, 40, 1);
+		m.setAlpha(255, 0, 0);
+	}
+	this.parent_.runMotion(m, onFinish);
+}
+
+void BattleInfoTelop::updatePos(bool isForceUpdate)
+{
+	if (!isForceUpdate && this.t_.getTime() < 10)
+	{
+		return;
+	}
+	this.updateVirtualPosition();
+	this.updateViewState();
+	this.setPartsPos();
+	this.t_.reset();
+}
+
+void BattleInfoTelop::updateViewState()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		if (this.vPos_[i] > 1.0)
+		{
+			this.parts_[i].setShow(false);
+		}
+		else if (this.vPos_[i] + this.vTextLength_ > 1.0)
+		{
+			this.parts_[i].setShow(true);
+			float r = (1.0 - this.vPos_[i]) / this.vTextLength_;
+			int w = r * this.parts_[i].getWidth();
+			if (w == 0)
+			{
+				this.parts_[i].setShow(false);
+			}
+			else
+			{
+				this.parts_[i].setShow(true);
+			}
+			this.parts_[i].setCgRange(0, 0, w, this.parts_[i].getHeight());
+		}
+		else
+		{
+			this.parts_[i].setShow(true);
+			this.parts_[i].setCgRange(0, 0, this.parts_[i].getWidth(), this.parts_[i].getHeight());
+		}
+	}
+}
+
+void BattleInfoTelop::updateVirtualPosition()
+{
+	float t = this.t_.getTime();
+	int i;
+	for (i = 0; i < this.vPos_.Numof(); ++i)
+	{
+		this.vPos_[i] -= t / 25000.0;
+		if (this.vPos_[i] < -this.vTextLength_)
+		{
+			this.vPos_[i] = this.getMaxPosition() + this.vTextLength_;
+		}
+	}
+}
+
+void BattleInfoTelop::setPartsPos()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		float x = this.ex_ + Math.Cos(this.rot_) * this.vPos_[i] * this.viewLength_;
+		float y = this.ey_ + Math.Sin(this.rot_) * this.vPos_[i] * this.viewLength_;
+		this.parts_[i].setPos(x, y);
+	}
+}
+
+float BattleInfoTelop::getMaxPosition()
+{
+	float max = -1.0;
+	int i;
+	for (i = 0; i < this.vPos_.Numof(); ++i)
+	{
+		max = Math.MaxF(this.vPos_[i], max);
+	}
+	return max;
+}
+

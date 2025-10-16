@@ -1,0 +1,81 @@
+void AdvFullScreenEffect::init(int colortype)
+{
+	int r;
+	int g;
+	int b;
+	this.getColor(r, g, b, colortype);
+	this.partsCg_.initAsPlaneImage(1024, 768, r, g, b, 255);
+	this.partsCg_.setPos(0.0, 0.0);
+	this.partsCg_.setZ(3999.0);
+}
+
+void AdvFullScreenEffect::getColor(ref int r, ref int g, ref int b, int colortype)
+{
+	switch (colortype)
+	{
+	case 0:
+		r = 0;
+		g = 0;
+		b = 0;
+		return;
+	case 1:
+		r = 0;
+		g = 0;
+		b = 255;
+		return;
+	case 2:
+		r = 0;
+		g = 255;
+		b = 0;
+		return;
+	case 3:
+		r = 0;
+		g = 255;
+		b = 255;
+		return;
+	case 4:
+		r = 255;
+		g = 0;
+		b = 0;
+		return;
+	case 5:
+		r = 255;
+		g = 0;
+		b = 255;
+		return;
+	case 6:
+		r = 255;
+		g = 255;
+		b = 0;
+		return;
+	case 7:
+		r = 255;
+		g = 255;
+		b = 255;
+		return;
+	}
+}
+
+void AdvFullScreenEffect::show(int asraTransitionType, int time)
+{
+	this.partsCg_.setShow(true);
+	if (asraTransitionType != -1 && time > 0)
+	{
+		全表示(asraTransitionType, time * g_globalTimer.getEffectiveScalingValue());
+	}
+}
+
+void AdvFullScreenEffect::hide(int asraTransitionType, int time)
+{
+	this.partsCg_.setShow(false);
+	if (asraTransitionType != -1 && time > 0)
+	{
+		全表示(asraTransitionType, time * g_globalTimer.getEffectiveScalingValue());
+	}
+}
+
+void AdvFullScreenEffect::release()
+{
+	this.partsCg_.release();
+}
+

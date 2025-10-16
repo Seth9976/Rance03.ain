@@ -1,0 +1,120 @@
+DungeonViewerCardView::DungeonViewerCardView()
+{
+	this.gameObjectId_ = g_gameObjectManager.addFocusObject(this.update, this.isHover);
+}
+
+void DungeonViewerCardView::setOnClickCallback(DG_DungeonViewerOnClickCallback cb)
+{
+	this.cb_ = cb;
+}
+
+void DungeonViewerCardView::init(ref DungeonCard card, int x, int y, int depth)
+{
+	this.card_ <- card;
+	this.depth_ = depth;
+	this.x_ = x;
+	this.y_ = y;
+	this.initParts();
+}
+
+void DungeonViewerCardView::initParts()
+{
+	CardInfomation info;
+	info = getCardInfomationFromId(this.card_.getCardTypeId());
+	this.parts_[0].init(info.getImageName(), 0);
+	this.parts_[1].initAsCgPlaneImage(info.getImageName(), 255, 255, 255);
+	this.parts_[6].initAsCgPlaneImage(info.getImageName(), 255, 255, 0);
+	this.parts_[6].setAlpha(128.0);
+	this.parts_[2].initAsText("%s[%3d,%3d]" % this.getOpenTypeString(this.card_.getOpenType()) % this.x_ % this.y_, 18, false, 256, 255, 255, 255);
+	this.parts_[3].initAsText("[%s]" % this.card_.getDataId(), 18, false, 256, 255, 255, 255);
+	string ev = info.getEventCallback();
+	string jcb = "%s" % info.getClickableJudgeCallback();
+	ev = ev.GetPart(ev.Length() - 6, 6);
+	jcb = jcb.GetPart(jcb.Length() - 6, 6);
+	this.parts_[4].initAsText(ev, 18, false, 256, 255, 255, 255);
+	this.parts_[5].initAsText(jcb, 18, false, 256, 255, 255, 255);
+	this.width_ = 90;
+	this.height_ = 144;
+	float s = 1.0;
+	s = Math.MinF(s, 90.0 / this.parts_[0].getWidth());
+	s = Math.MinF(s, 144.0 / this.parts_[0].getHeight());
+	this.parts_[0].setScaling(s * 100.0);
+	this.parts_[1].setScaling(s * 100.0);
+	this.parts_[6].setScaling(s * 100.0);
+	this.parts_[1].setCgRange(0, 0, 144, 150);
+	this.parts_[1].setAlpha(200.0);
+	createPartsGroup(this.parent_, this.parts_, 1100);
+	if (info.getChangeType() == 1)
+	{
+		this.parts_[1].setMultiColorValue(200, 0, 0);
+	}
+	else if (info.getChangeType() == 2)
+	{
+		this.parts_[1].setMultiColorValue(160, 0, 160);
+	}
+	else
+	{
+		this.parts_[1].setMultiColorValue(0, 0, 0);
+	}
+	this.setPartsShow();
+	this.setPartsPos();
+}
+
+string DungeonViewerCardView::getOpenTypeString(int type)
+{
+	switch (type)
+	{
+	case 0:
+		return "↑";
+	case 1:
+		return "↓";
+	case 2:
+		return "？";
+	}
+	return "エラー";
+}
+
+void DungeonViewerCardView::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void DungeonViewerCardView::setPartsPos()
+{
+	this.parts_[1].setPos(2.0, 10.0);
+	int i;
+	int h = this.parts_[2 + i].getHeight() - 2;
+	for (i = 0; i < 4; ++i)
+	{
+		this.parts_[2 + i].setPos(5.0, 15 + i * h);
+	}
+	int ws = this.width_ + 10;
+	int hs = this.height_ + 10;
+	this.parent_.setPos((512 + ws * this.x_) - this.width_ / 2, (this.depth_ - this.y_ - 1) * hs);
+}
+
+void DungeonViewerCardView::setParent(int parentPartsNumber)
+{
+	this.parent_.setParent(parentPartsNumber);
+}
+
+void DungeonViewerCardView::update()
+{
+	this.isHover_ = this.parts_[0].isHit(g_mouse.getX(), g_mouse.getY());
+	if (this.isHover() && g_mouse.isClickWithFocus(this.gameObjectId_))
+	{
+		this.cb_(this.x_, this.y_);
+	}
+	this.parts_[6].setShow(this.isHover_);
+}
+
+bool DungeonViewerCardView::isHover()
+{
+	return this.isHover_;
+}
+

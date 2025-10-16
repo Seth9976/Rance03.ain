@@ -1,0 +1,104 @@
+CASSE::CASSE()
+{
+	this.m_Volume = 1.0;
+	this.m_TransitionType = 0;
+	this.m_TransitionTotalTime = 0;
+}
+
+void CASSE::InitChannel(int Channel1, int Channel2)
+{
+	this.m_ChannelList.Alloc(2);
+	this.m_ChannelList[0] = Channel1;
+	this.m_ChannelList[1] = Channel2;
+}
+
+void CASSE::SwapChannel()
+{
+	this.m_CurrentChannel = 1 - this.m_CurrentChannel;
+}
+
+void CASSE::SetVolume(float Volume)
+{
+	this.m_Volume = Volume;
+}
+
+float CASSE::GetVolume()
+{
+	return this.m_Volume;
+}
+
+int CASSE::GetTransitionType()
+{
+	return this.m_TransitionType;
+}
+
+int CASSE::GetTransitionTotalTime()
+{
+	return this.m_TransitionTotalTime;
+}
+
+void CASSE::ReserveNext(string SoundName, int 効果時間, float Volume, int FadeType)
+{
+	this.m_Reserve = true;
+	this.m_Reserve_SoundName = SoundName;
+	this.m_Reserve_Time = 効果時間;
+	this.m_Reserve_Volume = Volume;
+	this.m_Reserve_FadeType = FadeType;
+}
+
+void CASSE::UpdateReserve()
+{
+	if (!this.m_Reserve)
+	{
+		return;
+	}
+	if (this.IsPlay())
+	{
+		return;
+	}
+	this.SetVolume(this.m_Reserve_Volume);
+	this.PlayNext(this.m_Reserve_SoundName, this.m_Reserve_Time, this.m_Reserve_FadeType);
+	this.m_Reserve = false;
+	this.m_Reserve_SoundName = "";
+	this.m_Reserve_Time = 0;
+	this.m_Reserve_Volume = 0.0;
+	this.m_Reserve_FadeType = -1;
+}
+
+void CASSE::PlayNext(string SoundName, int 効果時間, int FadeType)
+{
+	this.SwapChannel();
+	if (!SoundName.Empty())
+	{
+		KiwiSoundEngine.Prepare(this.m_ChannelList[this.m_CurrentChannel], SoundName, false);
+		this.Fade(0, 0.0, false, -1);
+		this.Fade(効果時間, this.m_Volume, false, FadeType);
+		KiwiSoundEngine.Play(this.m_ChannelList[this.m_CurrentChannel]);
+		g_BGMVolumeCapManager.BeginBGMFade(this.m_ChannelList[this.m_CurrentChannel], SoundName);
+	}
+	else
+	{
+		this.Stop();
+	}
+}
+
+bool CASSE::IsReserve()
+{
+	return this.m_Reserve;
+}
+
+void CASSE::Stop()
+{
+	KiwiSoundEngine.Stop(this.m_ChannelList[this.m_CurrentChannel]);
+}
+
+bool CASSE::IsPlay()
+{
+	return KiwiSoundEngine.IsPlay(this.m_ChannelList[this.m_CurrentChannel]);
+}
+
+void CASSE::Fade(int Time, float Volume, bool StopAfterEnd, int FadeType)
+{
+	KiwiSoundEngine.Fade(this.m_ChannelList[this.m_CurrentChannel], Time, Volume, StopAfterEnd, FadeType);
+}
+

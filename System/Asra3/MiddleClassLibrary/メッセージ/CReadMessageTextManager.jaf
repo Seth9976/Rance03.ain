@@ -1,0 +1,40 @@
+CReadMessageTextManager::CReadMessageTextManager()
+{
+}
+
+void CReadMessageTextManager::SetReadMessage(int MessageNumber)
+{
+	SReadMessageTextInfo Info;
+	Info.m_MessageNumber = MessageNumber;
+	Info.m_ReserveErase = false;
+	this.m_ReadMessageTextQueue.Insert(0, Info);
+}
+
+void CReadMessageTextManager::EraseMessageNumber(int MessageNumber)
+{
+	int QueueCount = this.m_ReadMessageTextQueue.Numof();
+	if (QueueCount == 0)
+	{
+		return;
+	}
+	int Index;
+	for (Index = QueueCount - 1; 0 <= Index; --Index)
+	{
+		ref SReadMessageTextInfo Info = this.m_ReadMessageTextQueue[Index];
+		if (Info.m_MessageNumber == MessageNumber)
+		{
+			Info.m_ReserveErase = true;
+		}
+	}
+	for (; this.m_ReadMessageTextQueue.Numof() != 0; )
+	{
+		ref SReadMessageTextInfo Info = this.m_ReadMessageTextQueue[this.m_ReadMessageTextQueue.Numof() - 1];
+		if (!Info.m_ReserveErase)
+		{
+			break;
+		}
+		MsgSkip.SetFlag(Info.m_MessageNumber);
+		this.m_ReadMessageTextQueue.PopBack();
+	}
+}
+

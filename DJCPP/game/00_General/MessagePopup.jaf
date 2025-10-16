@@ -1,0 +1,98 @@
+MessagePopup::MessagePopup()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+	this.x_ = 815;
+	this.y_ = 135;
+}
+
+void MessagePopup::init(string msg)
+{
+	this.msg_ = msg;
+	this.initParts();
+}
+
+void MessagePopup::initParts()
+{
+	this.parts_[0].init("システム／リザルト／メッセージ枠", 0);
+	this.parts_[1].initAsText(this.msg_, 26, false, 256, 0, 0, 0);
+	createPartsGroup(this.parent_, this.parts_, 4100);
+	this.setPartsPos();
+	this.setPos(815, 135);
+}
+
+void MessagePopup::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void MessagePopup::setPos(int x, int y)
+{
+	x = Math.Max(x, this.parts_[0].getWidth() / 2);
+	this.parent_.setPos(x, y);
+}
+
+void MessagePopup::setZ(int z)
+{
+	this.parent_.setZ(z);
+}
+
+void MessagePopup::setPartsPos()
+{
+	this.parts_[0].setPos(0.0, 0.0);
+	this.parts_[1].setPos(0.0, -84.0);
+	this.parts_[0].setOrigin(2);
+	this.parts_[1].setOrigin(5);
+}
+
+void MessagePopup::update()
+{
+	if (this.isFadeInMotion_)
+	{
+		float t = this.timer_.getTime() / 300.0;
+		if (t > 1.0)
+		{
+			this.isFadeInMotion_ = false;
+		}
+		float rot = Math.Sin(t * 360.0 * 3.0) * ((1 - t) * 90.0);
+		this.parts_[0].setXYRot(rot);
+		this.parts_[1].setAlpha(-256 + t * 512.0);
+	}
+	else
+	{
+		this.parts_[0].setXYRot(0.0);
+	}
+}
+
+void MessagePopup::fadeIn(bool val)
+{
+	this.setPartsShow();
+	if (val)
+	{
+		this.timer_.reset();
+		this.isFadeInMotion_ = true;
+	}
+	else
+	{
+		this.parent_.runMotion(getStandardMotion(1), NULL);
+	}
+}
+
+void MessagePopup::popup(int time, DG_GeneralCallback cb)
+{
+	this.cb_ = cb;
+	this.fadeIn(true);
+	this.timerCb_.setTimer(time, this.onFinishPopup);
+}
+
+void MessagePopup::onFinishPopup()
+{
+	this.cb_();
+	this.cb_.Clear();
+	this.fadeIn(false);
+}
+

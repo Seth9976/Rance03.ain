@@ -1,0 +1,78 @@
+CModeCGView::CModeCGView()
+{
+}
+
+CModeCGView::~CModeCGView()
+{
+}
+
+void CModeCGView::Init()
+{
+	this.m_ModeView.Create();
+	PARTS_SetWantSaveBackScene(this.m_ModeView.GetPartsNumber(), false);
+}
+
+void CModeCGView::Create(CModeCGModel Info)
+{
+	if (!this.m_ModeView.IsExist())
+	{
+		return;
+	}
+	bool IsEmptyCGName = Info.GetCG().Length() == 0;
+	bool IsEmptyFlatName = Info.GetFlatName().Length() == 0;
+	if (IsEmptyCGName == IsEmptyFlatName)
+	{
+		this.SetShow(false);
+		return;
+	}
+	if (!IsEmptyCGName)
+	{
+		if (this.m_Info.GetCG() != Info.GetCG() || this.m_Info.GetCGBeginNumber() != Info.GetCGBeginNumber() || this.m_Info.GetCGCount() != Info.GetCGCount() || this.m_Info.GetCGSwitchTime() != Info.GetCGSwitchTime())
+		{
+			if (Info.GetCGBeginNumber() == 0 && Info.GetCGCount() == 0 && Info.GetCGSwitchTime() == 0)
+			{
+				this.m_ModeView.SetCG(Info.GetCG(), 1);
+			}
+			else
+			{
+				this.m_ModeView.SetLoopCG(Info.GetCG(), Info.GetCGBeginNumber(), Info.GetCGCount(), Info.GetCGSwitchTime(), 1);
+			}
+		}
+	}
+	else
+	{
+		this.m_ModeView.SetFlat(Info.GetFlatName());
+	}
+	this.m_ModeView.SetPos(Info.GetX(), Info.GetY());
+	this.m_ModeView.SetZ(Info.GetZ());
+	Ｐ＿高速再生設定(this.m_ModeView.GetPartsNumber(), false);
+	this.m_Info = Info;
+}
+
+void CModeCGView::SetShow(bool Show)
+{
+	if (!this.m_ModeView.IsExist())
+	{
+		return;
+	}
+	this.m_ModeView.SetShow(Show);
+}
+
+bool CModeCGView::IsShow()
+{
+	if (!this.m_ModeView.IsExist())
+	{
+		return false;
+	}
+	return this.m_ModeView.IsShow();
+}
+
+void CModeCGView::SetPartsLayer(int ID)
+{
+	if (!this.m_ModeView.IsExist())
+	{
+		return;
+	}
+	Ｐ＿親設定(this.m_ModeView.GetPartsNumber(), ID);
+}
+

@@ -1,0 +1,92 @@
+BonusView::BonusView()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void BonusView::init(BattleBonus bonus, bool isBig)
+{
+	this.bonus_ = bonus;
+	this.isBig_ = isBig;
+	this.initParts();
+}
+
+void BonusView::initParts()
+{
+	if (this.isBig_)
+	{
+		this.parts_[0].init("システム／リザルト／ボーナス下地／大", 0);
+		this.parts_[1].initAsText(this.bonus_.getName(), 30, false, 256, 43, 4, 7);
+		this.parts_[2].initAsNumber("システム／数字／幅１８／赤黒", NULL);
+	}
+	else
+	{
+		this.parts_[0].init("システム／リザルト／ボーナス下地", 0);
+		this.parts_[1].initAsText(this.bonus_.getName(), 20, false, 256, 150, 19, 36);
+		this.parts_[2].initAsNumber("システム／数字／幅１３／赤", NULL);
+	}
+	createPartsGroup(this.parent_, this.parts_, 3560);
+	this.setPartsPos();
+}
+
+void BonusView::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void BonusView::setPartsPos()
+{
+	this.parts_[2].setOrigin(3);
+	this.parts_[1].setOrigin(4);
+	if (this.isBig_)
+	{
+		this.parts_[2].setPos(338.0, 33.0);
+		this.parts_[1].setPos(15.0, 21.0);
+	}
+	else
+	{
+		this.parts_[2].setPos(210.0, 18.0);
+		this.parts_[1].setPos(5.0, 10.0);
+	}
+}
+
+void BonusView::update()
+{
+}
+
+void BonusView::fadeIn(bool val, int delay, DG_GeneralCallback cb)
+{
+	this.setPartsShow();
+	if (val)
+	{
+		array@PartsMotion m[2];
+		m[0].setAlpha(0, 0, 0);
+		m[0].setTime(delay);
+		m[1].setAlpha(255, 255, 0);
+		m[1].setMove(-300, this.y_, this.x_, this.y_, 2);
+		m[1].setTime(600);
+		PartsMotion nm;
+		nm.setKey(15, 0, this.bonus_.getValue(), 0);
+		nm.setTime(400 + delay);
+		this.parts_[2].runMotion(nm, NULL);
+		this.parent_.runMotionArray(m, cb);
+	}
+	else
+	{
+		PartsMotion m;
+		m.setAlpha(255, 0, 0);
+		m.setMove(this.x_, this.y_, -300, this.y_, 1);
+		this.parent_.runMotion(m, cb);
+	}
+}
+
+void BonusView::setPos(int x, int y)
+{
+	this.x_ = x;
+	this.y_ = y;
+}
+

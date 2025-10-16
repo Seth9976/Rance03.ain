@@ -1,0 +1,171 @@
+BattlePlayerStand::BattlePlayerStand()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void BattlePlayerStand::init(string id)
+{
+	this.player_ <- getPlayerFromId(id);
+	if (this.player_.getHp() == 0)
+	{
+		this.isDead_ = true;
+	}
+	this.initParts();
+}
+
+void BattlePlayerStand::update()
+{
+}
+
+void BattlePlayerStand::fadeIn(bool val, DG_GeneralCallback onFinish)
+{
+	if (this.isDead_)
+	{
+		return;
+	}
+	this.setPartsShow();
+	if (val)
+	{
+		array@PartsMotion m[2];
+		int min;
+		int max;
+		g_party.getPlayerSkillIndexMinMax(min, max, this.player_.getId());
+		m[0].setAlpha(0, 0, 0);
+		m[0].setTime(((min + max) / 2.0) * 40.0);
+		m[1].setMove(this.x_ + 135.600006, this.y_ + 2.8, this.x_, this.y_, 1);
+		m[1].setAlpha(0, 255, 0);
+		m[1].setTime(250);
+		this.parent_.runMotionArray(m, onFinish);
+	}
+	else
+	{
+		this.parent_.runMotion(getStandardMotion(val ? 0 : 1), onFinish);
+	}
+}
+
+void BattlePlayerStand::initParts()
+{
+	this.parts_[0].init(this.player_.getBattleImageName(), 0);
+	this.parts_[1].initAsCgPlaneImage(this.player_.getBattleImageName(), 255, 255, 128);
+	this.parts_[1].setAlpha(128.0);
+	this.parts_[2].initAsCgPlaneImage(this.player_.getBattleImageName(), 255, 200, 0);
+	this.parts_[2].setAlpha(128.0);
+	int min;
+	int max;
+	g_party.getPlayerSkillIndexMinMax(min, max, this.player_.getId());
+	createPartsGroup(this.parent_, this.parts_, 2500 + ((min + max) / 2) * 5);
+	this.setPartsPos();
+	this.setPartsOrigin();
+}
+
+void BattlePlayerStand::setPartsOrigin()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setOrigin(8);
+	}
+}
+
+void BattlePlayerStand::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parts_[1].setShow(this.isFocus_);
+	this.parts_[2].setShow(false);
+	this.parent_.setShow(true);
+}
+
+void BattlePlayerStand::setPartsPos()
+{
+}
+
+void BattlePlayerStand::setFocus(bool val)
+{
+	if (this.isDead_)
+	{
+		return;
+	}
+	if (val == this.isFocus_)
+	{
+		return;
+	}
+	this.isFocus_ = val;
+	float mv = 90.0;
+	float tx = this.x_ / 3 + 400;
+	float ty = 100.0;
+	float r = Math.Atan2(ty - this.y_, tx - this.x_);
+	r = (r / 3.14159) * 180.0;
+	float mx = Math.Cos(r) * mv;
+	float my = Math.Sin(r) * mv;
+	PartsMotion m;
+	if (val)
+	{
+		m.setMove(this.x_, this.y_, this.x_ + mx, this.y_ + my, 1);
+		m.setTime(150);
+	}
+	else
+	{
+		m.setMove(this.x_ + mx, this.y_ + my, this.x_, this.y_, 0);
+		m.setTime(80);
+	}
+	this.parent_.setZ(val ? 2400 : 2500);
+	this.parent_.runMotion(m, NULL);
+	this.parts_[1].setShow(this.isFocus_);
+}
+
+void BattlePlayerStand::showDamageMotion()
+{
+	if (this.isDead_)
+	{
+		return;
+	}
+	PartsMotion m;
+	m.setTime(600);
+	m.setShakeLevel(30, 10, 0);
+	this.parent_.runMotion(m, NULL);
+	PartsMotion m;
+	m.setTime(1200);
+	m.setAlpha(255, 0, 0);
+	this.parts_[2].setShow(true);
+	this.parts_[2].runMotion(m, NULL);
+	this.parts_[1].setShow(false);
+}
+
+void BattlePlayerStand::showDeadMotion()
+{
+	if (this.isDead_)
+	{
+		return;
+	}
+	PartsMotion m;
+	m.setMove(this.x_, this.y_, this.x_, this.y_ + 100, 1);
+	m.setAlpha(255, 0, 0);
+	this.parent_.runMotion(m, NULL);
+	this.isDead_ = true;
+}
+
+void BattlePlayerStand::setPos(int x, int y)
+{
+	this.x_ = x;
+	this.y_ = y;
+	this.parent_.setPos(this.x_, this.y_);
+}
+
+void BattlePlayerStand::move(int x, int y)
+{
+	PartsMotion m;
+	m.setMove(this.x_, this.y_, x, y, 1);
+	this.parent_.runMotion(m, NULL);
+	this.x_ = x;
+	this.y_ = y;
+}
+
+bool BattlePlayerStand::isMotion()
+{
+	return this.parent_.isMotion();
+}
+

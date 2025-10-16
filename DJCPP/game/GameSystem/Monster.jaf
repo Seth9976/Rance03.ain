@@ -1,0 +1,162 @@
+void Monster::init(string id)
+{
+	string key = "モンスター情報";
+	this.id_ = id;
+	this.name_ = EX_SA2String(key, this.id_, "name", "");
+	this.imageName_ = EX_SA2String(key, this.id_, "imageName", "");
+	this.hp_ = EX_SA2Int(key, this.id_, "hp", 0);
+	this.exp_ = EX_SA2Int(key, this.id_, "exp", 0);
+	this.gold_ = EX_SA2Int(key, this.id_, "gold", 0);
+	this.monsterAttributeId_ = EX_SA2String(key, this.id_, "monsterAttribute", "");
+	this.changeToMonsterId_ = EX_SA2String(key, this.id_, "changeToMonsterId", "");
+}
+
+void Monster::setAttack()
+{
+	int i;
+	for (i = 0; i < this.atk_.Numof(); ++i)
+	{
+		this.atk_[i].init(this.id_, i);
+	}
+}
+
+string Monster::getId()
+{
+	return this.id_;
+}
+
+string Monster::getName()
+{
+	return this.name_;
+}
+
+string Monster::getImageName()
+{
+	return this.imageName_;
+}
+
+MonsterAttack Monster::getAttack(int index, int hpPercent)
+{
+	int maIndex = this.getMultiAttackIndex(index, hpPercent);
+	if (maIndex != -1)
+	{
+		return this.multiAttack_[maIndex];
+	}
+	return this.atk_[index % this.atk_.Numof()];
+}
+
+int Monster::getHp()
+{
+	return this.hp_ * g_monsterStrengthShifter.getHpRatio();
+}
+
+string Monster::getMonsterAttributeId()
+{
+	return this.monsterAttributeId_;
+}
+
+int Monster::getExp()
+{
+	return this.exp_;
+}
+
+int Monster::getGold()
+{
+	return this.gold_;
+}
+
+string Monster::getChangeToMonsterId()
+{
+	return this.changeToMonsterId_;
+}
+
+void Monster::addMultipleAttack(int exIndex)
+{
+	int count = this.multiAttack_.Numof();
+	this.multiAttack_.Realloc(count + 3);
+	int i;
+	for (i = 0; i < 3; ++i)
+	{
+		this.multiAttack_[count + i].initAsMultiMode(exIndex, i);
+	}
+}
+
+int Monster::getMultiAttackIndex(int index, int hpPercent)
+{
+	int minPercent = 100;
+	int ret = -1;
+	int i;
+	for (i = 0; i < this.multiAttack_.Numof(); ++i)
+	{
+		if (i % 3 != index % 3)
+		{
+			continue;
+		}
+		if (hpPercent < this.multiAttack_[i].getHpPercent())
+		{
+			if (this.multiAttack_[i].getHpPercent() < minPercent)
+			{
+				minPercent = this.multiAttack_[i].getHpPercent();
+				ret = i;
+			}
+		}
+	}
+	return ret;
+}
+
+void Monster::setFixedPosition(bool val, int deadMotionType)
+{
+	this.isFixedPosition_ = val;
+	this.deadMotionType_ = deadMotionType;
+}
+
+bool Monster::isFixedPosition()
+{
+	return this.isFixedPosition_;
+}
+
+void Monster::setPosition(int standX, int standY, int infoX, int infoY, int nameX, int nameY)
+{
+	this.standX_ = standX;
+	this.standY_ = standY;
+	this.infoX_ = infoX;
+	this.infoY_ = infoY;
+	this.nameX_ = nameX;
+	this.nameY_ = nameY;
+}
+
+void Monster::getStandPosition(ref int x, ref int y)
+{
+	x = this.standX_;
+	y = this.standY_;
+}
+
+void Monster::getInformationPosition(ref int x, ref int y)
+{
+	x = this.infoX_;
+	y = this.infoY_;
+}
+
+void Monster::getNamePosition(ref int x, ref int y)
+{
+	x = this.nameX_;
+	y = this.nameY_;
+}
+
+int Monster::getDeadMotionType()
+{
+	return this.deadMotionType_;
+}
+
+void Monster::setEffectOffset(int x, int y)
+{
+	this.effectOffsetX_ = x;
+	this.effectOffsetY_ = y;
+}
+
+void Monster::getEffectOffset(ref int x, ref int y)
+{
+	x = this.effectOffsetX_;
+	y = this.effectOffsetY_;
+}
+

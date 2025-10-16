@@ -1,0 +1,99 @@
+void SceneSystemMenu::init(bool isShowAutoSkip)
+{
+	this.isShowAutoSkip_ = isShowAutoSkip;
+	this.selected_ = -1;
+	this.partsBg_.initAsPlaneImage(1024, 768, 0, 0, 0, 255);
+	this.partsBg_.setZ(8500.0);
+	this.initButton();
+	this.setButtonPos();
+}
+
+void SceneSystemMenu::initButton()
+{
+	array@string n;
+	n.PushBack("枠消し");
+	n.PushBack("オート");
+	n.PushBack("スキップ");
+	n.PushBack("バックログ");
+	n.PushBack("バックシーン");
+	n.PushBack("コンフィグ");
+	n.PushBack("マニュアル");
+	n.PushBack("メニューを閉じる");
+	int i;
+	for (i = 0; i < this.btn_.Numof(); ++i)
+	{
+		this.btn_[i].init("システム／ボタン／幅１７０", n[i], "", true);
+		this.btn_[i].setClickCallback(this.onClick, i);
+		this.btn_[i].setZ(8550);
+	}
+}
+
+void SceneSystemMenu::setButtonPos()
+{
+	int i;
+	for (i = 0; i < this.btn_.Numof(); ++i)
+	{
+		this.btn_[i].setPos(840, 197 + 71 * i);
+	}
+}
+
+void SceneSystemMenu::fadeButton(bool val)
+{
+	int i;
+	for (i = 0; i < this.btn_.Numof(); ++i)
+	{
+		if (this.isShowAutoSkip_ || !this.isShowAutoSkip_ && i >= 3)
+		{
+			this.btn_[i].fadeIn(val);
+		}
+	}
+}
+
+void SceneSystemMenu::fadeIn(bool val, DG_GeneralCallback cb)
+{
+	this.fadeButton(val);
+	this.partsBg_.setShow(true);
+	PartsMotion m;
+	if (val)
+	{
+		m.setAlpha(0, 160, 0);
+	}
+	else
+	{
+		m.setAlpha(160, 0, 0);
+	}
+	this.partsBg_.runMotion(m, cb);
+}
+
+void SceneSystemMenu::run()
+{
+	this.fadeIn(true, NULL);
+}
+
+bool SceneSystemMenu::update()
+{
+	if (g_mouse.isClick(1) && !this.partsBg_.isMotion())
+	{
+		playCancel();
+		this.selected_ = -1;
+		this.fadeIn(false, this.onFinishFadeOut);
+	}
+	return !this.isFinish_;
+}
+
+void SceneSystemMenu::onClick(int id)
+{
+	this.selected_ = id;
+	this.fadeIn(false, this.onFinishFadeOut);
+}
+
+void SceneSystemMenu::onFinishFadeOut()
+{
+	this.isFinish_ = true;
+}
+
+int SceneSystemMenu::getSelected()
+{
+	return this.selected_;
+}
+

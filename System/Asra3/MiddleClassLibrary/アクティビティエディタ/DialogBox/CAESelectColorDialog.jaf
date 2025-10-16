@@ -1,0 +1,181 @@
+CAESelectColorDialog::CAESelectColorDialog()
+{
+}
+
+void CAESelectColorDialog::Show(int ID, int PosX, int PosY, int Red, int Green, int Blue, DG_ChangedColor dgChangedColor)
+{
+	AFL_Parts_AddLayer(-1);
+	this.m_dgChangedColor = dgChangedColor;
+	this.m_Color.Set(Red, Green, Blue, 255);
+	int LayoutBox = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿パディング設定(LayoutBox, 6, 6, 6, 6);
+	Ｐ＿レイアウトボックス＿配置設定(LayoutBox, 3);
+	this.m_Panel.Init(LayoutBox);
+	this.m_Panel.AddChangeTextEvent(this.ChangeTextEvent);
+	int SliderButtonWidth = 10;
+	int SliderWidth = 255 + SliderButtonWidth + SliderButtonWidth;
+	int SliderHeight = 16;
+	ref CAEPropertyItem RedItem = this.m_Panel.AddTextBoxItem("赤", 25, string(Red), 55, false);
+	this.m_RedSlider = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿横スクロールバー＿全体量設定(this.m_RedSlider, 256);
+	Ｐ＿横スクロールバー＿表示量設定(this.m_RedSlider, 1);
+	Ｐ＿横スクロールバー＿スクロール位置設定(this.m_RedSlider, Red);
+	Ｐ＿横スクロールバー＿サイズ設定(this.m_RedSlider, SliderWidth, SliderHeight);
+	Ｐ＿横スクロールバー＿左ボタン幅設定(this.m_RedSlider, SliderButtonWidth);
+	Ｐ＿横スクロールバー＿右ボタン幅設定(this.m_RedSlider, SliderButtonWidth);
+	Ｐ＿乗算色設定(this.m_RedSlider, 255, 200, 200);
+	Ｐ＿マージン設定(this.m_RedSlider, 0, 0, 3, 0);
+	RedItem.AddParts(this.m_RedSlider);
+	ref CAEPropertyItem GreenItem = this.m_Panel.AddTextBoxItem("緑", 25, string(Green), 55, false);
+	this.m_GreenSlider = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿横スクロールバー＿全体量設定(this.m_GreenSlider, 256);
+	Ｐ＿横スクロールバー＿表示量設定(this.m_GreenSlider, 1);
+	Ｐ＿横スクロールバー＿スクロール位置設定(this.m_GreenSlider, Green);
+	Ｐ＿横スクロールバー＿サイズ設定(this.m_GreenSlider, SliderWidth, SliderHeight);
+	Ｐ＿横スクロールバー＿左ボタン幅設定(this.m_GreenSlider, SliderButtonWidth);
+	Ｐ＿横スクロールバー＿右ボタン幅設定(this.m_GreenSlider, SliderButtonWidth);
+	Ｐ＿乗算色設定(this.m_GreenSlider, 200, 255, 200);
+	Ｐ＿マージン設定(this.m_GreenSlider, 0, 0, 3, 0);
+	GreenItem.AddParts(this.m_GreenSlider);
+	ref CAEPropertyItem BlueItem = this.m_Panel.AddTextBoxItem("青", 25, string(Blue), 55, false);
+	this.m_BlueSlider = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿横スクロールバー＿全体量設定(this.m_BlueSlider, 256);
+	Ｐ＿横スクロールバー＿表示量設定(this.m_BlueSlider, 1);
+	Ｐ＿横スクロールバー＿スクロール位置設定(this.m_BlueSlider, Blue);
+	Ｐ＿横スクロールバー＿サイズ設定(this.m_BlueSlider, SliderWidth, SliderHeight);
+	Ｐ＿横スクロールバー＿左ボタン幅設定(this.m_BlueSlider, SliderButtonWidth);
+	Ｐ＿横スクロールバー＿右ボタン幅設定(this.m_BlueSlider, SliderButtonWidth);
+	Ｐ＿乗算色設定(this.m_BlueSlider, 200, 200, 255);
+	Ｐ＿マージン設定(this.m_BlueSlider, 0, 0, 3, 0);
+	BlueItem.AddParts(this.m_BlueSlider);
+	int ButtonLayout = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿レイアウトタイプ設定(ButtonLayout, 2);
+	Ｐ＿レイアウトボックス＿パディング設定(ButtonLayout, 3, 3, 3, 3);
+	Ｐ＿レイアウトボックス＿追加(LayoutBox, ButtonLayout);
+	int OKButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(OKButton, "決定");
+	Ｐ＿ボタン＿サイズ設定(OKButton, 65, 22);
+	Ｐ＿マージン設定(OKButton, 0, 0, 3, 0);
+	Ｐ＿レイアウトボックス＿追加(ButtonLayout, OKButton);
+	AFL_Parts_AddMouseLClickEvent(OKButton, this.ClickOKButtonEvent);
+	int CancelButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(CancelButton, "キャンセル");
+	Ｐ＿ボタン＿サイズ設定(CancelButton, 100, 22);
+	Ｐ＿マージン設定(CancelButton, 0, 0, 3, 0);
+	Ｐ＿レイアウトボックス＿追加(ButtonLayout, CancelButton);
+	AFL_Parts_AddMouseLClickEvent(CancelButton, this.ClickCancelButtonEvent);
+	int Width = AFL_Parts_GetWidth(LayoutBox, 1);
+	int Height = AFL_Parts_GetHeight(LayoutBox, 1);
+	int BG = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿構築手順＿ピクセル作成(BG, Width, Height, 1);
+	Ｐ＿構築手順＿色塗り(BG, 0, 0, Width, Height, 200, 200, 200, -1, 1);
+	Ｐ＿構築ビルド(BG, 1);
+	Ｐ＿ドラッグ可能設定(BG, true);
+	Ｐ＿親設定(LayoutBox, BG);
+	PosX = Math.Max(0, Math.Min(AFL_View_GetWidth() - Width, PosX));
+	PosY = Math.Max(0, Math.Min(AFL_View_GetHeight() - Height, PosY));
+	Ｐ＿座標設定(BG, PosX, PosY);
+	AFL_Parts_AddDragEndEvent(BG, this.DragEndEvent);
+	this.m_OK = false;
+	this.m_Cancel = false;
+	PARTS_BeginInput();
+	int PrevRed = Red;
+	int PrevGreen = Green;
+	int PrevBlue = Blue;
+	for (; ; )
+	{
+		int NowRed = Ｐ＿横スクロールバー＿スクロール位置取得(this.m_RedSlider);
+		int NowGreen = Ｐ＿横スクロールバー＿スクロール位置取得(this.m_GreenSlider);
+		int NowBlue = Ｐ＿横スクロールバー＿スクロール位置取得(this.m_BlueSlider);
+		if (NowRed != PrevRed || NowGreen != PrevGreen || NowBlue != PrevBlue)
+		{
+			this.m_Color.Set(NowRed, NowGreen, NowBlue, 255);
+			dgChangedColor(ID, this.m_Color.GetR(), this.m_Color.GetG(), this.m_Color.GetB());
+			PrevRed = NowRed;
+			PrevGreen = NowGreen;
+			PrevBlue = NowBlue;
+			RedItem.SetTextBoxText(string(NowRed));
+			GreenItem.SetTextBoxText(string(NowGreen));
+			BlueItem.SetTextBoxText(string(NowBlue));
+		}
+		AFL_View_Update(true);
+		if (this.m_OK)
+		{
+			break;
+		}
+		if (this.m_Cancel)
+		{
+			dgChangedColor(ID, Red, Green, Blue);
+			break;
+		}
+	}
+	PARTS_EndInput();
+	this.m_Panel.Release();
+	PARTS_ReleaseWithInit(this.m_RedSlider);
+	PARTS_ReleaseWithInit(this.m_GreenSlider);
+	PARTS_ReleaseWithInit(this.m_BlueSlider);
+	PARTS_ReleaseWithInit(LayoutBox);
+	PARTS_ReleaseWithInit(CancelButton);
+	PARTS_ReleaseWithInit(OKButton);
+	PARTS_ReleaseWithInit(ButtonLayout);
+	PARTS_ReleaseWithInit(BG);
+	AFL_Parts_EraseLayer(-1);
+}
+
+void CAESelectColorDialog::ChangeTextEvent(int ID)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	if (Item.GetLabel() == "赤")
+	{
+		Ｐ＿横スクロールバー＿スクロール位置設定(this.m_RedSlider, Item.GetTextBoxInt());
+		int Value = Ｐ＿横スクロールバー＿スクロール位置取得(this.m_RedSlider);
+		if (Value != Item.GetTextBoxInt())
+		{
+			Item.SetTextBoxText(string(Value));
+		}
+	}
+	else if (Item.GetLabel() == "緑")
+	{
+		Ｐ＿横スクロールバー＿スクロール位置設定(this.m_GreenSlider, Item.GetTextBoxInt());
+		int Value = Ｐ＿横スクロールバー＿スクロール位置取得(this.m_GreenSlider);
+		if (Value != Item.GetTextBoxInt())
+		{
+			Item.SetTextBoxText(string(Value));
+		}
+	}
+	else if (Item.GetLabel() == "青")
+	{
+		Ｐ＿横スクロールバー＿スクロール位置設定(this.m_BlueSlider, Item.GetTextBoxInt());
+		int Value = Ｐ＿横スクロールバー＿スクロール位置取得(this.m_BlueSlider);
+		if (Value != Item.GetTextBoxInt())
+		{
+			Item.SetTextBoxText(string(Value));
+		}
+	}
+}
+
+void CAESelectColorDialog::ClickOKButtonEvent(int ID, int MouseX, int MouseY)
+{
+	this.m_OK = true;
+}
+
+void CAESelectColorDialog::ClickCancelButtonEvent(int ID, int MouseX, int MouseY)
+{
+	this.m_Cancel = true;
+}
+
+void CAESelectColorDialog::DragEndEvent(int ID)
+{
+	int PosX = Ｐ＿Ｘ座標取得(ID);
+	int PosY = Ｐ＿Ｙ座標取得(ID);
+	int Width = AFL_Parts_GetWidth(ID, 1);
+	int Height = AFL_Parts_GetHeight(ID, 1);
+	PosX = Math.Max(0, Math.Min(AFL_View_GetWidth() - Width, PosX));
+	PosY = Math.Max(0, Math.Min(AFL_View_GetHeight() - Height, PosY));
+	Ｐ＿座標設定(ID, PosX, PosY);
+}
+

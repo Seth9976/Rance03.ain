@@ -1,0 +1,70 @@
+void SYS_SelectEXNode(string TreePath, string NodeName, DG_SelectedEXNodeHandler dgObject)
+{
+	if (!system.IsDebugMode())
+	{
+		return;
+	}
+	for (; ; )
+	{
+		array@string NodeList;
+		EX_GetNodeNameList(TreePath, NodeList);
+		array@string EXNameList;
+		EX_GetEXNameList(TreePath, EXNameList);
+		if (NodeList.Empty() && EXNameList.Empty())
+		{
+			dgObject(TreePath, NodeName);
+			EXNameList.Free();
+			NodeList.Free();
+			break;
+		}
+		int Index;
+		選択肢(2147483647, "■■■■■ ノードリスト ■■■■■", 0);
+		int NodeListBase = Index;
+		int NodeListIndex;
+		for (NodeListIndex = 0; NodeListIndex < NodeList.Numof(); ++Index, ++NodeListIndex)
+		{
+			選択肢(Index, NodeList[NodeListIndex], 0);
+		}
+		選択肢(2147483647, "", 0);
+		選択肢(2147483647, "■■■■■  定義リスト ■■■■■", 0);
+		int EXNameListBase = Index;
+		int EXNameListIndex;
+		for (EXNameListIndex = 0; EXNameListIndex < EXNameList.Numof(); ++Index, ++EXNameListIndex)
+		{
+			選択肢(Index, EXNameList[EXNameListIndex], 0);
+		}
+		選択肢(2147483647, "", 0);
+		選択肢(2147483647, "-----------------", 0);
+		選択肢(Index, "戻る", 0);
+		int 結果 = テスト選択();
+		if (Index < 結果)
+		{
+			EXNameList.Free();
+			NodeList.Free();
+			continue;
+		}
+		if (結果 < 0 || Index == 結果)
+		{
+			EXNameList.Free();
+			NodeList.Free();
+			break;
+		}
+		NodeListIndex = 結果 - NodeListBase;
+		if (0 <= NodeListIndex && NodeListIndex < NodeList.Numof())
+		{
+			SYS_SelectEXNode(TreePath + "." + NodeList[NodeListIndex], NodeList[NodeListIndex], dgObject);
+			EXNameList.Free();
+			NodeList.Free();
+			continue;
+		}
+		EXNameListIndex = 結果 - EXNameListBase;
+		if (0 <= EXNameListIndex && EXNameListIndex < EXNameList.Numof())
+		{
+			dgObject(TreePath + "." + EXNameList[EXNameListIndex], EXNameList[EXNameListIndex]);
+			EXNameList.Free();
+			NodeList.Free();
+			continue;
+		}
+	}
+}
+

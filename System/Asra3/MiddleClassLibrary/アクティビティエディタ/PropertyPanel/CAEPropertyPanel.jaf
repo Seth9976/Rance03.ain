@@ -1,0 +1,294 @@
+CAEPropertyPanel::CAEPropertyPanel()
+{
+	this.Init(0);
+}
+
+CAEPropertyPanel::~CAEPropertyPanel()
+{
+	this.Release();
+}
+
+void CAEPropertyPanel::Init(int LayoutID)
+{
+	this.Release();
+	this.m_LayoutID = LayoutID;
+	this.m_ToolTip.Init();
+	this.m_ToolTip.SetGetToolTipTextEvent(this.GetToolTipText);
+}
+
+void CAEPropertyPanel::Release()
+{
+	this.m_ToolTip.Release();
+	this.m_dgSelectedComboBoxEvent.Clear();
+	this.m_dgChangedCheckBoxEvent.Clear();
+	this.m_dgMouseClickEvent.Clear();
+	this.m_dgChangeTextEvent.Clear();
+	this.m_dgMouseWheelEvent.Clear();
+	this.m_dgKeyDownEvent.Clear();
+	this.m_ForcusItemList.Free();
+	this.m_ItemList.Free();
+	this.m_LayoutID = -1;
+}
+
+void CAEPropertyPanel::OutputError(string Text)
+{
+	system.Output("ＧＵＩエディタ警告：%s\n" % Text);
+}
+
+string CAEPropertyPanel::GetToolTipText(int Number)
+{
+	ref CAEPropertyItem Item = this.GetItem(Number);
+	if (Item === NULL)
+	{
+		return "";
+	}
+	return Item.GetToolTipText();
+}
+
+void CAEPropertyPanel::AddChangeFocusParts(int Number)
+{
+	if (Number == 0)
+	{
+		return;
+	}
+	this.m_ForcusItemList.PushBack(Number);
+	AFL_Parts_AddKeyUpEvent(Number, this.KeyUpEvent);
+}
+
+ref CAEPropertyItem CAEPropertyPanel::AddItem()
+{
+	this.m_ItemList.Realloc(this.m_ItemList.Numof() + 1);
+	this.m_ItemList[this.m_ItemList.Numof() - 1].AddKeyDownEvent(this.KeyDownEvent);
+	this.m_ItemList[this.m_ItemList.Numof() - 1].AddMouseWheelEvent(this.MouseWheelEvent);
+	this.m_ItemList[this.m_ItemList.Numof() - 1].SetToolTip(this.m_ToolTip);
+	return this.m_ItemList[this.m_ItemList.Numof() - 1];
+}
+
+ref CAEPropertyItem CAEPropertyPanel::AddTextBoxItem(string Label, int LabelWidth, string Text, int TextBoxWidth, bool OpenIMEGainFocus)
+{
+	if (this.IsExistItem(Label))
+	{
+		this.OutputError("同じ名前の項目が存在します。\n　　%s" % Label);
+	}
+	ref CAEPropertyItem Item = this.AddItem();
+	int ID = Item.SetTextBox(Label, LabelWidth, TextBoxWidth, OpenIMEGainFocus);
+	Item.SetTextBoxText(Text);
+	Item.AddChangeTextEvent(this.ChangeTextEvent);
+	Ｐ＿レイアウトボックス＿追加(this.m_LayoutID, ID);
+	this.AddChangeFocusParts(Item.GetTextBoxID());
+	return Item;
+}
+
+ref CAEPropertyItem CAEPropertyPanel::AddButtonItem(string Label, int LabelWidth, string Text, int ButtonWidth, int TextPos)
+{
+	if (this.IsExistItem(Label))
+	{
+		this.OutputError("同じ名前の項目が存在します。\n　　%s" % Label);
+	}
+	ref CAEPropertyItem Item = this.AddItem();
+	int ID = Item.SetButtonItem(Label, LabelWidth, ButtonWidth, TextPos);
+	Item.SetButtonText(Text);
+	Item.AddMouseClickEvent(this.MouseLClickEvent);
+	Ｐ＿レイアウトボックス＿追加(this.m_LayoutID, ID);
+	return Item;
+}
+
+ref CAEPropertyItem CAEPropertyPanel::AddCheckBoxItem(string Label, int LabelWidth, int CheckBoxWidth, bool Flg)
+{
+	if (this.IsExistItem(Label))
+	{
+		this.OutputError("同じ名前の項目が存在します。\n　　%s" % Label);
+	}
+	ref CAEPropertyItem Item = this.AddItem();
+	int ID = Item.SetCheckBoxItem(Label, LabelWidth, CheckBoxWidth);
+	Item.SetFlg(Flg);
+	Item.AddMouseClickEvent(this.MouseLClickEvent);
+	Item.AddChangedCheckBoxEvent(this.ChangedCheckBoxEvent);
+	Ｐ＿レイアウトボックス＿追加(this.m_LayoutID, ID);
+	return Item;
+}
+
+ref CAEPropertyItem CAEPropertyPanel::AddComboBoxItem(string Label, int LabelWidth, int ComboBoxWidth, int ComboBoxHeight, array@string List, int Index)
+{
+	if (this.IsExistItem(Label))
+	{
+		this.OutputError("同じ名前の項目が存在します。\n　　%s" % Label);
+	}
+	ref CAEPropertyItem Item = this.AddItem();
+	int ID = Item.SetComboBoxItem(Label, LabelWidth, ComboBoxWidth, ComboBoxHeight);
+	Item.SetComboBoxItemList(List);
+	Item.SetComboBoxIndex(Index);
+	Item.AddMouseClickEvent(this.MouseLClickEvent);
+	Item.AddSelectedComboBoxEvent(this.SelectedComboBoxEvent);
+	Ｐ＿レイアウトボックス＿追加(this.m_LayoutID, ID);
+	return Item;
+}
+
+ref CAEPropertyItem CAEPropertyPanel::AddLabelItem(string Label, int LabelWidth)
+{
+	if (this.IsExistItem(Label))
+	{
+		this.OutputError("同じ名前の項目が存在します。\n　　%s" % Label);
+	}
+	ref CAEPropertyItem Item = this.AddItem();
+	int ID = Item.SetLabelItem(Label, LabelWidth);
+	Ｐ＿レイアウトボックス＿追加(this.m_LayoutID, ID);
+	return Item;
+}
+
+bool CAEPropertyPanel::IsExistItem(string Label)
+{
+	return this.GetItemByLabel(Label) !== NULL;
+}
+
+ref CAEPropertyItem CAEPropertyPanel::GetItem(int ID)
+{
+	int Index;
+	for (Index = 0; Index < this.m_ItemList.Numof(); ++Index)
+	{
+		if (this.m_ItemList[Index].IsExistParts(ID))
+		{
+			return this.m_ItemList[Index];
+		}
+	}
+	return NULL;
+}
+
+ref CAEPropertyItem CAEPropertyPanel::GetItemByLabel(string Label)
+{
+	int Index;
+	for (Index = 0; Index < this.m_ItemList.Numof(); ++Index)
+	{
+		if (this.m_ItemList[Index].GetLabel() == Label)
+		{
+			return this.m_ItemList[Index];
+		}
+	}
+	return NULL;
+}
+
+void CAEPropertyPanel::KeyDownEvent(int ID, int KeyID)
+{
+	this.m_dgKeyDownEvent(ID, KeyID);
+}
+
+void CAEPropertyPanel::MouseWheelEvent(int ID, int Forward, int Back)
+{
+	this.m_dgMouseWheelEvent(ID, Forward, Back);
+}
+
+void CAEPropertyPanel::ChangeTextEvent(int ID)
+{
+	this.m_dgChangeTextEvent(ID);
+}
+
+void CAEPropertyPanel::MouseLClickEvent(int ID, int MouseX, int MouseY)
+{
+	this.m_dgMouseClickEvent(ID, MouseX, MouseY);
+}
+
+void CAEPropertyPanel::ChangedCheckBoxEvent(int ID, bool Check)
+{
+	this.m_dgChangedCheckBoxEvent(ID, Check);
+}
+
+void CAEPropertyPanel::SelectedComboBoxEvent(int ID, int Index)
+{
+	this.m_dgSelectedComboBoxEvent(ID, Index);
+}
+
+void CAEPropertyPanel::KeyUpEvent(int ID, int KeyID)
+{
+	if (KeyID != 9)
+	{
+		return;
+	}
+	if (InputString.Converts() || InputString.Inputs())
+	{
+		return;
+	}
+	int Size = this.m_ForcusItemList.Numof();
+	int i;
+	for (i = 0; i < Size; ++i)
+	{
+		if (ID == this.m_ForcusItemList[i])
+		{
+			break;
+		}
+	}
+	if (Size <= i)
+	{
+		return;
+	}
+	int Number = i;
+	if (!AFL_IsKeyDown(16))
+	{
+		Number = i == Size - 1 ? 0 : i + 1;
+	}
+	else
+	{
+		Number = i == 0 ? Size - 1 : i - 1;
+	}
+	Ｐ＿フォーカス設定(this.m_ForcusItemList[Number]);
+}
+
+void CAEPropertyPanel::AddKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent += DelegateObject;
+}
+
+void CAEPropertyPanel::EraseKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent -= DelegateObject;
+}
+
+void CAEPropertyPanel::AddMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent += DelegateObject;
+}
+
+void CAEPropertyPanel::EraseMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent -= DelegateObject;
+}
+
+void CAEPropertyPanel::AddChangeTextEvent(DG_ChangedHandler DelegateObject)
+{
+	this.m_dgChangeTextEvent += DelegateObject;
+}
+
+void CAEPropertyPanel::EraseChangeTextEvent(DG_ChangedHandler DelegateObject)
+{
+	this.m_dgChangeTextEvent -= DelegateObject;
+}
+
+void CAEPropertyPanel::AddMouseClickEvent(DG_MouseClickHandler DelegateObject)
+{
+	this.m_dgMouseClickEvent += DelegateObject;
+}
+
+void CAEPropertyPanel::EraseMouseClickEvent(DG_MouseClickHandler DelegateObject)
+{
+	this.m_dgMouseClickEvent -= DelegateObject;
+}
+
+void CAEPropertyPanel::AddChangedCheckBoxEvent(DG_ChangedFlgHandler DelegateObject)
+{
+	this.m_dgChangedCheckBoxEvent += DelegateObject;
+}
+
+void CAEPropertyPanel::EraseChangedCheckBoxEvent(DG_ChangedFlgHandler DelegateObject)
+{
+	this.m_dgChangedCheckBoxEvent -= DelegateObject;
+}
+
+void CAEPropertyPanel::AddSelectedEvent(DG_SelectedHandler DelegateObject)
+{
+	this.m_dgSelectedComboBoxEvent += DelegateObject;
+}
+
+void CAEPropertyPanel::EraseSelectedEvent(DG_SelectedHandler DelegateObject)
+{
+	this.m_dgSelectedComboBoxEvent -= DelegateObject;
+}
+

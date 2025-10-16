@@ -1,0 +1,29 @@
+void MusicInfo::init(int index)
+{
+	string key = "音楽情報";
+	this.index_ = index;
+	this.id_ = EX_A2String(key, 0, index, "");
+	this.isPlayed_ = false;
+	this.songName_ = EX_SA2String(key, this.id_, "songName", "");
+}
+
+int MusicInfo::getIndex()
+{
+	return this.index_;
+}
+
+string MusicInfo::getSongName()
+{
+	return this.songName_;
+}
+
+string MusicInfo::getId()
+{
+	return this.id_;
+}
+
+bool MusicInfo::isPlayed()
+{
+	return g_playedMusic.Find(0, g_playedMusic.Numof(), this.id_) != -1;
+}
+

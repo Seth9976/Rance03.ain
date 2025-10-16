@@ -1,0 +1,476 @@
+CPartsFunctionSet::CPartsFunctionSet()
+{
+	this.Release();
+}
+
+CPartsFunctionSet::~CPartsFunctionSet()
+{
+	this.Release();
+}
+
+void CPartsFunctionSet::Release()
+{
+	this.m_dgFixedEvent.Clear();
+	this.m_dgChangedFlgEvent.Clear();
+	this.m_dgChangedEvent.Clear();
+	this.m_dgSelectedEvent.Clear();
+	this.m_dgDeletedEvent.Clear();
+	this.m_dgCreatedEvent.Clear();
+	this.m_dgScrollEvent.Clear();
+	this.m_dgLostFocusEvent.Clear();
+	this.m_dgFocusEvent.Clear();
+	this.m_dgDropLeaveEvent.Clear();
+	this.m_dgDroppedEvent.Clear();
+	this.m_dgDropOnEvent.Clear();
+	this.m_dgDropEnterEvent.Clear();
+	this.m_dgDragEndEvent.Clear();
+	this.m_dgDragingEvent.Clear();
+	this.m_dgDragBeginEvent.Clear();
+	this.m_dgKeyUpEvent.Clear();
+	this.m_dgKeyPressEvent.Clear();
+	this.m_dgKeyDownEvent.Clear();
+	this.m_dgKeyTriggerEvent.Clear();
+	this.m_dgMouseOnEvent.Clear();
+	this.m_dgMouseMClickEvent.Clear();
+	this.m_dgMouseRClickEvent.Clear();
+	this.m_dgMouseLClickEvent.Clear();
+	this.m_dgMouseWheelEvent.Clear();
+	this.m_dgMouseLeaveEvent.Clear();
+	this.m_dgMouseMoveEvent.Clear();
+	this.m_dgMouseEnterEvent.Clear();
+	this.m_PartsNumber = 0;
+	this.m_Use = false;
+}
+
+void CPartsFunctionSet::Init(int PartsNumber)
+{
+	this.m_PartsNumber = PartsNumber;
+	this.m_Use = true;
+}
+
+bool CPartsFunctionSet::IsUse()
+{
+	return this.m_Use;
+}
+
+void CPartsFunctionSet::CallFunctionMouseEnter(int MouseX, int MouseY)
+{
+	this.m_dgMouseEnterEvent(this.m_PartsNumber, MouseX, MouseY);
+}
+
+void CPartsFunctionSet::CallFunctionMouseMove(int MouseX, int MouseY)
+{
+	this.m_dgMouseMoveEvent(this.m_PartsNumber, MouseX, MouseY);
+}
+
+void CPartsFunctionSet::CallFunctionMouseLeave(int MouseX, int MouseY)
+{
+	this.m_dgMouseLeaveEvent(this.m_PartsNumber, MouseX, MouseY);
+}
+
+void CPartsFunctionSet::CallFunctionMouseWheel(int Forward, int Back)
+{
+	this.m_dgMouseWheelEvent(this.m_PartsNumber, Forward, Back);
+}
+
+void CPartsFunctionSet::CallFunctionMouseClick(int MouseX, int MouseY, int KeyCode)
+{
+	if (KeyCode == 1)
+	{
+		this.m_dgMouseLClickEvent(this.m_PartsNumber, MouseX, MouseY);
+	}
+	else if (KeyCode == 2)
+	{
+		this.m_dgMouseRClickEvent(this.m_PartsNumber, MouseX, MouseY);
+	}
+	else if (KeyCode == 4)
+	{
+		this.m_dgMouseMClickEvent(this.m_PartsNumber, MouseX, MouseY);
+	}
+}
+
+void CPartsFunctionSet::CallFunctionMouseOnCursor(int MouseX, int MouseY, int Time)
+{
+	this.m_dgMouseOnEvent(this.m_PartsNumber, MouseX, MouseY, Time);
+}
+
+void CPartsFunctionSet::CallFunctionKeyTrigger(int KeyCode)
+{
+	this.m_dgKeyTriggerEvent(this.m_PartsNumber, KeyCode);
+}
+
+void CPartsFunctionSet::CallFunctionKeyDown(int KeyCode)
+{
+	this.m_dgKeyDownEvent(this.m_PartsNumber, KeyCode);
+}
+
+void CPartsFunctionSet::CallFunctionKeyPress(int KeyCode)
+{
+	this.m_dgKeyPressEvent(this.m_PartsNumber, KeyCode);
+}
+
+void CPartsFunctionSet::CallFunctionKeyUp(int KeyCode)
+{
+	this.m_dgKeyUpEvent(this.m_PartsNumber, KeyCode);
+}
+
+void CPartsFunctionSet::CallFunctionDragBegin()
+{
+	this.m_dgDragBeginEvent(this.m_PartsNumber);
+}
+
+void CPartsFunctionSet::CallFunctionDraging(int BeginMouseX, int BeginMouseY, int MouseX, int MouseY)
+{
+	this.m_dgDragingEvent(this.m_PartsNumber, BeginMouseX, BeginMouseY, MouseX, MouseY);
+}
+
+void CPartsFunctionSet::CallFunctionDragEnd()
+{
+	this.m_dgDragEndEvent(this.m_PartsNumber);
+}
+
+void CPartsFunctionSet::CallFunctionDropEnter(int DragPartsNumber)
+{
+	this.m_dgDropEnterEvent(this.m_PartsNumber, DragPartsNumber);
+}
+
+void CPartsFunctionSet::CallFunctionDropOn(int DragPartsNumber, int MouseX, int MouseY)
+{
+	this.m_dgDropOnEvent(this.m_PartsNumber, DragPartsNumber, MouseX, MouseY);
+}
+
+void CPartsFunctionSet::CallFunctionDropped(int DragPartsNumber, int MouseX, int MouseY)
+{
+	this.m_dgDroppedEvent(this.m_PartsNumber, DragPartsNumber, MouseX, MouseY);
+}
+
+void CPartsFunctionSet::CallFunctionDropLeave(int DragPartsNumber)
+{
+	this.m_dgDropLeaveEvent(this.m_PartsNumber, DragPartsNumber);
+}
+
+void CPartsFunctionSet::CallFunctionFocus()
+{
+	this.m_dgFocusEvent(this.m_PartsNumber);
+}
+
+void CPartsFunctionSet::CallFunctionLostFocus()
+{
+	this.m_dgLostFocusEvent(this.m_PartsNumber);
+}
+
+void CPartsFunctionSet::CallFunctionScroll(int ScrollPos, int Total)
+{
+	this.m_dgScrollEvent(this.m_PartsNumber, ScrollPos, Total);
+}
+
+void CPartsFunctionSet::CallFunctionCreated()
+{
+	this.m_dgCreatedEvent(this.m_PartsNumber);
+}
+
+void CPartsFunctionSet::CallFunctionDeleted()
+{
+	this.m_dgDeletedEvent(this.m_PartsNumber);
+}
+
+void CPartsFunctionSet::CallFunctionSelected(int Selected)
+{
+	this.m_dgSelectedEvent(this.m_PartsNumber, Selected);
+}
+
+void CPartsFunctionSet::CallFunctionChanged()
+{
+	this.m_dgChangedEvent(this.m_PartsNumber);
+}
+
+void CPartsFunctionSet::CallFunctionChangedFlg(bool Check)
+{
+	this.m_dgChangedFlgEvent(this.m_PartsNumber, Check);
+}
+
+void CPartsFunctionSet::CallFunctionFixed()
+{
+	this.m_dgFixedEvent(this.m_PartsNumber);
+}
+
+void CPartsFunctionSet::AddMouseEnterEvent(DG_MouseEnterHandler DelegateObject)
+{
+	this.m_dgMouseEnterEvent += DelegateObject;
+}
+
+void CPartsFunctionSet::EraseMouseEnterEvent(DG_MouseEnterHandler DelegateObject)
+{
+	this.m_dgMouseEnterEvent -= DelegateObject;
+}
+
+void CPartsFunctionSet::AddMouseMoveEvent(DG_MouseMoveHandler DelegateObject)
+{
+	this.m_dgMouseMoveEvent += DelegateObject;
+}
+
+void CPartsFunctionSet::EraseMouseMoveEvent(DG_MouseMoveHandler DelegateObject)
+{
+	this.m_dgMouseMoveEvent -= DelegateObject;
+}
+
+void CPartsFunctionSet::AddMouseLeaveEvent(DG_MouseLeaveHandler DelegateObject)
+{
+	this.m_dgMouseLeaveEvent += DelegateObject;
+}
+
+void CPartsFunctionSet::EraseMouseLeaveEvent(DG_MouseLeaveHandler DelegateObject)
+{
+	this.m_dgMouseLeaveEvent -= DelegateObject;
+}
+
+void CPartsFunctionSet::AddMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent += DelegateObject;
+}
+
+void CPartsFunctionSet::EraseMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent -= DelegateObject;
+}
+
+void CPartsFunctionSet::AddMouseLClickEvent(DG_MouseClickHandler DelegateObject)
+{
+	this.m_dgMouseLClickEvent += DelegateObject;
+}
+
+void CPartsFunctionSet::EraseMouseLClickEvent(DG_MouseClickHandler DelegateObject)
+{
+	this.m_dgMouseLClickEvent -= DelegateObject;
+}
+
+void CPartsFunctionSet::AddMouseRClickEvent(DG_MouseClickHandler DelegateObject)
+{
+	this.m_dgMouseRClickEvent += DelegateObject;
+}
+
+void CPartsFunctionSet::EraseMouseRClickEvent(DG_MouseClickHandler DelegateObject)
+{
+	this.m_dgMouseRClickEvent -= DelegateObject;
+}
+
+void CPartsFunctionSet::AddMouseMClickEvent(DG_MouseClickHandler DelegateObject)
+{
+	this.m_dgMouseMClickEvent += DelegateObject;
+}
+
+void CPartsFunctionSet::EraseMouseMClickEvent(DG_MouseClickHandler DelegateObject)
+{
+	this.m_dgMouseMClickEvent -= DelegateObject;
+}
+
+void CPartsFunctionSet::AddMouseOnEvent(DG_MouseOnHandler DelegateObject)
+{
+	this.m_dgMouseOnEvent += DelegateObject;
+}
+
+void CPartsFunctionSet::EraseMouseOnEvent(DG_MouseOnHandler DelegateObject)
+{
+	this.m_dgMouseOnEvent -= DelegateObject;
+}
+
+void CPartsFunctionSet::AddKeyTriggerEvent(DG_KeyTriggerHandler DelegateObject)
+{
+	this.m_dgKeyTriggerEvent += DelegateObject;
+}
+
+void CPartsFunctionSet::EraseKeyTriggerEvent(DG_KeyTriggerHandler DelegateObject)
+{
+	this.m_dgKeyTriggerEvent -= DelegateObject;
+}
+
+void CPartsFunctionSet::AddKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent += DelegateObject;
+}
+
+void CPartsFunctionSet::EraseKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent -= DelegateObject;
+}
+
+void CPartsFunctionSet::AddKeyPressEvent(DG_KeyPressHandler DelegateObject)
+{
+	this.m_dgKeyPressEvent += DelegateObject;
+}
+
+void CPartsFunctionSet::EraseKeyPressEvent(DG_KeyPressHandler DelegateObject)
+{
+	this.m_dgKeyPressEvent -= DelegateObject;
+}
+
+void CPartsFunctionSet::AddKeyUpEvent(DG_KeyUpHandler DelegateObject)
+{
+	this.m_dgKeyUpEvent += DelegateObject;
+}
+
+void CPartsFunctionSet::EraseKeyUpEvent(DG_KeyUpHandler DelegateObject)
+{
+	this.m_dgKeyUpEvent -= DelegateObject;
+}
+
+void CPartsFunctionSet::AddDragBeginEvent(DG_DragBeginHandler DelegateObject)
+{
+	this.m_dgDragBeginEvent += DelegateObject;
+}
+
+void CPartsFunctionSet::EraseDragBeginEvent(DG_DragBeginHandler DelegateObject)
+{
+	this.m_dgDragBeginEvent -= DelegateObject;
+}
+
+void CPartsFunctionSet::AddDragingEvent(DG_DragingHandler DelegateObject)
+{
+	this.m_dgDragingEvent += DelegateObject;
+}
+
+void CPartsFunctionSet::EraseDragingEvent(DG_DragingHandler DelegateObject)
+{
+	this.m_dgDragingEvent -= DelegateObject;
+}
+
+void CPartsFunctionSet::AddDragEndEvent(DG_DragEndHandler DelegateObject)
+{
+	this.m_dgDragEndEvent += DelegateObject;
+}
+
+void CPartsFunctionSet::EraseDragEndEvent(DG_DragEndHandler DelegateObject)
+{
+	this.m_dgDragEndEvent -= DelegateObject;
+}
+
+void CPartsFunctionSet::AddDropEnterEvent(DG_DropEnterHandler DelegateObject)
+{
+	this.m_dgDropEnterEvent += DelegateObject;
+}
+
+void CPartsFunctionSet::EraseDropEnterEvent(DG_DropEnterHandler DelegateObject)
+{
+	this.m_dgDropEnterEvent -= DelegateObject;
+}
+
+void CPartsFunctionSet::AddDropOnEvent(DG_DropOnHandler DelegateObject)
+{
+	this.m_dgDropOnEvent += DelegateObject;
+}
+
+void CPartsFunctionSet::EraseDropOnEvent(DG_DropOnHandler DelegateObject)
+{
+	this.m_dgDropOnEvent -= DelegateObject;
+}
+
+void CPartsFunctionSet::AddDroppedEvent(DG_DroppedHandler DelegateObject)
+{
+	this.m_dgDroppedEvent += DelegateObject;
+}
+
+void CPartsFunctionSet::EraseDroppedEvent(DG_DroppedHandler DelegateObject)
+{
+	this.m_dgDroppedEvent -= DelegateObject;
+}
+
+void CPartsFunctionSet::AddDropLeaveEvent(DG_DropLeaveHandler DelegateObject)
+{
+	this.m_dgDropLeaveEvent += DelegateObject;
+}
+
+void CPartsFunctionSet::EraseDropLeaveEvent(DG_DropLeaveHandler DelegateObject)
+{
+	this.m_dgDropLeaveEvent -= DelegateObject;
+}
+
+void CPartsFunctionSet::AddFocusEvent(DG_FocusHandler DelegateObject)
+{
+	this.m_dgFocusEvent += DelegateObject;
+}
+
+void CPartsFunctionSet::EraseFocusEvent(DG_FocusHandler DelegateObject)
+{
+	this.m_dgFocusEvent -= DelegateObject;
+}
+
+void CPartsFunctionSet::AddLostFocusEvent(DG_LostFocusHandler DelegateObject)
+{
+	this.m_dgLostFocusEvent += DelegateObject;
+}
+
+void CPartsFunctionSet::EraseLostFocusEvent(DG_LostFocusHandler DelegateObject)
+{
+	this.m_dgLostFocusEvent -= DelegateObject;
+}
+
+void CPartsFunctionSet::AddScrollEvent(DG_ScrollHandler DelegateObject)
+{
+	this.m_dgScrollEvent += DelegateObject;
+}
+
+void CPartsFunctionSet::EraseScrollEvent(DG_ScrollHandler DelegateObject)
+{
+	this.m_dgScrollEvent -= DelegateObject;
+}
+
+void CPartsFunctionSet::AddCreatedEvent(DG_CreatedHandler DelegateObject)
+{
+	this.m_dgCreatedEvent += DelegateObject;
+}
+
+void CPartsFunctionSet::EraseCreatedEvent(DG_CreatedHandler DelegateObject)
+{
+	this.m_dgCreatedEvent -= DelegateObject;
+}
+
+void CPartsFunctionSet::AddDeletedEvent(DG_DeletedHandler DelegateObject)
+{
+	this.m_dgDeletedEvent += DelegateObject;
+}
+
+void CPartsFunctionSet::EraseDeletedEvent(DG_DeletedHandler DelegateObject)
+{
+	this.m_dgDeletedEvent -= DelegateObject;
+}
+
+void CPartsFunctionSet::AddSelectedEvent(DG_SelectedHandler DelegateObject)
+{
+	this.m_dgSelectedEvent += DelegateObject;
+}
+
+void CPartsFunctionSet::EraseSelectedEvent(DG_SelectedHandler DelegateObject)
+{
+	this.m_dgSelectedEvent -= DelegateObject;
+}
+
+void CPartsFunctionSet::AddChangedEvent(DG_ChangedHandler DelegateObject)
+{
+	this.m_dgChangedEvent += DelegateObject;
+}
+
+void CPartsFunctionSet::EraseChangedEvent(DG_ChangedHandler DelegateObject)
+{
+	this.m_dgChangedEvent -= DelegateObject;
+}
+
+void CPartsFunctionSet::AddChangedFlgEvent(DG_ChangedFlgHandler DelegateObject)
+{
+	this.m_dgChangedFlgEvent += DelegateObject;
+}
+
+void CPartsFunctionSet::EraseChangedFlgEvent(DG_ChangedFlgHandler DelegateObject)
+{
+	this.m_dgChangedFlgEvent -= DelegateObject;
+}
+
+void CPartsFunctionSet::AddFixedEvent(DG_FixedHandler DelegateObject)
+{
+	this.m_dgFixedEvent += DelegateObject;
+}
+
+void CPartsFunctionSet::EraseFixedEvent(DG_FixedHandler DelegateObject)
+{
+	this.m_dgFixedEvent -= DelegateObject;
+}
+

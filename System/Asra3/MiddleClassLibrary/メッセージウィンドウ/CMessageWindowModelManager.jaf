@@ -1,0 +1,119 @@
+CMessageWindowModelManager::CMessageWindowModelManager()
+{
+}
+
+bool CMessageWindowModelManager::Init()
+{
+	this.m_ModelList.Alloc(40);
+	int n;
+	for (n = 0; n < this.m_ModelList.Numof(); n++)
+	{
+		this.m_ModelList[n].Init(n);
+	}
+	int OffsetZRange = EX_Int("Ｅ＿メッセージウィンドウ.Ｚ値増加量", 2);
+	this.m_IncZ = Math.Max(2, OffsetZRange);
+	int OffsetZRange = this.m_IncZ;
+	int OffsetTextZRange = EX_Int("Ｅ＿メッセージウィンドウ.テキストＺ値オフセット", OffsetZRange - 1);
+	this.m_TextOffsetZ = Math.Max(1, Math.Min(OffsetZRange - 1, OffsetTextZRange));
+	this.m_MessageWindowMulColorR = EX_AInt("Ｅ＿メッセージウィンドウ.全体.乗算カラー", 0, 0);
+	this.m_MessageWindowMulColorG = EX_AInt("Ｅ＿メッセージウィンドウ.全体.乗算カラー", 1, 0);
+	this.m_MessageWindowMulColorB = EX_AInt("Ｅ＿メッセージウィンドウ.全体.乗算カラー", 2, 0);
+	this.m_ReadTextColorList.Alloc(12);
+	int n;
+	for (n = 0; n < this.m_ReadTextColorList.Numof(); n++)
+	{
+		CASColor Color;
+		Color = CF_CASColor(255, 255, 255, 255);
+		switch (n)
+		{
+		case 0:
+			Color = CF_CASColor(EX_RA2Int("Ｅ＿既読メッセージ色", 0, "赤", 255), EX_RA2Int("Ｅ＿既読メッセージ色", 0, "緑", 127), EX_RA2Int("Ｅ＿既読メッセージ色", 0, "青", 127), 255);
+			break;
+		case 1:
+			Color = CF_CASColor(EX_RA2Int("Ｅ＿既読メッセージ色", 1, "赤", 255), EX_RA2Int("Ｅ＿既読メッセージ色", 1, "緑", 127), EX_RA2Int("Ｅ＿既読メッセージ色", 1, "青", 191), 255);
+			break;
+		case 2:
+			Color = CF_CASColor(EX_RA2Int("Ｅ＿既読メッセージ色", 2, "赤", 255), EX_RA2Int("Ｅ＿既読メッセージ色", 2, "緑", 127), EX_RA2Int("Ｅ＿既読メッセージ色", 2, "青", 255), 255);
+			break;
+		case 3:
+			Color = CF_CASColor(EX_RA2Int("Ｅ＿既読メッセージ色", 3, "赤", 191), EX_RA2Int("Ｅ＿既読メッセージ色", 3, "緑", 127), EX_RA2Int("Ｅ＿既読メッセージ色", 3, "青", 255), 255);
+			break;
+		case 4:
+			Color = CF_CASColor(EX_RA2Int("Ｅ＿既読メッセージ色", 4, "赤", 127), EX_RA2Int("Ｅ＿既読メッセージ色", 4, "緑", 127), EX_RA2Int("Ｅ＿既読メッセージ色", 4, "青", 255), 255);
+			break;
+		case 5:
+			Color = CF_CASColor(EX_RA2Int("Ｅ＿既読メッセージ色", 5, "赤", 127), EX_RA2Int("Ｅ＿既読メッセージ色", 5, "緑", 191), EX_RA2Int("Ｅ＿既読メッセージ色", 5, "青", 255), 255);
+			break;
+		case 6:
+			Color = CF_CASColor(EX_RA2Int("Ｅ＿既読メッセージ色", 6, "赤", 127), EX_RA2Int("Ｅ＿既読メッセージ色", 6, "緑", 255), EX_RA2Int("Ｅ＿既読メッセージ色", 6, "青", 255), 255);
+			break;
+		case 7:
+			Color = CF_CASColor(EX_RA2Int("Ｅ＿既読メッセージ色", 7, "赤", 127), EX_RA2Int("Ｅ＿既読メッセージ色", 7, "緑", 255), EX_RA2Int("Ｅ＿既読メッセージ色", 7, "青", 191), 255);
+			break;
+		case 8:
+			Color = CF_CASColor(EX_RA2Int("Ｅ＿既読メッセージ色", 8, "赤", 127), EX_RA2Int("Ｅ＿既読メッセージ色", 8, "緑", 255), EX_RA2Int("Ｅ＿既読メッセージ色", 8, "青", 127), 255);
+			break;
+		case 9:
+			Color = CF_CASColor(EX_RA2Int("Ｅ＿既読メッセージ色", 9, "赤", 191), EX_RA2Int("Ｅ＿既読メッセージ色", 9, "緑", 255), EX_RA2Int("Ｅ＿既読メッセージ色", 9, "青", 127), 255);
+			break;
+		case 10:
+			Color = CF_CASColor(EX_RA2Int("Ｅ＿既読メッセージ色", 10, "赤", 255), EX_RA2Int("Ｅ＿既読メッセージ色", 10, "緑", 255), EX_RA2Int("Ｅ＿既読メッセージ色", 10, "青", 127), 255);
+			break;
+		case 11:
+			Color = CF_CASColor(EX_RA2Int("Ｅ＿既読メッセージ色", 11, "赤", 255), EX_RA2Int("Ｅ＿既読メッセージ色", 11, "緑", 191), EX_RA2Int("Ｅ＿既読メッセージ色", 11, "青", 127), 255);
+			break;
+		}
+		this.m_ReadTextColorList[n] = Color;
+	}
+	return true;
+}
+
+void CMessageWindowModelManager::SetZ(int Z)
+{
+	this.m_Z = Z;
+}
+
+int CMessageWindowModelManager::GetZ()
+{
+	return this.m_Z;
+}
+
+int CMessageWindowModelManager::GetIncZ()
+{
+	return this.m_IncZ;
+}
+
+int CMessageWindowModelManager::GetTextOffsetZ()
+{
+	return this.m_TextOffsetZ;
+}
+
+int CMessageWindowModelManager::GetMessageWindowMulColorR()
+{
+	return this.m_MessageWindowMulColorR;
+}
+
+int CMessageWindowModelManager::GetMessageWindowMulColorG()
+{
+	return this.m_MessageWindowMulColorG;
+}
+
+int CMessageWindowModelManager::GetMessageWindowMulColorB()
+{
+	return this.m_MessageWindowMulColorB;
+}
+
+CASColor CMessageWindowModelManager::GetReadTextColor(int Index)
+{
+	if (Index < 0 || Index >= this.m_ReadTextColorList.Numof())
+	{
+		return CF_CASColor(255, 255, 255, 255);
+	}
+	return this.m_ReadTextColorList[Index];
+}
+
+ref CMessageWindowModel CMessageWindowModelManager::GetMessageWindow(int MessageWindowNumber)
+{
+	return this.m_ModelList[MessageWindowNumber];
+}
+

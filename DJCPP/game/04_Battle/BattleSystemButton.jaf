@@ -1,0 +1,94 @@
+BattleSystemButton::BattleSystemButton()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void BattleSystemButton::init()
+{
+	this.state_ = 1;
+	this.initButton();
+	this.parts_[0].init("システム／オート／下地", 0);
+	this.parts_[1].initAsNumber("システム／数字／幅１０／白", NULL);
+	this.parts_[0].setPos(952.0, 452.0);
+	this.parts_[1].setPos(952.0, 455.0);
+	this.parts_[0].setOrigin(8);
+	this.parts_[1].setOrigin(8);
+	createPartsGroup(this.parent_, this.parts_, 2820);
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.helper_.init();
+	this.helper_.setPos(874, 457);
+	this.setButtonPos();
+}
+
+void BattleSystemButton::update()
+{
+}
+
+void BattleSystemButton::setOnClickCallback(DG_OnBattleSystemButtonClickCallback cb)
+{
+	this.callback_ = cb;
+	this.btn_.setClickCallback(this.onClick, 0);
+	this.btnAuto_.setClickCallback(this.onClick, 1);
+}
+
+void BattleSystemButton::onClick(int i)
+{
+	this.callback_(i);
+}
+
+void BattleSystemButton::initButton()
+{
+	this.btn_.init("システム／ボタン／幅３００", "戦闘開始", "効果音／戦闘開始クリック", true);
+	this.btnAuto_.init("オート", this.getAutoItemCount);
+}
+
+void BattleSystemButton::setButtonPos()
+{
+	this.btn_.setPos(362, 402);
+	this.btnAuto_.setPos(888, 403);
+	this.btn_.setZ(2800);
+	this.btnAuto_.setZ(2800);
+}
+
+void BattleSystemButton::setButtonEnable(bool val)
+{
+	this.btn_.setEnable(val);
+}
+
+void BattleSystemButton::fadeIn(bool val)
+{
+	this.btn_.fadeIn(val);
+	this.btnAuto_.updateCount();
+	this.btnAuto_.fadeIn(val, NULL);
+	this.state_ = val ? 0 : 1;
+	if (g_playerCommonParam.getMaxHelperCount() > 0)
+	{
+		this.helper_.fadeIn(val, NULL);
+	}
+}
+
+void BattleSystemButton::fadeAutoButton(bool val)
+{
+}
+
+void BattleSystemButton::onFinishNoItemFadeOut()
+{
+	pass("%d" % g_playerCommonParam.getItemCount("オート"));
+	this.parent_.setShow(false);
+}
+
+void BattleSystemButton::updateState()
+{
+	this.btnAuto_.updateCount();
+	this.helper_.updateCount();
+}
+
+int BattleSystemButton::getAutoItemCount()
+{
+	return g_playerCommonParam.getItemCount("オート");
+}
+

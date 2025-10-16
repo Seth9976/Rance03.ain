@@ -1,0 +1,58 @@
+void MapBackground::init()
+{
+	this.partsBg_.init("システム／マップ", 0);
+	this.partsBg_.setZ(1000.0);
+}
+
+int MapBackground::getParentPartsNumber()
+{
+	return this.partsBg_.getPartsNumber();
+}
+
+void MapBackground::fadeIn(bool val, DG_MapBackGroundFadeInOutCallback cb)
+{
+	this.callback_ = cb;
+	this.partsBg_.setShow(true);
+	PartsMotion m;
+	m.setTime(1000);
+	if (val)
+	{
+		m.setAlpha(0, 255, 0);
+		this.partsBg_.runMotion(m, this.onFinishFadeIn);
+		this.state_ = 1;
+	}
+	else
+	{
+		m.setAlpha(255, 0, 0);
+		this.partsBg_.runMotion(m, this.onFinishFadeOut);
+		this.state_ = 3;
+	}
+}
+
+void MapBackground::setFocus(int x, int y)
+{
+	this.focusX_ = x;
+	this.focusY_ = y;
+	this.partsBg_.setPos(Math.Min(0, Math.Max(-1024, 512 - this.focusX_)), Math.Min(0, Math.Max(-768, 384 - this.focusY_)));
+}
+
+void MapBackground::onFinishFadeIn()
+{
+	this.callback_();
+	this.callback_.Clear();
+	this.state_ = 2;
+}
+
+void MapBackground::onFinishFadeOut()
+{
+	this.callback_();
+	this.callback_.Clear();
+	this.state_ = 0;
+}
+
+void MapBackground::getCurrentFocus(ref int x, ref int y)
+{
+	x = this.focusX_;
+	y = this.focusY_;
+}
+

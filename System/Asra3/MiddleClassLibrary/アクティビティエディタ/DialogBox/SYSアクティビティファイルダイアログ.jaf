@@ -1,0 +1,56 @@
+bool SYS_Activity_SelectFile(ref string SelectActivityPath)
+{
+	string GameFolderPath;
+	SystemService.GetGameFolderPath(GameFolderPath);
+	string ActivityFolderPath = GameFolderPath + "DebugData\\01_First\\Activity\\";
+	array@string FilterTitleList;
+	FilterTitleList.PushBack("Activity");
+	array@string FilterExtendList;
+	FilterExtendList.PushBack("*.pact");
+	string SelectActivityPathBuffer = SelectActivityPath;
+	if (!FileDialog.OpenLoadDialog(SelectActivityPathBuffer, "アクティビティファイルを選択してください", ActivityFolderPath, FilterTitleList, FilterExtendList))
+	{
+		return false;
+	}
+	if (SelectActivityPathBuffer.Length() <= ActivityFolderPath.Length())
+	{
+		DIALOG_OK("選択できるファイルは【%s】以下のファイルです" % "DebugData\\01_First\\Activity\\");
+		return SYS_Activity_SelectFile(SelectActivityPath);
+	}
+	if (SelectActivityPathBuffer.GetPart(0, ActivityFolderPath.Length()) != ActivityFolderPath)
+	{
+		DIALOG_OK("選択できるファイルは【%s】以下のファイルです" % "DebugData\\01_First\\Activity\\");
+		return SYS_Activity_SelectFile(SelectActivityPath);
+	}
+	SelectActivityPath = SelectActivityPathBuffer.GetPart(ActivityFolderPath.Length(), SelectActivityPathBuffer.Length() - ActivityFolderPath.Length());
+	return true;
+}
+
+bool SYS_Activity_SaveFile(ref string SelectActivityPath)
+{
+	string GameFolderPath;
+	SystemService.GetGameFolderPath(GameFolderPath);
+	string ActivityFolderPath = GameFolderPath + "DebugData\\01_First\\Activity\\";
+	array@string FilterTitleList;
+	FilterTitleList.PushBack("Activity");
+	array@string FilterExtendList;
+	FilterExtendList.PushBack("*.pact");
+	string SelectActivityPathBuffer = SelectActivityPath;
+	if (!FileDialog.OpenSaveDialog(SelectActivityPathBuffer, "保存するアクティビティファイルを設定してください", ActivityFolderPath, FilterTitleList, FilterExtendList))
+	{
+		return false;
+	}
+	if (SelectActivityPathBuffer.Length() <= ActivityFolderPath.Length())
+	{
+		DIALOG_OK("保存可能な場所は【%s】以下のファイルです" % "DebugData\\01_First\\Activity\\");
+		return SYS_Activity_SaveFile(SelectActivityPath);
+	}
+	if (SelectActivityPathBuffer.GetPart(0, ActivityFolderPath.Length()) != ActivityFolderPath)
+	{
+		DIALOG_OK("保存可能な場所は【%s】以下のファイルです" % "DebugData\\01_First\\Activity\\");
+		return SYS_Activity_SaveFile(SelectActivityPath);
+	}
+	SelectActivityPath = SelectActivityPathBuffer.GetPart(ActivityFolderPath.Length(), SelectActivityPathBuffer.Length() - ActivityFolderPath.Length());
+	return true;
+}
+

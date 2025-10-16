@@ -1,0 +1,81 @@
+FollowCamera::FollowCamera()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+	this.timer_.reset();
+	this.lastTime_ = 0;
+}
+
+void FollowCamera::update()
+{
+	int now = this.timer_.getTime();
+	float dt = now - this.lastTime_;
+	if (dt < 12.0)
+	{
+		return;
+	}
+	if (dt > 60.0)
+	{
+		dt = 24.0;
+	}
+	this.lastTime_ = now;
+	float pps = 800.0;
+	float dest = getDest(this.x_, this.y_, this.fx_, this.fy_);
+	if (dest == 0.0)
+	{
+		return;
+	}
+	if (dest <= 1.5 && this.speed_ > 0.0)
+	{
+		this.speed_ = (dest * 1000.0) / dt;
+		this.x_ = this.fx_;
+		this.y_ = this.fy_;
+		return;
+	}
+	int i;
+	float dtSpeed;
+	int suitei = getHenni(this.speed_, 0.0, this.speed_ / pps);
+	if (suitei < dest)
+	{
+		dtSpeed = this.speed_ + pps * (dt / 1000.0);
+	}
+	else
+	{
+		dtSpeed = this.speed_ - pps * (dt / 1000.0);
+	}
+	dtSpeed = Math.MinF(Math.MaxF(dtSpeed, 0.0), pps);
+	float henni = getHenni(this.speed_, dtSpeed, dt / 1000.0);
+	float rad = (Math.Atan2(this.fy_ - this.y_, this.fx_ - this.x_) * 180.0) / 3.1415;
+	this.x_ += Math.Cos(rad) * henni;
+	this.y_ += Math.Sin(rad) * henni;
+	this.speed_ = dtSpeed;
+}
+
+void FollowCamera::setPos(int x, int y)
+{
+	this.reset();
+	this.x_ = x;
+	this.y_ = y;
+}
+
+void FollowCamera::reset()
+{
+	this.x_ = this.y_ = this.fx_ = this.fy_ = 0.0;
+	this.speed_ = 0.0;
+}
+
+void FollowCamera::setFollowPos(int x, int y)
+{
+	this.fx_ = x;
+	this.fy_ = y;
+}
+
+int FollowCamera::getX()
+{
+	return this.x_;
+}
+
+int FollowCamera::getY()
+{
+	return this.y_;
+}
+

@@ -1,0 +1,252 @@
+PlayerStatusView::PlayerStatusView()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void PlayerStatusView::init(array@string playerIds)
+{
+	this.playerIds_.Alloc(playerIds.Numof());
+	this.playerIds_.Copy(0, playerIds, 0, playerIds.Numof());
+	this.reset(this.playerIds_[roundOff(this.currentPos_)]);
+}
+
+void PlayerStatusView::reset(string playerId)
+{
+	this.player_ <- getPlayerFromId(playerId);
+	this.parts_.Free();
+	this.parts_.Alloc(16);
+	this.initParts();
+}
+
+void PlayerStatusView::initParts()
+{
+	this.parts_[0].init("システム／編成／ステータス下地", 0);
+	this.parts_[2].init("システム／編成／経験値ゲージ", 0);
+	this.parts_[3].init("システム／編成／ＨＰゲージ", 0);
+	this.parts_[5].init("システム／編成／レベルスラッシュ", 0);
+	this.parts_[8].init("システム／編成／経験値スラッシュ", 0);
+	this.parts_[11].init("システム／編成／ＨＰスラッシュ", 0);
+	this.initNumberParts(4, "システム／数字／幅２２／白", 22);
+	this.initNumberParts(6, "システム／数字／幅１４／ピンク", 14);
+	this.initNumberParts(7, "システム／数字／幅１１／黄", 11);
+	this.initNumberParts(9, "システム／数字／幅１１／黄", 11);
+	this.initNumberParts(10, "システム／数字／幅２０／白フチ", 20);
+	this.initNumberParts(12, "システム／数字／幅１３／白フチ", 13);
+	this.initNumberParts(13, "システム／数字／幅１４／白", 14);
+	this.initNumberParts(14, "システム／数字／幅１４／白", 14);
+	this.initNumberParts(15, "システム／数字／幅１４／白", 14);
+	createPartsGroup(this.parent_, this.parts_, 4200);
+	this.resetParts();
+	this.setPartsParam();
+	this.setPartsShow();
+	this.setPartsPos();
+}
+
+void PlayerStatusView::resetParts()
+{
+	this.parts_[1].init(this.player_.getPartyNamePlateCgName(), 0);
+	this.parts_[1].setShow(true);
+	this.parts_[1].setParent(this.parent_.getPartsNumber());
+	this.parts_[1].setZ(2.0);
+	this.parts_[1].setPos(456.0, 289.0);
+	string name = getZeroThreeSkillFromId(this.player_.getZeroThreeSkillId()).getName();
+	if (this.player_.isZeroThreeSkillOpened())
+	{
+		this.btnSkill_.init("システム／編成／ゼロスリースキル", name, "", true);
+		this.btnSkill_.setClickCallback(this.onClickZeroThreeSkillButton, 0);
+		this.btnSkill_.setEnable(true);
+	}
+	else
+	{
+		this.btnSkill_.init("システム／編成／ゼロスリースキル", "？？？", "", true);
+		this.btnSkill_.setEnable(false);
+	}
+	this.btnSkill_.setParent(this.parent_.getPartsNumber());
+	this.btnSkill_.setZ(17);
+	this.btnSkill_.setPos(625, 480);
+	this.btnSkill_.setShow(true);
+}
+
+void PlayerStatusView::initNumberParts(int pIndex, string fileName, int width)
+{
+	NumberPartsInfomation info;
+	info.setSameWidth(width);
+	this.parts_[pIndex].initAsNumber(fileName, info);
+}
+
+void PlayerStatusView::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void PlayerStatusView::setPartsPos()
+{
+	this.parts_[0].setPos(1024.0, 768.0);
+	this.parts_[0].setOrigin(3);
+	this.parts_[0].changeOrigin(1);
+	this.setPartsSpaceOut(771, 384, 6, 5, 4);
+	this.setPartsSpaceOut(771, 411, 9, 8, 7);
+	this.setPartsSpaceOut(771, 442, 12, 11, 10);
+	this.parts_[13].setOrigin(8);
+	this.parts_[13].setPos(551.0, 453.0);
+	this.parts_[14].setOrigin(8);
+	this.parts_[14].setPos(651.0, 453.0);
+	this.parts_[15].setOrigin(8);
+	this.parts_[15].setPos(751.0, 453.0);
+	this.parts_[2].setPos(587.0, 388.0);
+	this.parts_[3].setPos(530.0, 425.0);
+}
+
+void PlayerStatusView::setPartsParam()
+{
+	int morphBase = this.currentPos_;
+	float morph = this.currentPos_ - morphBase;
+	ref Player l;
+	ref Player r;
+	if (morphBase < this.playerIds_.Numof() - 1)
+	{
+		l <- getPlayerFromId(this.playerIds_[morphBase]);
+		r <- getPlayerFromId(this.playerIds_[morphBase + 1]);
+	}
+	else
+	{
+		l <- getPlayerFromId(this.playerIds_[morphBase]);
+		r <- getPlayerFromId(this.playerIds_[morphBase]);
+	}
+	this.parts_[4].setNumber(l.getLevel() * (1 - morph) + r.getLevel() * morph);
+	this.parts_[6].setNumber(l.getMaxLevel() * (1 - morph) + r.getMaxLevel() * morph);
+	this.parts_[7].setNumber(l.getExp() * (1 - morph) + r.getExp() * morph);
+	this.parts_[9].setNumber(l.getNextExp() * (1 - morph) + r.getNextExp() * morph);
+	this.parts_[10].setNumber(l.getHp() * (1 - morph) + r.getHp() * morph);
+	this.parts_[12].setNumber(l.getMaxHp() * (1 - morph) + r.getMaxHp() * morph);
+	this.parts_[13].setNumber(l.getStrength() * (1 - morph) + r.getStrength() * morph);
+	this.parts_[14].setNumber(l.getMind() * (1 - morph) + r.getMind() * morph);
+	this.parts_[15].setNumber(l.getDexterity() * (1 - morph) + r.getDexterity() * morph);
+	float r1 = float(l.getHp()) / float(l.getMaxHp());
+	float r2 = float(r.getHp()) / float(r.getMaxHp());
+	float ratio = r1 * (1 - morph) + r2 * morph;
+	int w = this.parts_[3].getWidth() * ratio;
+	if (w == 0)
+	{
+		if (morph <= 0.02 && l.getHp() > 0)
+		{
+			w = 1;
+		}
+		else if (morph >= 0.98 && r.getHp() > 0)
+		{
+			w = 1;
+		}
+	}
+	this.parts_[3].setCgRange(0, 0, w, this.parts_[3].getHeight());
+	float ratio = (float(l.getExp()) / float(l.getNextExp())) * (1 - morph) + (float(r.getExp()) / float(r.getNextExp())) * morph;
+	this.parts_[2].setCgRange(0, 0, this.parts_[2].getWidth() * ratio, this.parts_[2].getHeight());
+}
+
+void PlayerStatusView::setPartsSpaceOut(int x, int y, int p1, int p2, int p3)
+{
+	this.parts_[p1].setOrigin(3);
+	this.parts_[p2].setOrigin(3);
+	this.parts_[p3].setOrigin(3);
+	this.parts_[p1].setPos(x, y);
+	x -= this.parts_[p1].getWidth();
+	this.parts_[p2].setPos(x, y);
+	x -= this.parts_[p2].getWidth();
+	this.parts_[p3].setPos(x, y);
+}
+
+void PlayerStatusView::update()
+{
+}
+
+void PlayerStatusView::fadeIn(bool val)
+{
+	if (val)
+	{
+		PartsMotion m;
+		m.setTime(300);
+		m.setAlpha(0, 255, 0);
+		int i;
+		for (i = 0; i < this.parts_.Numof(); ++i)
+		{
+			if (i != 0)
+			{
+				this.parts_[i].runMotion(m, NULL);
+			}
+		}
+		PartsMotion m2;
+		int w = this.parts_[0].getWidth();
+		int h = this.parts_[0].getHeight();
+		m2.setCgRangeMove(0, 0, 1, h, 0, 0, w, h, 0);
+		m2.setTime(350);
+		this.parts_[0].runMotion(m2, NULL);
+	}
+	else
+	{
+		PartsMotion m;
+		m.setTime(150);
+		m.setAlpha(255, 0, 0);
+		this.parent_.runMotion(m, NULL);
+	}
+	this.btnSkill_.fadeIn(val);
+}
+
+void PlayerStatusView::setFloatingPosition(float pos)
+{
+	int r = roundOff(pos);
+	int s = roundOff(this.currentPos_);
+	if (r != s)
+	{
+		this.currentPos_ = pos;
+		this.changePlayerId(this.playerIds_[r]);
+	}
+	else if (pos != this.currentPos_)
+	{
+		this.currentPos_ = pos;
+		this.updateParam();
+	}
+}
+
+void PlayerStatusView::changePlayerId(string playerId)
+{
+	this.player_ <- getPlayerFromId(playerId);
+	this.resetParts();
+	this.updateParam();
+}
+
+void PlayerStatusView::updateParam()
+{
+	this.setPartsParam();
+	this.setPartsSpaceOut(771, 384, 6, 5, 4);
+	this.setPartsSpaceOut(771, 411, 9, 8, 7);
+	this.setPartsSpaceOut(771, 442, 12, 11, 10);
+}
+
+void PlayerStatusView::changeCenter(bool isWithOutInfomation)
+{
+	PartsMotion m;
+	if (isWithOutInfomation)
+	{
+		m.setMove(100, 0, 0, 0, 1);
+	}
+	else
+	{
+		m.setMove(0, 0, 100, 0, 1);
+	}
+	this.parent_.runMotion(m, NULL);
+}
+
+void PlayerStatusView::onClickZeroThreeSkillButton(int id)
+{
+	DialogInfomation info;
+	ref ZeroThreeSkill s = getZeroThreeSkillFromId(this.player_.getZeroThreeSkillId());
+	info.setCaption(s.getName());
+	info.setMessage(s.getDesc());
+	info.setPictureImageName("システム／ダイアログ／写真／%s" % this.player_.getShortName());
+	openDialog(info);
+}
+

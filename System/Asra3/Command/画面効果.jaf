@@ -1,0 +1,69 @@
+void 全表示(int 効果番号, int 効果時間)
+{
+	SYS_画面更新(効果番号, 効果時間, _全表示効果番号, _全表示効果時間, true);
+}
+
+void Ａ＿画面トランジション終了待ち(int 効果番号, int 効果時間)
+{
+	if (効果番号 < 0)
+	{
+		効果番号 = _全表示効果番号;
+	}
+	if (効果時間 < 0)
+	{
+		効果時間 = _全表示効果時間;
+	}
+	if (効果番号 == 0 || 効果時間 <= 0)
+	{
+		AFL_View_Update(true);
+		return;
+	}
+	SYS_効果番号チェック(効果番号);
+	ChipmunkSpriteEngine.TRANS_Begin(効果番号);
+	CASTimer Timer;
+	Timer.Reset();
+	for (; ; )
+	{
+		int nTime = Timer.Get();
+		if (nTime >= 効果時間)
+		{
+			break;
+		}
+		float fRate = float(nTime) / float(効果時間);
+		SYS_View_Update(false, true, fRate);
+	}
+	ChipmunkSpriteEngine.TRANS_End();
+	AFL_View_Update(true);
+}
+
+void 全消去()
+{
+	PARTS_ReleaseAllPartsWithoutSystem();
+	字枠セット(0, -2147483648);
+}
+
+void 画面揺らし(int 横振幅, int 縦振幅, int 効果時間)
+{
+	if (!SYS_全文スキップ中確認() && !SYS_スキップ中確認())
+	{
+		SYS_画面揺らし(横振幅, 縦振幅, 効果時間);
+	}
+}
+
+void Ａ＿画面揺らし終了待ち(int 横振幅, int 縦振幅, int 効果時間)
+{
+	SYS_画面揺らし終了待ち(横振幅, 縦振幅, 効果時間);
+}
+
+void 文字表示後画面揺らし(int 横振幅, int 縦振幅, int 効果時間)
+{
+	_文字表示後画面揺らし横 = 横振幅;
+	_文字表示後画面揺らし縦 = 縦振幅;
+	_文字表示後画面揺らし時 = 効果時間;
+}
+
+void 全画面色(int Ｒ, int Ｇ, int Ｂ)
+{
+	SYS_全画面色(Ｒ, Ｇ, Ｂ);
+}
+

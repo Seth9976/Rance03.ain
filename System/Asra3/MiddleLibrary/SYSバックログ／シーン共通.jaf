@@ -1,0 +1,25 @@
+void SYS_バックログオープン通知()
+{
+	g_OpenBacklogMessage = true;
+	g_OpenBacklogMessageTime = system.GetTime();
+}
+
+bool SYS_バックログオープン確認()
+{
+	if (!g_OpenBacklogMessage)
+	{
+		return false;
+	}
+	g_OpenBacklogMessage = false;
+	if (Math.Abs(system.GetTime() - g_OpenBacklogMessageTime) >= 250)
+	{
+		return false;
+	}
+	return true;
+}
+
+void SYS_バックログオープン通知クリア()
+{
+	g_OpenBacklogMessage = false;
+}
+

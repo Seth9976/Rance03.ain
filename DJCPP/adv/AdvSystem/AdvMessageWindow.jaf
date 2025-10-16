@@ -1,0 +1,33 @@
+void AdvMessageWindow::init()
+{
+	this.isShow_ = false;
+	int 枠番号 = 1;
+	Ａ＿メッセージウィンドウＣＧ設定(枠番号, "システム／メッセージウィンドウ");
+	Ａ＿メッセージウィンドウ座標設定(枠番号, -41, 590);
+	Ａ＿メッセージウィンドウＺ座標設定(3400);
+	字(256);
+	字サイズ(36);
+	字太(1);
+	字間隔(1, -1, 3);
+	Ａ＿キー待ちマークフラット設定(1, "システム／ウェイトカーソル");
+	キー待ちマーク位置(1, 612, 139);
+	メッセージエリア余白(枠番号, 40, 0, 0, 68);
+}
+
+void AdvMessageWindow::show()
+{
+	字枠(1, -2147483648, -1, -1);
+	this.isShow_ = true;
+}
+
+void AdvMessageWindow::hide()
+{
+	字枠(0, -2147483648, -1, -1);
+	this.isShow_ = false;
+}
+
+bool AdvMessageWindow::isShow()
+{
+	return this.isShow_;
+}
+

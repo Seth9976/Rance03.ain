@@ -1,0 +1,228 @@
+void test_Player_Init()
+{
+	getPlayerFromId("ランス").setAttackSkillId(0, "ランス斬り1");
+	getPlayerFromId("ランス").setAttackSkillId(1, "ランスアタック1");
+	getPlayerFromId("シィル").setAttackSkillId(0, "炎の矢1");
+	getPlayerFromId("シィル").setAttackSkillId(1, "ヒーリング1");
+	getPlayerFromId("ランス").setStrength(100);
+	getPlayerFromId("ランス").setMind(100);
+	getPlayerFromId("シィル").setStrength(100);
+	getPlayerFromId("シィル").setMind(100);
+	getPlayerFromId("ランス").setJoin(true);
+	getPlayerFromId("シィル").setJoin(true);
+}
+
+void test_Party_Organize()
+{
+	g_party.setMaxCount(8);
+	int j;
+	for (j = 0; j < 4; ++j)
+	{
+		int i;
+		for (i = 1; i < g_player.Numof(); ++i)
+		{
+			string skillId = g_player[i].getAttackSkillId(j);
+			if (skillId != "")
+			{
+				g_party.add(skillId);
+			}
+		}
+	}
+}
+
+void test_ExLoading_Player()
+{
+	int i;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		string s = "id:%s name:%s short:%s image:%s btlimage:%s hp:%d maxHp:%d level:%d exp:%d join:%d zerothree:%s upHp:%d upStr:%d, upMind:%d upDex:%d maxLv:%d atk1:%s atk2:%s atk3:%s atk4:%s atk5:%s atk6:%s" % g_player[i].getId() % g_player[i].getName() % g_player[i].getShortName() % g_player[i].getImageName() % g_player[i].getBattleImageName() % g_player[i].getHp() % g_player[i].getMaxHp() % g_player[i].getLevel() % g_player[i].getExp() % g_player[i].isJoin() % g_player[i].getZeroThreeSkillId() % g_player[i].getUpHp() % g_player[i].getUpStrength() % g_player[i].getUpMind() % g_player[i].getUpDexterity() % g_player[i].getMaxLevel() % g_player[i].getAttackSkillId(0) % g_player[i].getAttackSkillId(1) % g_player[i].getAttackSkillId(2) % g_player[i].getAttackSkillId(3) % g_player[i].getAttackSkillId(4) % g_player[i].getAttackSkillId(5);
+		pass(s);
+	}
+}
+
+void test_ExLoading_PlayerSkillAttribute()
+{
+	int i;
+	for (i = 0; i < g_playerAttackAttribute.Numof(); ++i)
+	{
+		string n = "id:%s name:%s attackKind:%d" % g_playerAttackAttribute[i].getId() % g_playerAttackAttribute[i].getName() % g_playerAttackAttribute[i].getAttackKind();
+		pass(n);
+	}
+}
+
+void test_ExLoading_PlayerSkill()
+{
+	int i;
+	for (i = 0; i < g_attackSkill.Numof(); ++i)
+	{
+		string s = "id_:[%s]|characterId_:[%s]|name_:[%s]|desc_:[%s]|targetType_:[%d]|attributeId_:[%s]|groupId_:[%s]|groupRank_:[%d]|coolTime_:[%d]|param:[%f]" % g_attackSkill[i].getId() % g_attackSkill[i].getPlayerId() % g_attackSkill[i].getName() % g_attackSkill[i].getDesc() % g_attackSkill[i].getTargetType() % g_attackSkill[i].getAttributeId() % g_attackSkill[i].getGroupId() % g_attackSkill[i].getGroupRank() % g_attackSkill[i].getCoolTime() % g_attackSkill[i].getParam();
+		pass(s);
+	}
+}
+
+void test_Player_SkillUpgrade()
+{
+	g_player[0].setAttackSkillId(0, "ランス／攻撃１");
+	g_player[0].setAttackSkillId(1, "ランス／ランスアタック２");
+	g_party.add("ランス／攻撃１");
+	g_party.add("シィル／攻撃１");
+	g_party.add("ランス／ランスアタック２");
+	pass("ランス／攻撃１：%d" % g_player[0].isAttackSkillUpgradable("ランス／攻撃１"));
+	pass("ランス／攻撃２：%d" % g_player[0].isAttackSkillUpgradable("ランス／攻撃２"));
+	pass("シィル／攻撃１：%d" % g_player[0].isAttackSkillUpgradable("シィル／攻撃１"));
+	pass("ランス／ランスアタック２：%d" % g_player[0].isAttackSkillUpgradable("ランス／ランスアタック２"));
+	g_player[0].upgradeSkill("ランス／攻撃２");
+	pass("result----");
+	int i;
+	for (i = 0; i < 8; ++i)
+	{
+		string n = g_party.getAttackSkillId(i);
+		pass(n);
+	}
+}
+
+void test_Player_Buff()
+{
+	g_player[0].addBuff("BUFF01");
+	g_player[0].addBuff("BUFF02");
+	g_player[0].addBuff("BUFF03");
+	g_player[0].addBuff("BUFF01");
+	g_player[0].addBuff("BUFF01aedf");
+	pass("test1");
+	pass("Exist[%s] %d" % "BUFF01" % g_player[0].isExistBuff("BUFF01"));
+	pass("Exist[%s] %d" % "BUFF02" % g_player[0].isExistBuff("BUFF02"));
+	pass("Exist[%s] %d" % "BUFF03" % g_player[0].isExistBuff("BUFF03"));
+	pass("Exist[%s] %d" % "BUFF01aedf" % g_player[0].isExistBuff("BUFF01aedf"));
+	pass("test2");
+	g_player[0].eraseBuff("BUFF01");
+	pass("Exist[%s] %d" % "BUFF01" % g_player[0].isExistBuff("BUFF01"));
+	pass("Exist[%s] %d" % "BUFF02" % g_player[0].isExistBuff("BUFF02"));
+	pass("Exist[%s] %d" % "BUFF03" % g_player[0].isExistBuff("BUFF03"));
+	pass("Exist[%s] %d" % "BUFF01aedf" % g_player[0].isExistBuff("BUFF01aedf"));
+	pass("test3");
+	g_player[0].eraseBuff("");
+	pass("Exist[%s] %d" % "BUFF01" % g_player[0].isExistBuff("BUFF01"));
+	pass("Exist[%s] %d" % "BUFF02" % g_player[0].isExistBuff("BUFF02"));
+	pass("Exist[%s] %d" % "BUFF03" % g_player[0].isExistBuff("BUFF03"));
+	pass("Exist[%s] %d" % "BUFF01aedf" % g_player[0].isExistBuff("BUFF01aedf"));
+}
+
+void test_Player_BadCondition()
+{
+	int i;
+	for (i = 0; i < g_badCondition.Numof(); ++i)
+	{
+		string s = "id:%s name:%s imageName:%s desc:%s" % g_badCondition[i].getId() % g_badCondition[i].getName() % g_badCondition[i].getImageName() % g_badCondition[i].getDesc();
+		pass(s);
+	}
+}
+
+void test_Player_ZeroThreeSkill()
+{
+	int i;
+	for (i = 0; i < g_zeroThreeSkill.Numof(); ++i)
+	{
+		string s = "id:%s name:%s desc:%s" % g_zeroThreeSkill[i].getId() % g_zeroThreeSkill[i].getName() % g_zeroThreeSkill[i].getDesc();
+		pass(s);
+	}
+}
+
+void test_ExLoading_PlayerBuff()
+{
+	int i;
+	for (i = 0; i < g_playerBuff.Numof(); ++i)
+	{
+		string s = "id_:[%s] name_:[%s] imageName_:[%s] calcType:[%d] type_:[%d]" % g_playerBuff[i].getId() % g_playerBuff[i].getName() % g_playerBuff[i].getImageName() % g_playerBuff[i].getCalcType() % g_playerBuff[i].getType();
+		pass(s);
+	}
+}
+
+void test_Player_CommonParam()
+{
+	g_playerCommonParam.setGold(100);
+	pass("gold: %d" % g_playerCommonParam.getGold());
+	g_playerCommonParam.setGold(222);
+	pass("gold: %d" % g_playerCommonParam.getGold());
+	g_playerCommonParam.setGold(-1);
+	pass("gold: %d" % g_playerCommonParam.getGold());
+	g_playerCommonParam.addItem("ITEM_U_001");
+	g_playerCommonParam.addItem("ITEM_U_001");
+	g_playerCommonParam.addItem("ITEM_U_002");
+	g_playerCommonParam.addItem("ITEM_U_003");
+	g_playerCommonParam.addItem("ITEM_U_002");
+	g_playerCommonParam.addItem("ITEM_U_001");
+	g_playerCommonParam.addItem("ITEM_K_002");
+	g_playerCommonParam.addItem("ITEM_K_001");
+	array@string item;
+	g_playerCommonParam.getItemList(item);
+	int i;
+	for (i = 0; i < item.Numof(); ++i)
+	{
+		pass("%s %d" % item[i] % g_playerCommonParam.getItemCount(item[i]));
+	}
+}
+
+void test_ExLoading_PlayerSkillOpenLevel()
+{
+	int i;
+	for (i = 0; i < g_playerBuff.Numof(); ++i)
+	{
+		string s = "skillId_:[%s] playerId_:[%s] index_:[%d] openLevel_:[%d]" % g_playerSkillOpenLevel[i].getSkillId() % g_playerSkillOpenLevel[i].getPlayerId() % g_playerSkillOpenLevel[i].getIndex() % g_playerSkillOpenLevel[i].getOpenLevel();
+		pass(s);
+	}
+}
+
+void test_Player_LevelUp()
+{
+	int i;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		while (true)
+		{
+			if (!g_player[i].levelUp())
+			{
+				break;
+			}
+		}
+	}
+}
+
+void test_LevelMaxAndPartyOrganize()
+{
+	debugPlayerLevelUp();
+	debugPlayerJoinAll();
+	debugPlayerSkillLevelMax();
+	debugPlayerHpRecovery();
+	debugPlayerZeroThreeSkillOpen();
+	test_Party_Organize();
+}
+
+void test_LevelupSkillChoice()
+{
+	test_Party_Organize();
+	string r = getSkillIdNextRankFromOrganizedParty(1);
+	string pId = getPlayerSkillFromId(r).getPlayerId();
+	getPlayerFromId(pId).upgradeSkill(r);
+}
+
+void test_PlayerNextSkill()
+{
+	int r = RAND(6);
+	int i;
+	for (i = 0; i < 10; ++i)
+	{
+		pass(getSkillIdNextRankFromJoinedPlayer(r));
+	}
+}
+
+void test_Ricktest()
+{
+	debugPlayerJoinAll();
+	g_party.add(g_player[14].getAttackSkillId(1));
+	g_player[14].setZeroThreeSkillOpened(true);
+	g_player[14].setHp(1);
+	BattleInfomation info;
+	info.addMonster(g_monster[0].getId());
+	openBattle2(info);
+}
+

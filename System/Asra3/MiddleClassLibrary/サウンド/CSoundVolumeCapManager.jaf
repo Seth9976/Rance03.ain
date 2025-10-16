@@ -1,0 +1,170 @@
+CSoundVolumeCapManager::CSoundVolumeCapManager()
+{
+	this.m_CurrentSoundVolumeCap.Set(0.0, 450, 100, 450);
+	this.m_bWaitingSoundFadeByVoice = false;
+	this.m_PlayChannel = -1;
+}
+
+bool CSoundVolumeCapManager::IsWaitingSoundFadeByVoice()
+{
+	if (!this.m_bWaitingSoundFadeByVoice)
+	{
+		if (KiwiSoundEngine.IsPlay(this.m_PlayChannel))
+		{
+			return false;
+		}
+		this.m_bWaitingSoundFadeByVoice = true;
+		this.m_WaitingSoundFadeByVoiceTimer.Reset();
+		return false;
+	}
+	return true;
+}
+
+bool CSoundVolumeCapManager::SeachCalcVolumeList(int GroupNumber)
+{
+	if (EX_IsExist("Ｅ＿サウンドグループ設定"))
+	{
+		if (GroupNumber <= SYS_SOUNDGROUP_BACKVOICE())
+		{
+			return false;
+		}
+		if (EX_IA2Int("Ｅ＿サウンドグループ設定", GroupNumber, "対応音声グループ番号", -1) != -1)
+		{
+			return false;
+		}
+		return true;
+	}
+	int TempGroupNumber = GroupNumber;
+	array@int GroupNumberLog;
+	while (true)
+	{
+		int ParentGroupNumber = EX_IA2Int("Ｅ＿ＳＥボリューム計算", TempGroupNumber, "親サウンドグループ番号", -1);
+		GroupNumberLog.PushBack(TempGroupNumber);
+		if (ParentGroupNumber < 0 || ParentGroupNumber == SYS_SOUNDGROUP_MASTER())
+		{
+			if (GroupNumberLog.Find(0, GroupNumberLog.Numof(), SYS_SOUNDGROUP_VOICE()) >= 0)
+			{
+				break;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else if (ParentGroupNumber == SYS_SOUNDGROUP_BGM() || ParentGroupNumber == SYS_SOUNDGROUP_SE() || ParentGroupNumber == SYS_SOUNDGROUP_BACKVOICE() || GroupNumberLog.Find(0, GroupNumberLog.Numof(), ParentGroupNumber) != -1)
+		{
+			return false;
+		}
+		else
+		{
+			TempGroupNumber = ParentGroupNumber;
+		}
+	}
+	return true;
+}
+
+void CSoundVolumeCapManager::ResetPlayListVolume(int myIndex)
+{
+	int Count;
+	int Numof = g_サウンド再生リスト.Numof();
+	int TotalTime = this.m_CurrentSoundVolumeCap.GetFadeInTime();
+	for (Count = 0; Count < Numof; Count++)
+	{
+		if (myIndex != Count && !g_サウンド再生リスト[Count].bStop)
+		{
+			SYS_Sound_BeginFade(g_サウンド再生リスト[Count].FadeChannel, TotalTime, 1.0, 5);
+			g_サウンド再生リスト[Count].bRunSoundFadeByVoice = false;
+		}
+	}
+}
+
+void CSoundVolumeCapManager::BeginSoundFade(int Channel, string SoundName)
+{
+	if (!g_bConfigBGMFadeByVoice)
+	{
+		return;
+	}
+	int GroupNumber = KiwiSoundEngine.GetGroupNumFromFile(SoundName);
+	if (GroupNumber < 0 || GroupNumber == SYS_SOUNDGROUP_MASTER() || GroupNumber == SYS_SOUNDGROUP_BGM() || GroupNumber == SYS_SOUNDGROUP_SE() || GroupNumber == SYS_SOUNDGROUP_BACKVOICE())
+	{
+		return;
+	}
+	if (GroupNumber != SYS_SOUNDGROUP_VOICE())
+	{
+		if (!this.SeachCalcVolumeList(GroupNumber))
+		{
+			return;
+		}
+	}
+	int Index = SYS_GetIndexBackSE(GroupNumber);
+	this.ResetPlayListVolume(Index);
+	if (Index == -1 || g_サウンド再生リスト[Index].bStop)
+	{
+		return;
+	}
+	this.m_PlayChannel = Channel;
+	float VolumeCapRate = this.m_CurrentSoundVolumeCap.GetCapVolume();
+	int TotalTime = this.m_CurrentSoundVolumeCap.GetFadeOutTime();
+	SYS_Sound_BeginFade(g_サウンド再生リスト[Index].FadeChannel, TotalTime, VolumeCapRate, 5);
+	g_サウンド再生リスト[Index].bRunSoundFadeByVoice = true;
+	this.m_bWaitingSoundFadeByVoice = false;
+}
+
+void CSoundVolumeCapManager::UpdateSoundFade(int Index)
+{
+	BackSE_t Temp_t;
+	Temp_t = g_サウンド再生リスト[Index];
+	if (!Temp_t.bRunSoundFadeByVoice || Temp_t.bStop)
+	{
+		return;
+	}
+	if (!this.IsWaitingSoundFadeByVoice())
+	{
+		return;
+	}
+	int nSoundFadeWaitTime = this.m_CurrentSoundVolumeCap.GetWaitForFadeInTime();
+	if (this.m_WaitingSoundFadeByVoiceTimer.Get() < nSoundFadeWaitTime)
+	{
+		return;
+	}
+	int TotalTime = this.m_CurrentSoundVolumeCap.GetFadeInTime();
+	SYS_Sound_BeginFade(Temp_t.FadeChannel, TotalTime, 1.0, 5);
+	g_サウンド再生リスト[Index].bRunSoundFadeByVoice = false;
+}
+
+void CSoundVolumeCapManager::UpdateSoundShuffle(int Index)
+{
+	BackSE_t Temp_t;
+	Temp_t = g_サウンド再生リスト[Index];
+	if (!Temp_t.bStop)
+	{
+		if (!KiwiSoundEngine.IsPlay(Temp_t.FadeChannel))
+		{
+			Temp_t.PlayIndex = (Temp_t.PlayIndex + 1) % Temp_t.PlayList.Numof();
+			if (Temp_t.PlayIndex == 0)
+			{
+				SYS_ShuffleSoundList(Temp_t.PlayList);
+			}
+			KiwiSoundEngine.Prepare(Temp_t.FadeChannel, Temp_t.PlayList[Temp_t.PlayIndex], false);
+			KiwiSoundEngine.Play(Temp_t.FadeChannel);
+			g_サウンド再生リスト[Index] = Temp_t;
+		}
+	}
+}
+
+void CSoundVolumeCapManager::UpdateSound()
+{
+	int Numof = g_サウンド再生リスト.Numof();
+	int Count;
+	for (Count = 0; Count < Numof; Count++)
+	{
+		this.UpdateSoundShuffle(Count);
+		this.UpdateSoundFade(Count);
+	}
+	int nSoundFadeWaitTime = this.m_CurrentSoundVolumeCap.GetWaitForFadeInTime();
+	if (this.m_bWaitingSoundFadeByVoice && this.m_WaitingSoundFadeByVoiceTimer.Get() >= nSoundFadeWaitTime)
+	{
+		this.m_bWaitingSoundFadeByVoice = false;
+	}
+}
+

@@ -1,0 +1,182 @@
+CAEPropertyFlat::CAEPropertyFlat()
+{
+	this.Release();
+}
+
+CAEPropertyFlat::~CAEPropertyFlat()
+{
+	this.Release();
+}
+
+void CAEPropertyFlat::Init(int LayoutID, ref CAEInstanceItem Item, int State)
+{
+	this.Release();
+	if (Item === NULL)
+	{
+		return;
+	}
+	this.m_Item <- Item;
+	this.m_PartsState = State;
+	this.m_Panel.Init(LayoutID);
+	this.m_Panel.AddKeyDownEvent(this.KeyDownEvent);
+	this.m_Panel.AddMouseWheelEvent(this.MouseWheelEvent);
+	this.m_Panel.AddChangeTextEvent(this.ChangeTextEvent);
+	this.m_Panel.AddMouseClickEvent(this.MouseLClickEvent);
+	int ID = this.m_Item.GetID();
+	this.m_Panel.AddTextBoxItem("フラット名", Ｐ＿フラット名取得(ID, State), true);
+	this.m_Panel.AddTextBoxItem("再生開始フレーム", string(AFL_Parts_GetPartsFlatCurrentFrameNumber(ID, State)), false);
+	this.m_Panel.AddTextBoxItem("再生速度倍率", AFL_Parts_GetFlatUpdateSpeedRate(ID, State).String(), false);
+	this.m_Panel.AddButtonItem("画像差し替え", "編集");
+	this.m_Panel.AddButtonItem("サウンド差し替え", "編集");
+}
+
+void CAEPropertyFlat::Release()
+{
+	this.m_dgMouseWheelEvent.Clear();
+	this.m_dgKeyDownEvent.Clear();
+	this.m_Item <- NULL;
+	this.m_Panel.Release();
+}
+
+void CAEPropertyFlat::KeyDownEvent(int ID, int KeyID)
+{
+	this.m_dgKeyDownEvent(ID, KeyID);
+}
+
+void CAEPropertyFlat::MouseWheelEvent(int ID, int Forward, int Back)
+{
+	this.m_dgMouseWheelEvent(ID, Forward, Back);
+}
+
+void CAEPropertyFlat::ChangeTextEvent(int ID)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	string FlatName = Ｐ＿フラット名取得(PartsID, this.m_PartsState);
+	int CurrentFrame = AFL_Parts_GetPartsFlatCurrentFrameNumber(PartsID, this.m_PartsState);
+	float UpdateSpeedRate = AFL_Parts_GetFlatUpdateSpeedRate(PartsID, this.m_PartsState);
+	if (Item.GetLabel() == "フラット名")
+	{
+		FlatName = Item.GetTextBoxText();
+	}
+	else if (Item.GetLabel() == "再生開始フレーム")
+	{
+		CurrentFrame = Item.GetTextBoxInt();
+	}
+	else if (Item.GetLabel() == "再生速度倍率")
+	{
+		UpdateSpeedRate = Item.GetTextBoxFloat();
+	}
+	this.Build(PartsID, FlatName, CurrentFrame, UpdateSpeedRate);
+}
+
+void CAEPropertyFlat::MouseLClickEvent(int ID, int MouseX, int MouseY)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	if (Item.GetLabel() == "画像差し替え")
+	{
+		array@string NameList;
+		Ｐ＿フラットＣＧ名リスト取得(PartsID, NameList, this.m_PartsState);
+		int Index;
+		array@SGUIStringPair List;
+		for (Index = 0; Index < NameList.Numof(); ++Index)
+		{
+			SGUIStringPair Pair;
+			Pair.m_First = NameList[Index];
+			Pair.m_Second = Ｐ＿フラット代替ＣＧ名取得(PartsID, NameList[Index], this.m_PartsState);
+			List.PushBack(Pair);
+		}
+		CAEEditStringPairDialog Form;
+		Form.Show(ID, MouseX, MouseY, List, this.ChangedListEvent);
+	}
+	else if (Item.GetLabel() == "サウンド差し替え")
+	{
+		array@string NameList;
+		Ｐ＿フラットサウンド名リスト取得(PartsID, NameList, this.m_PartsState);
+		int Index;
+		array@SGUIStringPair List;
+		for (Index = 0; Index < NameList.Numof(); ++Index)
+		{
+			SGUIStringPair Pair;
+			Pair.m_First = NameList[Index];
+			Pair.m_Second = string(Ｐ＿フラット代替サウンド取得(PartsID, NameList[Index], this.m_PartsState));
+			List.PushBack(Pair);
+		}
+		CAEEditStringPairDialog Form;
+		Form.Show(ID, MouseX, MouseY, List, this.ChangedListEvent);
+	}
+}
+
+void CAEPropertyFlat::ChangedListEvent(int ID, ref array@SGUIStringPair List)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	if (Item.GetLabel() == "画像差し替え")
+	{
+		int Index;
+		for (Index = 0; Index < List.Numof(); ++Index)
+		{
+			if (List[Index].m_Second.Empty())
+			{
+				Ｐ＿フラットＣＧ変更一部キャンセル(PartsID, List[Index].m_First, this.m_PartsState);
+				continue;
+			}
+			Ｐ＿フラットＣＧ変更(PartsID, List[Index].m_First, List[Index].m_Second, this.m_PartsState);
+		}
+	}
+	else if (Item.GetLabel() == "サウンド差し替え")
+	{
+		int Index;
+		for (Index = 0; Index < List.Numof(); ++Index)
+		{
+			if (List[Index].m_Second.Empty())
+			{
+				Ｐ＿フラットサウンド変更一部キャンセル(PartsID, List[Index].m_First, this.m_PartsState);
+				continue;
+			}
+			Ｐ＿フラットサウンド変更(PartsID, List[Index].m_First, List[Index].m_Second, this.m_PartsState);
+		}
+	}
+}
+
+void CAEPropertyFlat::Build(int PartsNumber, string FlatName, int CurrentFrame, float UpdateSpeedRate)
+{
+	Ｐ＿フラット設定(PartsNumber, FlatName, this.m_PartsState);
+	AFL_Parts_SetFlatUpdateSpeedRate(PartsNumber, UpdateSpeedRate, this.m_PartsState);
+	Ｐ＿フラット開始フレーム移動(PartsNumber, this.m_PartsState);
+	AFL_Parts_GoFramePartsFlat(PartsNumber, CurrentFrame, this.m_PartsState);
+}
+
+void CAEPropertyFlat::AddKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent += DelegateObject;
+}
+
+void CAEPropertyFlat::EraseKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent -= DelegateObject;
+}
+
+void CAEPropertyFlat::AddMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent += DelegateObject;
+}
+
+void CAEPropertyFlat::EraseMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent -= DelegateObject;
+}
+

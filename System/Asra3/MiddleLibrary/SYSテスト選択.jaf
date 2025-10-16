@@ -1,0 +1,299 @@
+void SYS_テスト選択(ref SYS_選択_result_t result)
+{
+	CASPartsLayer Layer;
+	result.fnc.Clear();
+	result.値 = 0;
+	if (_選択肢.Empty())
+	{
+		SYS_ERROR("選択肢が登録されていない", 0);
+		return;
+	}
+	array@選択肢_t SelectItemList;
+	SelectItemList.Alloc(_選択肢.Numof());
+	SelectItemList.Copy(0, _選択肢, 0, _選択肢.Numof());
+	_選択肢.Free();
+	int i;
+	int max_x;
+	int max_y;
+	int x0 = 2;
+	int y0 = 2;
+	int x = x0;
+	int y = y0;
+	array@CASParts item;
+	item.Alloc(SelectItemList.Numof());
+	CASCharSpriteProperty TextProperty;
+	TextProperty.SetType(g_テスト選択肢_フォント種類);
+	TextProperty.SetSize(g_テスト選択肢_フォントサイズ);
+	TextProperty.SetColor(CF_CASColor(192, 192, 192, 255));
+	CASCharSpriteProperty SelectedTextProperty;
+	SelectedTextProperty.SetType(g_テスト選択肢_フォント種類);
+	SelectedTextProperty.SetSize(g_テスト選択肢_フォントサイズ);
+	SelectedTextProperty.SetColor(CF_CASColor(255, 255, 255, 255));
+	array@CASRect ItemRectList;
+	ItemRectList.Alloc(SelectItemList.Numof());
+	int MaxTextPartsWidth;
+	int MaxTextPartsHeight;
+	for (i = 0; i < item.Numof(); i++)
+	{
+		item[i].Create();
+		item[i].SetClickable(true);
+		item[i].SetFontProperty(TextProperty, 1);
+		item[i].SetFontProperty(SelectedTextProperty, 2);
+		item[i].SetText(SelectItemList[i].テキスト, 1);
+		item[i].SetText(SelectItemList[i].テキスト, 2);
+		if (MaxTextPartsWidth < item[i].GetWidth(1))
+		{
+			MaxTextPartsWidth = item[i].GetWidth(1);
+		}
+		if (MaxTextPartsHeight < item[i].GetHeight(1))
+		{
+			MaxTextPartsHeight = item[i].GetHeight(1);
+		}
+	}
+	int NumofY = (AFL_View_GetHeight() - y0) / (MaxTextPartsHeight + 1);
+	for (i = 0; i < SelectItemList.Numof(); i++)
+	{
+		if (x > max_x)
+		{
+			max_x = x;
+		}
+		if (y > max_y)
+		{
+			max_y = y;
+		}
+		item[i].SetPos(x, y);
+		item[i].SetZ(1);
+		ItemRectList[i].Set(x, y, MaxTextPartsWidth, MaxTextPartsHeight);
+		y += MaxTextPartsHeight + 1;
+		if (y + MaxTextPartsHeight + 1 > AFL_View_GetHeight())
+		{
+			x += MaxTextPartsWidth + 1;
+			y = y0;
+		}
+	}
+	CASParts BaseParts;
+	BaseParts.Create();
+	Ｐ＿構築手順＿初期化(BaseParts.GetPartsNumber(), 1);
+	Ｐ＿構築手順＿作成(BaseParts.GetPartsNumber(), max_x + MaxTextPartsWidth, max_y + MaxTextPartsHeight, 1);
+	Ｐ＿構築手順＿色塗り(BaseParts.GetPartsNumber(), 0, 0, max_x + MaxTextPartsWidth, max_y + MaxTextPartsHeight, 0, 64, 32, 255, 1);
+	Ｐ＿構築ビルド(BaseParts.GetPartsNumber(), 1);
+	BaseParts.SetPos(1, 1);
+	BaseParts.SetZ(0);
+	array@CASClick ClickList;
+	ClickList.Alloc(SelectItemList.Numof());
+	for (i = 0; i < ClickList.Numof(); i++)
+	{
+		if (SelectItemList[i].キーコード == 0)
+		{
+			continue;
+		}
+		ClickList[i].Init(SelectItemList[i].キーコード, true);
+	}
+	CASClick LButtonClick;
+	CASClick RButtonClick;
+	CASClick ReturnKeyClick;
+	CASClick EscapeKeyClick;
+	CASClick UpKeyClick;
+	CASClick DownKeyClick;
+	CASClick LeftKeyClick;
+	CASClick RightKeyClick;
+	LButtonClick.Init(1, true);
+	RButtonClick.Init(2, true);
+	ReturnKeyClick.Init(13, true);
+	EscapeKeyClick.Init(27, true);
+	UpKeyClick.Init(38, true);
+	DownKeyClick.Init(40, true);
+	LeftKeyClick.Init(37, true);
+	RightKeyClick.Init(39, true);
+	CASJoyClickAssignedKey OKJoyClick;
+	CASJoyClickAssignedKey UpJoyClick;
+	CASJoyClickAssignedKey DownJoyClick;
+	CASJoyClickAssignedKey LeftJoyClick;
+	CASJoyClickAssignedKey RightJoyClick;
+	OKJoyClick.Init(4, true);
+	UpJoyClick.Init(2, true);
+	DownJoyClick.Init(3, true);
+	LeftJoyClick.Init(0, true);
+	RightJoyClick.Init(1, true);
+	bool MouseSelectMode = true;
+	int SelectIndex = -1;
+	int sel = -1;
+	int PrevMouseX;
+	int PrevMouseY;
+	AFL_Mouse_GetPos(PrevMouseX, PrevMouseY);
+	for (; ; )
+	{
+		int MouseX;
+		int MouseY;
+		AFL_Mouse_GetPos(MouseX, MouseY);
+		if (MouseX != PrevMouseX || MouseY != PrevMouseY)
+		{
+			MouseSelectMode = true;
+		}
+		PrevMouseX = MouseX;
+		PrevMouseY = MouseY;
+		if (MouseSelectMode)
+		{
+			SelectIndex = -1;
+			for (i = 0; i < ItemRectList.Numof(); i++)
+			{
+				if (ItemRectList[i].IsIn(MouseX, MouseY))
+				{
+					SelectIndex = i;
+					break;
+				}
+			}
+		}
+		bool UpKeyPress = UpKeyClick.IsKeyPress(-2147483648);
+		bool DownKeyPress = DownKeyClick.IsKeyPress(-2147483648);
+		bool LeftKeyPress = LeftKeyClick.IsKeyPress(-2147483648);
+		bool RightKeyPress = RightKeyClick.IsKeyPress(-2147483648);
+		bool UpJoyPress = UpJoyClick.IsKeyPress();
+		bool DownJoyPress = DownJoyClick.IsKeyPress();
+		bool LeftJoyPress = LeftJoyClick.IsKeyPress();
+		bool RightJoyPress = RightJoyClick.IsKeyPress();
+		if (UpKeyPress || UpJoyPress)
+		{
+			if (MouseSelectMode)
+			{
+				MouseSelectMode = false;
+				if (SelectIndex == -1)
+				{
+					SelectIndex = 0;
+				}
+				else if (--SelectIndex < 0)
+				{
+					SelectIndex = 0;
+				}
+			}
+			else if (--SelectIndex < 0)
+			{
+				SelectIndex = 0;
+			}
+		}
+		if (DownKeyPress || DownJoyPress)
+		{
+			if (MouseSelectMode)
+			{
+				MouseSelectMode = false;
+				if (SelectIndex == -1)
+				{
+					SelectIndex = 0;
+				}
+				else if (++SelectIndex >= item.Numof())
+				{
+					SelectIndex = item.Numof() - 1;
+				}
+			}
+			else if (++SelectIndex >= item.Numof())
+			{
+				SelectIndex = item.Numof() - 1;
+			}
+		}
+		if (LeftKeyPress || LeftJoyPress)
+		{
+			if (MouseSelectMode)
+			{
+				MouseSelectMode = false;
+				if (SelectIndex == -1)
+				{
+					SelectIndex = 0;
+				}
+				else
+				{
+					SelectIndex -= NumofY;
+					if (SelectIndex < 0)
+					{
+						SelectIndex = 0;
+					}
+				}
+			}
+			else
+			{
+				SelectIndex -= NumofY;
+				if (SelectIndex < 0)
+				{
+					SelectIndex = 0;
+				}
+			}
+		}
+		if (RightKeyPress || RightJoyPress)
+		{
+			if (MouseSelectMode)
+			{
+				MouseSelectMode = false;
+				if (SelectIndex == -1)
+				{
+					SelectIndex = 0;
+				}
+				else
+				{
+					SelectIndex += NumofY;
+					if (SelectIndex >= item.Numof())
+					{
+						SelectIndex = item.Numof() - 1;
+					}
+				}
+			}
+			else
+			{
+				SelectIndex += NumofY;
+				if (SelectIndex >= item.Numof())
+				{
+					SelectIndex = item.Numof() - 1;
+				}
+			}
+		}
+		for (i = 0; i < ClickList.Numof(); i++)
+		{
+			if (ClickList[i].IsClick(-2147483648))
+			{
+				sel = i;
+				break;
+			}
+		}
+		if (i < ClickList.Numof() && sel != -1)
+		{
+			break;
+		}
+		sel = SelectIndex;
+		if (LButtonClick.IsClick(sel) && sel != -1)
+		{
+			break;
+		}
+		if (ReturnKeyClick.IsClick(sel) && sel != -1)
+		{
+			break;
+		}
+		if (OKJoyClick.IsClick(sel) && sel != -1)
+		{
+			break;
+		}
+		if (RButtonClick.IsClick(-2147483648))
+		{
+			result.値 = -1;
+			return;
+		}
+		if (EscapeKeyClick.IsClick(-2147483648))
+		{
+			BaseParts.SetShow(false);
+			for (i = 0; i < item.Numof(); i++)
+			{
+				item[i].SetShow(false);
+			}
+			Ｓ＿コンフィグ();
+			BaseParts.SetShow(true);
+			for (i = 0; i < item.Numof(); i++)
+			{
+				item[i].SetShow(true);
+			}
+		}
+		for (i = 0; i < item.Numof(); i++)
+		{
+			item[i].SetState(i == SelectIndex ? 2 : 1);
+		}
+		AFL_View_Update(true);
+	}
+	result.値 = SelectItemList[sel].番号;
+}
+

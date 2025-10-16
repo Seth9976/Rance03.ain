@@ -1,0 +1,99 @@
+PartySkillSelector::PartySkillSelector()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void PartySkillSelector::init(DG_OnSkillSelectorClickCallback cb)
+{
+	this.cb_ = cb;
+	int i;
+	for (i = 0; i < this.partsEmpty_.Numof(); ++i)
+	{
+		this.partsEmpty_[i].init("システム／スキル／下地／空", 0);
+		int x = 113 * i + 15;
+		int y = 14 * i + 508;
+		this.partsEmpty_[i].setPos(x, y);
+	}
+	createPartsGroup(this.parent_, this.partsEmpty_, 4350);
+	this.parent_.setShow(true);
+	this.selector_.Free();
+	this.selector_.Alloc(g_party.getCount());
+	for (i = 0; i < this.selector_.Numof(); ++i)
+	{
+		this.innerInit(this.selector_[i], i, g_party.getAttackSkillId(i));
+	}
+	this.setShowEmptyParts();
+}
+
+void PartySkillSelector::setShowEmptyParts()
+{
+	int i;
+	for (i = 0; i < this.partsEmpty_.Numof(); ++i)
+	{
+		this.partsEmpty_[i].setShow(i < g_party.getMaxCount());
+	}
+}
+
+void PartySkillSelector::update()
+{
+}
+
+void PartySkillSelector::onClick(int index)
+{
+	this.cb_(index);
+}
+
+void PartySkillSelector::fadeIn(bool val)
+{
+	int i;
+	for (i = 0; i < this.selector_.Numof(); ++i)
+	{
+		this.selector_[i].obj.fadeIn(val, false);
+	}
+	this.parent_.runMotion(getStandardMotion(val ? 0 : 1), NULL);
+}
+
+void PartySkillSelector::innerInit(ref SelectorContainer sc, int index, string skillId)
+{
+	ref PlayerSkill ps = getPlayerSkillFromId(skillId);
+	sc.obj <- new SkillSelector;
+	sc.obj.init(ps.getId(), ps.getPlayerId(), index, true);
+	sc.obj.setZ(4500);
+	sc.obj.setOnClickCallback(this.onClick);
+	sc.obj.setCoolTime(getCoolTimeFromSkillId(skillId));
+	sc.obj.setEnable(true);
+}
+
+void PartySkillSelector::add(int index, string skillId)
+{
+	ref PlayerSkill ps = getPlayerSkillFromId(skillId);
+	SelectorContainer sc;
+	this.innerInit(sc, index, skillId);
+	sc.obj.fadeIn(true, true);
+	if (this.selector_.Numof() == index)
+	{
+		this.selector_.PushBack(sc);
+	}
+	else
+	{
+		this.selector_.Insert(index, sc);
+	}
+	this.reposition();
+}
+
+void PartySkillSelector::erase(int index)
+{
+	this.selector_.Erase(index);
+	this.reposition();
+}
+
+void PartySkillSelector::reposition()
+{
+	int i;
+	for (i = 0; i < this.selector_.Numof(); ++i)
+	{
+		this.selector_[i].obj.changeIndex(i);
+	}
+	this.setShowEmptyParts();
+}
+

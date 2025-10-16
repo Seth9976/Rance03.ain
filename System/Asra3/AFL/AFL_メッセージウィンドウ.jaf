@@ -1,0 +1,32 @@
+void AFL_SetShowMessageWindowCallbackFunc(FTShowMessageWindowCallback Func)
+{
+	if (Func.Numof() == 0)
+	{
+		return;
+	}
+	g_ShowMessageWindowCallbackFuncList += Func;
+}
+
+void AFL_ClearShowMessageWindowCallbackFunc(FTShowMessageWindowCallback Func)
+{
+	if (Func.Numof() == 0)
+	{
+		return;
+	}
+	g_ShowMessageWindowCallbackFuncList -= Func;
+}
+
+void AFL_UpdateMessageWindowLayer(int ID)
+{
+	if (ID == -1)
+	{
+		ID = AFL_Parts_GetActiveLayer();
+	}
+	g_MessageWindowManager.SetPartsLayer(ID);
+	g_MessageTextView.SetPartsLayer(ID);
+	g_SystemButtonViewList.SetPartsLayer(ID);
+	_g_MsgKeyWaitAnime.SetPartsLayer(ID);
+	_g_MsgSkipModeCGList.SetPartsLayer(ID);
+	_g_AutoModeCGList.SetPartsLayer(ID);
+}
+

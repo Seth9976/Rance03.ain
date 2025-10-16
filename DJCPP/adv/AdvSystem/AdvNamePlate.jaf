@@ -1,0 +1,76 @@
+void AdvNamePlate::show(string characterName)
+{
+	if (this.currentCharacterName_ == characterName)
+	{
+		return;
+	}
+	if (this.currentCharacterName_ != "")
+	{
+		this.hide();
+	}
+	this.currentCharacterName_ = characterName;
+	string fileName = this.getCgName(this.currentCharacterName_);
+	this.initParts(fileName);
+	if (!skipFunction())
+	{
+		this.runShowMotion();
+		RunPartsMotion();
+	}
+	else
+	{
+		this.partsCg_.setPos(0.0, 618.0);
+		this.partsCg_.setAlpha(255.0);
+	}
+}
+
+string AdvNamePlate::getCgName(string characterName)
+{
+	return "システム／名札／" + this.currentCharacterName_;
+}
+
+void AdvNamePlate::initParts(string cgName)
+{
+	this.partsCg_.init(cgName, 0);
+	this.partsCg_.setPos(-100.0, 618.0);
+	this.partsCg_.setZ(3500.0);
+	this.partsCg_.setShow(true);
+	this.partsCg_.setOrigin(1);
+	Ｐ＿メッセージウィンドウ表示連動設定(this.partsCg_.getPartsNumber(), true);
+}
+
+void AdvNamePlate::runShowMotion()
+{
+	PartsMotion m;
+	m.setTime(100);
+	m.setMove(-100, 618, 0, 618, 1);
+	m.setAlpha(0, 255, 0);
+	this.partsCg_.runMotion(m, NULL);
+}
+
+void AdvNamePlate::hide()
+{
+	this.currentCharacterName_ = "";
+	this.runHideMotion();
+	RunPartsMotion();
+}
+
+void AdvNamePlate::runHideMotion()
+{
+	PartsMotion m;
+	m.setTime(50);
+	m.setMove(0, 618, -100, 618, 1);
+	m.setAlpha(255, 0, 0);
+	this.partsCg_.runMotion(m, this.onFinishHide);
+}
+
+void AdvNamePlate::onFinishHide()
+{
+	this.currentCharacterName_ = "";
+	this.partsCg_.release();
+}
+
+bool AdvNamePlate::isShow()
+{
+	return this.currentCharacterName_ != "";
+}
+

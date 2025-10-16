@@ -1,0 +1,813 @@
+void 制御／寝る(bool boss)
+{
+	int i;
+	int max;
+	bool helper = false;
+	if (g_playerCommonParam.getMaxHelperCount() != 0)
+	{
+		helper = true;
+	}
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		if (g_player[i].isJoin())
+		{
+			max = g_player[i].getMaxHp();
+			g_player[i].setHp(max);
+			g_player[i].clearCoolTime("");
+		}
+	}
+	g_playerCommonParam.clearBadCondition();
+	if (helper)
+	{
+		g_playerCommonParam.setHelperCount(g_playerCommonParam.getMaxHelperCount());
+	}
+	if (!boss)
+	{
+		if (制御／文字列フラグ確認("レンチ") == "羅刹")
+		{
+			制御／文字列フラグ設定("レンチ", "修羅", 0);
+		}
+		else
+		{
+			制御／文字列フラグ設定("レンチ", "羅刹", 0);
+		}
+		int inn;
+		inn = 制御／数値フラグ確認("宿泊数");
+		inn++;
+		制御／数値フラグ設定("宿泊数", inn);
+		DialogInfomation info;
+		info.setCaption("HPが全快した！");
+		if (helper)
+		{
+			info.setMessage("ハッスルもあわせて全快！|クールタイムもリセットされ、|各種状態異常も消えた！");
+		}
+		else
+		{
+			info.setMessage("クールタイムもリセットされ、|各種状態異常も消えた！");
+		}
+		info.setPictureImageName("システム／ダイアログ／写真／回復");
+		openDialog(info);
+	}
+}
+
+void 制御／選択肢(int number, string label)
+{
+	gameAddAdvSelection(number, label);
+	return;
+}
+
+int 制御／選択肢番号(bool town)
+{
+	int i;
+	if (town)
+	{
+		i = gameAdvSelection();
+	}
+	else
+	{
+		i = gameAdvSelection2();
+	}
+	return i;
+}
+
+int 制御／所持金確認()
+{
+	int gold;
+	gold = g_playerCommonParam.getGold();
+	return gold;
+}
+
+void 制御／所持金増減(int gold)
+{
+	g_playerCommonParam.addGold(gold);
+	string caption;
+	DialogInfomation info;
+	if (gold >= 0)
+	{
+		caption = "%dGOLDを獲得！" % gold;
+		info.setCaption(caption);
+		info.setMessage("しゃりんしゃりん");
+		info.setPictureImageName("システム／ダイアログ／写真／金増加");
+	}
+	else
+	{
+		int showGold;
+		showGold = gold * -1;
+		caption = "%dGOLDを手放した！" % showGold;
+		info.setCaption(caption);
+		info.setMessage("しゃりんしゃりん……");
+		info.setPictureImageName("システム／ダイアログ／写真／金減少");
+	}
+	openDialog(info);
+}
+
+void 制御／数値フラグ設定(string name, int val)
+{
+	g_gameFlagMap.setInt(name, val);
+}
+
+int 制御／数値フラグ確認(string name)
+{
+	int i;
+	i = g_gameFlagMap.getInt(name);
+	return i;
+}
+
+void 制御／文字列フラグ設定(string name, string val, int score)
+{
+	if (name == "俺のメモ")
+	{
+		gameSetMemo(score, val);
+	}
+	else
+	{
+		g_gameFlagMap.setString(name, val);
+	}
+}
+
+string 制御／文字列フラグ確認(string name)
+{
+	string s;
+	s = g_gameFlagMap.getString(name);
+	return s;
+}
+
+void 制御／セーブ()
+{
+	openSave();
+}
+
+void 制御／ロード()
+{
+	openLoad();
+}
+
+void 制御／マップ／経路追加(string id1, string id2, bool isNew)
+{
+	g_mapChain.addChain(id1, id2, isNew);
+}
+
+void 制御／マップ／経路削除(string id1, string id2)
+{
+	g_mapChain.eraseChain(id1, id2);
+}
+
+int 制御／レベル確認(string playerId)
+{
+	int level;
+	level = getPlayerFromId(playerId).getLevel();
+	return level;
+}
+
+void 制御／レベル設定(string playerId, int level)
+{
+	int i;
+	for (i = 0; i < level; ++i)
+	{
+		int next;
+		next = getPlayerFromId(playerId).getNextExp();
+		getPlayerFromId(playerId).setExp(next);
+		getPlayerFromId(playerId).levelUp();
+	}
+	int max;
+	max = getPlayerFromId(playerId).getMaxHp();
+	getPlayerFromId(playerId).setHp(max);
+}
+
+void 制御／ゼロスリースキル設定(string playerId)
+{
+	getPlayerFromId(playerId).setZeroThreeSkillOpened(true);
+	string caption;
+	string desc;
+	string image;
+	ZeroThreeSkill z;
+	z = getZeroThreeSkillFromId(getPlayerFromId(playerId).getZeroThreeSkillId());
+	caption = z.getName() + "を会得！";
+	desc = "キャンプのパーティ編成で、|" + getPlayerFromId(playerId).getShortName() + "の、|ゼロスリースキルが確認できます";
+	image = "システム／ダイアログ／写真／" + getPlayerFromId(playerId).getShortName();
+	DialogInfomation info;
+	info.setCaption(caption);
+	info.setMessage(desc);
+	info.setPictureImageName(image);
+	openDialog(info);
+}
+
+void 制御／パーティ／プレイヤー設定(string id, bool show)
+{
+	getPlayerFromId(id).setJoin(true);
+	int max;
+	max = getPlayerFromId(id).getMaxHp();
+	getPlayerFromId(id).setHp(max);
+	制御／パーティ／攻撃スキル設定(id, 1);
+	if (show)
+	{
+		string caption;
+		string image;
+		caption = getPlayerFromId(id).getShortName() + "が参加！";
+		image = "システム／ダイアログ／写真／" + getPlayerFromId(id).getShortName();
+		DialogInfomation info;
+		info.setCaption(caption);
+		info.setMessage("キャンプのパーティ編成で、|バトルスキルが確認できます");
+		info.setPictureImageName(image);
+		openDialog(info);
+	}
+}
+
+void 制御／パーティ／プレイヤー削除(string id, bool show)
+{
+	gameExitPlayerFromParty(id);
+	int i;
+	int alive;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		if (g_player[i].isJoin() && g_player[i].getHp() != 0)
+		{
+			alive = 1;
+			break;
+		}
+	}
+	int j;
+	if (!alive)
+	{
+		for (j = 0; j < g_player.Numof(); ++j)
+		{
+			if (g_player[j].isJoin())
+			{
+				g_player[j].setHp(1);
+				break;
+			}
+		}
+	}
+	if (g_party.empty())
+	{
+		int k;
+		for (k = 0; k < g_player.Numof(); ++k)
+		{
+			if (g_player[k].isJoin())
+			{
+				string pId = g_player[k].getId();
+				制御／パーティ／攻撃スキル設定(pId, 4);
+			}
+		}
+	}
+	if (show)
+	{
+		string caption;
+		string image;
+		caption = getPlayerFromId(id).getShortName() + "が離脱！";
+		DialogInfomation info;
+		info.setCaption(caption);
+		info.setMessage("戦闘に参加していた場合は、|そのぶんのバトルスキルが空きます");
+		info.setPictureImageName("システム／ダイアログ／写真／情報");
+		openDialog(info);
+	}
+}
+
+bool 制御／パーティ／攻撃スキル確認／テロップ(string playerId, string groupId)
+{
+	array@string skills;
+	g_party.getSkillIdList(skills);
+	int i;
+	for (i = 0; i < skills.Numof(); ++i)
+	{
+		if (getPlayerFromId(playerId).getCoolTime(skills[i]) == 0 && getPlayerSkillFromId(skills[i]).getGroupId() == groupId)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void 制御／パーティ／攻撃スキル設定(string playerId, int num)
+{
+	int i;
+	for (i = 0; i < num; ++i)
+	{
+		string s = getPlayerFromId(playerId).getAttackSkillId(i);
+		if (s != "")
+		{
+			g_party.add(s);
+		}
+	}
+}
+
+void 制御／パーティ／クールタイム削除(string playerId)
+{
+	getPlayerFromId(playerId).clearCoolTime("");
+}
+
+bool 制御／パーティ／プレイヤー確認(string id)
+{
+	if (getPlayerFromId(id).isJoin())
+	{
+		return true;
+	}
+	return false;
+}
+
+bool 制御／パーティ／プレイヤー確認／戦闘(string id)
+{
+	array@string players;
+	g_party.getPlayerIdList(players);
+	if (players.Find(0, players.Numof(), id) >= 0 && getPlayerFromId(id).getHp() != 0)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool 制御／パーティ／ゼロスリースキル確認(string id)
+{
+	array@string players;
+	g_party.getPlayerIdList(players);
+	if (players.Find(0, players.Numof(), id) >= 0 && getPlayerFromId(id).isZeroThreeSkillOpened() && getPlayerFromId(id).getHp() != 0)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool 制御／パーティ／ゼロスリースキル確認／地平線(string id)
+{
+	if (getPlayerFromId(id).isZeroThreeSkillOpened())
+	{
+		return true;
+	}
+	return false;
+}
+
+void 制御／シーン設定／マップ(string id)
+{
+	g_gameSceneManager.setMap(id);
+}
+
+void 制御／シーン設定／ダンジョン(string id, int x, int y)
+{
+	g_gameSceneManager.setDungeon(id, x, y);
+}
+
+void 制御／シーン設定／ＡＤＶ(string name)
+{
+	g_gameSceneManager.setAdv(name);
+}
+
+void 制御／アイテム設定(string id)
+{
+	g_playerCommonParam.addItem(id);
+	string caption;
+	string desc;
+	caption = getItemFromId(id).getName() + "を獲得！";
+	desc = getItemFromId(id).getDesc();
+	DialogInfomation info;
+	info.setCaption(caption);
+	info.setMessage(desc);
+	info.setItemId(id);
+	openDialog(info);
+}
+
+void 制御／アイテム削除(string id, int count, bool show)
+{
+	int max;
+	max = g_playerCommonParam.getItemCount(id);
+	if (count > max)
+	{
+		count = max;
+	}
+	int i;
+	for (i = 0; i < count; ++i)
+	{
+		g_playerCommonParam.decItem(id);
+	}
+	if (show)
+	{
+		string caption;
+		string desc;
+		caption = getItemFromId(id).getName() + "を手放した！";
+		DialogInfomation info;
+		info.setCaption(caption);
+		info.setMessage("もう必要なくなったな");
+		info.setPictureImageName("システム／ダイアログ／写真／情報");
+		openDialog(info);
+	}
+}
+
+int 制御／アイテム確認(string id)
+{
+	int value;
+	value = g_playerCommonParam.getItemCount(id);
+	return value;
+}
+
+void 制御／カード設定(string dungeonId, int x, int y, string newCardId)
+{
+	gameChangeCardPermanent(dungeonId, x, y, newCardId);
+}
+
+void 制御／ＨＰ回復／最大(string playerId)
+{
+	int max;
+	max = getPlayerFromId(playerId).getMaxHp();
+	getPlayerFromId(playerId).setHp(max);
+}
+
+bool 制御／ＨＰ減少確認()
+{
+	int i;
+	int max;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		if (g_player[i].isJoin() && g_player[i].getMaxHp() != g_player[i].getHp())
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void 制御／ウィリス設定(bool val)
+{
+	g_playerCommonParam.setEnableLevelGod(val);
+}
+
+void 制御／帰り木設定(bool val)
+{
+	g_playerCommonParam.setEnableExitDungeon(val);
+}
+
+void 制御／アイテム使用設定(bool val)
+{
+	g_playerCommonParam.setEnableItem(val);
+}
+
+int 制御／必要経験値確認(int nextLevel)
+{
+	int val;
+	switch (nextLevel)
+	{
+	case 1:
+	case 2:
+	case 3:
+	case 4:
+	case 5:
+	case 6:
+	case 7:
+	case 8:
+	case 9:
+	case 10:
+		val = 20;
+		break;
+	case 11:
+		val = 20;
+		break;
+	case 12:
+		val = 35;
+		break;
+	case 13:
+		val = 95;
+		break;
+	case 14:
+		val = 150;
+		break;
+	case 15:
+		val = 195;
+		break;
+	case 16:
+		val = 240;
+		break;
+	case 17:
+		val = 285;
+		break;
+	case 18:
+		val = 450;
+		break;
+	case 19:
+		val = 585;
+		break;
+	case 20:
+		val = 720;
+		break;
+	case 21:
+		val = 855;
+		break;
+	case 22:
+		val = 1350;
+		break;
+	case 23:
+		val = 1755;
+		break;
+	case 24:
+		val = 2160;
+		break;
+	case 25:
+		val = 2565;
+		break;
+	case 26:
+		val = 4050;
+		break;
+	case 27:
+		val = 5265;
+		break;
+	case 28:
+		val = 6480;
+		break;
+	case 29:
+		val = 6075;
+		break;
+	case 30:
+		val = 12150;
+		break;
+	case 31:
+		val = 15795;
+		break;
+	case 32:
+		val = 19440;
+		break;
+	case 33:
+		val = 23085;
+		break;
+	case 34:
+		val = 36450;
+		break;
+	case 35:
+		val = 47385;
+		break;
+	case 36:
+		val = 58320;
+		break;
+	case 37:
+		val = 69255;
+		break;
+	case 38:
+		val = 109350;
+		break;
+	case 39:
+		val = 142155;
+		break;
+	case 40:
+		val = 174960;
+		break;
+	case 41:
+		val = 207765;
+		break;
+	case 42:
+		val = 328050;
+		break;
+	case 43:
+		val = 426465;
+		break;
+	case 44:
+		val = 524880;
+		break;
+	case 45:
+		val = 623295;
+		break;
+	case 46:
+		val = 984150;
+		break;
+	case 47:
+		val = 1279395;
+		break;
+	case 48:
+		val = 1574640;
+		break;
+	case 49:
+		val = 1869885;
+		break;
+	case 50:
+		val = 2952450;
+		break;
+	case 51:
+		val = 3247695;
+		break;
+	case 52:
+		val = 3542940;
+		break;
+	case 53:
+		val = 3838185;
+		break;
+	case 54:
+		val = 4133430;
+		break;
+	case 55:
+		val = 4428675;
+		break;
+	case 56:
+		val = 4723920;
+		break;
+	case 57:
+		val = 5019165;
+		break;
+	case 58:
+		val = 5314410;
+		break;
+	case 59:
+		val = 5609655;
+		break;
+	default:
+		val = 5904900;
+		break;
+	}
+	return val;
+}
+
+void 制御／買物(string shopId, string shopName)
+{
+	g_shop[0].addItem("世色癌1");
+	g_shop[0].addItem("アサクヒロク1");
+	g_shop[0].addItem("オート");
+	g_shop[0].addItem("ランス斬り2");
+	g_shop[0].addItem("炎の矢2");
+	g_shop[0].addItem("忍び斬り2");
+	g_shop[0].addItem("金的パンチ2");
+	g_shop[1].addItem("マヨネーズ");
+	g_shop[1].addItem("カッパーマトック");
+	g_shop[2].addItem("スカウトキー");
+	g_shop[2].addItem("ピッキングドリル");
+	g_shop[3].addItem("量産型バラバラ時計");
+	g_shop[3].addItem("養殖セーブライオン");
+	if (EV("ＥＶ／解放軍司令部／カスタム／初回", -2147483648))
+	{
+		g_shop[0].addItem("ランスアタック2");
+		g_shop[0].addItem("襲う2");
+		g_shop[0].addItem("ヒーリング2");
+		g_shop[0].addItem("石の壁2");
+		g_shop[0].addItem("手裏剣打ち2");
+		g_shop[0].addItem("分身の術2");
+		g_shop[0].addItem("火丼の術2");
+		g_shop[0].addItem("1回切り2");
+		g_shop[0].addItem("連続切り2");
+		g_shop[0].addItem("蝶のように2");
+		g_shop[0].addItem("クレイルシェル2");
+		g_shop[0].addItem("金的キック2");
+		g_shop[0].addItem("寝る2");
+	}
+	if (EV("ＥＶ／ラジール屋敷／司令官室／Ｈ後", -2147483648))
+	{
+		g_shop[0].addItem("世色癌2");
+		g_shop[0].addItem("アサクヒロク2");
+		g_shop[0].addItem("ランス斬り3");
+		g_shop[0].addItem("ランスアタック3");
+		g_shop[0].addItem("襲う3");
+		g_shop[0].addItem("炎の矢3");
+		g_shop[0].addItem("ヒーリング3");
+		g_shop[0].addItem("石の壁3");
+		g_shop[0].addItem("忍び斬り3");
+		g_shop[0].addItem("手裏剣打ち3");
+		g_shop[0].addItem("分身の術3");
+		g_shop[0].addItem("火丼の術3");
+		g_shop[0].addItem("薙ぎ払い3");
+		g_shop[0].addItem("デビルアロー3");
+		g_shop[0].addItem("陣地構築3");
+		g_shop[0].addItem("おやつ3");
+		g_shop[0].addItem("局地地震3");
+		g_shop[0].addItem("マジカルバリア3");
+		g_shop[0].addItem("両刀斬り3");
+		g_shop[0].addItem("ムードメイク3");
+		g_shop[0].addItem("1回切り3");
+		g_shop[0].addItem("連続切り3");
+		g_shop[0].addItem("蝶のように3");
+		g_shop[0].addItem("ハックスラッシュ3");
+		g_shop[0].addItem("ひらり3");
+		g_shop[0].addItem("金的パンチ3");
+		g_shop[0].addItem("クレイルシェル3");
+		g_shop[0].addItem("金的キック3");
+		g_shop[0].addItem("寝る3");
+	}
+	if (EV("ＥＶ／宿屋／入る／セル", -2147483648))
+	{
+		g_shop[0].addItem("ランス斬り4");
+		g_shop[0].addItem("ランスアタック4");
+		g_shop[0].addItem("襲う4");
+		g_shop[0].addItem("ランスチャージ4");
+		g_shop[0].addItem("炎の矢4");
+		g_shop[0].addItem("ヒーリング4");
+		g_shop[0].addItem("石の壁4");
+		g_shop[0].addItem("F.レーザー4");
+		g_shop[0].addItem("忍び斬り4");
+		g_shop[0].addItem("手裏剣打ち4");
+		g_shop[0].addItem("分身の術4");
+		g_shop[0].addItem("火丼の術4");
+		g_shop[0].addItem("薙ぎ払い4");
+		g_shop[0].addItem("デビルアロー4");
+		g_shop[0].addItem("デビルビーム4");
+		g_shop[0].addItem("色仕掛け4");
+		g_shop[0].addItem("陣地構築4");
+		g_shop[0].addItem("おやつ4");
+		g_shop[0].addItem("迫撃水4");
+		g_shop[0].addItem("局地地震4");
+		g_shop[0].addItem("マジカルバリア4");
+		g_shop[0].addItem("白色破壊光線4");
+		g_shop[0].addItem("魔想4");
+		g_shop[0].addItem("両刀斬り4");
+		g_shop[0].addItem("ムードメイク4");
+		g_shop[0].addItem("ラブテクニカル4");
+		g_shop[0].addItem("千人斬り4");
+		g_shop[0].addItem("健常者潰し4");
+		g_shop[0].addItem("回復の雨4");
+		g_shop[0].addItem("悔悛の錠4");
+		g_shop[0].addItem("斧ブーメラン4");
+		g_shop[0].addItem("大切断4");
+		g_shop[0].addItem("背後からスー4");
+		g_shop[0].addItem("ハックスラッシュ4");
+		g_shop[0].addItem("ひらり4");
+		g_shop[0].addItem("Nシステマ4");
+		g_shop[0].addItem("チャクラム投げ4");
+		g_shop[0].addItem("1回切り4");
+		g_shop[0].addItem("連続切り4");
+		g_shop[0].addItem("蝶のように4");
+		g_shop[0].addItem("金的パンチ4");
+		g_shop[0].addItem("クレイルシェル4");
+		g_shop[0].addItem("金的キック4");
+		g_shop[0].addItem("寝る4");
+	}
+	if (EV("ＥＶ／都市／サウス／入る／初回", -2147483648))
+	{
+		g_shop[0].addItem("世色癌3");
+		g_shop[0].addItem("アサクヒロク3");
+		g_shop[0].addItem("ランス斬り5");
+		g_shop[0].addItem("炎の矢5");
+		g_shop[0].addItem("忍び斬り5");
+		g_shop[0].addItem("薙ぎ払い5");
+	}
+	if (EV("ＥＶ／居館／一階／入口／初回", -2147483648))
+	{
+		g_shop[0].addItem("ランスアタック5");
+		g_shop[0].addItem("襲う5");
+		g_shop[0].addItem("ランスチャージ5");
+		g_shop[0].addItem("ヒーリング5");
+		g_shop[0].addItem("石の壁5");
+		g_shop[0].addItem("F.レーザー5");
+		g_shop[0].addItem("王女様の鞭5");
+		g_shop[0].addItem("リーザスの雷竜5");
+		g_shop[0].addItem("おしおき5");
+		g_shop[0].addItem("大号令5");
+		g_shop[0].addItem("串刺し5");
+		g_shop[0].addItem("ヒーリングm5");
+		g_shop[0].addItem("神聖分解波5");
+		g_shop[0].addItem("マリス七変化5");
+		g_shop[0].addItem("手裏剣打ち5");
+		g_shop[0].addItem("分身の術5");
+		g_shop[0].addItem("火丼の術5");
+		g_shop[0].addItem("デビルアロー5");
+		g_shop[0].addItem("デビルビーム5");
+		g_shop[0].addItem("色仕掛け5");
+		g_shop[0].addItem("陣地構築5");
+		g_shop[0].addItem("おやつ5");
+		g_shop[0].addItem("迫撃水5");
+		g_shop[0].addItem("局地地震5");
+		g_shop[0].addItem("マジカルバリア5");
+		g_shop[0].addItem("白色破壊光線5");
+		g_shop[0].addItem("魔想5");
+		g_shop[0].addItem("両刀斬り5");
+		g_shop[0].addItem("ムードメイク5");
+		g_shop[0].addItem("ラブテクニカル5");
+		g_shop[0].addItem("千人斬り5");
+		g_shop[0].addItem("幻獣アタック3");
+		g_shop[0].addItem("幻獣アタック4");
+		g_shop[0].addItem("幻獣アタック5");
+		g_shop[0].addItem("幻獣トス3");
+		g_shop[0].addItem("幻獣トス4");
+		g_shop[0].addItem("幻獣トス5");
+		g_shop[0].addItem("らぶてくにかる3");
+		g_shop[0].addItem("らぶてくにかる4");
+		g_shop[0].addItem("らぶてくにかる5");
+		g_shop[0].addItem("ミルアタック3");
+		g_shop[0].addItem("ミルアタック4");
+		g_shop[0].addItem("ミルアタック5");
+		g_shop[0].addItem("健常者潰し5");
+		g_shop[0].addItem("回復の雨5");
+		g_shop[0].addItem("悔悛の錠5");
+		g_shop[0].addItem("キョウダイン5");
+		g_shop[0].addItem("斧ブーメラン5");
+		g_shop[0].addItem("大切断5");
+		g_shop[0].addItem("背後からスー5");
+		g_shop[0].addItem("先手0三歩5");
+		g_shop[0].addItem("ハックスラッシュ5");
+		g_shop[0].addItem("ひらり5");
+		g_shop[0].addItem("Nシステマ5");
+		g_shop[0].addItem("チャクラム投げ5");
+		g_shop[0].addItem("斬り返し5");
+		g_shop[0].addItem("黒金砕き5");
+		g_shop[0].addItem("槍攻撃5");
+		g_shop[0].addItem("即ブロ5");
+		g_shop[0].addItem("手加減攻撃5");
+		g_shop[0].addItem("剣攻撃5");
+		g_shop[0].addItem("ジバ流朧突き5");
+		g_shop[0].addItem("スカルピアッサ5");
+		g_shop[0].addItem("無現軌道5");
+		g_shop[0].addItem("アンコク5");
+		g_shop[0].addItem("軟体凍結5");
+		g_shop[0].addItem("死爆5");
+		g_shop[0].addItem("ヒキコモリオン5");
+		g_shop[0].addItem("1回切り5");
+		g_shop[0].addItem("連続切り5");
+		g_shop[0].addItem("蝶のように5");
+		g_shop[0].addItem("心頭滅却5");
+		g_shop[0].addItem("金的パンチ5");
+		g_shop[0].addItem("クレイルシェル5");
+		g_shop[0].addItem("金的キック5");
+		g_shop[0].addItem("寝る5");
+	}
+	openShop(shopId, shopName);
+}
+

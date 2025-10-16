@@ -1,0 +1,167 @@
+void initConfigSetting()
+{
+	AFL_Config_SetLoadedActivityEvent("onLoadConfigActivity");
+	AFL_Config_SetReleasingActivityEvent("onReleaseConfigActivity");
+	AFL_Config_SetAsraDataForPartsEvent("onConfigBeginUpdateEvent");
+	AFL_Config_SetPartsDataForAsraEvent("onConfigEndUpdateEvent");
+}
+
+void onLoadConfigActivity(string fileName, string name)
+{
+	setCursorClickSoundToActivity(name);
+	addResetButtonEvent(name, "SYS_男性音声ボタン", "onClickMaleVolumeResetButton");
+	addResetButtonEvent(name, "SYS_女性音声ボタン", "onClickFemaleVolumeResetButton");
+	addResetButtonEvent(name, "SYS_ゲーム速度ボタン", "onClickGameSpeedResetButton");
+}
+
+void setCursorClickSoundToActivity(string name)
+{
+	int count = AFL_Activity_NumofParts(name);
+	int i;
+	for (i = 0; i < count; ++i)
+	{
+		string partsName;
+		int partsNumber;
+		AFL_Activity_GetParts(i, name, partsName, partsNumber);
+		if (PARTS_GetComponentType(partsNumber, 1) == 0 || PARTS_GetComponentType(partsNumber, 1) == 1)
+		{
+			Ｐ＿オンカーソル効果音設定(partsNumber, "効果音／カーソル");
+			Ｐ＿クリック効果音設定(partsNumber, "効果音／クリック");
+		}
+	}
+}
+
+void addResetButtonEvent(string activity, string partsName, DG_MouseClickHandler cb)
+{
+	int pn = AFL_Activity_GetPartsNumber(activity, partsName);
+	if (pn != 0)
+	{
+		AFL_Parts_AddMouseLClickEvent(pn, cb);
+	}
+}
+
+void onReleaseConfigActivity(string fileName, string name)
+{
+}
+
+void onConfigBeginUpdateEvent(int time, string activityName)
+{
+	setConfigSlider(activityName, "SYS_ゲーム速度スライダ", &getGameSpeedRate);
+	setConfigSlider(activityName, "SYS_男性音声スライダ", &getMaleVoiceVolume);
+	setConfigSlider(activityName, "SYS_女性音声スライダ", &getFemaleVoiceVolume);
+	setConfigCheckbox(activityName, "SYS_男性音声消音", &getMaleVoiceMute);
+	setConfigCheckbox(activityName, "SYS_女性音声消音", &getFemaleVoiceMute);
+}
+
+void onConfigEndUpdateEvent(int time, string activityName)
+{
+	setConfigParamFromSliderValue(activityName, "SYS_ゲーム速度スライダ", "setGameSpeedRate");
+	setConfigParamFromSliderValue(activityName, "SYS_男性音声スライダ", "setMaleVoiceVolume");
+	setConfigParamFromSliderValue(activityName, "SYS_女性音声スライダ", "setFemaleVoiceVolume");
+	setConfigParamFromCheckboxValue(activityName, "SYS_男性音声消音", &setMaleVoiceMute);
+	setConfigParamFromCheckboxValue(activityName, "SYS_女性音声消音", &setFemaleVoiceMute);
+}
+
+void setConfigSlider(string activity, string partsName, DG_GetConfigSliderParamFunc func)
+{
+	int pn = AFL_Activity_GetPartsNumber(activity, partsName);
+	if (pn != 0)
+	{
+		Ｐ＿横スクロールバー＿スクロールレート設定(pn, func());
+	}
+}
+
+void setConfigCheckbox(string activity, string partsName, DG_GetConfigCheckboxFunc func)
+{
+	int pn = AFL_Activity_GetPartsNumber(activity, partsName);
+	if (pn != 0)
+	{
+		Ｐ＿チェックボックス＿チェック状態設定(pn, func());
+	}
+}
+
+void setConfigParamFromSliderValue(string activity, string partsName, DG_SetConfigSliderParamFunc func)
+{
+	int pn = AFL_Activity_GetPartsNumber(activity, partsName);
+	if (pn != 0)
+	{
+		float rate = Ｐ＿横スクロールバー＿スクロールレート取得(pn);
+		func(rate);
+	}
+}
+
+void setConfigParamFromCheckboxValue(string activity, string partsName, DG_SetConfigCheckboxParamFunc func)
+{
+	int pn = AFL_Activity_GetPartsNumber(activity, partsName);
+	if (pn != 0)
+	{
+		bool val = Ｐ＿チェックボックス＿チェック状態取得(pn);
+		func(val);
+	}
+}
+
+void setGameSpeedRate(float rate)
+{
+	g_common_configTimerScaling = rate * 1.5 + 1.0;
+}
+
+void setMaleVoiceVolume(float rate)
+{
+	AFL_Config_SetVolume(6, rate * 100.0);
+}
+
+void setFemaleVoiceVolume(float rate)
+{
+	AFL_Config_SetVolume(7, rate * 100.0);
+}
+
+void setMaleVoiceMute(bool val)
+{
+	AFL_Config_SetMute(6, val);
+}
+
+void setFemaleVoiceMute(bool val)
+{
+	AFL_Config_SetMute(7, val);
+}
+
+float getGameSpeedRate()
+{
+	return (g_common_configTimerScaling - 1.0) / 1.5;
+}
+
+float getMaleVoiceVolume()
+{
+	return AFL_Config_GetVolume(6) / 100.0;
+}
+
+float getFemaleVoiceVolume()
+{
+	return AFL_Config_GetVolume(7) / 100.0;
+}
+
+bool getMaleVoiceMute()
+{
+	return AFL_Config_GetMute(6);
+}
+
+bool getFemaleVoiceMute()
+{
+	return AFL_Config_GetMute(7);
+}
+
+void onClickMaleVolumeResetButton(int pn, int x, int y)
+{
+	AFL_Config_SetVolume(6, AFL_Config_GetDefaultVolume(6));
+}
+
+void onClickFemaleVolumeResetButton(int pn, int x, int y)
+{
+	AFL_Config_SetVolume(7, AFL_Config_GetDefaultVolume(7));
+}
+
+void onClickGameSpeedResetButton(int pn, int x, int y)
+{
+	g_common_configTimerScaling = 1.0;
+}
+

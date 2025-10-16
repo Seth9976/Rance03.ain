@@ -1,0 +1,171 @@
+HVScroller::HVScroller()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void HVScroller::init(float x, float y, float width, float height)
+{
+	this.initParts();
+	this.state_ = 1;
+	this.width_ = width;
+	this.height_ = height;
+	float mx;
+	float my;
+	this.convertMapPosToPartsPos(mx, my, x, y);
+	this.parent_.setPos(mx, my);
+}
+
+void HVScroller::initParts()
+{
+	this.parent_.initAsDummy();
+	this.setPartsShow();
+}
+
+void HVScroller::setPartsShow()
+{
+}
+
+void HVScroller::update()
+{
+	switch (this.state_)
+	{
+	case 0:
+		break;
+	case 2:
+		break;
+	case 5:
+		if (this.timer_.getTime() <= 300)
+		{
+		}
+		else
+		{
+			this.state_ = 1;
+		}
+	case 1:
+		if (g_mouse.onDown(0))
+		{
+			this.state_ = 4;
+			this.dragStartMouseX_ = g_mouse.getX();
+			this.dragStartMouseY_ = g_mouse.getY();
+		}
+		break;
+	case 4:
+		if (getDest(g_mouse.getX(), g_mouse.getY(), this.dragStartMouseX_, this.dragStartMouseY_) > 20.0)
+		{
+			this.dragStartPartsX_ = this.parent_.getX();
+			this.dragStartPartsY_ = this.parent_.getY();
+			this.state_ = 3;
+			g_mouse.setNextMouseUpIgnore();
+		}
+		if (!g_mouse.isDown(0))
+		{
+			this.state_ = 1;
+		}
+		break;
+	case 3:
+		if (g_mouse.isCursorChanged())
+		{
+			float x = this.getNonlinearDragParam(this.dragStartPartsX_, g_mouse.getX() - this.dragStartMouseX_, 1024.0, this.width_);
+			float y = this.getNonlinearDragParam(this.dragStartPartsY_, g_mouse.getY() - this.dragStartMouseY_, 768.0, this.height_);
+			this.parent_.setPos(x, y);
+		}
+		if (!g_mouse.isDown(0))
+		{
+			this.state_ = 1;
+		}
+		break;
+	case 6:
+		float t = Math.MinF(1.0, float(this.timer_.getTime()) / float(this.focusTime_));
+		float x = getMotionValue(7, this.focusFromX_, this.focusToX_, t);
+		float y = getMotionValue(7, this.focusFromY_, this.focusToY_, t);
+		this.parent_.setPos(x, y);
+		if (this.timer_.getTime() > this.focusTime_)
+		{
+			this.onFinishMoveFocus_();
+			this.state_ = 1;
+		}
+		break;
+	case 7:
+		this.parent_.setPos(this.followCamera_.getX(), this.followCamera_.getY());
+		break;
+	}
+}
+
+float HVScroller::getNonlinearDragParam(float partsStartPos, float dragWidth, float screenSize, float objectSize)
+{
+	float linearL = Math.Max(0, Math.Abs(partsStartPos) - 100);
+	float nonLinearL = dragWidth - linearL;
+	if (0 < nonLinearL)
+	{
+		float outsideMargin = Math.Min(100, Math.Abs(partsStartPos));
+		float n = (nonLinearL / screenSize) * outsideMargin;
+		return partsStartPos + linearL + n;
+	}
+	float linearR = Math.Max(0, (partsStartPos + objectSize) - screenSize - 100.0);
+	float nonLinearR = -dragWidth - linearR;
+	if (0 < nonLinearR)
+	{
+		float outsideMargin = Math.Min(100, Math.Abs((objectSize + partsStartPos) - screenSize));
+		float n = (nonLinearR / screenSize) * outsideMargin;
+		return partsStartPos - linearR - n;
+	}
+	return partsStartPos + dragWidth;
+}
+
+int HVScroller::getPartsNumber()
+{
+	return this.parent_.getPartsNumber();
+}
+
+void HVScroller::moveFocus(float x, float y, DG_GeneralCallback onFinishMoveFocus)
+{
+	this.onFinishMoveFocus_ = onFinishMoveFocus;
+	this.focusFromX_ = this.parent_.getX();
+	this.focusFromY_ = this.parent_.getY();
+	this.convertMapPosToPartsPos(this.focusToX_, this.focusToY_, x, y);
+	this.focusTime_ = getDest(this.focusFromX_, this.focusFromY_, this.focusToX_, this.focusToY_) * 2.0;
+	this.timer_.reset();
+	this.state_ = 6;
+}
+
+void HVScroller::convertMapPosToPartsPos(ref float x, ref float y, float mapX, float mapY)
+{
+	x = Math.MaxF(1024 - this.width_, Math.MinF(0.0, 512 - mapX));
+	y = Math.MaxF(768 - this.height_, Math.MinF(0.0, 384 - mapY));
+}
+
+void HVScroller::setCameraFollowMode(bool val)
+{
+	if (val)
+	{
+		this.followCamera_.setPos(this.parent_.getX(), this.parent_.getY());
+		this.state_ = 7;
+	}
+	else
+	{
+		this.state_ = 1;
+	}
+}
+
+void HVScroller::setCameraTarget(float x, float y)
+{
+	float mx;
+	float my;
+	this.convertMapPosToPartsPos(mx, my, x, y);
+	this.followCamera_.setFollowPos(mx, my);
+}
+
+void HVScroller::fadeIn(bool val, int time, DG_GeneralCallback onFinishCallback)
+{
+	this.parent_.setShow(true);
+	PartsMotion m;
+	m = getStandardMotion(val ? 0 : 1);
+	m.setTime(time);
+	this.parent_.runMotion(m, onFinishCallback);
+}
+
+void HVScroller::setShow(bool val)
+{
+	this.parent_.setShow(val);
+}
+

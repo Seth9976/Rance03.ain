@@ -1,0 +1,149 @@
+SkillIconVirtualHorizontalView::SkillIconVirtualHorizontalView()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void SkillIconVirtualHorizontalView::init(array@string playerIds, int index)
+{
+	this.parent_.initAsDummy();
+	this.parent_.setShow(true);
+	this.parent_.setZ(6000.0);
+	this.index_ = index;
+	this.icons_.Alloc(playerIds.Numof());
+	int i;
+	for (i = 0; i < this.icons_.Numof(); ++i)
+	{
+		string skillId = getPlayerFromId(playerIds[i]).getAttackSkillId(this.index_);
+		if (skillId != "")
+		{
+			this.icons_[i].init(skillId, 0, 0, getCoolTimeFromSkillId(skillId));
+		}
+		else
+		{
+			int openLevel;
+			this.getAvailableLevelPlayerNewSkill(playerIds[i], this.index_, skillId, openLevel);
+			if (openLevel != -1)
+			{
+				this.icons_[i].init(skillId, 1, openLevel, 0);
+			}
+			else
+			{
+				this.icons_[i].init(skillId, 2, openLevel, 0);
+			}
+		}
+		this.icons_[i].setOnClickCallback(this.onClick);
+		this.icons_[i].setParent(this.parent_.getPartsNumber());
+	}
+	this.setIconPos();
+}
+
+void SkillIconVirtualHorizontalView::update()
+{
+	int i;
+	for (i = 0; i < this.icons_.Numof(); ++i)
+	{
+		int n;
+		if (this.icons_[i].isHover())
+		{
+			n = 1;
+		}
+	}
+}
+
+void SkillIconVirtualHorizontalView::fadeIn(bool val, unknown_delegate onFinish)
+{
+	int x = this.isWithOutInfomation_ ? 0 : -145;
+	if (val)
+	{
+		array@PartsMotion m[2];
+		m[0].setTime((3 - this.index_) * 50);
+		m[0].setAlpha(0, 0, 0);
+		m[1].setMove(x - 150, -495, x - 0, 0, 1);
+		m[1].setAlpha(0, 255, 0);
+		m[1].setTime(300);
+		this.parent_.runMotionArray(m, NULL);
+	}
+	else
+	{
+		PartsMotion m;
+		m.setMove(x, 0, x - 500, 0, 1);
+		m.setAlpha(255, 0, 0);
+		m.setTime(150);
+		this.parent_.runMotion(m, NULL);
+	}
+}
+
+void SkillIconVirtualHorizontalView::setClickCallback(DG_OnClickSkillIcon cb)
+{
+	this.onClickCallback_ = cb;
+}
+
+void SkillIconVirtualHorizontalView::setFloatingPosition(float val)
+{
+	int i;
+	for (i = 0; i < this.icons_.Numof(); ++i)
+	{
+		this.icons_[i].setViewValue(val - i);
+	}
+}
+
+void SkillIconVirtualHorizontalView::onClick(string skillId)
+{
+	this.onClickCallback_(skillId);
+}
+
+void SkillIconVirtualHorizontalView::getAvailableLevelPlayerNewSkill(string playerId, int index, ref string skillId, ref int openLevel)
+{
+	int i;
+	for (i = 0; i < g_playerSkillOpenLevel.Numof(); ++i)
+	{
+		if (g_playerSkillOpenLevel[i].getPlayerId() == playerId && g_playerSkillOpenLevel[i].getIndex() == index)
+		{
+			skillId = g_playerSkillOpenLevel[i].getSkillId();
+			openLevel = g_playerSkillOpenLevel[i].getOpenLevel();
+			return;
+		}
+	}
+}
+
+void SkillIconVirtualHorizontalView::setEquiped(string skillId, bool val)
+{
+	int i;
+	for (i = 0; i < this.icons_.Numof(); ++i)
+	{
+		if (this.icons_[i].getSkillId() == skillId)
+		{
+			this.icons_[i].setEquip(val);
+		}
+	}
+}
+
+void SkillIconVirtualHorizontalView::changeCenter(bool isWithOutInfomation)
+{
+	this.isWithOutInfomation_ = isWithOutInfomation;
+	PartsMotion m;
+	if (this.isWithOutInfomation_)
+	{
+		m.setMove(-145, 0, 0, 0, 1);
+	}
+	else
+	{
+		m.setMove(0, 0, -145, 0, 1);
+	}
+	this.parent_.runMotion(m, NULL);
+	int i;
+	for (i = 0; i < this.icons_.Numof(); ++i)
+	{
+		this.icons_[i].setShowInformation(!isWithOutInfomation);
+	}
+}
+
+void SkillIconVirtualHorizontalView::setIconPos()
+{
+	int i;
+	for (i = 0; i < this.icons_.Numof(); ++i)
+	{
+		this.icons_[i].setPos(167 + this.index_ * 34, 8 + this.index_ * 115);
+	}
+}
+

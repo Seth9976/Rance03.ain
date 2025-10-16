@@ -1,0 +1,77 @@
+void SceneNetworkConnection::init()
+{
+	this.partsBg_.init("システム／接続確認", 0);
+	this.initButton();
+	this.setButtonPos();
+	this.partsBg_.setZ(4000.0);
+}
+
+void SceneNetworkConnection::initButton()
+{
+	this.btn_[0].init("システム／ボタン／幅１２８", "許可する", "", true);
+	this.btn_[1].init("システム／ボタン／幅１２８", "許可しない", "", true);
+	int i;
+	for (i = 0; i < this.btn_.Numof(); ++i)
+	{
+		this.btn_[i].setClickCallback(this.onClick, i);
+		this.btn_[i].setZ(4500);
+	}
+}
+
+void SceneNetworkConnection::setButtonPos()
+{
+	this.btn_[0].setPos(374, 595);
+	this.btn_[1].setPos(522, 595);
+}
+
+void SceneNetworkConnection::fadeButton(bool val)
+{
+	int i;
+	for (i = 0; i < this.btn_.Numof(); ++i)
+	{
+		this.btn_[i].fadeIn(val);
+	}
+}
+
+void SceneNetworkConnection::fadeIn(bool val, DG_GeneralCallback cb)
+{
+	this.fadeButton(val);
+	this.partsBg_.setShow(true);
+	PartsMotion m;
+	if (val)
+	{
+		m.setAlpha(0, 255, 0);
+	}
+	else
+	{
+		m.setAlpha(255, 0, 0);
+	}
+	this.partsBg_.runMotion(m, cb);
+}
+
+void SceneNetworkConnection::run()
+{
+	this.fadeIn(true, NULL);
+}
+
+bool SceneNetworkConnection::update()
+{
+	return !this.isFinish_;
+}
+
+void SceneNetworkConnection::onClick(int id)
+{
+	this.selected_ = id;
+	this.fadeIn(false, this.onFinishFadeOut);
+}
+
+void SceneNetworkConnection::onFinishFadeOut()
+{
+	this.isFinish_ = true;
+}
+
+int SceneNetworkConnection::getSelected()
+{
+	return this.selected_;
+}
+

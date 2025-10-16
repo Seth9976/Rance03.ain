@@ -1,0 +1,78 @@
+CgPosNavigator::CgPosNavigator()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void CgPosNavigator::init(int count)
+{
+	this.count_ = count;
+	this.initParts();
+}
+
+void CgPosNavigator::update()
+{
+}
+
+void CgPosNavigator::fadeIn(bool val, DG_GeneralCallback onFinish)
+{
+	this.setPartsShow();
+	this.parent_.runMotion(getStandardMotion(val ? 0 : 1), onFinish);
+}
+
+void CgPosNavigator::initParts()
+{
+	this.parts_.Alloc(this.count_ + 1);
+	this.onIndex_ = this.count_;
+	int i;
+	for (i = 0; i < this.count_; ++i)
+	{
+		this.parts_[i].init("システム／ページ／消灯", 0);
+		this.parts_[i].setOrigin(2);
+	}
+	this.parts_[this.onIndex_].init("システム／ページ／点灯", 0);
+	this.parts_[this.onIndex_].setOrigin(2);
+	createPartsGroup(this.parent_, this.parts_, 15000);
+	this.setPartsPos();
+}
+
+void CgPosNavigator::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void CgPosNavigator::setPartsPos()
+{
+	int maxWidth = 480;
+	this.span_ = 20;
+	if (maxWidth < this.span_ * this.count_)
+	{
+		this.span_ = maxWidth / this.count_;
+	}
+	int w = this.span_ * this.count_;
+	this.left_ = 512 - w / 2;
+	int i;
+	for (i = 0; i < this.count_; ++i)
+	{
+		this.parts_[i].setPos(this.left_ + i * this.span_, 750.0);
+	}
+}
+
+void CgPosNavigator::setPos(float pos)
+{
+	float p = roundOff(pos);
+	if (Math.AbsF(p - pos) < 0.1)
+	{
+		this.parts_[this.onIndex_].setAlpha(255.0);
+	}
+	else
+	{
+		this.parts_[this.onIndex_].setAlpha(128.0);
+	}
+	this.parts_[this.onIndex_].setPos(this.left_ + pos * this.span_, 750.0);
+}
+

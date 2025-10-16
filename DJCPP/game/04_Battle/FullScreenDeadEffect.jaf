@@ -1,0 +1,89 @@
+FullScreenDeadEffect::FullScreenDeadEffect()
+{
+	this.isFinish_ = false;
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void FullScreenDeadEffect::init()
+{
+	int i;
+	for (i = 0; i < this.ef.Numof(); ++i)
+	{
+		this.ef[i].init(RAND(1024), RAND(768));
+	}
+	this.initParts();
+}
+
+void FullScreenDeadEffect::update()
+{
+}
+
+void FullScreenDeadEffect::showOverlay(DG_GeneralCallback onFinish)
+{
+	array@PartsMotion m[2];
+	m[0].setTime(2500);
+	m[0].setAlpha(0, 255, 0);
+	m[1].setTime(1000);
+	this.setPartsShow();
+	this.parts_[1].setShow(false);
+	this.parent_.runMotionArray(m, onFinish);
+}
+
+void FullScreenDeadEffect::initParts()
+{
+	this.parts_[0].initAsPlaneImage(1024, 768, 255, 255, 255, 255);
+	this.parts_[1].initAsPlaneImage(1024, 768, 0, 0, 0, 255);
+	createPartsGroup(this.parent_, this.parts_, 30000);
+	this.setPartsPos();
+}
+
+void FullScreenDeadEffect::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void FullScreenDeadEffect::setPartsPos()
+{
+}
+
+void FullScreenDeadEffect::run(DG_GeneralCallback onFinish)
+{
+	this.onFinish_ = onFinish;
+	int i;
+	for (i = 0; i < this.ef.Numof(); ++i)
+	{
+		this.ef[i].run(i * 100);
+	}
+	this.showOverlay(this.onFinishFlashIn);
+}
+
+void FullScreenDeadEffect::onFinishFlashIn()
+{
+	int i;
+	for (i = 0; i < this.ef.Numof(); ++i)
+	{
+		this.ef[i].stopLoop();
+	}
+	PartsMotion m;
+	m = getStandardMotion(0);
+	m.setTime(2500);
+	this.parts_[1].setShow(true);
+	this.parts_[1].runMotion(m, this.onFinishFadeOut);
+}
+
+void FullScreenDeadEffect::onFinishFadeOut()
+{
+	this.isFinish_ = true;
+	this.onFinish_();
+}
+
+bool FullScreenDeadEffect::isFinish()
+{
+	return this.isFinish_;
+}
+

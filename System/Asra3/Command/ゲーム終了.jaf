@@ -1,0 +1,45 @@
+void ゲーム終了()
+{
+	if (AFL_Config_GetCloseGameConfirm())
+	{
+		if (!system.MsgBoxOkCancel("ゲームを終了しますか？\n\n※セーブされていないデータは失われます"))
+		{
+			SYS_WaitToKeyUpFromMessageBox();
+			return;
+		}
+	}
+	system.Exit(0);
+	for (; ; )
+	{
+		system.Peek();
+	}
+}
+
+void タイトルに戻る()
+{
+	if (AFL_Config_GetBackToTitleConfirm())
+	{
+		if (!system.MsgBoxOkCancel("タイトル画面に戻りますか？\n\n※セーブされていないデータは失われます"))
+		{
+			SYS_WaitToKeyUpFromMessageBox();
+			return;
+		}
+	}
+	Ａ＿タイトルに戻る＿確認なし();
+}
+
+void Ａ＿タイトルに戻る＿確認なし()
+{
+	SYS_コンフィグセーブ();
+	system.Reset();
+	for (; ; )
+	{
+		system.Peek();
+	}
+}
+
+bool 再起動後確認()
+{
+	return SystemService.IsResetOnce();
+}
+

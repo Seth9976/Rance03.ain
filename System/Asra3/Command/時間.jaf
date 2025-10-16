@@ -1,0 +1,44 @@
+void W(int 時間)
+{
+	AFL_View_Update(true);
+	if (時間 < 1)
+	{
+		return;
+	}
+	CASClick LButtonClick;
+	CASClick ReturnKeyClick;
+	CASClick DownKeyClick;
+	LButtonClick.Init(1, !SYS_IsClickModeCancel());
+	ReturnKeyClick.Init(13, !SYS_IsClickModeCancel());
+	DownKeyClick.Init(40, !SYS_IsClickModeCancel());
+	CASJoyClickAssignedKey JoyOkClick;
+	JoyOkClick.Init(4, true);
+	int t = system.GetTime();
+	while (system.GetTime() - t < 時間)
+	{
+		if (SYS_ホイールフォア即確認())
+		{
+			SYS_バックログオープン通知();
+			break;
+		}
+		if (SYS_ホイールバック確認())
+		{
+			break;
+		}
+		if (SYS_全文スキップ中確認())
+		{
+			break;
+		}
+		if (SYS_スキップ中確認())
+		{
+			break;
+		}
+		if (LButtonClick.IsClick(-2147483648) || ReturnKeyClick.IsClick(-2147483648) || DownKeyClick.IsClick(-2147483648) || JoyOkClick.IsClick(-2147483648))
+		{
+			SYS_ReleaseModeByClickCancel();
+			break;
+		}
+		AFL_View_Update(true);
+	}
+}
+

@@ -1,0 +1,61 @@
+MapBranch::MapBranch()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void MapBranch::init(ref MapChainInfo info, int parentPartsNumber)
+{
+	this.parentPartsNumber_ = parentPartsNumber;
+	this.info_ = info;
+	this.isShown_ = !this.info_.isNew;
+	this.initParts();
+}
+
+void MapBranch::initParts()
+{
+	this.branch_.init(this.parentPartsNumber_);
+	int x1;
+	int y1;
+	int x2;
+	int y2;
+	x1 = getMapPlaceFromId(this.info_.pId1).getX();
+	y1 = getMapPlaceFromId(this.info_.pId1).getY();
+	x2 = getMapPlaceFromId(this.info_.pId2).getX();
+	y2 = getMapPlaceFromId(this.info_.pId2).getY();
+	this.branch_.setPos(x1, y1, x2, y2);
+	this.branch_.setShow(!this.info_.isNew);
+}
+
+void MapBranch::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void MapBranch::fadeIn(bool val)
+{
+	this.branch_.fadeIn(val, NULL);
+}
+
+void MapBranch::update()
+{
+}
+
+void MapBranch::showNewBranch(DG_GeneralCallback onFinishCallback)
+{
+	g_sysSound.play(6, "効果音／新しいブランチ");
+	this.branch_.fadeIn(true, onFinishCallback);
+}
+
+void MapBranch::getCenter(ref int x, ref int y)
+{
+	ref MapPlace mp1 = getMapPlaceFromId(this.info_.pId1);
+	ref MapPlace mp2 = getMapPlaceFromId(this.info_.pId2);
+	x = (mp1.getX() + mp2.getX()) / 2;
+	y = (mp1.getY() + mp2.getY()) / 2;
+}
+

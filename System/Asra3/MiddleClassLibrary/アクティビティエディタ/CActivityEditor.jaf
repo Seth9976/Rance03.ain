@@ -1,0 +1,427 @@
+CActivityEditor::CActivityEditor()
+{
+}
+
+CActivityEditor::~CActivityEditor()
+{
+}
+
+bool CActivityEditor::CreateBGRect()
+{
+	PARTS_ReleaseWithInit(this.m_BGRect);
+	this.m_BGRect = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿Ｚ座標設定(this.m_BGRect, 0);
+	Ｐ＿クリック可能設定(this.m_BGRect, true);
+	AFL_Parts_AddMouseLClickEvent(this.m_BGRect, this.MouseClickEvent);
+	return true;
+}
+
+bool CActivityEditor::CreateToolForm()
+{
+	this.m_PanelList.Create();
+	this.m_PanelList.SetLayoutType(1);
+	if (!this.CreateProjectForm())
+	{
+		return false;
+	}
+	if (!this.CreateComponentListForm())
+	{
+		return false;
+	}
+	if (!this.CreateInstanceItemList())
+	{
+		return false;
+	}
+	if (!this.CreateInstanceTreeForm())
+	{
+		return false;
+	}
+	if (!this.CreatePropertyForm())
+	{
+		return false;
+	}
+	this.LoadPanelSetting();
+	this.m_PanelList.AddUpdateLayoutEvent(this.OnUpdatePanelLayout);
+	return true;
+}
+
+bool CActivityEditor::CreateProjectForm()
+{
+	int Number = this.m_ProjectForm.Create();
+	if (Number == 0)
+	{
+		return false;
+	}
+	this.m_PanelList.ResetPanel("プロジェクト", Number);
+	this.m_PanelList.SetPanelSize(Number, 420, 120);
+	this.m_ProjectForm.SetCreateClick(this.MouseProjectCreateClickEvent);
+	this.m_ProjectForm.SetLoadClick(this.MouseProjectLoadClickEvent);
+	this.m_ProjectForm.SetSaveClick(this.MouseProjectSaveClickEvent);
+	this.m_ProjectForm.SetSaveAsClick(this.MouseProjectSaveAsClickEvent);
+	this.m_ProjectForm.SetRunClick(this.MouseProjectRunClickEvent);
+	this.m_ProjectForm.SetResetPosClick(this.MouseProjectResetPosClickEvent);
+	this.m_ProjectForm.CreateProject("");
+	return true;
+}
+
+bool CActivityEditor::CreateComponentListForm()
+{
+	int Number = this.m_ComponentListForm.Create();
+	if (Number == 0)
+	{
+		return false;
+	}
+	this.m_PanelList.ResetPanel("コンポーネントリスト", Number);
+	this.m_PanelList.SetPanelSize(Number, 420, 150);
+	this.m_ComponentListForm.AddAddComponentEvent(this.m_InstanceTreeForm.Add);
+	return true;
+}
+
+bool CActivityEditor::CreateInstanceItemList()
+{
+	this.m_InstanceItemList.Create(this.m_InstanceLayerID);
+	this.m_InstanceItemList.AddSelectEvent(this.m_PropertyForm.SetComponent);
+	return true;
+}
+
+bool CActivityEditor::CreateInstanceTreeForm()
+{
+	int Number = this.m_InstanceTreeForm.Create(this.m_InstanceItemList);
+	if (Number == 0)
+	{
+		SYS_ERROR("インスタンスツリーの初期化に失敗しました", 0);
+		return false;
+	}
+	this.m_PanelList.ResetPanel("インスタンスツリー", Number);
+	this.m_PanelList.SetPanelSize(Number, 420, 320);
+	return true;
+}
+
+bool CActivityEditor::CreatePropertyForm()
+{
+	int Number = this.m_PropertyForm.Create();
+	if (Number == 0)
+	{
+		return false;
+	}
+	this.m_PanelList.ResetPanel("プロパティ", Number);
+	this.m_PanelList.SetPanelSize(Number, 420, 350);
+	this.m_PropertyForm.SetInstanceTree(this.m_InstanceItemList);
+	return true;
+}
+
+void CActivityEditor::MouseClickEvent(int ID, int MouseX, int MouseY)
+{
+	this.m_InstanceItemList.Passive();
+}
+
+void CActivityEditor::MouseProjectCreateClickEvent(int ID, int MouseX, int MouseY)
+{
+	if (!DIALOG_OKCANCEL("現在作成中のデータを破棄しますか？"))
+	{
+		return;
+	}
+	this.m_InstanceTreeForm.ReleaseAllInstance();
+	this.m_ProjectForm.CreateProject("");
+}
+
+void CActivityEditor::MouseProjectLoadClickEvent(int ID, int MouseX, int MouseY)
+{
+	if (!DIALOG_OKCANCEL("現在作成中のデータを破棄して\n新しいデータを読み込みますか？"))
+	{
+		return;
+	}
+	string SelectActivityPath;
+	if (!SYS_Activity_SelectFile(SelectActivityPath))
+	{
+		return;
+	}
+	this.Load(SelectActivityPath);
+}
+
+void CActivityEditor::Load(string ActivityName)
+{
+	CActivityData ActivityData;
+	if (!ActivityData.Load(ActivityName, this.m_InstanceLayerID))
+	{
+		return;
+	}
+	if (!this.m_InstanceTreeForm.LoadActivity(ActivityData))
+	{
+		return;
+	}
+	if (!this.m_ProjectForm.LoadActivity(ActivityData))
+	{
+		return;
+	}
+	this.m_ProjectForm.SetProjectName(ActivityName);
+}
+
+void CActivityEditor::MouseProjectSaveClickEvent(int ID, int MouseX, int MouseY)
+{
+	if (this.m_ProjectForm.GetProjectName().Empty())
+	{
+		this.MouseProjectSaveAsClickEvent(ID, MouseX, MouseY);
+		return;
+	}
+	if (!this.OutputActivity(this.m_ProjectForm.GetProjectName()))
+	{
+		DIALOG_OK("データの書き出しに失敗しました");
+		return;
+	}
+}
+
+void CActivityEditor::MouseProjectSaveAsClickEvent(int ID, int MouseX, int MouseY)
+{
+	string FileName = this.m_ProjectForm.GetProjectName();
+	if (!SYS_Activity_SaveFile(FileName))
+	{
+		return;
+	}
+	if (!this.OutputActivity(FileName))
+	{
+		DIALOG_OK("データの書き出しに失敗しました");
+		return;
+	}
+	this.m_ProjectForm.SetProjectName(FileName);
+}
+
+void CActivityEditor::MouseProjectRunClickEvent(int ID, int MouseX, int MouseY)
+{
+	this.RunActivity();
+}
+
+void CActivityEditor::MouseProjectResetPosClickEvent(int ID, int MouseX, int MouseY)
+{
+	this.m_InstanceItemList.SetPosForRoot(0, 0);
+}
+
+void CActivityEditor::MouseMoveEvent(int Number, int MouseX, int MouseY)
+{
+	if (this.m_DownMButton && this.m_EditMode)
+	{
+		int DiffX = MouseX - this.m_StartMousePosX;
+		int DiffY = MouseY - this.m_StartMousePosY;
+		this.m_InstanceItemList.SetPosForRoot(this.m_StartRootPosX + DiffX, this.m_StartRootPosY + DiffY);
+	}
+}
+
+void CActivityEditor::KeyTriggerEvent(int Number, int KeyCode)
+{
+	if (KeyCode == 4 && this.m_EditMode)
+	{
+		this.m_DownMButton = true;
+		this.m_StartRootPosX = this.m_InstanceItemList.GetPosXByRoot();
+		this.m_StartRootPosY = this.m_InstanceItemList.GetPosYByRoot();
+		this.m_StartMousePosX = 0;
+		this.m_StartMousePosY = 0;
+		AFL_Mouse_GetPos(this.m_StartMousePosX, this.m_StartMousePosY);
+	}
+}
+
+void CActivityEditor::KeyUpEvent(int Number, int KeyCode)
+{
+	if (KeyCode == 4 && this.m_EditMode)
+	{
+		this.m_DownMButton = false;
+		this.m_StartRootPosX = 0;
+		this.m_StartRootPosY = 0;
+		this.m_StartMousePosX = 0;
+		this.m_StartMousePosY = 0;
+	}
+}
+
+bool CActivityEditor::OutputActivity(string ActivityName)
+{
+	int PrevPosX = this.m_InstanceItemList.GetPosXByRoot();
+	int PrevPosY = this.m_InstanceItemList.GetPosYByRoot();
+	this.m_InstanceItemList.SetPosForRoot(0, 0);
+	CActivityData ActivityData;
+	if (!ActivityData.Create(ActivityName))
+	{
+		this.m_InstanceItemList.SetPosForRoot(PrevPosX, PrevPosY);
+		return false;
+	}
+	if (!this.m_InstanceTreeForm.SaveActivity(ActivityData))
+	{
+		this.m_InstanceItemList.SetPosForRoot(PrevPosX, PrevPosY);
+		return false;
+	}
+	if (!this.m_ProjectForm.SaveActivity(ActivityData))
+	{
+		this.m_InstanceItemList.SetPosForRoot(PrevPosX, PrevPosY);
+		return false;
+	}
+	if (!ActivityData.CloseWithWrite())
+	{
+		this.m_InstanceItemList.SetPosForRoot(PrevPosX, PrevPosY);
+		return false;
+	}
+	this.m_InstanceItemList.SetPosForRoot(PrevPosX, PrevPosY);
+	return true;
+}
+
+bool CActivityEditor::SaveEXText(ref string Data)
+{
+	CActivityData ActivityData;
+	if (!ActivityData.Create("仮実行"))
+	{
+		return false;
+	}
+	if (!this.m_InstanceTreeForm.SaveActivity(ActivityData))
+	{
+		return false;
+	}
+	if (!this.m_ProjectForm.SaveActivity(ActivityData))
+	{
+		return false;
+	}
+	Data = "";
+	if (!ActivityData.SaveEXText(Data))
+	{
+		return false;
+	}
+	return true;
+}
+
+void CActivityEditor::SetEditMode(bool EditMode)
+{
+	if (this.m_EditMode == EditMode)
+	{
+		return;
+	}
+	this.m_EditMode = EditMode;
+	AFL_Parts_SetActiveLayer(this.m_UILayerID);
+	this.m_InstanceItemList.EditMode(this.m_EditMode);
+	this.m_PanelList.SetShow(this.m_EditMode);
+	Ｐ＿フォーカス設定(this.m_BGRect);
+	Ｐ＿表示設定(this.m_UILayerID, EditMode);
+	if (!this.m_EditMode)
+	{
+		AFL_Parts_SetActiveLayer(this.m_InstanceLayerID);
+	}
+}
+
+void CActivityEditor::SwitchEditMode()
+{
+	this.SetEditMode(!this.m_EditMode);
+}
+
+void CActivityEditor::OnBeginUpdate(int PassedTime)
+{
+	int Width = AFL_View_GetWidth();
+	int Height = AFL_View_GetHeight();
+	Ｐ＿矩形判定設定(this.m_BGRect, 0, 0, Width, Height);
+	if (this.m_PanelList.GetHeight() != Height)
+	{
+		this.m_PanelList.SetSize(0, Height);
+	}
+	this.m_PanelList.SetPos(Width - this.m_PanelList.GetWidth(), 0.0);
+}
+
+void CActivityEditor::OnUpdatePanelLayout()
+{
+	this.SavePanelSetting();
+}
+
+void CActivityEditor::SavePanelSetting()
+{
+	FileOperation.CreateFolder(SYS_GetDirectoryName(this.EX_PANELLAYOUT_FILEPATH));
+	if (!AFL_TextFileWriter_Create(this.EX_PANELLAYOUT_FILEPATH))
+	{
+		return;
+	}
+	AFL_TextFileWriter_Write(this.m_PanelList.GetEXString("パネルレイアウト"));
+	AFL_TextFileWriter_Close();
+}
+
+void CActivityEditor::LoadPanelSetting()
+{
+	this.m_PanelList.Restore("パネルレイアウト");
+}
+
+void CActivityEditor::Run(string ActivityName)
+{
+	this.EX_PANELLAYOUT_FILEPATH = SYS_AddPunct(system.GetSaveFolderName()) + "..\\ActivityEditor\\設定.txtex";
+	EX_AddEXFile(this.EX_PANELLAYOUT_FILEPATH);
+	this.m_InstanceLayerID = AFL_Parts_AddLayer(-1);
+	this.m_UILayerID = AFL_Parts_AddLayer(-1);
+	AFL_Parts_AddWholeMouseMoveEvent(this.MouseMoveEvent);
+	AFL_Parts_AddWholeKeyTriggerEvent(this.KeyTriggerEvent);
+	AFL_Parts_AddWholeKeyUpEvent(this.KeyUpEvent);
+	CASClick F4KeyClick;
+	F4KeyClick.Init(115, true);
+	CASClick F5KeyClick;
+	F5KeyClick.Init(116, true);
+	CASClick F1KeyClick;
+	F1KeyClick.Init(112, true);
+	CASClick ConfigKey;
+	ConfigKey.Init(27, true);
+	if (!this.CreateBGRect())
+	{
+		return;
+	}
+	if (!this.CreateToolForm())
+	{
+		return;
+	}
+	this.SetEditMode(true);
+	if (!ActivityName.Empty())
+	{
+		this.Load(ActivityName);
+	}
+	this.m_DownMButton = false;
+	PARTS_BeginInput();
+	for (; ; )
+	{
+		this.OnBeginUpdate(0);
+		AFL_View_Update(true);
+		if (ConfigKey.IsClick(-2147483648))
+		{
+			Ｓ＿コンフィグ();
+		}
+		if (F1KeyClick.IsClick(-2147483648))
+		{
+			this.SwitchEditMode();
+		}
+		if (this.m_EditMode && F5KeyClick.IsClick(-2147483648))
+		{
+			this.RunActivity();
+		}
+		if (F4KeyClick.IsClick(-2147483648) || this.m_ProjectForm.IsEnd())
+		{
+			if (DIALOG_OKCANCEL("終了しますか？"))
+			{
+				break;
+			}
+			this.m_ProjectForm.End(false);
+		}
+	}
+	PARTS_EndInput();
+	PARTS_ReleaseWithInit(this.m_BGRect);
+	AFL_Parts_EraseWholeMouseMoveEvent(this.MouseMoveEvent);
+	AFL_Parts_EraseWholeKeyTriggerEvent(this.KeyTriggerEvent);
+	AFL_Parts_EraseWholeKeyUpEvent(this.KeyUpEvent);
+	AFL_Parts_EraseLayer(-1);
+	AFL_Parts_EraseLayer(-1);
+}
+
+void CActivityEditor::RunActivity()
+{
+	bool PrevEndTypeClickEscape = this.m_ProjectForm.IsEndTypeClickEscape();
+	this.m_ProjectForm.SetEndTypeClickEscape(true);
+	this.SetEditMode(false);
+	string ActivityData;
+	if (!this.SaveEXText(ActivityData))
+	{
+		DIALOG_OK("アクティビティデータの作成に失敗しました。\n実行を中止します。");
+		this.SetEditMode(true);
+		return;
+	}
+	this.m_InstanceItemList.SetShow(false);
+	SYS_Activity_RunEXText(ActivityData, NULL, NULL, NULL);
+	this.SetEditMode(true);
+	this.m_InstanceItemList.SetShow(true);
+	this.m_ProjectForm.SetEndTypeClickEscape(PrevEndTypeClickEscape);
+}
+

@@ -1,0 +1,28 @@
+void BadCondition::init(string id, string name, string imageName, string desc)
+{
+	this.id_ = id;
+	this.name_ = name;
+	this.imageName_ = imageName;
+	this.desc_ = desc;
+}
+
+string BadCondition::getId()
+{
+	return this.id_;
+}
+
+string BadCondition::getName()
+{
+	return this.name_;
+}
+
+string BadCondition::getImageName()
+{
+	return this.imageName_;
+}
+
+string BadCondition::getDesc()
+{
+	return this.desc_;
+}
+

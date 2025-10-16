@@ -1,0 +1,557 @@
+CAEInstanceItemList::CAEInstanceItemList()
+{
+}
+
+CAEInstanceItemList::~CAEInstanceItemList()
+{
+	this.Release();
+}
+
+void CAEInstanceItemList::Create(int InstanceLayerID)
+{
+	this.Release();
+	this.m_InstanceLayerID = InstanceLayerID;
+	this.RecreateRootParts();
+	this.m_Overlay1 = PARTS_GetFreeSystemPartsNumber();
+	this.m_Overlay2 = PARTS_GetFreeSystemPartsNumber();
+	this.m_Overlay3 = PARTS_GetFreeSystemPartsNumber();
+	this.m_Overlay4 = PARTS_GetFreeSystemPartsNumber();
+}
+
+void CAEInstanceItemList::Release()
+{
+	this.m_InstanceLayerID = 0;
+	this.m_ActiveItem <- NULL;
+	this.m_PrevActiveItem <- NULL;
+	this.m_List.Free();
+	this.m_CopyData = "";
+	this.m_CopyName = "";
+	PARTS_ReleaseWithInit(this.m_Overlay4);
+	PARTS_ReleaseWithInit(this.m_Overlay3);
+	PARTS_ReleaseWithInit(this.m_Overlay2);
+	PARTS_ReleaseWithInit(this.m_Overlay1);
+}
+
+void CAEInstanceItemList::ReleaseAllInstance()
+{
+	this.Passive();
+	this.m_ActiveItem <- NULL;
+	this.m_PrevActiveItem <- NULL;
+	this.m_List.Free();
+	this.RecreateRootParts();
+}
+
+void CAEInstanceItemList::RecreateRootParts()
+{
+	PARTS_ReleaseWithInit(this.m_RootParts);
+	int PrevActiveID = AFL_Parts_SetActiveLayer(this.m_InstanceLayerID);
+	this.m_RootParts = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿座標設定(this.m_RootParts, 0.0, 0.0);
+	Ｐ＿レイアウトボックス＿レイアウトタイプ設定(this.m_RootParts, 0);
+	AFL_Parts_SetActiveLayer(PrevActiveID);
+}
+
+void CAEInstanceItemList::EditMode(bool Mode)
+{
+	int Index;
+	for (Index = 0; Index < this.m_List.Numof(); ++Index)
+	{
+		this.m_List[Index].EditMode(Mode);
+	}
+	Ｐ＿表示設定(this.m_Overlay1, Mode);
+	Ｐ＿表示設定(this.m_Overlay2, Mode);
+	Ｐ＿表示設定(this.m_Overlay3, Mode);
+	Ｐ＿表示設定(this.m_Overlay4, Mode);
+}
+
+void CAEInstanceItemList::SetShow(bool Show)
+{
+	Ｐ＿表示設定(this.m_RootParts, Show);
+}
+
+int CAEInstanceItemList::Numof()
+{
+	int Count;
+	int Index;
+	for (Index = 0; Index < this.m_List.Numof(); ++Index)
+	{
+		if (!this.m_List[Index].IsCreated())
+		{
+			continue;
+		}
+		++Count;
+	}
+	return Count;
+}
+
+void CAEInstanceItemList::Active(int Number)
+{
+	ref CAEInstanceItem Item = this.FindInstanceByNumber(Number);
+	if (Item === NULL)
+	{
+		return;
+	}
+	Item.Active(true);
+}
+
+ref CAEInstanceItem CAEInstanceItemList::GetActive()
+{
+	return this.m_ActiveItem;
+}
+
+void CAEInstanceItemList::Passive()
+{
+	this.SelectInstance(NULL);
+}
+
+ref CAEInstanceItem CAEInstanceItemList::AddInstance(int GUIType)
+{
+	int FreeIndex;
+	for (FreeIndex = 0; FreeIndex < this.m_List.Numof(); ++FreeIndex)
+	{
+		if (!this.m_List[FreeIndex].IsCreated())
+		{
+			break;
+		}
+	}
+	if (FreeIndex == this.m_List.Numof())
+	{
+		this.m_List.Realloc(this.m_List.Numof() + 1);
+	}
+	string BasePartsName = this.GetComponentName(GUIType);
+	string Name = BasePartsName + "_000";
+	int Index;
+	for (Index = 1; this.IsExist(Name); ++Index)
+	{
+		Name = "%s_%03d" % BasePartsName % Index;
+	}
+	this.m_List[FreeIndex].Init(GUIType, this.m_InstanceLayerID, Name, this.m_Overlay1, this.m_Overlay2, this.m_Overlay3, this.m_Overlay4);
+	this.m_List[FreeIndex].AddSelectEvent(this.SelectInstance);
+	return this.m_List[FreeIndex];
+}
+
+string CAEInstanceItemList::GetComponentName(int ComponentType)
+{
+	return PARTS_GetComponentTypeName(ComponentType);
+}
+
+bool CAEInstanceItemList::IsExist(string Name)
+{
+	int Index;
+	for (Index = 0; Index < this.m_List.Numof(); ++Index)
+	{
+		if (this.m_List[Index].GetName() == Name)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+int CAEInstanceItemList::GetRootParts()
+{
+	return this.m_RootParts;
+}
+
+bool CAEInstanceItemList::IsRootParts(int Parts)
+{
+	return this.m_RootParts == Parts;
+}
+
+void CAEInstanceItemList::SetPosForRoot(int PosX, int PosY)
+{
+	if (this.m_RootParts == 0)
+	{
+		return;
+	}
+	Ｐ＿座標設定(this.m_RootParts, PosX, PosY);
+}
+
+int CAEInstanceItemList::GetPosXByRoot()
+{
+	if (this.m_RootParts == 0)
+	{
+		return 0;
+	}
+	return Ｐ＿Ｘ座標取得(this.m_RootParts);
+}
+
+int CAEInstanceItemList::GetPosYByRoot()
+{
+	if (this.m_RootParts == 0)
+	{
+		return 0;
+	}
+	return Ｐ＿Ｙ座標取得(this.m_RootParts);
+}
+
+ref CAEInstanceItem CAEInstanceItemList::FindInstanceByNumber(int Number)
+{
+	int Index;
+	for (Index = 0; Index < this.m_List.Numof(); ++Index)
+	{
+		if (this.m_List[Index].GetID() == Number)
+		{
+			return this.m_List[Index];
+		}
+	}
+	return NULL;
+}
+
+ref CAEInstanceItem CAEInstanceItemList::FindInstanceByName(string Name)
+{
+	int Index;
+	for (Index = 0; Index < this.m_List.Numof(); ++Index)
+	{
+		if (this.m_List[Index].GetName() == Name)
+		{
+			return this.m_List[Index];
+		}
+	}
+	return NULL;
+}
+
+void CAEInstanceItemList::GetNameList(ref array@string List, int WithoutNumber)
+{
+	List.Free();
+	int Index;
+	for (Index = 0; Index < this.m_List.Numof(); ++Index)
+	{
+		if (WithoutNumber == this.m_List[Index].GetID())
+		{
+			continue;
+		}
+		List.PushBack(this.m_List[Index].GetName());
+	}
+}
+
+void CAEInstanceItemList::GetAlphaClipperNameList(ref array@string List, int WithoutNumber)
+{
+	List.Free();
+	int Index;
+	for (Index = 0; Index < this.m_List.Numof(); ++Index)
+	{
+		if (WithoutNumber == this.m_List[Index].GetID())
+		{
+			continue;
+		}
+		int Type = this.m_List[Index].GetType(1);
+		if (Type != 11 && Type != 18)
+		{
+			continue;
+		}
+		List.PushBack(this.m_List[Index].GetName());
+	}
+}
+
+void CAEInstanceItemList::GetOnCursorShowLinkNameList(ref array@string List, int WithoutNumber)
+{
+	this.GetNameList(List, WithoutNumber);
+}
+
+void CAEInstanceItemList::GetPartsNameList(ref array@string List, int PartsType, int WithoutNumber)
+{
+	List.Free();
+	this.AddPartsNameList(List, PartsType, WithoutNumber);
+}
+
+void CAEInstanceItemList::AddPartsNameList(ref array@string List, int PartsType, int WithoutNumber)
+{
+	int Index;
+	for (Index = 0; Index < this.m_List.Numof(); ++Index)
+	{
+		if (WithoutNumber == this.m_List[Index].GetID())
+		{
+			continue;
+		}
+		int Type = this.m_List[Index].GetType(1);
+		if (Type != PartsType)
+		{
+			continue;
+		}
+		List.PushBack(this.m_List[Index].GetName());
+	}
+}
+
+string CAEInstanceItemList::GetName(int Number)
+{
+	ref CAEInstanceItem Item = this.FindInstanceByNumber(Number);
+	if (Item === NULL)
+	{
+		return "";
+	}
+	return Item.GetName();
+}
+
+int CAEInstanceItemList::GetNumber(string Name)
+{
+	ref CAEInstanceItem Item = this.FindInstanceByName(Name);
+	if (Item === NULL)
+	{
+		return 0;
+	}
+	return Item.GetID();
+}
+
+void CAEInstanceItemList::SelectInstance(ref CAEInstanceItem Item)
+{
+	if (this.m_ActiveItem !== Item)
+	{
+		if (this.m_ActiveItem !== NULL)
+		{
+			this.m_ActiveItem.Active(false);
+		}
+		this.m_ActiveItem <- Item;
+	}
+	Ｐ＿表示設定(this.m_Overlay1, this.m_ActiveItem !== NULL);
+	Ｐ＿表示設定(this.m_Overlay2, this.m_ActiveItem !== NULL);
+	Ｐ＿表示設定(this.m_Overlay3, this.m_ActiveItem !== NULL);
+	Ｐ＿表示設定(this.m_Overlay4, this.m_ActiveItem !== NULL);
+	this.m_dgSelectEvent(Item);
+}
+
+void CAEInstanceItemList::AddSelectEvent(DG_InstanceItem_SelectHandler DelegateObject)
+{
+	this.m_dgSelectEvent += DelegateObject;
+}
+
+void CAEInstanceItemList::EraseSelectEvent(DG_InstanceItem_SelectHandler DelegateObject)
+{
+	this.m_dgSelectEvent -= DelegateObject;
+}
+
+bool CAEInstanceItemList::CreateAllPartsActivity(string Name)
+{
+	if (!SYS_Activity_AddParts(Name, "ルートパーツ", this.m_RootParts))
+	{
+		DIALOG_OK("アクティビティエディタルートパーツの保存に失敗しました\n");
+	}
+	int Index;
+	for (Index = 0; Index < this.m_List.Numof(); ++Index)
+	{
+		if (!this.CreatePartsActivity(Name, this.m_List[Index]))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+bool CAEInstanceItemList::CreatePartsActivityWithChild(string Name, ref CAEInstanceItem Item)
+{
+	if (!this.CreatePartsActivity(Name, Item))
+	{
+		return false;
+	}
+	int NumofChild = Ｐ＿子数取得(Item.GetID());
+	int Index;
+	for (Index = 0; Index < NumofChild; ++Index)
+	{
+		int Child = Ｐ＿子取得(Item.GetID(), Index);
+		if (!this.CreatePartsActivityWithChild(Name, this.FindInstanceByNumber(Child)))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+bool CAEInstanceItemList::CreatePartsActivity(string Name, ref CAEInstanceItem Item)
+{
+	if (!Item.IsCreated())
+	{
+		return true;
+	}
+	if (!SYS_Activity_AddParts(Name, Item.GetName(), Item.GetID()))
+	{
+		DIALOG_OK("パーツの保存に失敗しました【%s】\n" % Item.GetName());
+		return false;
+	}
+	if (!Item.IsOpen())
+	{
+		SYS_Activity_AddClosePartsName(Name, Item.GetName());
+	}
+	if (Item.IsExistIntentData())
+	{
+		array@string DestinationList;
+		Item.GetDestination(DestinationList);
+		SYS_Activity_SetIntentDataList(Name, Item.GetName(), DestinationList, Item.GetIntentType());
+	}
+	return true;
+}
+
+bool CAEInstanceItemList::LoadPartsActivity(string Name)
+{
+	int NumofParts = SYS_Activity_NumofParts(Name);
+	int Index;
+	for (Index = 0; Index < NumofParts; ++Index)
+	{
+		string BasePartsName;
+		int PartsNumber;
+		if (!SYS_Activity_GetParts(Index, Name, BasePartsName, PartsNumber))
+		{
+			DIALOG_OK("パーツの取得に失敗しました【%s】\n" % Name);
+			return false;
+		}
+		if (BasePartsName == "ルートパーツ")
+		{
+			this.m_RootParts = PartsNumber;
+			continue;
+		}
+		string PartsName = BasePartsName;
+		int Index;
+		for (Index = 0; this.IsExist(PartsName); ++Index)
+		{
+			PartsName = "%s:%d" % BasePartsName % Index;
+		}
+		int FreeIndex;
+		for (FreeIndex = 0; FreeIndex < this.m_List.Numof(); ++FreeIndex)
+		{
+			if (!this.m_List[FreeIndex].IsCreated())
+			{
+				break;
+			}
+		}
+		if (FreeIndex == this.m_List.Numof())
+		{
+			this.m_List.Realloc(this.m_List.Numof() + 1);
+		}
+		ref CAEInstanceItem Item = this.m_List[FreeIndex];
+		Item.Set(PartsNumber, PartsName, this.m_InstanceLayerID, this.m_Overlay1, this.m_Overlay2, this.m_Overlay3, this.m_Overlay4);
+		Item.AddSelectEvent(this.SelectInstance);
+		Item.SetOpen(!SYS_Activity_IsExistClosePartsName(Name, BasePartsName));
+		if (SYS_Activity_IsExistIntentData(Name, BasePartsName))
+		{
+			array@string List;
+			SYS_Activity_GetIntentDataDestination(Name, BasePartsName, List);
+			Item.SetDestinationList(List);
+			Item.SetIntentType(SYS_Activity_GetIntentDataType(Name, BasePartsName));
+		}
+	}
+	return true;
+}
+
+bool CAEInstanceItemList::SaveActivity(ref CActivityData ActivityData)
+{
+	if (ActivityData === NULL)
+	{
+		return false;
+	}
+	if (!ActivityData.IsHoldActivity())
+	{
+		return false;
+	}
+	if (!this.CreateAllPartsActivity(ActivityData.GetActivityName()))
+	{
+		DIALOG_OK("パーツ登録失敗\n");
+		return false;
+	}
+	return true;
+}
+
+bool CAEInstanceItemList::LoadActivity(ref CActivityData ActivityData)
+{
+	if (ActivityData === NULL)
+	{
+		return false;
+	}
+	if (!ActivityData.IsHoldActivity())
+	{
+		return false;
+	}
+	this.ReleaseAllInstance();
+	this.LoadPartsActivity(ActivityData.GetActivityName());
+	return true;
+}
+
+bool CAEInstanceItemList::CopyActiveParts()
+{
+	if (this.m_ActiveItem === NULL)
+	{
+		return true;
+	}
+	CActivityData ActivityData;
+	if (!ActivityData.Create("コピーデータ"))
+	{
+		DIALOG_OK("アクティビティ作成失敗\n");
+		return false;
+	}
+	if (!this.CreatePartsActivityWithChild(ActivityData.GetActivityName(), this.m_ActiveItem))
+	{
+		DIALOG_OK("パーツ登録失敗\n");
+		return false;
+	}
+	this.m_CopyData = "";
+	if (!ActivityData.SaveEXText(this.m_CopyData))
+	{
+		DIALOG_OK("コピーデータ作成失敗\n");
+	}
+	this.m_CopyName = this.m_ActiveItem.GetName();
+	return true;
+}
+
+bool CAEInstanceItemList::SingleCopyActiveParts()
+{
+	if (this.m_ActiveItem === NULL)
+	{
+		return true;
+	}
+	CActivityData ActivityData;
+	if (!ActivityData.Create("コピーデータ"))
+	{
+		DIALOG_OK("アクティビティ作成失敗\n");
+		return false;
+	}
+	if (!this.CreatePartsActivity(ActivityData.GetActivityName(), this.m_ActiveItem))
+	{
+		DIALOG_OK("パーツ登録失敗\n");
+		return false;
+	}
+	this.m_CopyData = "";
+	if (!ActivityData.SaveEXText(this.m_CopyData))
+	{
+		DIALOG_OK("コピーデータ作成失敗\n");
+	}
+	this.m_CopyName = this.m_ActiveItem.GetName();
+	return true;
+}
+
+bool CAEInstanceItemList::PasteActiveParts()
+{
+	if (this.m_CopyData.Empty() || this.m_CopyName.Empty())
+	{
+		return true;
+	}
+	CActivityData ActivityData;
+	if (!ActivityData.LoadEXText("コピーデータ", this.m_CopyData, this.m_InstanceLayerID))
+	{
+		DIALOG_OK("アクティビティ作成失敗\n");
+		return false;
+	}
+	int AddNumber = SYS_Activity_GetPartsNumber(ActivityData.GetActivityName(), this.m_CopyName);
+	int MyParent = this.m_RootParts;
+	int MyIndex = Ｐ＿子数取得(this.m_RootParts);
+	if (this.m_ActiveItem !== NULL)
+	{
+		MyParent = Ｐ＿親設定取得(this.m_ActiveItem.GetID());
+		MyIndex = Ｐ＿子インデックス取得(MyParent, this.m_ActiveItem.GetID());
+	}
+	Ｐ＿子挿入(MyParent, MyIndex + 1, AddNumber);
+	this.LoadPartsActivity(ActivityData.GetActivityName());
+	return true;
+}
+
+bool CAEInstanceItemList::IsExistCopyData()
+{
+	return !this.m_CopyData.Empty() && !this.m_CopyName.Empty();
+}
+
+void CAEInstanceItemList::SetOpen(bool Open)
+{
+	int i;
+	for (i = 0; i < this.m_List.Numof(); ++i)
+	{
+		this.m_List[i].SetOpen(Open);
+	}
+}
+

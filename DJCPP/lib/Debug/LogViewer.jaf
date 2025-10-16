@@ -1,0 +1,15 @@
+void LogViewer::init(string title)
+{
+	this.handle_ = OutputLog.Create(title);
+}
+
+void LogViewer::add(string val)
+{
+	OutputLog.Output(this.handle_, val);
+}
+
+void LogViewer::clear()
+{
+	OutputLog.Clear(this.handle_);
+}
+

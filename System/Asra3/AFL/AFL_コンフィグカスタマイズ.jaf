@@ -1,0 +1,2037 @@
+float AFL_Config_GetMessageSpeedRate()
+{
+	return g_fMessageSpeedRate;
+}
+
+void AFL_Config_SetMessageSpeedRate(float Rate)
+{
+	if (Rate < 0.0)
+	{
+		Rate = 0.0;
+	}
+	else if (Rate > 1.0)
+	{
+		Rate = 1.0;
+	}
+	g_fMessageSpeedRate = Rate;
+}
+
+void AFL_Config_ResetMessageSpeedRate()
+{
+	g_fMessageSpeedRate = 0.5;
+}
+
+float AFL_Config_GetAutoModeWaitTimeRate()
+{
+	return g_fAutoModeWaitTimeRate;
+}
+
+void AFL_Config_SetAutoModeWaitTimeRate(float Rate)
+{
+	if (Rate < 0.0)
+	{
+		Rate = 0.0;
+	}
+	else if (Rate > 1.0)
+	{
+		Rate = 1.0;
+	}
+	g_fAutoModeWaitTimeRate = Rate;
+}
+
+void AFL_Config_ResetAutoModeWaitTimeRate()
+{
+	g_fAutoModeWaitTimeRate = 0.5;
+}
+
+float AFL_Config_GetReadMessageSkipWaitTimeRate()
+{
+	return g_fReadMessageSkipWaitTimeRate;
+}
+
+void AFL_Config_SetReadMessageSkipWaitTimeRate(float Rate)
+{
+	if (Rate < 0.0)
+	{
+		Rate = 0.0;
+	}
+	else if (Rate > 1.0)
+	{
+		Rate = 1.0;
+	}
+	g_fReadMessageSkipWaitTimeRate = Rate;
+}
+
+void AFL_Config_ResetReadMessageSkipWaitTimeRate()
+{
+	g_fReadMessageSkipWaitTimeRate = 1.0;
+}
+
+bool AFL_Config_GetRestrainScreensaverWhileAutoMode()
+{
+	return g_bRestrainScreensaverWhileAutoMode;
+}
+
+void AFL_Config_SetRestrainScreensaverWhileAutoMode(bool Flag)
+{
+	g_bRestrainScreensaverWhileAutoMode = Flag;
+}
+
+bool AFL_Config_GetFrameSkipWhileMessageSkip()
+{
+	return g_bConfigIsSpeedupForFrameSkip;
+}
+
+void AFL_Config_SetFrameSkipWhileMessageSkip(bool Flag)
+{
+	g_bConfigIsSpeedupForFrameSkip = Flag;
+	ChipmunkSpriteEngine.SYSTEM_SetConfigFrameSkipWhileMessageSkip(g_bConfigIsSpeedupForFrameSkip);
+}
+
+bool AFL_Config_GetReleaseSkipModeByClick()
+{
+	return g_bConfigReleaseSkipModeByClick;
+}
+
+void AFL_Config_SetReleaseSkipModeByClick(bool Flag)
+{
+	g_bConfigReleaseSkipModeByClick = Flag;
+}
+
+bool AFL_Config_GetReleaseSkipModeByReadMessage()
+{
+	return g_bConfigReleaseSkipModeByReadMessage;
+}
+
+void AFL_Config_SetReleaseSkipModeByReadMessage(bool Flag)
+{
+	g_bConfigReleaseSkipModeByReadMessage = Flag;
+}
+
+bool AFL_Config_GetReleaseAutoModeByClick()
+{
+	return g_bConfigReleaseAutoModeByClick;
+}
+
+void AFL_Config_SetReleaseAutoModeByClick(bool Flag)
+{
+	g_bConfigReleaseAutoModeByClick = Flag;
+}
+
+void AFL_Config_SetSkipAllMessage(bool 許可)
+{
+	g_ConfigSkipAllMessage = 許可;
+}
+
+bool AFL_Config_GetSkipAllMessage()
+{
+	return g_ConfigSkipAllMessage;
+}
+
+bool AFL_Config_GetReleaseMessageSkipInSelectMenu()
+{
+	return g_ReleaseMessageSkipInSelectMenu;
+}
+
+void AFL_Config_SetReleaseMessageSkipInSelectMenu(bool Flag)
+{
+	g_ReleaseMessageSkipInSelectMenu = Flag;
+}
+
+bool AFL_Config_GetReleaseAutoModeInSelectMenu()
+{
+	return g_ReleaseAutoModeInSelectMenu;
+}
+
+void AFL_Config_SetReleaseAutoModeInSelectMenu(bool Flag)
+{
+	g_ReleaseAutoModeInSelectMenu = Flag;
+}
+
+bool AFL_Config_GetShowSampleMessage()
+{
+	return g_ShowSampleMessage;
+}
+
+void AFL_Config_SetShowSampleMessage(bool Flag)
+{
+	g_ShowSampleMessage = Flag;
+}
+
+void AFL_Config_ResetSampleMessageTimer()
+{
+	g_ConfigSampleTextTimer.Reset();
+}
+
+string AFL_Config_GetSampleMessageText()
+{
+	return AFL_Config_GetSampleMessageTextByElapsedTime(g_ConfigSampleTextTimer.Get());
+}
+
+string AFL_Config_GetSampleMessageTextByElapsedTime(int MilliSecond)
+{
+	string SampleMessageText = "これはサンプルメッセージです。";
+	int TimePerOneChar = g_MessageWindowModelManager.GetMessageWindow(1).文字速度 * SYS_メッセージ速度比率();
+	if (TimePerOneChar <= 0)
+	{
+		return SampleMessageText;
+	}
+	int TotalTime = SampleMessageText.Length() * TimePerOneChar + SYS_オートモード待機時間計算(SampleMessageText.Length());
+	MilliSecond %= TotalTime;
+	int TextLength = Math.Min(MilliSecond / TimePerOneChar, SampleMessageText.Length());
+	return SampleMessageText.GetPart(0, TextLength);
+}
+
+bool AFL_Config_IsAnimateMessageWindow()
+{
+	return g_AnimateMessageWindow;
+}
+
+void AFL_Config_SetAnimateMessageWindow(bool AnimateMessageWindow)
+{
+	g_AnimateMessageWindow = AnimateMessageWindow;
+}
+
+bool AFL_Config_ChangesReadTextColor()
+{
+	return g_既読メッセージ色番号 != -1;
+}
+
+void AFL_Config_SetReadTextColorIndex(int Index)
+{
+	Index = Math.Max(Index, -1);
+	Index = Math.Min(Index, 11);
+	g_既読メッセージ色番号 = Index;
+}
+
+int AFL_Config_GetReadTextColorIndex()
+{
+	return g_既読メッセージ色番号;
+}
+
+void AFL_Config_GetReadTextColor(int Index, ref int Red, ref int Green, ref int Blue)
+{
+	CASColor Color;
+	Color = g_MessageWindowModelManager.GetReadTextColor(Index);
+	Red = Color.GetR();
+	Green = Color.GetG();
+	Blue = Color.GetB();
+}
+
+void AFL_Config_GetReadTextColorByActiveIndex(ref int Red, ref int Green, ref int Blue)
+{
+	AFL_Config_GetReadTextColor(AFL_Config_GetReadTextColorIndex(), Red, Green, Blue);
+}
+
+void AFL_Config_GetReadTextColorNone(ref int Red, ref int Green, ref int Blue)
+{
+	AFL_Config_GetReadTextColor(-1, Red, Green, Blue);
+}
+
+void AFL_Config_GetReadTextColor00(ref int Red, ref int Green, ref int Blue)
+{
+	AFL_Config_GetReadTextColor(0, Red, Green, Blue);
+}
+
+void AFL_Config_GetReadTextColor01(ref int Red, ref int Green, ref int Blue)
+{
+	AFL_Config_GetReadTextColor(1, Red, Green, Blue);
+}
+
+void AFL_Config_GetReadTextColor02(ref int Red, ref int Green, ref int Blue)
+{
+	AFL_Config_GetReadTextColor(2, Red, Green, Blue);
+}
+
+void AFL_Config_GetReadTextColor03(ref int Red, ref int Green, ref int Blue)
+{
+	AFL_Config_GetReadTextColor(3, Red, Green, Blue);
+}
+
+void AFL_Config_GetReadTextColor04(ref int Red, ref int Green, ref int Blue)
+{
+	AFL_Config_GetReadTextColor(4, Red, Green, Blue);
+}
+
+void AFL_Config_GetReadTextColor05(ref int Red, ref int Green, ref int Blue)
+{
+	AFL_Config_GetReadTextColor(5, Red, Green, Blue);
+}
+
+void AFL_Config_GetReadTextColor06(ref int Red, ref int Green, ref int Blue)
+{
+	AFL_Config_GetReadTextColor(6, Red, Green, Blue);
+}
+
+void AFL_Config_GetReadTextColor07(ref int Red, ref int Green, ref int Blue)
+{
+	AFL_Config_GetReadTextColor(7, Red, Green, Blue);
+}
+
+void AFL_Config_GetReadTextColor08(ref int Red, ref int Green, ref int Blue)
+{
+	AFL_Config_GetReadTextColor(8, Red, Green, Blue);
+}
+
+void AFL_Config_GetReadTextColor09(ref int Red, ref int Green, ref int Blue)
+{
+	AFL_Config_GetReadTextColor(9, Red, Green, Blue);
+}
+
+void AFL_Config_GetReadTextColor10(ref int Red, ref int Green, ref int Blue)
+{
+	AFL_Config_GetReadTextColor(10, Red, Green, Blue);
+}
+
+void AFL_Config_GetReadTextColor11(ref int Red, ref int Green, ref int Blue)
+{
+	AFL_Config_GetReadTextColor(11, Red, Green, Blue);
+}
+
+void AFL_Config_SetReadTextColorIndexNone()
+{
+	AFL_Config_SetReadTextColorIndex(-1);
+}
+
+void AFL_Config_SetReadTextColorIndex00()
+{
+	AFL_Config_SetReadTextColorIndex(0);
+}
+
+void AFL_Config_SetReadTextColorIndex01()
+{
+	AFL_Config_SetReadTextColorIndex(1);
+}
+
+void AFL_Config_SetReadTextColorIndex02()
+{
+	AFL_Config_SetReadTextColorIndex(2);
+}
+
+void AFL_Config_SetReadTextColorIndex03()
+{
+	AFL_Config_SetReadTextColorIndex(3);
+}
+
+void AFL_Config_SetReadTextColorIndex04()
+{
+	AFL_Config_SetReadTextColorIndex(4);
+}
+
+void AFL_Config_SetReadTextColorIndex05()
+{
+	AFL_Config_SetReadTextColorIndex(5);
+}
+
+void AFL_Config_SetReadTextColorIndex06()
+{
+	AFL_Config_SetReadTextColorIndex(6);
+}
+
+void AFL_Config_SetReadTextColorIndex07()
+{
+	AFL_Config_SetReadTextColorIndex(7);
+}
+
+void AFL_Config_SetReadTextColorIndex08()
+{
+	AFL_Config_SetReadTextColorIndex(8);
+}
+
+void AFL_Config_SetReadTextColorIndex09()
+{
+	AFL_Config_SetReadTextColorIndex(9);
+}
+
+void AFL_Config_SetReadTextColorIndex10()
+{
+	AFL_Config_SetReadTextColorIndex(10);
+}
+
+void AFL_Config_SetReadTextColorIndex11()
+{
+	AFL_Config_SetReadTextColorIndex(11);
+}
+
+bool AFL_Config_IsReadTextColorIndexNone()
+{
+	return AFL_Config_GetReadTextColorIndex() == -1;
+}
+
+bool AFL_Config_IsReadTextColorIndex00()
+{
+	return AFL_Config_GetReadTextColorIndex() == 0;
+}
+
+bool AFL_Config_IsReadTextColorIndex01()
+{
+	return AFL_Config_GetReadTextColorIndex() == 1;
+}
+
+bool AFL_Config_IsReadTextColorIndex02()
+{
+	return AFL_Config_GetReadTextColorIndex() == 2;
+}
+
+bool AFL_Config_IsReadTextColorIndex03()
+{
+	return AFL_Config_GetReadTextColorIndex() == 3;
+}
+
+bool AFL_Config_IsReadTextColorIndex04()
+{
+	return AFL_Config_GetReadTextColorIndex() == 4;
+}
+
+bool AFL_Config_IsReadTextColorIndex05()
+{
+	return AFL_Config_GetReadTextColorIndex() == 5;
+}
+
+bool AFL_Config_IsReadTextColorIndex06()
+{
+	return AFL_Config_GetReadTextColorIndex() == 6;
+}
+
+bool AFL_Config_IsReadTextColorIndex07()
+{
+	return AFL_Config_GetReadTextColorIndex() == 7;
+}
+
+bool AFL_Config_IsReadTextColorIndex08()
+{
+	return AFL_Config_GetReadTextColorIndex() == 8;
+}
+
+bool AFL_Config_IsReadTextColorIndex09()
+{
+	return AFL_Config_GetReadTextColorIndex() == 9;
+}
+
+bool AFL_Config_IsReadTextColorIndex10()
+{
+	return AFL_Config_GetReadTextColorIndex() == 10;
+}
+
+bool AFL_Config_IsReadTextColorIndex11()
+{
+	return AFL_Config_GetReadTextColorIndex() == 11;
+}
+
+bool AFL_Config_ChangesBackSceneTextColor()
+{
+	return g_バックシーンメッセージ色番号 != -1;
+}
+
+void AFL_Config_SetBackSceneTextColorIndex(int Index)
+{
+	Index = Math.Max(Index, -1);
+	Index = Math.Min(Index, 11);
+	g_バックシーンメッセージ色番号 = Index;
+}
+
+int AFL_Config_GetBackSceneTextColorIndex()
+{
+	return g_バックシーンメッセージ色番号;
+}
+
+void AFL_Config_GetBackSceneTextColor(int Index, ref int Red, ref int Green, ref int Blue)
+{
+	CASColor Color;
+	Color = CF_CASColor(255, 255, 255, 255);
+	switch (Index)
+	{
+	case 0:
+		Color = CF_CASColor(EX_RA2Int("Ｅ＿バックシーンメッセージ色", 0, "赤", 255), EX_RA2Int("Ｅ＿バックシーンメッセージ色", 0, "緑", 191), EX_RA2Int("Ｅ＿バックシーンメッセージ色", 0, "青", 127), 255);
+		break;
+	case 1:
+		Color = CF_CASColor(EX_RA2Int("Ｅ＿バックシーンメッセージ色", 1, "赤", 255), EX_RA2Int("Ｅ＿バックシーンメッセージ色", 1, "緑", 255), EX_RA2Int("Ｅ＿バックシーンメッセージ色", 1, "青", 127), 255);
+		break;
+	case 2:
+		Color = CF_CASColor(EX_RA2Int("Ｅ＿バックシーンメッセージ色", 2, "赤", 191), EX_RA2Int("Ｅ＿バックシーンメッセージ色", 2, "緑", 255), EX_RA2Int("Ｅ＿バックシーンメッセージ色", 2, "青", 127), 255);
+		break;
+	case 3:
+		Color = CF_CASColor(EX_RA2Int("Ｅ＿バックシーンメッセージ色", 3, "赤", 127), EX_RA2Int("Ｅ＿バックシーンメッセージ色", 3, "緑", 255), EX_RA2Int("Ｅ＿バックシーンメッセージ色", 3, "青", 127), 255);
+		break;
+	case 4:
+		Color = CF_CASColor(EX_RA2Int("Ｅ＿バックシーンメッセージ色", 4, "赤", 127), EX_RA2Int("Ｅ＿バックシーンメッセージ色", 4, "緑", 255), EX_RA2Int("Ｅ＿バックシーンメッセージ色", 4, "青", 191), 255);
+		break;
+	case 5:
+		Color = CF_CASColor(EX_RA2Int("Ｅ＿バックシーンメッセージ色", 5, "赤", 127), EX_RA2Int("Ｅ＿バックシーンメッセージ色", 5, "緑", 255), EX_RA2Int("Ｅ＿バックシーンメッセージ色", 5, "青", 255), 255);
+		break;
+	case 6:
+		Color = CF_CASColor(EX_RA2Int("Ｅ＿バックシーンメッセージ色", 6, "赤", 127), EX_RA2Int("Ｅ＿バックシーンメッセージ色", 6, "緑", 191), EX_RA2Int("Ｅ＿バックシーンメッセージ色", 6, "青", 255), 255);
+		break;
+	case 7:
+		Color = CF_CASColor(EX_RA2Int("Ｅ＿バックシーンメッセージ色", 7, "赤", 127), EX_RA2Int("Ｅ＿バックシーンメッセージ色", 7, "緑", 127), EX_RA2Int("Ｅ＿バックシーンメッセージ色", 7, "青", 255), 255);
+		break;
+	case 8:
+		Color = CF_CASColor(EX_RA2Int("Ｅ＿バックシーンメッセージ色", 8, "赤", 191), EX_RA2Int("Ｅ＿バックシーンメッセージ色", 8, "緑", 127), EX_RA2Int("Ｅ＿バックシーンメッセージ色", 8, "青", 255), 255);
+		break;
+	case 9:
+		Color = CF_CASColor(EX_RA2Int("Ｅ＿バックシーンメッセージ色", 9, "赤", 255), EX_RA2Int("Ｅ＿バックシーンメッセージ色", 9, "緑", 127), EX_RA2Int("Ｅ＿バックシーンメッセージ色", 9, "青", 255), 255);
+		break;
+	case 10:
+		Color = CF_CASColor(EX_RA2Int("Ｅ＿バックシーンメッセージ色", 10, "赤", 255), EX_RA2Int("Ｅ＿バックシーンメッセージ色", 10, "緑", 127), EX_RA2Int("Ｅ＿バックシーンメッセージ色", 10, "青", 191), 255);
+		break;
+	case 11:
+		Color = CF_CASColor(EX_RA2Int("Ｅ＿バックシーンメッセージ色", 11, "赤", 255), EX_RA2Int("Ｅ＿バックシーンメッセージ色", 11, "緑", 127), EX_RA2Int("Ｅ＿バックシーンメッセージ色", 11, "青", 127), 255);
+		break;
+	}
+	Red = Color.GetR();
+	Green = Color.GetG();
+	Blue = Color.GetB();
+}
+
+void AFL_Config_GetBackSceneTextColorByActiveIndex(ref int Red, ref int Green, ref int Blue)
+{
+	AFL_Config_GetBackSceneTextColor(AFL_Config_GetBackSceneTextColorIndex(), Red, Green, Blue);
+}
+
+void AFL_Config_GetBackSceneTextColorNone(ref int Red, ref int Green, ref int Blue)
+{
+	AFL_Config_GetBackSceneTextColor(-1, Red, Green, Blue);
+}
+
+void AFL_Config_GetBackSceneTextColor00(ref int Red, ref int Green, ref int Blue)
+{
+	AFL_Config_GetBackSceneTextColor(0, Red, Green, Blue);
+}
+
+void AFL_Config_GetBackSceneTextColor01(ref int Red, ref int Green, ref int Blue)
+{
+	AFL_Config_GetBackSceneTextColor(1, Red, Green, Blue);
+}
+
+void AFL_Config_GetBackSceneTextColor02(ref int Red, ref int Green, ref int Blue)
+{
+	AFL_Config_GetBackSceneTextColor(2, Red, Green, Blue);
+}
+
+void AFL_Config_GetBackSceneTextColor03(ref int Red, ref int Green, ref int Blue)
+{
+	AFL_Config_GetBackSceneTextColor(3, Red, Green, Blue);
+}
+
+void AFL_Config_GetBackSceneTextColor04(ref int Red, ref int Green, ref int Blue)
+{
+	AFL_Config_GetBackSceneTextColor(4, Red, Green, Blue);
+}
+
+void AFL_Config_GetBackSceneTextColor05(ref int Red, ref int Green, ref int Blue)
+{
+	AFL_Config_GetBackSceneTextColor(5, Red, Green, Blue);
+}
+
+void AFL_Config_GetBackSceneTextColor06(ref int Red, ref int Green, ref int Blue)
+{
+	AFL_Config_GetBackSceneTextColor(6, Red, Green, Blue);
+}
+
+void AFL_Config_GetBackSceneTextColor07(ref int Red, ref int Green, ref int Blue)
+{
+	AFL_Config_GetBackSceneTextColor(7, Red, Green, Blue);
+}
+
+void AFL_Config_GetBackSceneTextColor08(ref int Red, ref int Green, ref int Blue)
+{
+	AFL_Config_GetBackSceneTextColor(8, Red, Green, Blue);
+}
+
+void AFL_Config_GetBackSceneTextColor09(ref int Red, ref int Green, ref int Blue)
+{
+	AFL_Config_GetBackSceneTextColor(9, Red, Green, Blue);
+}
+
+void AFL_Config_GetBackSceneTextColor10(ref int Red, ref int Green, ref int Blue)
+{
+	AFL_Config_GetBackSceneTextColor(10, Red, Green, Blue);
+}
+
+void AFL_Config_GetBackSceneTextColor11(ref int Red, ref int Green, ref int Blue)
+{
+	AFL_Config_GetBackSceneTextColor(11, Red, Green, Blue);
+}
+
+void AFL_Config_SetBackSceneTextColorIndexNone()
+{
+	AFL_Config_SetBackSceneTextColorIndex(-1);
+}
+
+void AFL_Config_SetBackSceneTextColorIndex00()
+{
+	AFL_Config_SetBackSceneTextColorIndex(0);
+}
+
+void AFL_Config_SetBackSceneTextColorIndex01()
+{
+	AFL_Config_SetBackSceneTextColorIndex(1);
+}
+
+void AFL_Config_SetBackSceneTextColorIndex02()
+{
+	AFL_Config_SetBackSceneTextColorIndex(2);
+}
+
+void AFL_Config_SetBackSceneTextColorIndex03()
+{
+	AFL_Config_SetBackSceneTextColorIndex(3);
+}
+
+void AFL_Config_SetBackSceneTextColorIndex04()
+{
+	AFL_Config_SetBackSceneTextColorIndex(4);
+}
+
+void AFL_Config_SetBackSceneTextColorIndex05()
+{
+	AFL_Config_SetBackSceneTextColorIndex(5);
+}
+
+void AFL_Config_SetBackSceneTextColorIndex06()
+{
+	AFL_Config_SetBackSceneTextColorIndex(6);
+}
+
+void AFL_Config_SetBackSceneTextColorIndex07()
+{
+	AFL_Config_SetBackSceneTextColorIndex(7);
+}
+
+void AFL_Config_SetBackSceneTextColorIndex08()
+{
+	AFL_Config_SetBackSceneTextColorIndex(8);
+}
+
+void AFL_Config_SetBackSceneTextColorIndex09()
+{
+	AFL_Config_SetBackSceneTextColorIndex(9);
+}
+
+void AFL_Config_SetBackSceneTextColorIndex10()
+{
+	AFL_Config_SetBackSceneTextColorIndex(10);
+}
+
+void AFL_Config_SetBackSceneTextColorIndex11()
+{
+	AFL_Config_SetBackSceneTextColorIndex(11);
+}
+
+bool AFL_Config_IsBackSceneTextColorIndexNone()
+{
+	return AFL_Config_GetBackSceneTextColorIndex() == -1;
+}
+
+bool AFL_Config_IsBackSceneTextColorIndex00()
+{
+	return AFL_Config_GetBackSceneTextColorIndex() == 0;
+}
+
+bool AFL_Config_IsBackSceneTextColorIndex01()
+{
+	return AFL_Config_GetBackSceneTextColorIndex() == 1;
+}
+
+bool AFL_Config_IsBackSceneTextColorIndex02()
+{
+	return AFL_Config_GetBackSceneTextColorIndex() == 2;
+}
+
+bool AFL_Config_IsBackSceneTextColorIndex03()
+{
+	return AFL_Config_GetBackSceneTextColorIndex() == 3;
+}
+
+bool AFL_Config_IsBackSceneTextColorIndex04()
+{
+	return AFL_Config_GetBackSceneTextColorIndex() == 4;
+}
+
+bool AFL_Config_IsBackSceneTextColorIndex05()
+{
+	return AFL_Config_GetBackSceneTextColorIndex() == 5;
+}
+
+bool AFL_Config_IsBackSceneTextColorIndex06()
+{
+	return AFL_Config_GetBackSceneTextColorIndex() == 6;
+}
+
+bool AFL_Config_IsBackSceneTextColorIndex07()
+{
+	return AFL_Config_GetBackSceneTextColorIndex() == 7;
+}
+
+bool AFL_Config_IsBackSceneTextColorIndex08()
+{
+	return AFL_Config_GetBackSceneTextColorIndex() == 8;
+}
+
+bool AFL_Config_IsBackSceneTextColorIndex09()
+{
+	return AFL_Config_GetBackSceneTextColorIndex() == 9;
+}
+
+bool AFL_Config_IsBackSceneTextColorIndex10()
+{
+	return AFL_Config_GetBackSceneTextColorIndex() == 10;
+}
+
+bool AFL_Config_IsBackSceneTextColorIndex11()
+{
+	return AFL_Config_GetBackSceneTextColorIndex() == 11;
+}
+
+float AFL_Config_GetMessageWindowMulColorRate()
+{
+	return g_ConfigMessageWindowMulColorRate;
+}
+
+void AFL_Config_SetMessageWindowMulColorRate(float Rate)
+{
+	if (Rate < 0.0)
+	{
+		Rate = 0.0;
+	}
+	else if (1.0 < Rate)
+	{
+		Rate = 1.0;
+	}
+	g_ConfigMessageWindowMulColorRate = Rate;
+}
+
+void AFL_Config_GetMessageWindowMulColor(ref int Red, ref int Green, ref int Blue)
+{
+	int MulR = g_MessageWindowModelManager.GetMessageWindowMulColorR();
+	int MulG = g_MessageWindowModelManager.GetMessageWindowMulColorG();
+	int MulB = g_MessageWindowModelManager.GetMessageWindowMulColorB();
+	Red = 255 + (MulR - 255) * (1.0 - AFL_Config_GetMessageWindowMulColorRate());
+	Green = 255 + (MulG - 255) * (1.0 - AFL_Config_GetMessageWindowMulColorRate());
+	Blue = 255 + (MulB - 255) * (1.0 - AFL_Config_GetMessageWindowMulColorRate());
+}
+
+void AFL_Config_ResetMessageWindowDefaultMulColorRate()
+{
+	AFL_Config_SetMessageWindowMulColorRate(SYS_GetMessageWindowDefaultMulColorRate());
+}
+
+float AFL_Config_GetMessageWindowAlphaRate()
+{
+	return g_ConfigMessageWindowAlphaRate;
+}
+
+void AFL_Config_SetMessageWindowAlphaRate(float Rate)
+{
+	if (Rate < 0.0)
+	{
+		Rate = 0.0;
+	}
+	else if (1.0 < Rate)
+	{
+		Rate = 1.0;
+	}
+	g_ConfigMessageWindowAlphaRate = Rate;
+}
+
+void AFL_Config_ResetMessageWindowDefaultAlphaRate()
+{
+	AFL_Config_SetMessageWindowAlphaRate(SYS_GetMessageWindowDefaultAlphaRate());
+}
+
+int AFL_Config_GetMessageWindowAlpha()
+{
+	return AFL_Config_GetMessageWindowAlphaRate() * 255.0;
+}
+
+bool AFL_Config_GetStopVoiceByStatus()
+{
+	return g_ConfigStopVoiceBySkipMessage;
+}
+
+void AFL_Config_SetStopVoiceByStatus(bool Flag)
+{
+	g_ConfigStopVoiceBySkipMessage = Flag;
+}
+
+int AFL_Config_GetVolume(int GroupNumber)
+{
+	int Volume;
+	SystemService.GetMixerVolume(GroupNumber, Volume);
+	return Volume;
+}
+
+int AFL_Config_GetDefaultVolume(int GroupNumber)
+{
+	int Volume;
+	SystemService.GetMixerDefaultVolume(GroupNumber, Volume);
+	return Volume;
+}
+
+void AFL_Config_SetVolume(int GroupNumber, int Volume)
+{
+	if (Volume < 0)
+	{
+		Volume = 0;
+	}
+	else if (Volume > 100)
+	{
+		Volume = 100;
+	}
+	SystemService.SetMixerVolume(GroupNumber, Volume);
+	int BackVoiceGroupNumber = SYS_GetBackVoiceGroupNumber(GroupNumber);
+	if (BackVoiceGroupNumber != -1)
+	{
+		SystemService.SetMixerVolume(BackVoiceGroupNumber, Volume);
+	}
+}
+
+bool AFL_Config_GetMute(int GroupNumber)
+{
+	bool Mute = false;
+	SystemService.GetMixerMute(GroupNumber, Mute);
+	return Mute;
+}
+
+void AFL_Config_SetMute(int GroupNumber, bool Mute)
+{
+	SystemService.SetMixerMute(GroupNumber, Mute);
+	int BackVoiceGroupNumber = SYS_GetBackVoiceGroupNumber(GroupNumber);
+	if (BackVoiceGroupNumber != -1)
+	{
+		SystemService.SetMixerMute(BackVoiceGroupNumber, Mute);
+	}
+}
+
+bool AFL_Config_GetBGMFadeByVoice()
+{
+	return g_bConfigBGMFadeByVoice;
+}
+
+void AFL_Config_SetBGMFadeByVoice(bool Flag)
+{
+	g_bConfigBGMFadeByVoice = Flag;
+}
+
+bool AFL_Config_IsMuteByInactiveWindow()
+{
+	return !g_ConfigSoundGlobalFocus;
+}
+
+void AFL_Config_SetMuteByInactiveWindow(bool Mute)
+{
+	g_ConfigSoundGlobalFocus = !Mute;
+	KiwiSoundEngine.SetGlobalFocus(g_ConfigSoundGlobalFocus);
+}
+
+float AFL_Config_GetMasterVolume()
+{
+	return AFL_Config_GetVolume(SYS_SOUNDGROUP_MASTER()) / 100.0;
+}
+
+void AFL_Config_SetMasterVolume(float Rate)
+{
+	AFL_Config_SetVolume(SYS_SOUNDGROUP_MASTER(), Rate * 100.0);
+}
+
+void AFL_Config_SetMasterDefaultVolume()
+{
+	AFL_Config_SetVolume(SYS_SOUNDGROUP_MASTER(), AFL_Config_GetDefaultVolume(SYS_SOUNDGROUP_MASTER()));
+}
+
+bool AFL_Config_GetMasterMute()
+{
+	return AFL_Config_GetMute(SYS_SOUNDGROUP_MASTER());
+}
+
+void AFL_Config_SetMasterMute(bool Flg)
+{
+	AFL_Config_SetMute(SYS_SOUNDGROUP_MASTER(), Flg);
+}
+
+float AFL_Config_GetBGMVolume()
+{
+	return AFL_Config_GetVolume(SYS_SOUNDGROUP_BGM()) / 100.0;
+}
+
+void AFL_Config_SetBGMVolume(float Rate)
+{
+	AFL_Config_SetVolume(SYS_SOUNDGROUP_BGM(), Rate * 100.0);
+}
+
+void AFL_Config_SetBGMDefaultVolume()
+{
+	AFL_Config_SetVolume(SYS_SOUNDGROUP_BGM(), AFL_Config_GetDefaultVolume(SYS_SOUNDGROUP_BGM()));
+}
+
+bool AFL_Config_GetBGMMute()
+{
+	return AFL_Config_GetMute(SYS_SOUNDGROUP_BGM());
+}
+
+void AFL_Config_SeBGMtMute(bool Flg)
+{
+	AFL_Config_SetMute(SYS_SOUNDGROUP_BGM(), Flg);
+}
+
+float AFL_Config_GetSEVolume()
+{
+	return AFL_Config_GetVolume(SYS_SOUNDGROUP_SE()) / 100.0;
+}
+
+void AFL_Config_SetSEVolume(float Rate)
+{
+	AFL_Config_SetVolume(SYS_SOUNDGROUP_SE(), Rate * 100.0);
+}
+
+void AFL_Config_SetSEDefaultVolume()
+{
+	AFL_Config_SetVolume(SYS_SOUNDGROUP_SE(), AFL_Config_GetDefaultVolume(SYS_SOUNDGROUP_SE()));
+}
+
+bool AFL_Config_GetSEMute()
+{
+	return AFL_Config_GetMute(SYS_SOUNDGROUP_SE());
+}
+
+void AFL_Config_SetSEMute(bool Flg)
+{
+	AFL_Config_SetMute(SYS_SOUNDGROUP_SE(), Flg);
+}
+
+float AFL_Config_GetVoiceVolume()
+{
+	return AFL_Config_GetVolume(SYS_SOUNDGROUP_VOICE()) / 100.0;
+}
+
+void AFL_Config_SetVoiceVolume(float Rate)
+{
+	AFL_Config_SetVolume(SYS_SOUNDGROUP_VOICE(), Rate * 100.0);
+}
+
+void AFL_Config_SetVoiceDefaultVolume()
+{
+	AFL_Config_SetVolume(SYS_SOUNDGROUP_VOICE(), AFL_Config_GetDefaultVolume(SYS_SOUNDGROUP_VOICE()));
+}
+
+bool AFL_Config_GetVoiceMute()
+{
+	return AFL_Config_GetMute(SYS_SOUNDGROUP_VOICE());
+}
+
+void AFL_Config_SetVoiceMute(bool Flg)
+{
+	AFL_Config_SetMute(SYS_SOUNDGROUP_VOICE(), Flg);
+}
+
+float AFL_Config_GetBackVoiceVolume()
+{
+	return AFL_Config_GetVolume(SYS_SOUNDGROUP_BACKVOICE()) / 100.0;
+}
+
+void AFL_Config_SetBackVoiceVolume(float Rate)
+{
+	AFL_Config_SetVolume(SYS_SOUNDGROUP_BACKVOICE(), Rate * 100.0);
+}
+
+void AFL_Config_SetBackVoiceDefaultVolume()
+{
+	AFL_Config_SetVolume(SYS_SOUNDGROUP_BACKVOICE(), AFL_Config_GetDefaultVolume(SYS_SOUNDGROUP_BACKVOICE()));
+}
+
+bool AFL_Config_GetBackVoiceMute()
+{
+	return AFL_Config_GetMute(SYS_SOUNDGROUP_BACKVOICE());
+}
+
+void AFL_Config_SetBackVoiceMute(bool Flg)
+{
+	AFL_Config_SetMute(SYS_SOUNDGROUP_BACKVOICE(), Flg);
+}
+
+bool AFL_Config_GetHideUnmoveMouseCursor()
+{
+	int HideUnmoveMouseCursor;
+	SystemService.GetMouseCursorConfig(0, HideUnmoveMouseCursor);
+	return HideUnmoveMouseCursor != 0;
+}
+
+void AFL_Config_SetHideUnmoveMouseCursor(bool Flag)
+{
+	SystemService.SetMouseCursorConfig(0, Flag ? 1 : 0);
+}
+
+bool AFL_Config_GetHideKeyOrJoypadInputMouseCursor()
+{
+	int HideUnmoveMouseCursor;
+	SystemService.GetMouseCursorConfig(1, HideUnmoveMouseCursor);
+	return HideUnmoveMouseCursor != 0;
+}
+
+void AFL_Config_SetHideKeyOrJoypadInputMouseCursor(bool Flag)
+{
+	SystemService.SetMouseCursorConfig(1, Flag ? 1 : 0);
+}
+
+bool AFL_Config_GetHideStepMessageMouseCursor()
+{
+	int HideUnmoveMouseCursor;
+	SystemService.GetMouseCursorConfig(2, HideUnmoveMouseCursor);
+	return HideUnmoveMouseCursor != 0;
+}
+
+void AFL_Config_SetHideStepMessageMouseCursor(bool Flag)
+{
+	SystemService.SetMouseCursorConfig(2, Flag ? 1 : 0);
+}
+
+int AFL_Config_GetWheelForward()
+{
+	return g_nKeyConfigMouseWheelForward;
+}
+
+void AFL_Config_SetWheelForward(int Type)
+{
+	if (Type != 0 && Type != 1)
+	{
+		return;
+	}
+	g_nKeyConfigMouseWheelForward = Type;
+}
+
+void AFL_Config_SetWheelForwardForBackLog()
+{
+	AFL_Config_SetWheelForward(0);
+}
+
+bool AFL_Config_IsWheelForwardForBackLog()
+{
+	return AFL_Config_GetWheelForward() == 0;
+}
+
+void AFL_Config_SetWheelForwardForBackScene()
+{
+	AFL_Config_SetWheelForward(1);
+}
+
+bool AFL_Config_IsWheelForwardForBackScene()
+{
+	return AFL_Config_GetWheelForward() == 1;
+}
+
+bool AFL_Config_GetQuickSaveConfirm()
+{
+	return AFL_GetConfigQuickSaveConfirm();
+}
+
+void AFL_Config_SetQuickSaveConfirm(bool Flag)
+{
+	g_ConfigQuickSaveConfirm = Flag;
+}
+
+bool AFL_Config_GetQuickLoadConfirm()
+{
+	return AFL_GetConfigQuickLoadConfirm();
+}
+
+void AFL_Config_SetQuickLoadConfirm(bool Flag)
+{
+	g_ConfigQuickLoadConfirm = Flag;
+}
+
+bool AFL_Config_GetSaveConfirm()
+{
+	return AFL_GetConfigSaveConfirm();
+}
+
+void AFL_Config_SetSaveConfirm(bool Flag)
+{
+	g_ConfigSaveConfirm = Flag;
+}
+
+bool AFL_Config_GetLoadConfirm()
+{
+	return AFL_GetConfigLoadConfirm();
+}
+
+void AFL_Config_SetLoadConfirm(bool Flag)
+{
+	g_ConfigLoadConfirm = Flag;
+}
+
+void AFL_Config_SetBackToTitleConfirm(bool Flag)
+{
+	SystemService.SetWindowSetting(5, Flag ? 1 : 0);
+}
+
+bool AFL_Config_GetBackToTitleConfirm()
+{
+	int Setting = 1;
+	SystemService.GetWindowSetting(5, Setting);
+	return Setting != 0;
+}
+
+void AFL_Config_SetCloseGameConfirm(bool Flag)
+{
+	SystemService.SetWindowSetting(6, Flag ? 1 : 0);
+}
+
+bool AFL_Config_GetCloseGameConfirm()
+{
+	int Setting = 1;
+	SystemService.GetWindowSetting(6, Setting);
+	return Setting != 0;
+}
+
+void AFL_Config_SetMoveMouseCursorSpeed(int Speed)
+{
+	g_MoveMouseCursorSpeedID = Math.Max(0, Math.Min(4, Speed));
+}
+
+int AFL_Config_GetMoveMouseCursorSpeed()
+{
+	return g_MoveMouseCursorSpeedID;
+}
+
+void AFL_Config_SetMoveMouseCursorSpeedForNone()
+{
+	AFL_Config_SetMoveMouseCursorSpeed(0);
+}
+
+void AFL_Config_SetMoveMouseCursorSpeedForLow()
+{
+	AFL_Config_SetMoveMouseCursorSpeed(1);
+}
+
+void AFL_Config_SetMoveMouseCursorSpeedForMiddle()
+{
+	AFL_Config_SetMoveMouseCursorSpeed(2);
+}
+
+void AFL_Config_SetMoveMouseCursorSpeedForHigh()
+{
+	AFL_Config_SetMoveMouseCursorSpeed(3);
+}
+
+void AFL_Config_SetMoveMouseCursorSpeedForFast()
+{
+	AFL_Config_SetMoveMouseCursorSpeed(4);
+}
+
+bool AFL_Config_IsMoveMouseCursorSpeedForNone()
+{
+	return AFL_Config_GetMoveMouseCursorSpeed() == 0;
+}
+
+bool AFL_Config_IsMoveMouseCursorSpeedForLow()
+{
+	return AFL_Config_GetMoveMouseCursorSpeed() == 1;
+}
+
+bool AFL_Config_IsMoveMouseCursorSpeedForMiddle()
+{
+	return AFL_Config_GetMoveMouseCursorSpeed() == 2;
+}
+
+bool AFL_Config_IsMoveMouseCursorSpeedForHigh()
+{
+	return AFL_Config_GetMoveMouseCursorSpeed() == 3;
+}
+
+bool AFL_Config_IsMoveMouseCursorSpeedForFast()
+{
+	return AFL_Config_GetMoveMouseCursorSpeed() == 4;
+}
+
+bool AFL_Config_GetWindowMode()
+{
+	return !SystemService.IsFullScreen();
+}
+
+bool AFL_Config_GetFullScreenMode()
+{
+	return SystemService.IsFullScreen();
+}
+
+void AFL_Config_SetWindowMode(bool WindowMode)
+{
+	if (WindowMode)
+	{
+		if (!SystemService.IsFullScreen())
+		{
+			return;
+		}
+		SystemService.ChangeNormalScreen();
+	}
+	else
+	{
+		if (SystemService.IsFullScreen())
+		{
+			return;
+		}
+		SystemService.ChangeFullScreen();
+	}
+}
+
+int AFL_Config_GetAspectRatio()
+{
+	int AspectRatio;
+	SystemService.GetWindowSetting(0, AspectRatio);
+	return AspectRatio;
+}
+
+void AFL_Config_SetAspectRatio(int Type)
+{
+	if (Type != 0 && Type != 1)
+	{
+		return;
+	}
+	SystemService.SetWindowSetting(0, Type);
+}
+
+void AFL_Config_SetAspectRatioDefault()
+{
+	AFL_Config_SetAspectRatio(0);
+}
+
+bool AFL_Config_IsAspectRatioDefault()
+{
+	return AFL_Config_GetAspectRatio() == 0;
+}
+
+void AFL_Config_SetAspectRatioFix()
+{
+	AFL_Config_SetAspectRatio(1);
+}
+
+bool AFL_Config_IsAspectRatioFix()
+{
+	return AFL_Config_GetAspectRatio() == 1;
+}
+
+int AFL_Config_GetScalingType()
+{
+	int ScalingMode;
+	SystemService.GetWindowSetting(1, ScalingMode);
+	return ScalingMode;
+}
+
+void AFL_Config_SetScalingType(int Type)
+{
+	if (Type != 0 && Type != 1)
+	{
+		return;
+	}
+	SystemService.SetWindowSetting(1, Type);
+}
+
+void AFL_Config_SetScalingDefault()
+{
+	AFL_Config_SetScalingType(0);
+}
+
+bool AFL_Config_IsScalingDefault()
+{
+	return AFL_Config_GetScalingType() == 0;
+}
+
+void AFL_Config_SetScalingBicubic()
+{
+	AFL_Config_SetScalingType(1);
+}
+
+bool AFL_Config_IsScalingBicubic()
+{
+	return AFL_Config_GetScalingType() == 1;
+}
+
+bool AFL_Config_GetWaitVSync()
+{
+	int WaitVSync;
+	SystemService.GetWindowSetting(2, WaitVSync);
+	return WaitVSync != 0;
+}
+
+void AFL_Config_SetWaitVSync(bool Flag)
+{
+	SystemService.SetWindowSetting(2, Flag ? 1 : 0);
+}
+
+bool AFL_Config_GetRecordPosSize()
+{
+	int RecordPosSize;
+	SystemService.GetWindowSetting(3, RecordPosSize);
+	return RecordPosSize != 0;
+}
+
+void AFL_Config_SetRecordPosSize(bool Flag)
+{
+	SystemService.SetWindowSetting(3, Flag ? 1 : 0);
+}
+
+bool AFL_Config_GetMinimizeByFullScreenInactive()
+{
+	int MinimizeByFullScreenInactive;
+	SystemService.GetWindowSetting(4, MinimizeByFullScreenInactive);
+	return MinimizeByFullScreenInactive != 0;
+}
+
+void AFL_Config_SetMinimizeByFullScreenInactive(bool Flag)
+{
+	SystemService.SetWindowSetting(4, Flag ? 1 : 0);
+}
+
+bool AFL_Config_GetSleepByInactive()
+{
+	return ChipmunkSpriteEngine.SYSTEM_GetConfigSleepByInactiveWindow();
+}
+
+void AFL_Config_SetSleepByInactive(bool Flag)
+{
+	ChipmunkSpriteEngine.SYSTEM_SetConfigSleepByInactiveWindow(Flag);
+	g_bSleepByInactiveWindow = Flag;
+}
+
+bool AFL_Config_GetOverFrameRateSleep()
+{
+	return ChipmunkSpriteEngine.SYSTEM_GetConfigOverFrameRateSleep();
+}
+
+void AFL_Config_SetOverFrameRateSleep(bool Flag)
+{
+	ChipmunkSpriteEngine.SYSTEM_SetConfigOverFrameRateSleep(Flag);
+	g_bConfigOverFrameRateSleep = Flag;
+}
+
+void AFL_Config_InitMainWindowPosAndSize()
+{
+	SystemService.InitMainWindowPosAndSize();
+}
+
+void AFL_Config_Network_SetEnableConnection(bool EnableConnection)
+{
+	if (g_Network_EnableConnection == EnableConnection)
+	{
+		return;
+	}
+	g_Network_EnableConnection = EnableConnection;
+	SYS_コンフィグセーブ();
+}
+
+bool AFL_Config_Network_GetEnableConnection()
+{
+	return g_Network_EnableConnection;
+}
+
+void AFL_Config_SetSoftwareRenderMode()
+{
+	g_Config3DSetting.SetRenderMode(0);
+}
+
+void AFL_Config_SetFixShadeRenderMode()
+{
+	g_Config3DSetting.SetRenderMode(1);
+}
+
+void AFL_Config_SetProgrammableShadeRenderMode()
+{
+	g_Config3DSetting.SetRenderMode(2);
+}
+
+bool AFL_Config_IsSoftwareRenderMode()
+{
+	return g_Config3DSetting.GetRenderMode() == 0;
+}
+
+bool AFL_Config_IsFixShadeRenderMode()
+{
+	return g_Config3DSetting.GetRenderMode() == 1;
+}
+
+bool AFL_Config_IsProgrammableShadeRenderMode()
+{
+	return g_Config3DSetting.GetRenderMode() == 2;
+}
+
+void AFL_Config_SetLightingModeOff()
+{
+	g_Config3DSetting.SetLightingMode(0);
+}
+
+void AFL_Config_SetLightingModeOn()
+{
+	g_Config3DSetting.SetLightingMode(1);
+}
+
+bool AFL_Config_IsLightingModeOff()
+{
+	return g_Config3DSetting.GetLightingMode() == 0;
+}
+
+bool AFL_Config_IsLightingModeOn()
+{
+	return g_Config3DSetting.GetLightingMode() == 1;
+}
+
+void AFL_Config_SetAntiAliasingModeNone()
+{
+	g_Config3DSetting.SetAntiAliasingMode(0);
+}
+
+void AFL_Config_SetAntiAliasingMode2()
+{
+	g_Config3DSetting.SetAntiAliasingMode(1);
+}
+
+void AFL_Config_SetAntiAliasingMode4()
+{
+	g_Config3DSetting.SetAntiAliasingMode(2);
+}
+
+void AFL_Config_SetAntiAliasingMode8()
+{
+	g_Config3DSetting.SetAntiAliasingMode(3);
+}
+
+bool AFL_Config_IsAntiAliasingModeNone()
+{
+	return g_Config3DSetting.GetAntiAliasingMode() == 0;
+}
+
+bool AFL_Config_IsAntiAliasingMode2()
+{
+	return g_Config3DSetting.GetAntiAliasingMode() == 1;
+}
+
+bool AFL_Config_IsAntiAliasingMode4()
+{
+	return g_Config3DSetting.GetAntiAliasingMode() == 2;
+}
+
+bool AFL_Config_IsAntiAliasingMode8()
+{
+	return g_Config3DSetting.GetAntiAliasingMode() == 3;
+}
+
+void AFL_Config_SetShadowModeNone()
+{
+	g_Config3DSetting.SetShadowMode(0);
+}
+
+void AFL_Config_SetShadowModeLow()
+{
+	g_Config3DSetting.SetShadowMode(1);
+}
+
+void AFL_Config_SetShadowModeMiddle()
+{
+	g_Config3DSetting.SetShadowMode(2);
+}
+
+void AFL_Config_SetShadowModeHigh()
+{
+	g_Config3DSetting.SetShadowMode(3);
+}
+
+bool AFL_Config_IsShadowModeNone()
+{
+	return g_Config3DSetting.GetShadowMode() == 0;
+}
+
+bool AFL_Config_IsShadowModeLow()
+{
+	return g_Config3DSetting.GetShadowMode() == 1;
+}
+
+bool AFL_Config_IsShadowModeMiddle()
+{
+	return g_Config3DSetting.GetShadowMode() == 2;
+}
+
+bool AFL_Config_IsShadowModeHigh()
+{
+	return g_Config3DSetting.GetShadowMode() == 3;
+}
+
+void AFL_Config_SetShadowMapResolutionLevelMax()
+{
+	g_Config3DSetting.SetShadowMapResolutionLevel(0);
+}
+
+void AFL_Config_SetShadowMapResolutionLevelHigh()
+{
+	g_Config3DSetting.SetShadowMapResolutionLevel(1);
+}
+
+void AFL_Config_SetShadowMapResolutionLevelMiddle()
+{
+	g_Config3DSetting.SetShadowMapResolutionLevel(2);
+}
+
+void AFL_Config_SetShadowMapResolutionLevelLow()
+{
+	g_Config3DSetting.SetShadowMapResolutionLevel(3);
+}
+
+void AFL_Config_SetShadowMapResolutionLevelMin()
+{
+	g_Config3DSetting.SetShadowMapResolutionLevel(4);
+}
+
+bool AFL_Config_IsShadowMapResolutionLevelMax()
+{
+	return g_Config3DSetting.GetShadowMapResolutionLevel() == 0;
+}
+
+bool AFL_Config_IsShadowMapResolutionLevelHigh()
+{
+	return g_Config3DSetting.GetShadowMapResolutionLevel() == 1;
+}
+
+bool AFL_Config_IsShadowMapResolutionLevelMiddle()
+{
+	return g_Config3DSetting.GetShadowMapResolutionLevel() == 2;
+}
+
+bool AFL_Config_IsShadowMapResolutionLevelLow()
+{
+	return g_Config3DSetting.GetShadowMapResolutionLevel() == 3;
+}
+
+bool AFL_Config_IsShadowMapResolutionLevelMin()
+{
+	return g_Config3DSetting.GetShadowMapResolutionLevel() == 4;
+}
+
+void AFL_Config_SetTextureResolutionLevelMax()
+{
+	g_Config3DSetting.SetTextureResolutionLevel(0);
+}
+
+void AFL_Config_SetTextureResolutionLevelHigh()
+{
+	g_Config3DSetting.SetTextureResolutionLevel(1);
+}
+
+void AFL_Config_SetTextureResolutionLevelMiddle()
+{
+	g_Config3DSetting.SetTextureResolutionLevel(2);
+}
+
+void AFL_Config_SetTextureResolutionLevelLow()
+{
+	g_Config3DSetting.SetTextureResolutionLevel(3);
+}
+
+void AFL_Config_SetTextureResolutionLevelMin()
+{
+	g_Config3DSetting.SetTextureResolutionLevel(4);
+}
+
+bool AFL_Config_IsTextureResolutionLevelMax()
+{
+	return g_Config3DSetting.GetTextureResolutionLevel() == 0;
+}
+
+bool AFL_Config_IsTextureResolutionLevelHigh()
+{
+	return g_Config3DSetting.GetTextureResolutionLevel() == 1;
+}
+
+bool AFL_Config_IsTextureResolutionLevelMiddle()
+{
+	return g_Config3DSetting.GetTextureResolutionLevel() == 2;
+}
+
+bool AFL_Config_IsTextureResolutionLevelLow()
+{
+	return g_Config3DSetting.GetTextureResolutionLevel() == 3;
+}
+
+bool AFL_Config_IsTextureResolutionLevelMin()
+{
+	return g_Config3DSetting.GetTextureResolutionLevel() == 4;
+}
+
+void AFL_Config_SetTextureFilterModePoint()
+{
+	g_Config3DSetting.SetTextureFilterMode(0);
+}
+
+void AFL_Config_SetTextureFilterModeLinear()
+{
+	g_Config3DSetting.SetTextureFilterMode(1);
+}
+
+void AFL_Config_SetTextureFilterModeAnisotropic04()
+{
+	g_Config3DSetting.SetTextureFilterMode(2);
+}
+
+void AFL_Config_SetTextureFilterModeAnisotropic08()
+{
+	g_Config3DSetting.SetTextureFilterMode(3);
+}
+
+void AFL_Config_SetTextureFilterModeAnisotropic16()
+{
+	g_Config3DSetting.SetTextureFilterMode(4);
+}
+
+bool AFL_Config_IsTextureFilterModePoint()
+{
+	return g_Config3DSetting.GetTextureFilterMode() == 0;
+}
+
+bool AFL_Config_IsTextureFilterModeLinear()
+{
+	return g_Config3DSetting.GetTextureFilterMode() == 1;
+}
+
+bool AFL_Config_IsTextureFilterModeAnisotropic04()
+{
+	return g_Config3DSetting.GetTextureFilterMode() == 2;
+}
+
+bool AFL_Config_IsTextureFilterModeAnisotropic08()
+{
+	return g_Config3DSetting.GetTextureFilterMode() == 3;
+}
+
+bool AFL_Config_IsTextureFilterModeAnisotropic16()
+{
+	return g_Config3DSetting.GetTextureFilterMode() == 4;
+}
+
+void AFL_Config_SetBumpModeOff()
+{
+	g_Config3DSetting.SetBumpMode(0);
+}
+
+void AFL_Config_SetBumpModeBumpMapping()
+{
+	g_Config3DSetting.SetBumpMode(1);
+}
+
+void AFL_Config_SetBumpModeParallaxMapping()
+{
+	g_Config3DSetting.SetBumpMode(2);
+}
+
+void AFL_Config_SetBumpModeReliefMapping()
+{
+	g_Config3DSetting.SetBumpMode(3);
+}
+
+bool AFL_Config_IsBumpModeOff()
+{
+	return g_Config3DSetting.GetBumpMode() == 0;
+}
+
+bool AFL_Config_IsBumpModeBumpMapping()
+{
+	return g_Config3DSetting.GetBumpMode() == 1;
+}
+
+bool AFL_Config_IsBumpModeParallaxMapping()
+{
+	return g_Config3DSetting.GetBumpMode() == 2;
+}
+
+bool AFL_Config_IsBumpModeReliefMapping()
+{
+	return g_Config3DSetting.GetBumpMode() == 3;
+}
+
+void AFL_Config_SetBloomModeOff()
+{
+	g_Config3DSetting.SetBloomMode(0);
+}
+
+void AFL_Config_SetBloomModeOn()
+{
+	g_Config3DSetting.SetBloomMode(1);
+}
+
+bool AFL_Config_IsBloomModeOff()
+{
+	return g_Config3DSetting.GetBloomMode() == 0;
+}
+
+bool AFL_Config_IsBloomModeOn()
+{
+	return g_Config3DSetting.GetBloomMode() == 1;
+}
+
+void AFL_Config_SetGlareModeOff()
+{
+	g_Config3DSetting.SetGlareMode(0);
+}
+
+void AFL_Config_SetGlareModeOn()
+{
+	g_Config3DSetting.SetGlareMode(1);
+}
+
+bool AFL_Config_IsGlareModeOff()
+{
+	return g_Config3DSetting.GetGlareMode() == 0;
+}
+
+bool AFL_Config_IsGlareModeOn()
+{
+	return g_Config3DSetting.GetGlareMode() == 1;
+}
+
+void AFL_Config_SetFogModeOff()
+{
+	g_Config3DSetting.SetFogMode(0);
+}
+
+void AFL_Config_SetFogModeOn()
+{
+	g_Config3DSetting.SetFogMode(1);
+}
+
+bool AFL_Config_IsFogModeOff()
+{
+	return g_Config3DSetting.GetFogMode() == 0;
+}
+
+bool AFL_Config_IsFogModeOn()
+{
+	return g_Config3DSetting.GetFogMode() == 1;
+}
+
+void AFL_Config_SetSpecularModeOff()
+{
+	g_Config3DSetting.SetSpecularMode(0);
+}
+
+void AFL_Config_SetSpecularModeOn()
+{
+	g_Config3DSetting.SetSpecularMode(1);
+}
+
+bool AFL_Config_IsSpecularModeOff()
+{
+	return g_Config3DSetting.GetSpecularMode() == 0;
+}
+
+bool AFL_Config_IsSpecularModeOn()
+{
+	return g_Config3DSetting.GetSpecularMode() == 1;
+}
+
+void AFL_Config_SetSoftFogEdgeModeOff()
+{
+	g_Config3DSetting.SetSoftFogEdgeMode(0);
+}
+
+void AFL_Config_SetSoftFogEdgeModeOn()
+{
+	g_Config3DSetting.SetSoftFogEdgeMode(1);
+}
+
+bool AFL_Config_IsSoftFogEdgeModeOff()
+{
+	return g_Config3DSetting.GetSoftFogEdgeMode() == 0;
+}
+
+bool AFL_Config_IsSoftFogEdgeModeOn()
+{
+	return g_Config3DSetting.GetSoftFogEdgeMode() == 1;
+}
+
+void AFL_Config_SetSSAOModeOff()
+{
+	g_Config3DSetting.SetSSAOMode(0);
+}
+
+void AFL_Config_SetSSAOModeOn()
+{
+	g_Config3DSetting.SetSSAOMode(1);
+}
+
+bool AFL_Config_IsSSAOModeOff()
+{
+	return g_Config3DSetting.GetSSAOMode() == 0;
+}
+
+bool AFL_Config_IsSSAOModeOn()
+{
+	return g_Config3DSetting.GetSSAOMode() == 1;
+}
+
+void AFL_Config_SetLightMapModeOff()
+{
+	g_Config3DSetting.SetLightMapMode(0);
+}
+
+void AFL_Config_SetLightMapModeOn()
+{
+	g_Config3DSetting.SetLightMapMode(1);
+}
+
+bool AFL_Config_IsLightMapModeOff()
+{
+	return g_Config3DSetting.GetLightMapMode() == 0;
+}
+
+bool AFL_Config_IsLightMapModeOn()
+{
+	return g_Config3DSetting.GetLightMapMode() == 1;
+}
+
+void AFL_Config_SetEdgeOff()
+{
+	g_Config3DSetting.SetEdge(0);
+}
+
+void AFL_Config_SetEdgeOn()
+{
+	g_Config3DSetting.SetEdge(1);
+}
+
+bool AFL_Config_IsEdgeOff()
+{
+	return g_Config3DSetting.GetEdge() == 0;
+}
+
+bool AFL_Config_IsEdgeOn()
+{
+	return g_Config3DSetting.GetEdge() == 1;
+}
+
+void AFL_Config_SetDOFModeOff()
+{
+	g_Config3DSetting.SetDOFMode(0);
+}
+
+void AFL_Config_SetDOFModeOn()
+{
+	g_Config3DSetting.SetDOFMode(1);
+}
+
+bool AFL_Config_IsDOFModeOff()
+{
+	return g_Config3DSetting.GetDOFMode() == 0;
+}
+
+bool AFL_Config_IsDOFModeOn()
+{
+	return g_Config3DSetting.GetDOFMode() == 1;
+}
+
+bool AFL_Config_GetShowFPS()
+{
+	return AFL_DebugFPS_GetShow();
+}
+
+void AFL_Config_SetShowFPS(bool Flag)
+{
+	AFL_DebugFPS_SetShow(Flag);
+}
+
+bool AFL_Config_GetShowMemorySize()
+{
+	return g_DebugMemorySize.GetShow();
+}
+
+void AFL_Config_SetShowMemorySize(bool Flag)
+{
+	g_DebugMemorySize.SetShow(Flag);
+}
+
+bool AFL_Config_GetShowFillRate()
+{
+	return g_DebugFillRate.GetShow();
+}
+
+void AFL_Config_SetShowFillRate(bool Flag)
+{
+	g_DebugFillRate.SetShow(Flag);
+}
+
+bool AFL_Config_GetShowVideoMemorySize()
+{
+	return g_DebugVideoMemorySize.GetShow();
+}
+
+void AFL_Config_SetShowVideoMemorySize(bool Flag)
+{
+	g_DebugVideoMemorySize.SetShow(Flag);
+}
+
+bool AFL_Config_GetDisavleDebugInfo()
+{
+	return !g_CompulsorilyShowDebugInfo;
+}
+
+void AFL_Config_SetDisavleDebugInfo(bool Flag)
+{
+	g_CompulsorilyShowDebugInfo = !Flag;
+}
+
+void AFL_Config_SetShowVoicePlaying(bool Flg)
+{
+	g_DebugVoicePlaying.SetShow(Flg);
+}
+
+bool AFL_Config_GetShowVoicePlaying()
+{
+	return g_DebugVoicePlaying.IsShow();
+}
+
+void AFL_Config_SetShowSEPlaying(bool Flg)
+{
+	g_DebugGimicSEPlaying.SetShow(Flg);
+}
+
+bool AFL_Config_GetShowSEPlaying()
+{
+	return g_DebugGimicSEPlaying.IsShow();
+}
+
+void AFL_Config_SetShowBackVoicePlaying(bool Flg)
+{
+	g_DebugBackVoicePlaying.SetShow(Flg);
+}
+
+bool AFL_Config_GetShowBackVoicePlaying()
+{
+	return g_DebugBackVoicePlaying.IsShow();
+}
+
+string AFL_Config_GetHelpText(int Type, bool AddNewLine)
+{
+	string NewLineText = AddNewLine ? "\n" : "";
+	string NewLineText2 = AddNewLine ? "\n\n" : "";
+	switch (Type)
+	{
+	case 0:
+		return "ゲーム画面の比率と同じでないディスプレイ" + NewLineText + "でも、フルスクリーン時に画面比率を維持" + NewLineText + "します。" + NewLineText2 + "この機能を使うにはDirect3Dが正常に" + NewLineText + "動作するビデオカードが必要です。";
+	case 1:
+		return "【フルスクリーン時の画面比率が標準の場合】" + NewLineText + "フルスクリーン時はディスプレイの拡大機能が" + NewLineText + "使用されます。ウィンドウモードの時は、" + NewLineText + "バイリニアフィルタリングが適用されます。" + NewLineText2 + "【フルスクリーン時の画面比率が固定の場合】" + NewLineText + "バイリニアフィルタリングが適用されます。";
+	case 2:
+		return "「標準」よりもよりシャープで綺麗な画質に" + NewLineText + "なります。" + NewLineText2 + "フルスクリーン時の画面比率が固定の場合と、" + NewLineText + "ウィンドウモード時のみ、この機能が適用" + NewLineText + "されます。" + NewLineText2 + "使用するにはシェーダモデル３．０に" + NewLineText + "対応したビデオカードが必要です。";
+	case 3:
+		return "画面更新時に垂直同期を待つことで、画面の" + NewLineText + "ちらつきを抑えることができます。";
+	case 4:
+		return "オフにすることで、マルチディスプレイ環境" + NewLineText + "において、フルスクリーン時に他の" + NewLineText + "ディスプレイ上のウィンドウをアクティブに" + NewLineText + "した時に、ゲーム側のウィンドウが最小化" + NewLineText + "されないようにします。";
+	case 5:
+		return "画面更新頻度を適度に抑え、ＣＰＵ使用率を" + NewLineText + "下げます。" + NewLineText2 + "なお、自動的に動作クロックを下げる機能を" + NewLineText + "持つＣＰＵを使用している場合、タスク" + NewLineText + "マネージャ上でのＣＰＵ使用率の値が" + NewLineText + "下がらない場合があります。";
+	}
+	return "";
+}
+
+string AFL_Config_GetWindowHelpTextForAspect()
+{
+	return AFL_Config_GetHelpText(0, true);
+}
+
+string AFL_Config_GetWindowHelpTextForScalingDefault()
+{
+	return AFL_Config_GetHelpText(1, true);
+}
+
+string AFL_Config_GetWindowHelpTextForScalingBicubic()
+{
+	return AFL_Config_GetHelpText(2, true);
+}
+
+string AFL_Config_GetWindowHelpTextForWaitVSync()
+{
+	return AFL_Config_GetHelpText(3, true);
+}
+
+string AFL_Config_GetWindowHelpTextForMinimizeByFullscreen()
+{
+	return AFL_Config_GetHelpText(4, true);
+}
+
+string AFL_Config_GetWindowHelpTextForOverFramerateSleep()
+{
+	return AFL_Config_GetHelpText(5, true);
+}
+
+string AFL_Config_Get3DHelpTextForRenderMode()
+{
+	return "";
+}
+
+string AFL_Config_Get3DHelpTextForAntiAliasing()
+{
+	return "ポリゴンのエッジをなめらかにします。\n\n" + "ビデオカードが対応している必要があります。";
+}
+
+string AFL_Config_Get3DHelpTextForShadowMode()
+{
+	return "描画するには、浮動小数点テクスチャに対応した\n" + "ビデオカードが必要です。";
+}
+
+string AFL_Config_Get3DHelpTextForShadowmapResolutionLevel()
+{
+	return "より上品質の設定をおこなうと影描画の画質が\n" + "向上しますが、ビデオメモリの消費量が多くなります。\n\n" + "ビデオカードによっては、上品質の設定ほど\n" + "対応していない場合があります。";
+}
+
+string AFL_Config_Get3DHelpTextForTextureResolutionLevel()
+{
+	return "より上品質の設定をおこなうと画質が\n" + "向上しますが、ビデオメモリの消費量が多くなります。\n\n" + "ビデオカードによっては、上品質の設定ほど\n" + "対応していない場合があります。";
+}
+
+string AFL_Config_Get3DHelpTextForTextureFilterMode()
+{
+	return "次数が高いほど画質が向上します。\n" + "ビデオカードによっては、上位の設定ほど\n" + "対応していない場合があります。";
+}
+
+string AFL_Config_Get3DHelpTextForBumpMode()
+{
+	return "凸凹を強調します。";
+}
+
+string AFL_Config_Get3DHelpTextForBloomMode()
+{
+	return "自己発光の輝きを描画します。";
+}
+
+string AFL_Config_Get3DHelpTextForGlareMode()
+{
+	return "明るい部分の輝きを描画します。";
+}
+
+string AFL_Config_Get3DHelpTextForFogMode()
+{
+	return "霧や空気感を描画します。";
+}
+
+string AFL_Config_Get3DHelpTextForSpecularMode()
+{
+	return "光の反射を描画します。";
+}
+
+string AFL_Config_Get3DHelpTextForSoftFogMode()
+{
+	return "アルファブレンディングされるビルボード等の\n" + "ポリゴン交差部分をぼかします。\n" + "浮動小数点テクスチャに対応したビデオカードが\n" + "必要です。";
+}
+
+string AFL_Config_Get3DHelpTextForSSAOMode()
+{
+	return "光が届きにくい部分を暗くします。\n" + "浮動小数点テクスチャに対応したビデオカードが\n" + "必要です。";
+}
+
+string AFL_Config_Get3DHelpTextForLightMapMode()
+{
+	return "影を焼き込みます。";
+}
+
+string AFL_Config_Get3DHelpTextForEdge()
+{
+	return "エッジを描画します。";
+}
+
+string AFL_Config_Get3DHelpTextForDOF()
+{
+	return "被写界深度フィルタを使用します。\n" + "浮動小数点テクスチャに対応したビデオカードが\n" + "必要です。";
+}
+

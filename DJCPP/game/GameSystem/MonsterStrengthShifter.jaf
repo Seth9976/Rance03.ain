@@ -1,0 +1,149 @@
+MonsterStrengthShifter::MonsterStrengthShifter()
+{
+	this.resetLocalRatio();
+	this.resetGlobalRatio();
+}
+
+void MonsterStrengthShifter::setLocalHpRatio(float ratio)
+{
+	this.localHpRatio_ = ratio;
+}
+
+void MonsterStrengthShifter::setLocalAtkRatio(float ratio)
+{
+	this.localAtkRatio_ = ratio;
+}
+
+void MonsterStrengthShifter::setLocalGoldRatio(float ratio)
+{
+	this.localGoldRatio_ = ratio;
+}
+
+void MonsterStrengthShifter::setLocalExpRatio(float ratio)
+{
+	this.localExpRatio_ = ratio;
+}
+
+void MonsterStrengthShifter::setLocalBuffRatio(float ratio)
+{
+	this.localBuffRatio_ = ratio;
+}
+
+void MonsterStrengthShifter::setGlobalHpRatio(float ratio)
+{
+	this.globalHpRatio_ = ratio;
+}
+
+void MonsterStrengthShifter::setGlobalAtkRatio(float ratio)
+{
+	this.globalAtkRatio_ = ratio;
+}
+
+void MonsterStrengthShifter::setGlobalGoldRatio(float ratio)
+{
+	this.globalGoldRatio_ = ratio;
+}
+
+void MonsterStrengthShifter::setGlobalExpRatio(float ratio)
+{
+	this.globalExpRatio_ = ratio;
+}
+
+void MonsterStrengthShifter::setGlobalBuffRatio(float ratio)
+{
+	this.globalBuffRatio_ = ratio;
+}
+
+float MonsterStrengthShifter::getHpRatio()
+{
+	return this.localHpRatio_ * this.globalHpRatio_;
+}
+
+float MonsterStrengthShifter::getAtkRatio()
+{
+	return this.localAtkRatio_ * this.globalAtkRatio_;
+}
+
+float MonsterStrengthShifter::getGoldRatio()
+{
+	return this.localGoldRatio_ * this.globalGoldRatio_;
+}
+
+float MonsterStrengthShifter::getExpRatio()
+{
+	return this.localExpRatio_ * this.globalExpRatio_;
+}
+
+float MonsterStrengthShifter::getBuffRatio()
+{
+	return this.localBuffRatio_ * this.globalBuffRatio_;
+}
+
+float MonsterStrengthShifter::getLocalHpRatio()
+{
+	return this.localHpRatio_;
+}
+
+float MonsterStrengthShifter::getLocalAtkRatio()
+{
+	return this.localAtkRatio_;
+}
+
+float MonsterStrengthShifter::getLocalGoldRatio()
+{
+	return this.localGoldRatio_;
+}
+
+float MonsterStrengthShifter::getLocalExpRatio()
+{
+	return this.localExpRatio_;
+}
+
+float MonsterStrengthShifter::getLocalBuffRatio()
+{
+	return this.localBuffRatio_;
+}
+
+float MonsterStrengthShifter::getGlobalHpRatio()
+{
+	return this.globalHpRatio_;
+}
+
+float MonsterStrengthShifter::getGlobalAtkRatio()
+{
+	return this.globalAtkRatio_;
+}
+
+float MonsterStrengthShifter::getGlobalGoldRatio()
+{
+	return this.globalGoldRatio_;
+}
+
+float MonsterStrengthShifter::getGlobalExpRatio()
+{
+	return this.globalExpRatio_;
+}
+
+float MonsterStrengthShifter::getGlobalBuffRatio()
+{
+	return this.globalBuffRatio_;
+}
+
+void MonsterStrengthShifter::resetGlobalRatio()
+{
+	this.globalHpRatio_ = 1.0;
+	this.globalAtkRatio_ = 1.0;
+	this.globalGoldRatio_ = 1.0;
+	this.globalExpRatio_ = 1.0;
+	this.globalBuffRatio_ = 1.0;
+}
+
+void MonsterStrengthShifter::resetLocalRatio()
+{
+	this.localHpRatio_ = 1.0;
+	this.localAtkRatio_ = 1.0;
+	this.localGoldRatio_ = 1.0;
+	this.localExpRatio_ = 1.0;
+	this.localBuffRatio_ = 1.0;
+}
+

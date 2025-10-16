@@ -1,0 +1,45 @@
+void initGameMode()
+{
+	AFL_SetInvalidateFrameSkipWhileMessageSkip(false);
+}
+
+void setGameMode(bool isGameMode)
+{
+	int val = isGameMode;
+	g_lastFrameSkipMode.PushBack(AFL_GetInvalidateFrameSkipWhileMessageSkip());
+	AFL_SetInvalidateFrameSkipWhileMessageSkip(isGameMode);
+	オートモードマーク表示許可設定(!isGameMode);
+	既読スキップモードマーク表示許可設定(!isGameMode);
+	updateGameModeParts(isGameMode);
+	g_hallucination.update();
+}
+
+void restoreGameMode()
+{
+	bool bFlg = false;
+	if (g_lastFrameSkipMode.Empty())
+	{
+		bFlg = false;
+	}
+	else
+	{
+		bFlg = g_lastFrameSkipMode[g_lastFrameSkipMode.Numof() - 1];
+		g_lastFrameSkipMode.PopBack();
+	}
+	int val = bFlg;
+	AFL_SetInvalidateFrameSkipWhileMessageSkip(bFlg);
+	オートモードマーク表示許可設定(!bFlg);
+	既読スキップモードマーク表示許可設定(!bFlg);
+	updateGameModeParts(bFlg);
+	g_hallucination.update();
+}
+
+bool getGameMode()
+{
+	return AFL_GetInvalidateFrameSkipWhileMessageSkip();
+}
+
+void updateGameModeParts(bool isGameMode)
+{
+}
+

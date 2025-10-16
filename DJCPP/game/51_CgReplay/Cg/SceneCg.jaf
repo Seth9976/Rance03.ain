@@ -1,0 +1,70 @@
+void SceneCg::init()
+{
+	this.isFinish_ = false;
+	this.pageCount_ = (g_cgList.Numof() + 11) / 12;
+	this.initTab();
+	this.initThumbnailList();
+	this.initButton();
+}
+
+void SceneCg::initThumbnailList()
+{
+	this.list_.init(true);
+	this.list_.setOnClickCallback(this.onClickThumbnailButton);
+}
+
+void SceneCg::initButton()
+{
+	this.btnExit_.init("システム／ボタン／幅１７０", "閉じる", "", true);
+	this.btnExit_.setPos(839, 691);
+	this.btnExit_.setClickCallback(this.onClickButtonExit, 0);
+}
+
+void SceneCg::onClickButtonExit(int index)
+{
+	this.fadeIn(false);
+}
+
+void SceneCg::initTab()
+{
+}
+
+void SceneCg::run()
+{
+	this.fadeIn(true);
+}
+
+void SceneCg::fadeIn(bool val)
+{
+	this.list_.fadeIn(val, NULL);
+	this.btnExit_.fadeIn(val);
+	if (!val)
+	{
+		this.timerCb_.setTimer(300, this.onFinish);
+	}
+}
+
+void SceneCg::onFinish()
+{
+	this.isFinish_ = true;
+}
+
+bool SceneCg::update()
+{
+	if (g_mouse.isClick(1))
+	{
+		playCancel();
+		this.fadeIn(false);
+	}
+	return !this.isFinish_;
+}
+
+void SceneCg::onClickThumbnailButton(int index)
+{
+	string key = "ＣＧ%02d" % (index + 1);
+	g_globalGameFlag.setInt(key, g_globalGameFlag.getInt(key) + 1);
+	array@string n;
+	g_cgList[index].getShownCgList(n);
+	openCgSwipeView(n);
+}
+

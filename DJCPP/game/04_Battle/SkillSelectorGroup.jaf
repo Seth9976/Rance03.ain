@@ -1,0 +1,281 @@
+SkillSelectorGroup::SkillSelectorGroup()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+	this.lastHoverIndex_ = -1;
+	this.isEnable_ = true;
+}
+
+void SkillSelectorGroup::init()
+{
+	this.initPanel();
+	this.initOrderList();
+	this.initSelector();
+}
+
+void SkillSelectorGroup::reset()
+{
+	this.initOrderList();
+	this.initSelector();
+}
+
+void SkillSelectorGroup::initOrderList()
+{
+	this.orderList_.Alloc(g_party.getCount());
+	int i;
+	for (i = 0; i < this.orderList_.Numof(); ++i)
+	{
+		this.orderList_[i] = -1;
+	}
+}
+
+void SkillSelectorGroup::initPanel()
+{
+	this.partsPanelBase_.initAsFlat("システム／戦闘／フレーム／下地");
+	this.partsPanelBase_.setShow(true);
+	this.partsPanelBase_.setZ(2600.0);
+	this.partsPanelChaos_.initAsFlat("システム／戦闘／フレーム／カオス");
+	this.partsPanelChaos_.setShow(true);
+	this.partsPanelChaos_.setZ(2640.0);
+}
+
+void SkillSelectorGroup::hideSelected(string attackSkillId)
+{
+	int index = this.getIndexFromId(attackSkillId);
+	if (0 <= index && index < this.selector_.Numof())
+	{
+		this.selector_[index].hideSelected();
+	}
+}
+
+void SkillSelectorGroup::initSelector()
+{
+	this.selector_.Alloc(g_party.getCount());
+	int i;
+	for (i = 0; i < this.selector_.Numof(); ++i)
+	{
+		ref PlayerSkill atk = getPlayerSkillFromId(g_party.getAttackSkillId(i));
+		this.selector_[i].init(atk.getId(), atk.getPlayerId(), i, false);
+		this.selector_[i].setOnClickCallback(this.onClickSelect);
+		this.selector_[i].setEnable(false);
+	}
+}
+
+int SkillSelectorGroup::getIndexFromId(string id)
+{
+	int i;
+	for (i = 0; i < g_party.getCount(); ++i)
+	{
+		if (g_party.getAttackSkillId(i) == id)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+void SkillSelectorGroup::clearOrder()
+{
+	int i;
+	for (i = 0; i < this.orderList_.Numof(); ++i)
+	{
+		this.orderList_[i] = -1;
+		this.selector_[i].setSelected(-1);
+	}
+}
+
+void SkillSelectorGroup::updateCoolTime()
+{
+	int i;
+	for (i = 0; i < this.selector_.Numof(); ++i)
+	{
+		ref PlayerSkill atk = getPlayerSkillFromId(g_party.getAttackSkillId(i));
+		ref Player p = getPlayerFromId(atk.getPlayerId());
+		this.selector_[i].setCoolTime(p.getCoolTime(atk.getId()));
+	}
+}
+
+void SkillSelectorGroup::setShowMoveOff()
+{
+	int i;
+	for (i = 0; i < this.selector_.Numof(); ++i)
+	{
+		this.selector_[i].setShowMoveOff();
+	}
+}
+
+void SkillSelectorGroup::getSelectedIdList(ref array@string result)
+{
+	result.Free();
+	int i;
+	for (i = 0; i < 8; ++i)
+	{
+		int index = this.orderList_.Find(0, this.orderList_.Numof(), i);
+		if (index >= 0)
+		{
+			result.PushBack(g_party.getAttackSkillId(index));
+		}
+	}
+}
+
+void SkillSelectorGroup::getAvailableIdList(ref array@string result)
+{
+	result.Free();
+	int i;
+	for (i = 0; i < this.selector_.Numof(); ++i)
+	{
+		if (this.selector_[i].isAvailable())
+		{
+			result.PushBack(g_party.getAttackSkillId(i));
+		}
+	}
+}
+
+void SkillSelectorGroup::update()
+{
+	int index = -1;
+	int i;
+	for (i = 0; i < this.selector_.Numof(); ++i)
+	{
+		if (this.selector_[i].isHover())
+		{
+			index = i;
+			break;
+		}
+	}
+	if (this.lastHoverIndex_ != index)
+	{
+		this.hoverCb_(index);
+	}
+	this.lastHoverIndex_ = index;
+}
+
+void SkillSelectorGroup::onClickSelect(int index)
+{
+	int n = this.getNextNumber();
+	if (this.orderList_[index] == -1)
+	{
+		this.orderList_[index] = n;
+		this.selector_[index].setSelected(n);
+	}
+	else
+	{
+		int current = this.orderList_[index];
+		this.orderList_[index] = -1;
+		this.selector_[index].setSelected(-1);
+		int i;
+		for (i = 0; i < this.orderList_.Numof(); ++i)
+		{
+			if (current < this.orderList_[i])
+			{
+				--this.orderList_[i];
+				this.selector_[i].setSelected(this.orderList_[i]);
+			}
+		}
+	}
+}
+
+void SkillSelectorGroup::select(int index)
+{
+	if (0 <= index && index < this.selector_.Numof())
+	{
+		if (this.selector_[index].isAvailable())
+		{
+			this.onClickSelect(index);
+		}
+	}
+}
+
+bool SkillSelectorGroup::isSelected(int index)
+{
+	if (0 <= index && index < this.selector_.Numof())
+	{
+		return this.selector_[index].getSelected() != -1;
+	}
+	return false;
+}
+
+int SkillSelectorGroup::getNextNumber()
+{
+	int n = -1;
+	int i;
+	for (i = 0; i < this.orderList_.Numof(); ++i)
+	{
+		n = Math.Max(this.orderList_[i], n);
+	}
+	return n + 1;
+}
+
+void SkillSelectorGroup::setEnable(bool val)
+{
+	if (this.isEnable_ == val)
+	{
+		return;
+	}
+	this.isEnable_ = val;
+	this.moveOffPanel(!val);
+	if (val)
+	{
+		DG_TelopFunction fn;
+		fn = EX_String("テロップ関数", "");
+		this.telop_.init(fn(), 537, 689, 0, 729);
+		fn.Clear();
+	}
+	this.telop_.fadeIn(val, NULL);
+	int i;
+	for (i = 0; i < this.selector_.Numof(); ++i)
+	{
+		this.selector_[i].moveOff(!val);
+		this.selector_[i].setEnable(val);
+	}
+}
+
+void SkillSelectorGroup::moveOffPanel(bool val)
+{
+	PartsMotion m;
+	if (val)
+	{
+		m.setMove(0, 0, 0, 40, 1);
+	}
+	else
+	{
+		m.setMove(0, 40, 0, 0, 1);
+	}
+	this.partsPanelBase_.runMotion(m, NULL);
+	this.partsPanelChaos_.runMotion(m, NULL);
+}
+
+void SkillSelectorGroup::fadeIn(bool val)
+{
+	int i;
+	for (i = 0; i < this.selector_.Numof(); ++i)
+	{
+		this.selector_[i].fadeIn(val, false);
+	}
+	if (val)
+	{
+		this.partsPanelBase_.startFlat(false, 1.0);
+		this.partsPanelChaos_.startFlat(false, 1.0);
+	}
+	else
+	{
+		PartsMotion m;
+		m.setAlpha(255, 0, 0);
+		this.partsPanelBase_.runMotion(m, NULL);
+		this.partsPanelChaos_.runMotion(m, NULL);
+	}
+}
+
+void SkillSelectorGroup::updateShowState()
+{
+	int i;
+	for (i = 0; i < this.selector_.Numof(); ++i)
+	{
+		this.selector_[i].updateShowState();
+	}
+}
+
+void SkillSelectorGroup::setOnChangeHoverIndex(DG_OnChangeHoverIndex cb)
+{
+	this.hoverCb_ = cb;
+}
+

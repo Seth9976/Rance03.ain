@@ -1,0 +1,103 @@
+GameObject::GameObject()
+{
+	this.isIndependent_ = false;
+	this.stackLevel_ = 0;
+}
+
+bool GameObject::isAlive()
+{
+	return this.updateMethod_.Numof() != 0;
+}
+
+void GameObject::setIndependentObject(bool val)
+{
+	this.isIndependent_ = val;
+}
+
+bool GameObject::isIndependentObject()
+{
+	return this.isIndependent_;
+}
+
+void GameObject::addSceneStackLevel()
+{
+	if (this.isIndependent_)
+	{
+		return;
+	}
+	++this.stackLevel_;
+}
+
+void GameObject::decSceneStackLevel()
+{
+	if (this.isIndependent_)
+	{
+		return;
+	}
+	this.stackLevel_ = Math.Max(this.stackLevel_ - 1, 0);
+}
+
+bool GameObject::isStacked()
+{
+	return this.stackLevel_ > 0;
+}
+
+void GameObject::setId(int id)
+{
+	this.id_ = id;
+}
+
+void GameObject::setUpdateMethod(DELEGATE_UPDATE_METHOD cbUpdate)
+{
+	this.updateMethod_ = cbUpdate;
+}
+
+void GameObject::setFocusedMethod(DELEGATE_FOCUSED_METHOD cbFocused)
+{
+	this.focusedMethod_ = cbFocused;
+}
+
+void GameObject::setSceneStackLevel(int val)
+{
+	this.stackLevel_ = Math.Max(0, val);
+}
+
+int GameObject::getId()
+{
+	return this.id_;
+}
+
+int GameObject::getSceneStackLevel()
+{
+	return this.stackLevel_;
+}
+
+bool GameObject::callUpdateMethod()
+{
+	if (this.updateMethod_.Numof() != 0)
+	{
+		this.updateMethod_();
+		return true;
+	}
+	return false;
+}
+
+bool GameObject::callFocuedMethod()
+{
+	if (this.focusedMethod_.Numof() != 0)
+	{
+		return this.focusedMethod_();
+	}
+	return false;
+}
+
+void GameObject::setObjectName(string val)
+{
+	this.objectName_ = val;
+}
+
+string GameObject::getObjectName()
+{
+	return this.objectName_;
+}
+

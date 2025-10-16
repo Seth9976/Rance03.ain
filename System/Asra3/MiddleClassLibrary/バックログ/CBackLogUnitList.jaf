@@ -1,0 +1,116 @@
+CBackLogUnitList::CBackLogUnitList()
+{
+	AFL_Parts_AddBeginUpdateEvent(this.PlayingVoice);
+}
+
+CBackLogUnitList::~CBackLogUnitList()
+{
+	AFL_Parts_EraseBeginUpdateEvent(this.PlayingVoice);
+}
+
+void CBackLogUnitList::Init(float PosX, float PosY, float PosZ, ref array@SBackLogUnitModel List)
+{
+	this.m_MainLayout.Create();
+	this.m_MainLayout.SetPos(PosX, PosY);
+	this.m_MainLayout.SetZ(PosZ);
+	this.m_ModelList <- List;
+}
+
+void CBackLogUnitList::Free()
+{
+	this.m_List.Free();
+}
+
+void CBackLogUnitList::AddUnit(ref SBackLogUnitModel Model)
+{
+	if (Model.m_Separator)
+	{
+		this.AddSeparate(Model);
+		return;
+	}
+	this.AddLog(Model);
+}
+
+void CBackLogUnitList::AddLog(ref SBackLogUnitModel Model)
+{
+	if (this.m_List.Empty())
+	{
+		this.PushUnit();
+	}
+	this.m_List[this.m_List.Numof() - 1].Add(Model);
+}
+
+void CBackLogUnitList::AddSeparate(ref SBackLogUnitModel Model)
+{
+	this.PushUnit();
+	this.m_List[this.m_List.Numof() - 1].Add(Model);
+	this.PushUnit();
+}
+
+void CBackLogUnitList::PushUnit()
+{
+	this.m_List.Realloc(this.m_List.Numof() + 1);
+}
+
+void CBackLogUnitList::Build(CASCharSpriteProperty Font, CASCharSpriteProperty VoiceFont, CASCharSpriteProperty VoiceOnFont, CASCharSpriteProperty PlayVoiceFont, int CharSpace, int LineSpace, int Width)
+{
+	int i;
+	for (i = 0; i < this.m_List.Numof(); ++i)
+	{
+		this.m_List[i].AddPlayVoiceEvent(this.NotifyPlayVoiceEvent);
+		this.m_List[i].Build(this.m_MainLayout.GetPartsNumber(), Font, VoiceFont, VoiceOnFont, PlayVoiceFont, CharSpace, LineSpace, Width);
+	}
+}
+
+void CBackLogUnitList::NotifyPlayVoiceEvent(ref array@string List)
+{
+	this.StopVoice();
+	this.m_VoiceList.Free();
+	if (List.Empty())
+	{
+		return;
+	}
+	this.m_VoiceList.Alloc(List.Numof());
+	this.m_VoiceList.Copy(0, List, 0, List.Numof());
+	SYS_PlayVoice(this.m_VoiceList[0]);
+}
+
+void CBackLogUnitList::PlayingVoice(int PassedTime)
+{
+	if (this.m_VoiceList.Empty())
+	{
+		return;
+	}
+	if (SYS_IsPlayVoice())
+	{
+		return;
+	}
+	if (this.m_VoiceList.Numof() == 1)
+	{
+		this.StopVoice();
+	}
+	this.m_VoiceList.Erase(0);
+	if (this.m_VoiceList.Empty())
+	{
+		return;
+	}
+	SYS_PlayVoice(this.m_VoiceList[0]);
+}
+
+void CBackLogUnitList::StopVoice()
+{
+	int i;
+	for (i = 0; i < this.m_List.Numof(); ++i)
+	{
+		this.m_List[i].StopVoice();
+	}
+	if (this.m_ModelList !== NULL)
+	{
+		for (i = 0; i < this.m_ModelList.Numof(); ++i)
+		{
+			this.m_ModelList[i].m_Playing = false;
+		}
+	}
+	SYS_StopVoice();
+}
+

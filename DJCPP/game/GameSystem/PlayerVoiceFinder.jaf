@@ -1,0 +1,72 @@
+void PlayerVoiceFinder::init(string playerId)
+{
+	this.playerId_ = playerId;
+	this.loadFromEx();
+	this.initRoundRobin();
+}
+
+void PlayerVoiceFinder::loadFromEx()
+{
+	string key = "システムボイス情報";
+	int count = EX_Height(key);
+	int i;
+	for (i = 0; i < count; ++i)
+	{
+		string id = EX_RA2String(key, i, "playerId", "");
+		if (id == this.playerId_)
+		{
+			VoiceNumberText n;
+			n.number = EX_RA2Int(key, i, "voice", 0);
+			n.text = EX_RA2String(key, i, "text", "");
+			n.hastleOk = EX_RA2Int(key, i, "hastleOk", 0);
+			int type = EX_RA2Int(key, i, "type", 0);
+			this.typeGroup_[type].numberText.PushBack(n);
+		}
+	}
+}
+
+void PlayerVoiceFinder::initRoundRobin()
+{
+	int i;
+	for (i = 0; i < this.roundRobin_.Numof(); ++i)
+	{
+		this.roundRobin_[i].init(this.typeGroup_[i].numberText.Numof());
+	}
+}
+
+int PlayerVoiceFinder::getFromType(int type, ref string text)
+{
+	if (type <= 6)
+	{
+		int index = this.roundRobin_[type].get();
+		if (text !== NULL)
+		{
+			text = this.typeGroup_[type].numberText[index].text;
+		}
+		return this.typeGroup_[type].numberText[index].number;
+	}
+	return -1;
+}
+
+int PlayerVoiceFinder::getFromText(string text)
+{
+	int i;
+	for (i = 7; i < this.typeGroup_.Numof(); ++i)
+	{
+		int j;
+		for (j = 0; j < this.typeGroup_[i].numberText.Numof(); ++j)
+		{
+			if (this.typeGroup_[i].numberText[j].text == text)
+			{
+				return this.typeGroup_[i].numberText[j].number;
+			}
+		}
+	}
+	return -1;
+}
+
+string PlayerVoiceFinder::getId()
+{
+	return this.playerId_;
+}
+

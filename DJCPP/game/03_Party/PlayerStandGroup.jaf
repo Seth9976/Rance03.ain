@@ -1,0 +1,97 @@
+PlayerStandGroup::PlayerStandGroup()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void PlayerStandGroup::init()
+{
+	array@string player;
+	int i;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		if (g_player[i].isJoin())
+		{
+			player.PushBack(g_player[i].getId());
+		}
+	}
+	this.scroller_.init(0, 0, 1024, 768, 300 * (player.Numof() - 1), 300, false);
+	this.initView(player);
+}
+
+void PlayerStandGroup::initView(array@string playerId)
+{
+	this.stand_.Alloc(playerId.Numof());
+	int i;
+	for (i = 0; i < this.stand_.Numof(); ++i)
+	{
+		this.stand_[i].init(playerId[i]);
+		this.stand_[i].setVirtualPos(i);
+		this.stand_[i].setGroupPos(512, 515, true);
+	}
+}
+
+void PlayerStandGroup::fadeIn(bool val)
+{
+	int i;
+	for (i = 0; i < this.stand_.Numof(); ++i)
+	{
+		this.stand_[i].fadeIn(val);
+	}
+}
+
+void PlayerStandGroup::update()
+{
+	float n = this.scroller_.getCurrentPosition() / 300.0;
+	if (this.currentPos_ != n)
+	{
+		this.currentPos_ = n;
+		this.updateViewPos();
+	}
+}
+
+void PlayerStandGroup::updateViewPos()
+{
+	int i;
+	for (i = 0; i < this.stand_.Numof(); ++i)
+	{
+		this.stand_[i].setVirtualPos(-this.currentPos_ + i);
+	}
+}
+
+void PlayerStandGroup::changePos(int val)
+{
+	this.scroller_.scrollTo(val * 300);
+}
+
+void PlayerStandGroup::setPos(int val)
+{
+	this.changePos(val);
+}
+
+void PlayerStandGroup::moveNext(bool isNext)
+{
+	float p = this.scroller_.getMoveToDestination() / 300.0;
+	if (isNext)
+	{
+		this.changePos(p + 1.0);
+	}
+	else
+	{
+		this.changePos(p - 1.0);
+	}
+}
+
+float PlayerStandGroup::getFloatingPosition()
+{
+	return Math.MaxF(0.0, this.currentPos_);
+}
+
+void PlayerStandGroup::changeCenter(bool isWithOutInfomation)
+{
+	int i;
+	for (i = 0; i < this.stand_.Numof(); ++i)
+	{
+		this.stand_[i].setGroupPos(isWithOutInfomation ? 512 : 552, 515, false);
+	}
+}
+

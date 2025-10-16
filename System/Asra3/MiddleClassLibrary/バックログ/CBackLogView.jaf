@@ -1,0 +1,333 @@
+CBackLogView::CBackLogView()
+{
+	this.m_ActivityNameByGame = "";
+	this.m_ActivityName = "";
+	this.m_ViewLastScene = false;
+	this.m_KeyUpWait = false;
+}
+
+void CBackLogView::Execute()
+{
+	this.CreateBacklogTextList();
+	if (this.NumofLine() <= 0)
+	{
+		return;
+	}
+	CASPartsLayer Layer;
+	bool IsExistActivityByGame = SYS_Activity_IsExistFile(this.m_ActivityNameByGame);
+	bool IsExistDefaultActivity = SYS_Activity_IsExistFile("Asra\\バックログ");
+	string FileName;
+	if (IsExistActivityByGame)
+	{
+		FileName = this.m_ActivityNameByGame;
+	}
+	else if (system.IsDebugMode() && IsExistDefaultActivity)
+	{
+		FileName = "Asra\\バックログ";
+	}
+	AFL_Parts_AddWholeMouseWheelEvent(this.MouseWheelEvent);
+	AFL_Parts_AddWholeKeyPressEvent(this.KeyPressEvent);
+	AFL_Parts_AddWholeKeyUpEvent(this.KeyUpEvent);
+	Ｐ＿アクティビティ実行(FileName, this.LoadedActivityEvent, NULL, NULL);
+	AFL_Parts_EraseWholeKeyUpEvent(this.KeyUpEvent);
+	AFL_Parts_EraseWholeKeyPressEvent(this.KeyPressEvent);
+	AFL_Parts_EraseWholeMouseWheelEvent(this.MouseWheelEvent);
+}
+
+void CBackLogView::CreateBacklogTextList()
+{
+	this.m_LogTextList.Free();
+	int NumofADVLog = AnteaterADVEngine.ADVLogList_GetNumofADVLog();
+	int i;
+	for (i = 0; i < NumofADVLog; ++i)
+	{
+		this.AddBacklogText(i);
+	}
+}
+
+void CBackLogView::AddBacklogText(int ADVLog)
+{
+	int NumofVoice = AnteaterADVEngine.ADVLogList_GetNumofADVLogVoice(ADVLog);
+	array@string VoiceNameList;
+	int VoiceIndex;
+	for (VoiceIndex = 0; VoiceIndex < NumofVoice; VoiceIndex++)
+	{
+		string VoiceName;
+		AnteaterADVEngine.ADVLogList_GetADVLogVoice(ADVLog, VoiceIndex, VoiceName);
+		VoiceNameList.PushBack(VoiceName);
+	}
+	int NumofText = AnteaterADVEngine.ADVLogList_GetNumofADVLogText(ADVLog);
+	int i;
+	for (i = 0; i < NumofText; ++i)
+	{
+		SBackLogUnitModel BackLogViewText;
+		AnteaterADVEngine.ADVLogList_GetADVLogText(ADVLog, i, BackLogViewText.m_Text);
+		BackLogViewText.m_VoiceNameList.Alloc(VoiceNameList.Numof());
+		BackLogViewText.m_VoiceNameList.Copy(0, VoiceNameList, 0, VoiceNameList.Numof());
+		this.m_LogTextList.PushBack(BackLogViewText);
+	}
+	SBackLogUnitModel SeparatorData;
+	SeparatorData.m_Separator = true;
+	this.m_LogTextList.PushBack(SeparatorData);
+}
+
+int CBackLogView::NumofLine()
+{
+	return this.m_LogTextList.Numof();
+}
+
+void CBackLogView::LoadedActivityEvent(string ActivityFileName, string ActivityName)
+{
+	this.m_ActivityName = ActivityName;
+	this.InitVScrollbar(ActivityName);
+	this.InitBackButton(ActivityName);
+	this.InitLogText(ActivityName);
+	this.SetLineIndex(this.NumofLine());
+}
+
+void CBackLogView::MouseWheelEvent(int PartsNumber, int Forward, int Back)
+{
+	if (!this.IsExistParts(this.m_ActivityName, "SYS_縦スクロールバー"))
+	{
+		return;
+	}
+	int Number = SYS_Activity_GetPartsNumber(this.m_ActivityName, "SYS_縦スクロールバー");
+	int Diff = Back - Forward;
+	if (this.m_ViewLastScene && 0 < Diff)
+	{
+		AFL_Activity_End();
+	}
+	int Current = Ｐ＿縦スクロールバー＿スクロール位置取得(Number);
+	Ｐ＿縦スクロールバー＿スクロール位置設定(Number, Current + Diff);
+}
+
+void CBackLogView::KeyPressEvent(int PartsNumber, int KeyCode)
+{
+	if (this.m_KeyUpWait)
+	{
+		return;
+	}
+	if (!this.IsExistParts(this.m_ActivityName, "SYS_縦スクロールバー"))
+	{
+		return;
+	}
+	int Number = SYS_Activity_GetPartsNumber(this.m_ActivityName, "SYS_縦スクロールバー");
+	int NumofView = Ｐ＿縦スクロールバー＿表示量取得(Number);
+	int Diff;
+	if (KeyCode == 40)
+	{
+		Diff = 1;
+	}
+	else if (KeyCode == 38)
+	{
+		Diff = -1;
+	}
+	else if (KeyCode == 34)
+	{
+		Diff = NumofView;
+	}
+	else if (KeyCode == 33)
+	{
+		Diff = -NumofView;
+	}
+	if (Diff == 0)
+	{
+		return;
+	}
+	int Current = Ｐ＿縦スクロールバー＿スクロール位置取得(Number);
+	if (this.m_ViewLastScene && 0 < Diff)
+	{
+		for (this.m_KeyUpWait = true; AFL_IsKeyDown(40) || AFL_IsKeyDown(34); )
+		{
+			AFL_View_Update(true);
+		}
+		this.m_KeyUpWait = false;
+		AFL_Activity_End();
+	}
+	Ｐ＿縦スクロールバー＿スクロール位置設定(Number, Current + Diff);
+}
+
+void CBackLogView::KeyUpEvent(int PartsNumber, int KeyCode)
+{
+	if (KeyCode == 67 && AFL_IsKeyDown(16))
+	{
+		this.DebugLogTextToLog();
+		this.DebugLogTextToClipboard();
+	}
+}
+
+void CBackLogView::InitVScrollbar(string ActivityName)
+{
+	if (!this.IsExistParts(ActivityName, "SYS_縦スクロールバー"))
+	{
+		return;
+	}
+	int Number = SYS_Activity_GetPartsNumber(ActivityName, "SYS_縦スクロールバー");
+	Ｐ＿縦スクロールバー＿全体量設定(Number, this.NumofLine());
+	Ｐ＿縦スクロールバー＿スクロール位置設定(Number, this.NumofLine());
+	AFL_Parts_AddScrollEvent(Number, this.ScrollEvent);
+	Ｐ＿フォーカス設定(Number);
+}
+
+void CBackLogView::InitBackButton(string ActivityName)
+{
+	if (!this.IsExistParts(ActivityName, "SYS_戻る"))
+	{
+		return;
+	}
+	int Number = SYS_Activity_GetPartsNumber(ActivityName, "SYS_戻る");
+	AFL_Parts_AddMouseLClickEvent(Number, this.ClickEnd);
+}
+
+void CBackLogView::InitLogText(string ActivityName)
+{
+	if (!this.IsExistParts(this.m_ActivityName, "SYS_縦スクロールバー"))
+	{
+		return;
+	}
+	if (!this.IsExistParts(this.m_ActivityName, "SYS_通常テキスト"))
+	{
+		return;
+	}
+	if (!this.IsExistParts(this.m_ActivityName, "SYS_音声ありテキスト"))
+	{
+		return;
+	}
+	int Number = SYS_Activity_GetPartsNumber(this.m_ActivityName, "SYS_縦スクロールバー");
+	int TextNumber = SYS_Activity_GetPartsNumber(this.m_ActivityName, "SYS_通常テキスト");
+	int VoiceTextNumber = SYS_Activity_GetPartsNumber(this.m_ActivityName, "SYS_音声ありテキスト");
+	Ｐ＿表示設定(TextNumber, false);
+	Ｐ＿表示設定(VoiceTextNumber, false);
+	int NumofView = Ｐ＿縦スクロールバー＿表示量取得(Number);
+	if (!this.IsExistParts(this.m_ActivityName, "SYS_背景"))
+	{
+		return;
+	}
+	int BGNumber = SYS_Activity_GetPartsNumber(this.m_ActivityName, "SYS_背景");
+	this.m_UnitList.Init(Ｐ＿Ｘ座標取得(TextNumber), Ｐ＿Ｙ座標取得(TextNumber), Ｐ＿Ｚ座標取得(BGNumber) + 10, this.m_LogTextList);
+}
+
+bool CBackLogView::IsExistParts(string ActivityName, string PartsName)
+{
+	if (SYS_Activity_IsExistPartsByName(ActivityName, PartsName))
+	{
+		return true;
+	}
+	system.Output("バックログ用アクティビティデータに【%s】が存在していません。\n" % PartsName);
+	return false;
+}
+
+void CBackLogView::ClickEnd(int Number, int MouseX, int MouseY)
+{
+	AFL_Activity_End();
+}
+
+void CBackLogView::ScrollEvent(int Number, int ScrollPos, int Total)
+{
+	this.SetLineIndex(ScrollPos);
+}
+
+void CBackLogView::SetLineIndex(int Index)
+{
+	Index = Math.Max(0, Math.Min(this.NumofLine() - 1, Index));
+	if (!this.IsExistParts(this.m_ActivityName, "SYS_縦スクロールバー"))
+	{
+		return;
+	}
+	if (!this.IsExistParts(this.m_ActivityName, "SYS_通常テキスト"))
+	{
+		return;
+	}
+	if (!this.IsExistParts(this.m_ActivityName, "SYS_音声ありテキスト"))
+	{
+		return;
+	}
+	int Number = SYS_Activity_GetPartsNumber(this.m_ActivityName, "SYS_縦スクロールバー");
+	int TextNumber = SYS_Activity_GetPartsNumber(this.m_ActivityName, "SYS_通常テキスト");
+	int VoiceTextNumber = SYS_Activity_GetPartsNumber(this.m_ActivityName, "SYS_音声ありテキスト");
+	int NumofView = Ｐ＿縦スクロールバー＿表示量取得(Number);
+	this.m_UnitList.Free();
+	int i;
+	for (i = 0; i < NumofView; ++i)
+	{
+		int LogIndex = Index + i;
+		if (this.m_LogTextList.Numof() <= LogIndex)
+		{
+			break;
+		}
+		this.m_UnitList.AddUnit(this.m_LogTextList[LogIndex]);
+	}
+	CASCharSpriteProperty Font;
+	CASCharSpriteProperty VoiceFont;
+	CASCharSpriteProperty VoiceOnFont;
+	CASCharSpriteProperty PlayVoiceFont;
+	PARTS_GetFont(TextNumber, Font, 1);
+	PARTS_GetFont(VoiceTextNumber, VoiceFont, 1);
+	PARTS_GetFont(VoiceTextNumber, VoiceOnFont, 2);
+	PARTS_GetFont(VoiceTextNumber, PlayVoiceFont, 3);
+	int CharSpace = Ｐ＿テキスト字間隔取得(TextNumber, 1);
+	int LineSpace = Ｐ＿テキスト行間隔取得(TextNumber, 1);
+	int Width = AFL_Parts_GetWidth(TextNumber, 1);
+	this.m_UnitList.Build(Font, VoiceFont, VoiceOnFont, PlayVoiceFont, CharSpace, LineSpace, Width);
+	float Rate = Ｐ＿縦スクロールバー＿スクロールレート取得(Number);
+	this.m_ViewLastScene = 1.0 <= Rate;
+}
+
+void CBackLogView::SetActivityName(string Name)
+{
+	this.m_ActivityNameByGame = Name;
+}
+
+void CBackLogView::DebugLogTextToLog()
+{
+	if (!system.IsDebugMode())
+	{
+		return;
+	}
+	system.Output(this.DebugGetLogText("\n"));
+}
+
+void CBackLogView::DebugLogTextToClipboard()
+{
+	if (!system.IsDebugMode())
+	{
+		return;
+	}
+	Clipboard.SetText(this.DebugGetLogText("\r\n"));
+}
+
+string CBackLogView::DebugGetLogText(string ReturnText)
+{
+	if (!system.IsDebugMode())
+	{
+		return "";
+	}
+	if (!this.IsExistParts(this.m_ActivityName, "SYS_縦スクロールバー"))
+	{
+		return "";
+	}
+	int Number = SYS_Activity_GetPartsNumber(this.m_ActivityName, "SYS_縦スクロールバー");
+	int Index = Ｐ＿縦スクロールバー＿スクロール位置取得(Number);
+	int NumofView = Ｐ＿縦スクロールバー＿表示量取得(Number);
+	string Log = "--------MessageBegin--------%s" % ReturnText;
+	int i;
+	for (i = 0; i < NumofView; ++i)
+	{
+		int LogIndex = Index + i;
+		if (this.m_LogTextList.Numof() <= LogIndex)
+		{
+			break;
+		}
+		if (this.m_LogTextList[LogIndex].m_Separator)
+		{
+			Log += ReturnText;
+		}
+		else
+		{
+			Log += this.m_LogTextList[LogIndex].m_Text + ReturnText;
+		}
+	}
+	Log += "--------MessageEnd----------%s" % ReturnText;
+	return Log;
+}
+

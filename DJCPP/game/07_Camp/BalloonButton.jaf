@@ -1,0 +1,163 @@
+BalloonButton::BalloonButton()
+{
+	this.gameObjectId_ = g_gameObjectManager.addFocusObject(this.update, this.isHover);
+	this.isEnable_ = true;
+}
+
+void BalloonButton::setEnable(bool val)
+{
+	this.isEnable_ = val;
+	this.updatePartsShowState();
+}
+
+void BalloonButton::init(string imageName, string text, DG_OnBalloonButtonClickCallback callback, int index)
+{
+	this.cb_ = callback;
+	this.index_ = index;
+	this.initParts(imageName, text);
+}
+
+void BalloonButton::initParts(string imageName, string text)
+{
+	this.parts_[0].init("システム／キャンプ／ボタン", 0);
+	this.parts_[0].setHitTestAsPixel(true);
+	this.parts_[1].init(imageName, 0);
+	this.parts_[3].initAsCgPlaneImage(imageName, 0, 0, 0);
+	this.parts_[3].setAlpha(200.0);
+	this.parts_[2].initAsText(text, 20, true, 256, 255, 255, 255);
+	createPartsGroup(this.parent_, this.parts_, 4400);
+	this.setPartsPos();
+	this.w_ = this.parts_[0].getWidth() / 4;
+	this.h_ = this.parts_[0].getHeight();
+	this.updatePartsShowState();
+}
+
+void BalloonButton::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parts_[3].setShow(!this.isEnable_);
+	this.parts_[2].setShow(this.isEnable_);
+	this.parent_.setShow(true);
+}
+
+void BalloonButton::setPartsPos()
+{
+	this.parts_[0].setPos(71.0, 68.0);
+	this.parts_[0].setOrigin(5);
+	this.parts_[3].setPos(71.0, 10.0);
+	this.parts_[1].setPos(71.0, 10.0);
+	this.parts_[2].setPos(71.0, 89.0);
+	this.parts_[3].setOrigin(8);
+	this.parts_[1].setOrigin(8);
+	this.parts_[2].setOrigin(8);
+}
+
+void BalloonButton::update()
+{
+	this.updateHover();
+	if (this.isHover_ != this.lastHover_)
+	{
+		this.updatePartsShowState();
+	}
+	if (g_mouse.isClickWithFocus(this.gameObjectId_))
+	{
+		this.cb_(this.index_);
+	}
+	if (!this.lastHover_ && this.isHover_)
+	{
+		playCursor();
+	}
+	if (this.isHover_ && g_mouse.onDown(0))
+	{
+		playClick();
+	}
+	this.lastHover_ = this.isHover_;
+}
+
+void BalloonButton::updateHover()
+{
+	this.isHover_ = this.isEnable_ && this.parts_[0].isHit(g_mouse.getX(), g_mouse.getY());
+}
+
+void BalloonButton::updatePartsShowState()
+{
+	int n;
+	if (this.isEnable_)
+	{
+		if (this.isHover_)
+		{
+			if (g_mouse.isDown(0))
+			{
+				n = 2;
+			}
+			n = 1;
+		}
+	}
+	else
+	{
+		n = 3;
+	}
+	this.parts_[0].setCgRange(n * this.w_, 0, this.w_, this.h_);
+	this.parts_[1].setShow(this.isEnable_);
+	this.parts_[3].setShow(!this.isEnable_);
+	this.parts_[2].setShow(this.isEnable_);
+}
+
+bool BalloonButton::isHover()
+{
+	this.updateHover();
+	return this.isHover_;
+}
+
+void BalloonButton::setPos(int x, int y)
+{
+	this.parent_.setPos(x, y);
+}
+
+void BalloonButton::fadeIn(bool val, int delay)
+{
+	this.setPartsShow();
+	this.updatePartsShowState();
+	if (val)
+	{
+		array@PartsMotion m[3];
+		m[0].setTime(delay);
+		m[0].setAlpha(0, 0, 0);
+		m[1].setScaling(0, 130, 1);
+		m[1].setTime(100);
+		m[1].setAlpha(0, 255, 0);
+		m[2].setScaling(130, 100, 3);
+		m[2].setTime(100);
+		this.parts_[0].runMotionArray(m, NULL);
+		int i;
+		for (i = 1; i < this.parts_.Numof(); ++i)
+		{
+			array@PartsMotion m2[2];
+			m2[0].setTime(delay);
+			m2[0].setAlpha(0, 0, 0);
+			m2[1].setAlpha(0, 255, 0);
+			m2[1].setTime(200);
+			this.parts_[i].runMotionArray(m2, NULL);
+		}
+	}
+	else
+	{
+		PartsMotion m;
+		m.setScaling(100, 0, 0);
+		m.setTime(100);
+		this.parts_[0].runMotion(m, NULL);
+		int i;
+		for (i = 1; i < this.parts_.Numof(); ++i)
+		{
+			PartsMotion m2;
+			m2.setTime(100);
+			m2.setAlpha(255, 0, 0);
+			this.parts_[i].runMotion(m2, NULL);
+		}
+	}
+}
+

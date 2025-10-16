@@ -1,0 +1,45 @@
+LoopMotionKey::LoopMotionKey()
+{
+	this.offset = 0;
+	this.moveRange = 0;
+	this.loopTime = 1000;
+	this.loopMotionType = 0;
+}
+
+void LoopMotionInfomation::set(int key, int offset, int moveRange, int loopTime, int loopMotionType)
+{
+	this.key_[key].offset = offset;
+	this.key_[key].moveRange = moveRange;
+	this.key_[key].loopTime = loopTime;
+	this.key_[key].loopMotionType = loopMotionType;
+}
+
+int LoopMotionInfomation::get(int key, int nowTime)
+{
+	int lt = this.key_[key].loopTime;
+	int ofs = this.key_[key].offset;
+	int r = this.key_[key].moveRange;
+	if (r == 0)
+	{
+		return ofs;
+	}
+	float t = float(nowTime % lt) / float(lt);
+	switch (this.key_[key].loopMotionType)
+	{
+	case 0:
+		return ofs + Math.Sin(t * 360.0) * (r / 2);
+	case 1:
+		return ofs + (t * r - r / 2);
+	case 2:
+		return ofs + ((1 - t) * r - r / 2);
+	default:
+		return ofs;
+	}
+	return ofs;
+}
+
+bool LoopMotionInfomation::isEnable(int key)
+{
+	return this.key_[key].moveRange != 0;
+}
+

@@ -1,0 +1,108 @@
+CAEPropertyToolTip::CAEPropertyToolTip()
+{
+}
+
+CAEPropertyToolTip::~CAEPropertyToolTip()
+{
+	this.Release();
+}
+
+void CAEPropertyToolTip::Init()
+{
+	this.Release();
+	this.m_ToolTip = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿Ｚ座標設定(this.m_ToolTip, 32767);
+	Ｐ＿オンカーソル透過設定(this.m_ToolTip, true);
+}
+
+void CAEPropertyToolTip::Release()
+{
+	this.m_dgGetToolTipTextEvent.Clear();
+	PARTS_ReleaseWithInit(this.m_ToolTip);
+	this.m_LastEnterParts = 0;
+	this.m_Text = "";
+}
+
+void CAEPropertyToolTip::AddParts(int Number)
+{
+	AFL_Parts_AddMouseEnterEvent(Number, this.MouseEnterEvent);
+	AFL_Parts_AddMouseLeaveEvent(Number, this.MouseLeaveEvent);
+}
+
+void CAEPropertyToolTip::SetGetToolTipTextEvent(DG_GetToolTipTextHandler dgObject)
+{
+	this.m_dgGetToolTipTextEvent.Clear();
+	this.m_dgGetToolTipTextEvent += dgObject;
+}
+
+void CAEPropertyToolTip::MouseEnterEvent(int ID, int MouseX, int MouseY)
+{
+	this.m_LastEnterParts = ID;
+	AFL_Parts_AddBeginUpdateEvent(this.UpdateFrameEvent);
+}
+
+void CAEPropertyToolTip::MouseLeaveEvent(int ID, int MouseX, int MouseY)
+{
+	if (this.m_LastEnterParts != ID)
+	{
+		return;
+	}
+	this.m_LastEnterParts = 0;
+	this.m_Text = "";
+	Ｐ＿表示設定(this.m_ToolTip, false);
+	AFL_Parts_EraseBeginUpdateEvent(this.UpdateFrameEvent);
+}
+
+void CAEPropertyToolTip::UpdateFrameEvent(int PassedTime)
+{
+	this.UpdateToolTipText(this.m_LastEnterParts);
+}
+
+void CAEPropertyToolTip::UpdateToolTipText(int ID)
+{
+	if (ID == 0)
+	{
+		return;
+	}
+	string Text = this.m_dgGetToolTipTextEvent(ID);
+	if (Text.Empty())
+	{
+		Ｐ＿表示設定(this.m_ToolTip, false);
+		return;
+	}
+	if (this.m_Text == Text)
+	{
+		return;
+	}
+	this.m_Text = Text;
+	int FontSize = 16;
+	CASCharSpriteProperty Font;
+	Font.SetType(0);
+	Font.SetSize(FontSize);
+	Font.SetColor(CF_CASColor(0, 0, 0, 255));
+	Font.SetBoldWeight(0.0);
+	Font.SetEdgeWeight(0.0);
+	Font.SetEdgeColor(CF_CASColor(0, 0, 0, 255));
+	int ToolTipWidth;
+	int ToolTipHeight;
+	PARTS_TextParts_CalcSize(Font, Text, ToolTipWidth, ToolTipHeight, 0, 0);
+	int BGWidth = ToolTipWidth + FontSize * 2;
+	int BGHeight = ToolTipHeight + FontSize;
+	Ｐ＿構築手順＿ピクセル作成(this.m_ToolTip, BGWidth, BGHeight, 1);
+	Ｐ＿構築手順＿色塗り(this.m_ToolTip, 0, 0, BGWidth, BGHeight, 255, 255, 255, -1, 1);
+	Ｐ＿構築手順＿テキストブレンド(this.m_ToolTip, FontSize, FontSize / 2, Text, Font, 0, 0, 1);
+	Ｐ＿構築手順＿矩形(this.m_ToolTip, 1, 1, BGWidth - 2, BGHeight - 2, 0, 0, 0, 1);
+	Ｐ＿構築ビルド(this.m_ToolTip, 1);
+	Ｐ＿表示設定(this.m_ToolTip, true);
+	int BaseX = PARTS_GetAbsoluteX(ID);
+	int BaseY = PARTS_GetAbsoluteY(ID);
+	int ToolTipX = BaseX;
+	int ToolTipY = BaseY - (BGHeight + FontSize);
+	int ViewWidth = AFL_View_GetWidth();
+	if (ViewWidth <= ToolTipX + BGWidth)
+	{
+		ToolTipX -= (ToolTipX + BGWidth) - ViewWidth;
+	}
+	Ｐ＿座標設定(this.m_ToolTip, ToolTipX, ToolTipY);
+}
+

@@ -1,0 +1,130 @@
+MapPlaceButton::MapPlaceButton()
+{
+	this.gameObjectId_ = g_gameObjectManager.addFocusObject(this.update, this.isHover);
+	this.isClickable_ = false;
+}
+
+void MapPlaceButton::init(int parentPartsNumber, string placeId, DG_MapPlaceButtonClickCallback cb, int id)
+{
+	this.place_ <- getMapPlaceFromId(placeId);
+	this.callback_ = cb;
+	this.id_ = id;
+	this.initParts();
+	this.parent_.setParent(parentPartsNumber);
+	this.buttonWidth_ = this.parts_[1].getWidth() / 4;
+	this.buttonHeight_ = this.parts_[1].getHeight();
+	this.updateButtonState();
+}
+
+void MapPlaceButton::update()
+{
+	this.updateHover();
+	this.updateButtonState();
+	if (this.isClick())
+	{
+		this.callback_(this.id_);
+	}
+	this.parent_.setShow(this.place_.isAvailable());
+	if (!this.lastHover_ && this.isHover_)
+	{
+		playCursor();
+	}
+	if (this.isHover_ && g_mouse.onDown(0))
+	{
+		playClick();
+		g_sysSound.play(6, "効果音／場所移動");
+	}
+	this.lastHover_ = this.isHover_;
+}
+
+void MapPlaceButton::updateHover()
+{
+	this.isHover_ = this.place_.isAvailable() && this.isClickable_ && this.parts_[1].isHit(g_mouse.getX(), g_mouse.getY());
+}
+
+void MapPlaceButton::initParts()
+{
+	this.parts_[0].init(this.place_.getImageName(), 0);
+	this.parts_[1].init("システム／マップ／枠", 0);
+	this.parts_[2].init("システム／マップ／名札", 0);
+	this.parts_[3].initAsText(this.place_.getCaption(), 28, false, 256, 0, 0, 0);
+	this.parts_[0].setShow(true);
+	this.parts_[1].setShow(true);
+	this.parts_[2].setShow(true);
+	this.parts_[3].setShow(true);
+	createPartsGroup(this.parent_, this.parts_, 30);
+	this.parts_[2].setPos(0.0, 50.0);
+	this.parts_[3].setPos(0.0, 40.0);
+	this.parts_[1].setCgRange(0, 0, this.parts_[1].getWidth() / 4, this.parts_[1].getHeight());
+	this.parts_[1].setOrigin(5);
+	this.parts_[0].setOrigin(5);
+	this.parts_[2].setOrigin(5);
+	this.parts_[3].setOrigin(5);
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].changeOrigin(5);
+	}
+	this.parent_.setPos(this.place_.getX(), this.place_.getY());
+}
+
+void MapPlaceButton::fadeIn(bool val)
+{
+	PartsMotion m;
+	if (val)
+	{
+		m.setScaling(0, 100, 3);
+		m.setTime(250);
+		this.parent_.runMotion(m, this.onFinishFadeIn);
+		this.state_ = 1;
+	}
+	else
+	{
+		m.setScaling(100, 0, 1);
+		m.setTime(150);
+		this.parent_.runMotion(m, this.onFinishFadeOut);
+		this.state_ = 3;
+	}
+}
+
+void MapPlaceButton::onFinishFadeIn()
+{
+	this.state_ = 2;
+}
+
+void MapPlaceButton::onFinishFadeOut()
+{
+	this.state_ = 0;
+}
+
+bool MapPlaceButton::isHover()
+{
+	this.updateHover();
+	return this.isHover_;
+}
+
+void MapPlaceButton::updateButtonState()
+{
+	int n;
+	if (this.isHover())
+	{
+		n = g_mouse.isDown(0) ? 2 : 1;
+	}
+	this.parts_[1].setCgRange(n * this.buttonWidth_, 0, this.buttonWidth_, this.buttonHeight_);
+}
+
+bool MapPlaceButton::isClick()
+{
+	return this.state_ == 2 && g_mouse.isClickWithFocus(this.gameObjectId_);
+}
+
+void MapPlaceButton::setParent(int partsNumber)
+{
+	this.parent_.setParent(partsNumber);
+}
+
+void MapPlaceButton::setClickable(bool val)
+{
+	this.isClickable_ = val;
+}
+

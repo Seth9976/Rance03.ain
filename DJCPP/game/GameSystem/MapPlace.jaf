@@ -1,0 +1,67 @@
+MapPlace::MapPlace()
+{
+	this.isAvailable_ = false;
+}
+
+bool MapPlace::isAvailable()
+{
+	return this.isAvailable_;
+}
+
+void MapPlace::setAvailable(bool val)
+{
+	this.isAvailable_ = val;
+}
+
+void MapPlace::init(string id)
+{
+	this.id_ = id;
+	this.loadParam();
+}
+
+void MapPlace::loadParam()
+{
+	string key = "マップ場所";
+	this.x_ = EX_SA2Int(key, this.id_, "x", 0);
+	this.y_ = EX_SA2Int(key, this.id_, "y", 0);
+	this.caption_ = EX_SA2String(key, this.id_, "caption", "");
+	this.imageName_ = EX_SA2String(key, this.id_, "imageName", "");
+	this.callbackFunction_ = EX_SA2String(key, this.id_, "callback", "");
+	this.musicId_ = EX_SA2String(key, this.id_, "musicId", "");
+}
+
+int MapPlace::getX()
+{
+	return this.x_;
+}
+
+int MapPlace::getY()
+{
+	return this.y_;
+}
+
+string MapPlace::getCaption()
+{
+	return this.caption_;
+}
+
+string MapPlace::getId()
+{
+	return this.id_;
+}
+
+string MapPlace::getCallbackFunction()
+{
+	return this.callbackFunction_;
+}
+
+string MapPlace::getImageName()
+{
+	return this.imageName_;
+}
+
+string MapPlace::getMusicId()
+{
+	return this.musicId_;
+}
+

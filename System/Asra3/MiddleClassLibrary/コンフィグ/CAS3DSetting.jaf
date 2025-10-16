@@ -1,0 +1,545 @@
+CAS3DSetting::CAS3DSetting()
+{
+	this.m_RenderMode = 2;
+	this.m_LightingMode = 1;
+	this.m_AntiAliasingMode = 0;
+	this.m_Edge = 0;
+	this.m_ShadowMode = 2;
+	this.m_ShadowMapResolutionLevel = 2;
+	this.m_BumpMode = 0;
+	this.m_BloomMode = 0;
+	this.m_GlareMode = 0;
+	this.m_FogMode = 0;
+	this.m_SpecularMode = 1;
+	this.m_LightMapMode = 1;
+	this.m_SoftFogEdgeMode = 0;
+	this.m_SSAOMode = 0;
+	this.m_TextureResolutionLevel = 0;
+	this.m_TextureFilterMode = 1;
+	this.m_DOFMode = 0;
+}
+
+bool CAS3DSetting::Load()
+{
+	if (!this.ExistReignSaveFile())
+	{
+		return true;
+	}
+	int nRenderMode;
+	int LightingMode;
+	int AntiAliasingMode;
+	int Edge;
+	int nShadowMode;
+	int nShadowMapResolutionLevel;
+	int nBumpMode;
+	int nBloomMode;
+	int nGlareMode;
+	int nFogMode;
+	int nSpecularMode;
+	int nLightMapMode;
+	int nSoftFogEdgeMode;
+	int nSSAOMode;
+	int nVertexBlendMode;
+	int nTextureResolutionLevel;
+	int nTextureFilterMode;
+	int DOFMode;
+	if (!VSFile.OpenForRead(this.GetSaveFileName()))
+	{
+		return false;
+	}
+	string ChunkName;
+	if (!VSFile.ReadString(ChunkName))
+	{
+		return false;
+	}
+	if (ChunkName != "3CO")
+	{
+		return false;
+	}
+	int nVersion;
+	if (!VSFile.ReadInt(nVersion))
+	{
+		return false;
+	}
+	if (nVersion < 0 || nVersion > 1)
+	{
+		return false;
+	}
+	if (!VSFile.ReadInt(nRenderMode))
+	{
+		return false;
+	}
+	if (!VSFile.ReadInt(LightingMode))
+	{
+		return false;
+	}
+	if (!VSFile.ReadInt(AntiAliasingMode))
+	{
+		return false;
+	}
+	if (!VSFile.ReadInt(Edge))
+	{
+		return false;
+	}
+	if (!VSFile.ReadInt(nShadowMode))
+	{
+		return false;
+	}
+	if (!VSFile.ReadInt(nShadowMapResolutionLevel))
+	{
+		return false;
+	}
+	if (!VSFile.ReadInt(nBumpMode))
+	{
+		return false;
+	}
+	if (!VSFile.ReadInt(nBloomMode))
+	{
+		return false;
+	}
+	if (!VSFile.ReadInt(nGlareMode))
+	{
+		return false;
+	}
+	if (!VSFile.ReadInt(nFogMode))
+	{
+		return false;
+	}
+	if (!VSFile.ReadInt(nSpecularMode))
+	{
+		return false;
+	}
+	if (!VSFile.ReadInt(nLightMapMode))
+	{
+		return false;
+	}
+	if (!VSFile.ReadInt(nSoftFogEdgeMode))
+	{
+		return false;
+	}
+	if (!VSFile.ReadInt(nSSAOMode))
+	{
+		return false;
+	}
+	if (!VSFile.ReadInt(nVertexBlendMode))
+	{
+		return false;
+	}
+	if (!VSFile.ReadInt(nTextureResolutionLevel))
+	{
+		return false;
+	}
+	if (!VSFile.ReadInt(nTextureFilterMode))
+	{
+		return false;
+	}
+	if (nVersion >= 1)
+	{
+		if (!VSFile.ReadInt(DOFMode))
+		{
+			return false;
+		}
+	}
+	if (!VSFile.Close())
+	{
+		return false;
+	}
+	this.m_RenderMode = nRenderMode;
+	this.m_LightingMode = LightingMode;
+	this.m_AntiAliasingMode = AntiAliasingMode;
+	this.m_Edge = Edge;
+	this.m_ShadowMode = nShadowMode;
+	this.m_ShadowMapResolutionLevel = nShadowMapResolutionLevel;
+	this.m_BumpMode = nBumpMode;
+	this.m_BloomMode = nBloomMode;
+	this.m_GlareMode = nGlareMode;
+	this.m_FogMode = nFogMode;
+	this.m_SpecularMode = nSpecularMode;
+	this.m_LightMapMode = nLightMapMode;
+	this.m_SoftFogEdgeMode = nSoftFogEdgeMode;
+	this.m_SSAOMode = nSSAOMode;
+	this.m_TextureResolutionLevel = nTextureResolutionLevel;
+	this.m_TextureFilterMode = nTextureFilterMode;
+	this.m_DOFMode = DOFMode;
+	return true;
+}
+
+bool CAS3DSetting::Save()
+{
+	if (!VSFile.OpenForWrite(this.GetSaveFileName()))
+	{
+		return false;
+	}
+	if (!VSFile.WriteString("3CO"))
+	{
+		return false;
+	}
+	if (!VSFile.WriteInt(1))
+	{
+		return false;
+	}
+	if (!VSFile.WriteInt(this.m_RenderMode))
+	{
+		return false;
+	}
+	if (!VSFile.WriteInt(this.m_LightingMode))
+	{
+		return false;
+	}
+	if (!VSFile.WriteInt(this.m_AntiAliasingMode))
+	{
+		return false;
+	}
+	if (!VSFile.WriteInt(this.m_Edge))
+	{
+		return false;
+	}
+	if (!VSFile.WriteInt(this.m_ShadowMode))
+	{
+		return false;
+	}
+	if (!VSFile.WriteInt(this.m_ShadowMapResolutionLevel))
+	{
+		return false;
+	}
+	if (!VSFile.WriteInt(this.m_BumpMode))
+	{
+		return false;
+	}
+	if (!VSFile.WriteInt(this.m_BloomMode))
+	{
+		return false;
+	}
+	if (!VSFile.WriteInt(this.m_GlareMode))
+	{
+		return false;
+	}
+	if (!VSFile.WriteInt(this.m_FogMode))
+	{
+		return false;
+	}
+	if (!VSFile.WriteInt(this.m_SpecularMode))
+	{
+		return false;
+	}
+	if (!VSFile.WriteInt(this.m_LightMapMode))
+	{
+		return false;
+	}
+	if (!VSFile.WriteInt(this.m_SoftFogEdgeMode))
+	{
+		return false;
+	}
+	if (!VSFile.WriteInt(this.m_SSAOMode))
+	{
+		return false;
+	}
+	if (!VSFile.WriteInt(0))
+	{
+		return false;
+	}
+	if (!VSFile.WriteInt(this.m_TextureResolutionLevel))
+	{
+		return false;
+	}
+	if (!VSFile.WriteInt(this.m_TextureFilterMode))
+	{
+		return false;
+	}
+	if (!VSFile.WriteInt(this.m_DOFMode))
+	{
+		return false;
+	}
+	if (!VSFile.Close())
+	{
+		return false;
+	}
+	return true;
+}
+
+void CAS3DSetting::Bind()
+{
+	this.SetRenderMode(this.m_RenderMode);
+	this.SetLightingMode(this.m_LightingMode);
+	this.SetAntiAliasingMode(this.m_AntiAliasingMode);
+	this.SetEdge(this.m_Edge);
+	this.SetShadowMode(this.m_ShadowMode);
+	this.SetShadowMapResolutionLevel(this.m_ShadowMapResolutionLevel);
+	this.SetBumpMode(this.m_BumpMode);
+	this.SetBloomMode(this.m_BloomMode);
+	this.SetGlareMode(this.m_GlareMode);
+	this.SetFogMode(this.m_FogMode);
+	this.SetSpecularMode(this.m_SpecularMode);
+	this.SetLightMapMode(this.m_LightMapMode);
+	this.SetSoftFogEdgeMode(this.m_SoftFogEdgeMode);
+	this.SetSSAOMode(this.m_SSAOMode);
+	this.SetTextureResolutionLevel(this.m_TextureResolutionLevel);
+	this.SetTextureFilterMode(this.m_TextureFilterMode);
+	this.SetDOFMode(this.m_DOFMode);
+}
+
+bool CAS3DSetting::SetParam(int Type, int Param)
+{
+	int NumofPlugin = SealEngine.GetNumofPlugin();
+	int Plugin;
+	for (Plugin = 0; Plugin < NumofPlugin; Plugin++)
+	{
+		if (!SealEngine.IsExistPlugin(Plugin))
+		{
+			continue;
+		}
+		switch (Type)
+		{
+		case 0:
+			SealEngine.SetRenderMode(Plugin, Param);
+			break;
+		case 1:
+			SealEngine.SetDrawOption(Plugin, 1, Param);
+			break;
+		case 2:
+			SystemService.SetAntiAliasingMode(Param);
+			break;
+		case 3:
+			SealEngine.SetShadowMode(Plugin, Param);
+			break;
+		case 4:
+			SealEngine.SetShadowMapResolutionLevel(Plugin, Param);
+			break;
+		case 5:
+			SealEngine.SetTextureResolutionLevel(Plugin, Param);
+			break;
+		case 6:
+			SealEngine.SetTextureFilterMode(Plugin, Param);
+			break;
+		case 7:
+			SealEngine.SetBumpMode(Plugin, Param);
+			break;
+		case 8:
+			SealEngine.SetBloomMode(Plugin, Param);
+			break;
+		case 9:
+			SealEngine.SetGlareMode(Plugin, Param);
+			break;
+		case 10:
+			SealEngine.SetFogMode(Plugin, Param);
+			break;
+		case 11:
+			SealEngine.SetSpecularMode(Plugin, Param);
+			break;
+		case 12:
+			SealEngine.SetSoftFogEdgeMode(Plugin, Param);
+			break;
+		case 13:
+			SealEngine.SetSSAOMode(Plugin, Param);
+			break;
+		case 14:
+			SealEngine.SetLightMapMode(Plugin, Param);
+			break;
+		case 15:
+			SealEngine.SetDrawOption(Plugin, 0, Param);
+			break;
+		case 16:
+			SealEngine.SetDrawOption(Plugin, 2, Param);
+			break;
+		}
+	}
+	return true;
+}
+
+bool CAS3DSetting::ExistReignSaveFile()
+{
+	return system.ExistFile(this.GetSaveFileName());
+}
+
+string CAS3DSetting::GetSaveFileName()
+{
+	return system.GetSaveFolderName() + "\\3DConfig.vsf";
+}
+
+int CAS3DSetting::GetRenderMode()
+{
+	return this.m_RenderMode;
+}
+
+int CAS3DSetting::GetLightingMode()
+{
+	return this.m_LightingMode;
+}
+
+int CAS3DSetting::GetAntiAliasingMode()
+{
+	return this.m_AntiAliasingMode;
+}
+
+int CAS3DSetting::GetEdge()
+{
+	return this.m_Edge;
+}
+
+int CAS3DSetting::GetShadowMode()
+{
+	return this.m_ShadowMode;
+}
+
+int CAS3DSetting::GetShadowMapResolutionLevel()
+{
+	return this.m_ShadowMapResolutionLevel;
+}
+
+int CAS3DSetting::GetBumpMode()
+{
+	return this.m_BumpMode;
+}
+
+int CAS3DSetting::GetBloomMode()
+{
+	return this.m_BloomMode;
+}
+
+int CAS3DSetting::GetGlareMode()
+{
+	return this.m_GlareMode;
+}
+
+int CAS3DSetting::GetFogMode()
+{
+	return this.m_FogMode;
+}
+
+int CAS3DSetting::GetSpecularMode()
+{
+	return this.m_SpecularMode;
+}
+
+int CAS3DSetting::GetLightMapMode()
+{
+	return this.m_LightMapMode;
+}
+
+int CAS3DSetting::GetSoftFogEdgeMode()
+{
+	return this.m_SoftFogEdgeMode;
+}
+
+int CAS3DSetting::GetSSAOMode()
+{
+	return this.m_SSAOMode;
+}
+
+int CAS3DSetting::GetTextureResolutionLevel()
+{
+	return this.m_TextureResolutionLevel;
+}
+
+int CAS3DSetting::GetTextureFilterMode()
+{
+	return this.m_TextureFilterMode;
+}
+
+int CAS3DSetting::GetDOFMode()
+{
+	return this.m_DOFMode;
+}
+
+void CAS3DSetting::SetRenderMode(int nRenderMode)
+{
+	this.m_RenderMode = nRenderMode;
+	this.SetParam(0, nRenderMode);
+}
+
+void CAS3DSetting::SetLightingMode(int LightingMode)
+{
+	this.m_LightingMode = LightingMode;
+	this.SetParam(1, LightingMode);
+}
+
+void CAS3DSetting::SetAntiAliasingMode(int AntiAliasingMode)
+{
+	this.m_AntiAliasingMode = AntiAliasingMode;
+	this.SetParam(2, AntiAliasingMode);
+}
+
+void CAS3DSetting::SetEdge(int Edge)
+{
+	this.m_Edge = Edge;
+	this.SetParam(15, Edge);
+}
+
+void CAS3DSetting::SetShadowMode(int nShadowMode)
+{
+	this.m_ShadowMode = nShadowMode;
+	this.SetParam(3, nShadowMode);
+}
+
+void CAS3DSetting::SetShadowMapResolutionLevel(int nShadowMapResolutionLevel)
+{
+	this.m_ShadowMapResolutionLevel = nShadowMapResolutionLevel;
+	this.SetParam(4, nShadowMapResolutionLevel);
+}
+
+void CAS3DSetting::SetBumpMode(int nBumpMode)
+{
+	this.m_BumpMode = nBumpMode;
+	this.SetParam(7, nBumpMode);
+}
+
+void CAS3DSetting::SetBloomMode(int nBloomMode)
+{
+	this.m_BloomMode = nBloomMode;
+	this.SetParam(8, nBloomMode);
+}
+
+void CAS3DSetting::SetGlareMode(int nGlareMode)
+{
+	this.m_GlareMode = nGlareMode;
+	this.SetParam(9, nGlareMode);
+}
+
+void CAS3DSetting::SetFogMode(int nFogMode)
+{
+	this.m_FogMode = nFogMode;
+	this.SetParam(10, nFogMode);
+}
+
+void CAS3DSetting::SetSpecularMode(int nSpecularMode)
+{
+	this.m_SpecularMode = nSpecularMode;
+	this.SetParam(11, nSpecularMode);
+}
+
+void CAS3DSetting::SetLightMapMode(int nLightMapMode)
+{
+	this.m_LightMapMode = nLightMapMode;
+	this.SetParam(14, nLightMapMode);
+}
+
+void CAS3DSetting::SetSoftFogEdgeMode(int nSoftFogEdgeMode)
+{
+	this.m_SoftFogEdgeMode = nSoftFogEdgeMode;
+	this.SetParam(12, nSoftFogEdgeMode);
+}
+
+void CAS3DSetting::SetSSAOMode(int nSSAOMode)
+{
+	this.m_SSAOMode = nSSAOMode;
+	this.SetParam(13, nSSAOMode);
+}
+
+void CAS3DSetting::SetTextureResolutionLevel(int nTextureResolutionLevel)
+{
+	this.m_TextureResolutionLevel = nTextureResolutionLevel;
+	this.SetParam(5, nTextureResolutionLevel);
+}
+
+void CAS3DSetting::SetTextureFilterMode(int nTextureFilterMode)
+{
+	this.m_TextureFilterMode = nTextureFilterMode;
+	this.SetParam(6, nTextureFilterMode);
+}
+
+void CAS3DSetting::SetDOFMode(int DOFMode)
+{
+	this.m_DOFMode = DOFMode;
+	this.SetParam(16, DOFMode);
+}
+

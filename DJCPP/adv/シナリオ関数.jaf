@@ -1,0 +1,310 @@
+void ■背景(string 背景名前, int 背景／表示方法, int 表示速度)
+{
+	checkAdvCommandHistory();
+	g_advBackGround.show(背景名前, 背景／表示方法, 表示速度, true);
+}
+
+void ■背景消去(int 背景／表示方法, int 表示速度, bool 即時実行)
+{
+	checkAdvCommandHistory();
+	■枠消去();
+	g_advBackGround.hide(背景／表示方法, 表示速度, 即時実行);
+}
+
+void ■背景視点移動(int 方向, bool 即時実行)
+{
+	checkAdvCommandHistory();
+	g_advBackGround.move(方向 == 1, 300, 即時実行);
+}
+
+void ■立ち絵(string 立ち絵名前, int 表示方向, bool 即時実行)
+{
+	checkAdvCommandHistory();
+	g_advStand[0].show(立ち絵名前, 表示方向, 即時実行);
+}
+
+void ■立ち絵消去(int 表示方向, bool 即時実行)
+{
+	checkAdvCommandHistory();
+	g_advStand[0].hide(表示方向, 即時実行);
+}
+
+void ■立ち絵モ(int 立ち絵モ種類)
+{
+	g_advStand[0].motion(立ち絵モ種類);
+}
+
+void ■立ち絵背(string 立ち絵名前, int 表示方向, bool 即時実行)
+{
+	checkAdvCommandHistory();
+	int n;
+	switch (表示方向)
+	{
+	case 1:
+		表示方向 = 2;
+		break;
+	case 2:
+		表示方向 = 1;
+		break;
+	}
+	g_advStand[1].show(立ち絵名前, 表示方向, 即時実行);
+}
+
+void ■立ち絵背消去(int 表示方向, bool 即時実行)
+{
+	checkAdvCommandHistory();
+	int n;
+	switch (表示方向)
+	{
+	case 1:
+		表示方向 = 2;
+		break;
+	case 2:
+		表示方向 = 1;
+		break;
+	}
+	g_advStand[1].hide(表示方向, 即時実行);
+}
+
+void ■立ち絵背モ(int 立ち絵モ種類)
+{
+	checkAdvCommandHistory();
+	g_advStand[1].motion(立ち絵モ種類);
+}
+
+void ●名札(string キャラ名前, string 名札定義)
+{
+	checkAdvCommandHistory();
+	○名札(キャラ名前, 名札定義);
+}
+
+void ○名札(string キャラ名前, string 名札定義)
+{
+	checkAdvCommandHistory();
+	g_advMessageWindow.show();
+	if (名札定義 != "")
+	{
+		innerShowNamePlate(名札定義);
+	}
+	else
+	{
+		innerShowNamePlate(キャラ名前);
+	}
+}
+
+void innerShowNamePlate(string 名札名前)
+{
+	array@string n;
+	splitToken(n, 名札名前, "／");
+	バックログ登録("【%s】" % n[0]);
+	g_advMessageWindow.show();
+	g_advNamePlate.show(名札名前);
+}
+
+void ●ト書き()
+{
+	checkAdvCommandHistory();
+	g_advMessageWindow.show();
+	g_advNamePlate.hide();
+}
+
+void ■枠消去()
+{
+	if (g_advNamePlate.isShow())
+	{
+		checkAdvCommandHistory();
+		g_advNamePlate.hide();
+	}
+	g_advMessageWindow.hide();
+}
+
+void ■シーン終了(int 表示速度)
+{
+	checkAdvCommandHistory();
+	■枠消去();
+	g_advBackGround.release();
+	g_advStand[0].release();
+	g_advStand[1].release();
+	全表示(1, 表示速度 * g_globalTimer.getEffectiveScalingValue());
+}
+
+void ■立ち絵全消去()
+{
+	checkAdvCommandHistory();
+	■枠消去();
+	■立ち絵消去(1, false);
+	■立ち絵背消去(1, false);
+	RunPartsMotion();
+}
+
+void ■イベント(string 画像名, int 効果種類, int 表示速度)
+{
+	checkAdvCommandHistory();
+	■枠消去();
+	string name = 画像名 == "" ? "背景／黒" : "イベント／" + 画像名;
+	g_advEventCg.show(name, 効果種類, 表示速度);
+	g_advStand[0].release();
+	g_advStand[1].release();
+	g_advBackGround.release();
+}
+
+void ■イベント終了(int 効果種類, int 表示速度)
+{
+	checkAdvCommandHistory();
+	■枠消去();
+	g_advEventCg.hide(効果種類, 表示速度);
+	■回想登録(system.GetFuncStackName(1));
+}
+
+void ■射精(string 変更ＣＧ名)
+{
+	checkAdvCommandHistory();
+	■枠消去();
+	g_advFullScreenEffect.init(7);
+	g_advFullScreenEffect.show(1, 1500);
+	g_advFullScreenEffect.hide(1, 300);
+	g_advFullScreenEffect.show(1, 500);
+	g_advEventCg.show("イベント／" + 変更ＣＧ名, -1, 0);
+	g_advFullScreenEffect.hide(1, 1500);
+	g_advFullScreenEffect.release();
+}
+
+void ■フラッシュ(int フラッシュイン時間, int フラッシュアウト時間, int 色)
+{
+	フラッシュイン時間 = Math.Max(5, フラッシュイン時間);
+	フラッシュアウト時間 = Math.Max(5, フラッシュアウト時間);
+	checkAdvCommandHistory();
+	g_advFullScreenEffect.init(色);
+	g_advFullScreenEffect.show(1, フラッシュイン時間);
+	g_advFullScreenEffect.hide(1, フラッシュアウト時間);
+	g_advFullScreenEffect.release();
+}
+
+void ■フラッシュイン(int time)
+{
+	checkAdvCommandHistory();
+	g_advFullScreenEffect.init(7);
+	g_advFullScreenEffect.show(1, time);
+}
+
+void ■フラッシュアウト(int time)
+{
+	checkAdvCommandHistory();
+	g_advFullScreenEffect.hide(1, time);
+	g_advFullScreenEffect.release();
+}
+
+void ■画面揺らし(int 揺れ幅, int 揺れ時間)
+{
+	checkAdvCommandHistory();
+	画面揺らし(揺れ幅, 揺れ幅, 揺れ時間);
+}
+
+void ■全体イン(string 立ち絵背, string 立ち絵)
+{
+	checkAdvCommandHistory();
+	■立ち絵(立ち絵, 1, false);
+	■立ち絵背(立ち絵背, 1, false);
+	■背景視点移動(-1, true);
+}
+
+void ■全体アウト()
+{
+	checkAdvCommandHistory();
+	■立ち絵消去(1, false);
+	■立ち絵背消去(1, false);
+	■背景視点移動(1, true);
+}
+
+void ■立ち絵背景アウト()
+{
+	checkAdvCommandHistory();
+	■立ち絵消去(1, false);
+	■立ち絵背消去(1, false);
+	■背景消去(0, 1000, true);
+}
+
+void ■切り替え(string 現在キャラ, string 変更キャラ)
+{
+	checkAdvCommandHistory();
+	g_advChangeCharacter.run(現在キャラ, 変更キャラ);
+}
+
+void ■効果音(string 効果音名)
+{
+	checkAdvCommandHistory();
+	g_advSound.playSound(効果音名, false);
+}
+
+void ■効果音非継続(string 効果音名)
+{
+	checkAdvCommandHistory();
+	g_advSound.playSound(効果音名, true);
+}
+
+void ■ループ効果音(string 効果音名, int time)
+{
+	checkAdvCommandHistory();
+	g_advSound.playLoopSound(効果音名, time);
+}
+
+void ■ループ効果音停止(int フェード時間)
+{
+	checkAdvCommandHistory();
+	g_advSound.stopLoopSound(フェード時間);
+}
+
+void ■音楽(string 音楽名, int フェード時間)
+{
+	checkAdvCommandHistory();
+	音楽名 = g_advSound.resolveMusicName(音楽名);
+	if (g_music.getPlayingMusicId() != "" && フェード時間 == 0)
+	{
+		advErr("フェードアウトせずに音楽連続再生");
+	}
+	g_music.play(音楽名, フェード時間, false);
+}
+
+void ■音楽停止(int フェード時間)
+{
+	checkAdvCommandHistory();
+	g_music.fadeOut(フェード時間);
+}
+
+void ■効果音停止()
+{
+}
+
+void ■スタッフロール開始(string flatName)
+{
+	g_advStaffroll.show(flatName);
+}
+
+void ■スタッフロール終了()
+{
+	g_advStaffroll.hide();
+}
+
+void ■回想登録(string func)
+{
+	pass(func);
+	if (g_replayEvent.Find(0, g_replayEvent.Numof(), func) != -1)
+	{
+		return;
+	}
+	int i;
+	for (i = 0; i < g_replay.Numof(); ++i)
+	{
+		if (g_replay[i].isEventExist(func))
+		{
+			g_replayEvent.PushBack(func);
+			共有セーブ();
+			break;
+		}
+	}
+}
+
+void checkAdvCommandHistory()
+{
+}
+

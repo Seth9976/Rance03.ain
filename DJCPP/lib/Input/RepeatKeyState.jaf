@@ -1,0 +1,25 @@
+RepeatKeyState::RepeatKeyState()
+{
+	this.pressedFrameCount_ = 0;
+	this.isPress_ = false;
+}
+
+bool RepeatKeyState::isPress()
+{
+	return this.isPress_;
+}
+
+void RepeatKeyState::update(bool newState)
+{
+	if (!newState)
+	{
+		this.pressedFrameCount_ = 0;
+		this.isPress_ = false;
+	}
+	else
+	{
+		this.isPress_ = this.pressedFrameCount_ == 0 || this.pressedFrameCount_ > 40 && this.pressedFrameCount_ % 6 == 0;
+		++this.pressedFrameCount_;
+	}
+}
+

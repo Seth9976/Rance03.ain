@@ -1,0 +1,67 @@
+MapFrame::MapFrame()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void MapFrame::init()
+{
+	this.initParts();
+}
+
+void MapFrame::update()
+{
+}
+
+void MapFrame::fadeIn(bool val, unknown_delegate onFinish)
+{
+	this.setPartsShow();
+	PartsMotion m;
+	int w = this.parts_[0].getWidth();
+	if (val)
+	{
+		m.setMove(-w, 0, 0, 0, 1);
+	}
+	else
+	{
+		m.setMove(0, 0, -w, 0, 1);
+	}
+	this.parts_[0].runMotion(m, NULL);
+	PartsMotion m;
+	int w = this.parts_[1].getWidth();
+	if (val)
+	{
+		m.setMove(1024 + w, 768, 1024, 768, 1);
+	}
+	else
+	{
+		m.setMove(1024, 768, 1024 + w, 768, 1);
+	}
+	this.parts_[1].runMotion(m, NULL);
+}
+
+void MapFrame::initParts()
+{
+	this.parts_[0].init("システム／マップ／上フレーム", 0);
+	this.parts_[1].init("システム／マップ／下フレーム", 0);
+	createPartsGroup(this.parent_, this.parts_, 1400);
+	this.setPartsPos();
+}
+
+void MapFrame::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void MapFrame::setPartsPos()
+{
+	this.parts_[0].setPos(0.0, 0.0);
+	this.parts_[1].setPos(1024.0, 768.0);
+	this.parts_[0].setOrigin(7);
+	this.parts_[1].setOrigin(3);
+}
+

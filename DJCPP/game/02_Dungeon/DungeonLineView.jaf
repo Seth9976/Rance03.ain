@@ -1,0 +1,238 @@
+DungeonLineView::DungeonLineView()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void DungeonLineView::init(ref DungeonLine dungeonLine, float playerXPos, float viewLocalY, int r, int g, int b)
+{
+	this.r_ = r;
+	this.g_ = g;
+	this.b_ = b;
+	this.dungeonLine_ <- dungeonLine;
+	this.playerPosX_ = playerXPos;
+	this.viewlocalY_ = viewLocalY;
+	this.initCardView();
+}
+
+void DungeonLineView::update()
+{
+	if (this.state_ == 1)
+	{
+		float t = this.timerMoveForward_.getTime();
+		this.viewlocalY_ = this.moveFromY_ - getMotionValue(7, 0.0, 1.0, t / 220.0);
+	}
+	else if (this.state_ == 2)
+	{
+		float t = this.timerMoveSideways_.getTime();
+		this.playerPosX_ = this.moveFromX_ + getMotionValue(7, 0.0, this.moveDirection_, t / 300.0);
+	}
+	this.setCardCameraPos();
+	this.setCardViewPos();
+}
+
+void DungeonLineView::moveForward(DG_GeneralCallback onFinishCallback)
+{
+	if (this.state_ != 0)
+	{
+		return;
+	}
+	this.onFinishMoveForwardCallback_ = onFinishCallback;
+	this.moveFromY_ = this.viewlocalY_;
+	this.timerMoveForward_.setTimer(220, this.onFinishMoveForward);
+	this.state_ = 1;
+}
+
+void DungeonLineView::moveSideways(int playerXPos, DG_GeneralCallback onFinishMoveSidewaysCallback)
+{
+	if (this.state_ != 0)
+	{
+		return;
+	}
+	this.onFinishMoveSidewaysCallback_ = onFinishMoveSidewaysCallback;
+	this.moveFromX_ = this.playerPosX_;
+	this.moveDirection_ = playerXPos - this.playerPosX_;
+	this.timerMoveSideways_.setTimer(300, this.onFinishMoveSideways);
+	if (this.viewlocalY_ == 0.0)
+	{
+		this.purgeAnotherCard(playerXPos);
+	}
+	this.state_ = 2;
+}
+
+void DungeonLineView::openCard(int playerXPos, DG_GeneralCallback onFinishOpenCardCallback)
+{
+	int index = playerXPos + this.cardView_.Numof() / 2;
+	ref DungeonCard c = this.dungeonLine_.getDungeonCard(index);
+	if (!c.isOpen())
+	{
+		this.onFinishCardOpenCallback_ = onFinishOpenCardCallback;
+		this.innerOpenCard(playerXPos);
+	}
+	else
+	{
+		CardInfomation info;
+		info = getCardInfomationFromId(c.getCardTypeId());
+		if (info.getEventCallback() != "")
+		{
+			this.timerOpenCard_.setTimer(100, onFinishOpenCardCallback);
+		}
+		else
+		{
+			onFinishOpenCardCallback();
+		}
+	}
+}
+
+void DungeonLineView::innerOpenCard(int xPos)
+{
+	int index = xPos + this.cardView_.Numof() / 2;
+	ref DungeonCard c = this.dungeonLine_.getDungeonCard(index);
+	c.openCard();
+}
+
+void DungeonLineView::purgeAnotherCard(int xPos)
+{
+	int index = xPos + this.cardView_.Numof() / 2;
+	int i;
+	for (i = 0; i < this.cardView_.Numof(); ++i)
+	{
+		if (i != index)
+		{
+			this.cardView_[i].purge();
+		}
+	}
+}
+
+void DungeonLineView::setOnClickCallback(DG_OnLineCardClickCallback onClickCallback)
+{
+	this.onClickCallback_ = onClickCallback;
+}
+
+void DungeonLineView::initCardView()
+{
+	this.cardView_.Alloc(this.dungeonLine_.getWidth());
+	int i;
+	for (i = 0; i < this.cardView_.Numof(); ++i)
+	{
+		ref DungeonCard c = this.dungeonLine_.getDungeonCard(i);
+		this.cardView_[i].init(c, this.onCardClick, i, this.r_, this.g_, this.b_);
+		this.cardView_[i].setFinishCardOpenCallback(this.onFinishCardOpen);
+	}
+	this.setCardCameraPos();
+}
+
+void DungeonLineView::setCardViewPos()
+{
+	int i;
+	for (i = 0; i < this.cardView_.Numof(); ++i)
+	{
+		this.cardView_[i].setLocalPos(i - this.cardView_.Numof() / 2, this.viewlocalY_);
+	}
+}
+
+void DungeonLineView::setCardCameraPos()
+{
+	int i;
+	for (i = 0; i < this.cardView_.Numof(); ++i)
+	{
+		this.cardView_[i].setCameraPos(this.playerPosX_);
+	}
+}
+
+void DungeonLineView::onFinishMoveForward()
+{
+	this.state_ = 0;
+	this.viewlocalY_ = this.moveFromY_ - 1.0;
+	this.setSelectable();
+	this.onFinishMoveForwardCallback_();
+	this.onFinishMoveForwardCallback_.Clear();
+}
+
+void DungeonLineView::setSelectable()
+{
+	if (this.viewlocalY_ != 0.0)
+	{
+		return;
+	}
+	int p = this.playerPosX_ + this.cardView_.Numof() / 2;
+	int i;
+	for (i = 0; i < this.cardView_.Numof(); ++i)
+	{
+		this.cardView_[i].setEnable(p - 1 <= i && i <= p + 1);
+	}
+}
+
+void DungeonLineView::onFinishMoveSideways()
+{
+	this.state_ = 0;
+	this.playerPosX_ = this.moveFromX_ + this.moveDirection_;
+	this.onFinishMoveSidewaysCallback_();
+	this.onFinishMoveSidewaysCallback_.Clear();
+}
+
+void DungeonLineView::onFinishCardOpen()
+{
+	this.onFinishCardOpenCallback_();
+}
+
+void DungeonLineView::onCardClick(int index)
+{
+	if (g_playerCommonParam.getBadConditionTurn("内股") != 0)
+	{
+		if (RAND(3) != 1)
+		{
+			array@int n;
+			string s;
+			int i;
+			for (i = 0; i < 3; ++i)
+			{
+				int target = (this.playerPosX_ - 1.0) + i;
+				int cvIndex = target + this.cardView_.Numof() / 2;
+				if (0 <= cvIndex && cvIndex < this.cardView_.Numof())
+				{
+					if (this.cardView_[cvIndex].isClickable())
+					{
+						n.PushBack(cvIndex);
+					}
+				}
+			}
+			index = n[RAND(n.Numof()) - 1];
+		}
+	}
+	this.disableCard();
+	this.onClickCallback_(this.cardView_[index].getDungeonCard(), index - this.cardView_.Numof() / 2, this.dungeonLine_.getDepthPos());
+}
+
+void DungeonLineView::disableCard()
+{
+	int i;
+	for (i = 0; i < this.cardView_.Numof(); ++i)
+	{
+		this.cardView_[i].setEnable(false);
+	}
+}
+
+void DungeonLineView::fadeIn(bool val, DG_GeneralCallback callback)
+{
+	this.onFinishFadeInCallback_ = callback;
+	if (val)
+	{
+		this.setCardViewPos();
+	}
+	int i;
+	for (i = 0; i < this.cardView_.Numof(); ++i)
+	{
+		this.cardView_[i].fadeIn(val, this.onCardViewFadeInFinish);
+	}
+}
+
+void DungeonLineView::onCardViewFadeInFinish()
+{
+	++this.fadeFinishCount_;
+	if (this.fadeFinishCount_ == this.cardView_.Numof())
+	{
+		this.onFinishFadeInCallback_();
+		this.fadeFinishCount_ = 0;
+	}
+}
+

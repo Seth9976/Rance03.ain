@@ -1,0 +1,10 @@
+文字入力エリア_t::文字入力エリア_t()
+{
+	this.m_nMaxTextLengthSJIS = -1;
+}
+
+選択エリア_t::選択エリア_t()
+{
+	this.nCursorOffsetZ = 1;
+}
+

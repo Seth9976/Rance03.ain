@@ -1,0 +1,42 @@
+TimerCallback::TimerCallback()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+	this.release();
+}
+
+void TimerCallback::setTimer(int time, DG_GeneralCallback cb)
+{
+	this.time_ = time;
+	this.isRunning_ = true;
+	this.cb_ = cb;
+	this.timer_.reset();
+}
+
+void TimerCallback::update()
+{
+	if (this.time_ >= 0 && this.timer_.getTime() > this.time_)
+	{
+		DG_GeneralCallback bk = this.cb_;
+		this.release();
+		bk();
+		bk.Clear();
+	}
+}
+
+void TimerCallback::release()
+{
+	this.isRunning_ = false;
+	this.time_ = -1;
+	this.cb_.Clear();
+}
+
+int TimerCallback::getTime()
+{
+	return this.timer_.getTime();
+}
+
+bool TimerCallback::isRunning()
+{
+	return this.isRunning_;
+}
+

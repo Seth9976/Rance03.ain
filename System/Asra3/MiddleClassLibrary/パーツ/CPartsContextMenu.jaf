@@ -1,0 +1,260 @@
+CPartsContextMenu::CPartsContextMenu()
+{
+	this.m_PartsNumber = 0;
+}
+
+CPartsContextMenu::~CPartsContextMenu()
+{
+	this.Close();
+}
+
+void CPartsContextMenu::Open(int PosX, int PosY)
+{
+	if (this.NumofShowItem() <= 0)
+	{
+		return;
+	}
+	AFL_Parts_AddLayer(-1);
+	this.m_PartsNumber = PARTS_GetFreeSystemPartsNumber();
+	int Width = 200;
+	int Height = 20 * this.NumofShowItem() + 8;
+	if (PosX == -2147483648 || PosY == -2147483648)
+	{
+		AFL_Mouse_GetPos(PosX, PosY);
+	}
+	Ｐ＿座標設定(this.m_PartsNumber, PosX + Width <= AFL_View_GetWidth() ? PosX : PosX - Width, PosY + Height <= AFL_View_GetHeight() ? PosY : PosY - Height);
+	Ｐ＿Ｚ座標設定(this.m_PartsNumber, 1);
+	Ｐ＿構築手順＿ピクセル作成(this.m_PartsNumber, Width, Height, 1);
+	Ｐ＿構築手順＿色塗り(this.m_PartsNumber, 0, 0, Width, Height, 150, 150, 150, -1, 1);
+	Ｐ＿構築手順＿色塗り(this.m_PartsNumber, 1, 1, Width - 2, Height - 2, 245, 245, 245, -1, 1);
+	Ｐ＿構築ビルド(this.m_PartsNumber, 1);
+	int LayoutPartsNumber = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿レイアウトタイプ設定(LayoutPartsNumber, 1);
+	Ｐ＿レイアウトボックス＿パディング設定(LayoutPartsNumber, 4, 4, 4, 4);
+	CASCharSpriteProperty Font;
+	Font.SetSize(12);
+	Font.SetColor(CF_CASColor(0, 0, 0, 255));
+	CASCharSpriteProperty DisableFont;
+	DisableFont.SetSize(12);
+	DisableFont.SetColor(CF_CASColor(100, 100, 100, 255));
+	int i;
+	int Numof = this.m_ItemList.Numof();
+	for (i = 0; i < Numof; ++i)
+	{
+		if (!this.m_ItemList[i].Show)
+		{
+			continue;
+		}
+		this.m_ItemList[i].PartsNumber = PARTS_GetFreeSystemPartsNumber();
+		Ｐ＿構築手順＿ピクセル作成(this.m_ItemList[i].PartsNumber, 192, 20, 1);
+		Ｐ＿構築手順＿色塗り(this.m_ItemList[i].PartsNumber, 0, 0, 192, 20, 245, 245, 245, -1, 1);
+		if (this.m_ItemList[i].Text == "-" && this.m_ItemList[i].Delegate.Numof() == 0)
+		{
+			Ｐ＿構築手順＿線(this.m_ItemList[i].PartsNumber, 0, 9, 192, 9, 224, 224, 224, 255, 1);
+			Ｐ＿構築手順＿線(this.m_ItemList[i].PartsNumber, 0, 10, 192, 10, 255, 255, 255, 255, 1);
+			Ｐ＿構築ビルド(this.m_ItemList[i].PartsNumber, 1);
+			Ｐ＿オンカーソル透過設定(this.m_ItemList[i].PartsNumber, true);
+			Ｐ＿クリック可能設定(this.m_ItemList[i].PartsNumber, false);
+		}
+		else if (!this.m_ItemList[i].Enable || this.m_ItemList[i].Delegate.Numof() == 0)
+		{
+			Ｐ＿構築手順＿テキストブレンド(this.m_ItemList[i].PartsNumber, 4, 4, this.m_ItemList[i].Text, DisableFont, 0, 0, 1);
+			Ｐ＿構築ビルド(this.m_ItemList[i].PartsNumber, 1);
+			Ｐ＿オンカーソル透過設定(this.m_ItemList[i].PartsNumber, true);
+			Ｐ＿クリック可能設定(this.m_ItemList[i].PartsNumber, false);
+		}
+		else
+		{
+			Ｐ＿構築手順＿テキストブレンド(this.m_ItemList[i].PartsNumber, 4, 4, this.m_ItemList[i].Text, Font, 0, 0, 1);
+			Ｐ＿構築ビルド(this.m_ItemList[i].PartsNumber, 1);
+			Ｐ＿オンカーソル透過設定(this.m_ItemList[i].PartsNumber, false);
+			Ｐ＿クリック可能設定(this.m_ItemList[i].PartsNumber, true);
+			AFL_Parts_AddMouseLClickEvent(this.m_ItemList[i].PartsNumber, this.MenuItem_OnMouseLClick);
+			AFL_Parts_AddMouseEnterEvent(this.m_ItemList[i].PartsNumber, this.MenuItem_OnMouseEnter);
+			AFL_Parts_AddMouseLeaveEvent(this.m_ItemList[i].PartsNumber, this.MenuItem_OnMouseLeave);
+		}
+		Ｐ＿レイアウトボックス＿追加(LayoutPartsNumber, this.m_ItemList[i].PartsNumber);
+	}
+	Ｐ＿子追加(this.m_PartsNumber, LayoutPartsNumber);
+	Ｐ＿フォーカス設定(this.m_PartsNumber);
+	AFL_Parts_AddLostFocusEvent(this.m_PartsNumber, this.OnLostFocus);
+}
+
+void CPartsContextMenu::Close()
+{
+	if (this.m_PartsNumber == 0)
+	{
+		return;
+	}
+	AFL_Parts_EraseLayer(-1);
+	PARTS_ReleaseWithChild(this.m_PartsNumber);
+	this.m_PartsNumber = 0;
+	int i;
+	int Numof = this.m_ItemList.Numof();
+	for (i = 0; i < Numof; ++i)
+	{
+		this.m_ItemList[i].PartsNumber = 0;
+	}
+}
+
+int CPartsContextMenu::AddItem(string ItemText, DG_SelectContextMenuItemHandler DelegateObject)
+{
+	SPartsContextMenuItem Item;
+	Item.PartsNumber = 0;
+	Item.Text = ItemText;
+	Item.Delegate = DelegateObject;
+	Item.Show = true;
+	Item.Enable = true;
+	this.m_ItemList.PushBack(Item);
+	return this.m_ItemList.Numof() - 1;
+}
+
+int CPartsContextMenu::InsertItem(int Index, string ItemText, DG_SelectContextMenuItemHandler DelegateObject)
+{
+	if (Index < 0 || Index >= this.m_ItemList.Numof())
+	{
+		return this.AddItem(ItemText, DelegateObject);
+	}
+	SPartsContextMenuItem Item;
+	Item.PartsNumber = 0;
+	Item.Text = ItemText;
+	Item.Delegate = DelegateObject;
+	Item.Show = true;
+	Item.Enable = true;
+	this.m_ItemList.Insert(Index, Item);
+	return Index;
+}
+
+int CPartsContextMenu::AddSeparator()
+{
+	return this.AddItem("-", NULL);
+}
+
+int CPartsContextMenu::InsertSeparator(int Index)
+{
+	return this.InsertItem(Index, "-", NULL);
+}
+
+int CPartsContextMenu::NumofItem()
+{
+	return this.m_ItemList.Numof();
+}
+
+int CPartsContextMenu::NumofShowItem()
+{
+	int Result;
+	int i;
+	int Numof = this.m_ItemList.Numof();
+	for (i = 0; i < Numof; ++i)
+	{
+		if (this.m_ItemList[i].Show)
+		{
+			++Result;
+		}
+	}
+	return Result;
+}
+
+void CPartsContextMenu::SetItemText(int Index, string ItemText)
+{
+	if (Index < 0 || Index >= this.m_ItemList.Numof())
+	{
+		return;
+	}
+	this.m_ItemList[Index].Text = ItemText;
+}
+
+string CPartsContextMenu::GetItemText(int Index)
+{
+	if (Index < 0 || Index >= this.m_ItemList.Numof())
+	{
+		return "";
+	}
+	return this.m_ItemList[Index].Text;
+}
+
+void CPartsContextMenu::SetItemShow(int Index, bool Show)
+{
+	if (Index < 0 || Index >= this.m_ItemList.Numof())
+	{
+		return;
+	}
+	this.m_ItemList[Index].Show = Show;
+}
+
+bool CPartsContextMenu::GetItemShow(int Index)
+{
+	if (Index < 0 || Index >= this.m_ItemList.Numof())
+	{
+		return false;
+	}
+	return this.m_ItemList[Index].Show;
+}
+
+void CPartsContextMenu::SetItemEnable(int Index, bool Enable)
+{
+	if (Index < 0 || Index >= this.m_ItemList.Numof())
+	{
+		return;
+	}
+	this.m_ItemList[Index].Enable = Enable;
+}
+
+bool CPartsContextMenu::GetItemEnable(int Index)
+{
+	if (Index < 0 || Index >= this.m_ItemList.Numof())
+	{
+		return false;
+	}
+	return this.m_ItemList[Index].Enable;
+}
+
+int CPartsContextMenu::GetPartsNumber()
+{
+	return this.m_PartsNumber;
+}
+
+void CPartsContextMenu::OnLostFocus(int PartsNumber)
+{
+	if (PartsNumber != this.m_PartsNumber)
+	{
+		return;
+	}
+	int i;
+	int Numof = this.m_ItemList.Numof();
+	for (i = 0; i < Numof; ++i)
+	{
+		if (Ｐ＿フォーカス確認(this.m_ItemList[i].PartsNumber))
+		{
+			return;
+		}
+	}
+	this.Close();
+}
+
+void CPartsContextMenu::MenuItem_OnMouseLClick(int PartsNumber, int MouseX, int MouseY)
+{
+	int i;
+	int Numof = this.m_ItemList.Numof();
+	for (i = 0; i < Numof; ++i)
+	{
+		if (this.m_ItemList[i].PartsNumber != PartsNumber)
+		{
+			continue;
+		}
+		this.m_ItemList[i].Delegate(i, this.m_ItemList[i].Text);
+		this.Close();
+		break;
+	}
+}
+
+void CPartsContextMenu::MenuItem_OnMouseEnter(int PartsNumber, int MouseX, int MouseY)
+{
+	Ｐ＿乗算色設定(PartsNumber, 255, 200, 200);
+}
+
+void CPartsContextMenu::MenuItem_OnMouseLeave(int PartsNumber, int MouseX, int MouseY)
+{
+	Ｐ＿乗算色設定(PartsNumber, 255, 255, 255);
+}
+

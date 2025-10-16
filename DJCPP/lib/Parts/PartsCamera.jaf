@@ -1,0 +1,49 @@
+PartsCamera::PartsCamera()
+{
+	this.reset();
+}
+
+void PartsCamera::reset()
+{
+	this.zoomCenterX_ = 512.0;
+	this.zoomCenterY_ = 384.0;
+	this.rot_ = 0.0;
+	this.zoom_ = 1.0;
+}
+
+void PartsCamera::setCenter(float x, float y)
+{
+	this.zoomCenterX_ = x;
+	this.zoomCenterY_ = y;
+}
+
+void PartsCamera::setRot(float rot)
+{
+	this.rot_ = rot;
+}
+
+void PartsCamera::setZoom(float zoom)
+{
+	this.zoom_ = zoom;
+}
+
+float PartsCamera::getRot()
+{
+	return this.rot_;
+}
+
+float PartsCamera::getZoom()
+{
+	return this.zoom_;
+}
+
+void PartsCamera::convertPos(ref float rx, ref float ry, float x, float y)
+{
+	float tx = (x - this.zoomCenterX_) * this.zoom_;
+	float ty = (y - this.zoomCenterY_) * this.zoom_;
+	rx = tx;
+	ry = ty;
+	rx = rx + 512.0;
+	ry = ry + 384.0;
+}
+

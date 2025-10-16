@@ -1,0 +1,67 @@
+void SceneCgSwipeView::init(array@string imageName)
+{
+	this.isFinish_ = false;
+	this.isShowNavi_ = false;
+	this.view_.init(imageName);
+	this.btnClose_.init("システム／ボタン／幅１７０", "閉じる", "", true);
+	this.btnClose_.setPos(839, 691);
+	this.btnClose_.setZ(15000);
+	this.btnClose_.setClickCallback(this.onClickCloseButton, 0);
+	this.navi_.init(this.view_.getScrollPosition, this.view_.getPageCount());
+	this.navi_.setOnClickCallback(this.onClick);
+	this.posNavi_.init(imageName.Numof());
+}
+
+void SceneCgSwipeView::onClickCloseButton(int index)
+{
+	this.fadeOut();
+}
+
+void SceneCgSwipeView::fadeOut()
+{
+	if (this.isShowNavi_)
+	{
+		this.showNavi(false);
+	}
+	this.view_.fadeIn(false);
+	this.timer_.setTimer(250, this.onFinishFadeOut);
+}
+
+void SceneCgSwipeView::onFinishFadeOut()
+{
+	this.isFinish_ = true;
+}
+
+void SceneCgSwipeView::run()
+{
+	this.view_.fadeIn(true);
+}
+
+void SceneCgSwipeView::onClick(int index)
+{
+	this.view_.scroll(index == 0 ? false : true);
+}
+
+bool SceneCgSwipeView::update()
+{
+	if (g_mouse.isClick(1) && !this.timer_.isRunning())
+	{
+		playCancel();
+		this.fadeOut();
+	}
+	if (g_mouse.isClickWithNoFocus())
+	{
+		this.isShowNavi_ = !this.isShowNavi_;
+		this.showNavi(this.isShowNavi_);
+	}
+	this.posNavi_.setPos(this.view_.getScrollPosition());
+	return !this.isFinish_;
+}
+
+void SceneCgSwipeView::showNavi(bool val)
+{
+	this.navi_.fadeIn(val);
+	this.posNavi_.fadeIn(val, NULL);
+	this.btnClose_.fadeIn(val);
+}
+

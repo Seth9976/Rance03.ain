@@ -1,0 +1,38 @@
+void pass(string msg)
+{
+}
+
+void stop(string msg)
+{
+}
+
+string getFunctionStackString(int excludeLatest)
+{
+	array@string fn;
+	getFunctionStackList(fn);
+	string result;
+	int i;
+	for (i = 0; i < fn.Numof() - excludeLatest; ++i)
+	{
+		result += ">" + fn[i];
+	}
+	result = "…" + result.GetPart(Math.Max(0, result.Length() - 70), 70);
+	return result;
+}
+
+void getFunctionStackList(ref array@string fn)
+{
+	int i;
+	while (true)
+	{
+		string r = system.GetFuncStackName(i);
+		if (r == "")
+		{
+			break;
+		}
+		fn.PushBack(r);
+		++i;
+	}
+	fn.Reverse();
+}
+

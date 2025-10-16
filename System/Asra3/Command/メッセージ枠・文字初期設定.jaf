@@ -1,0 +1,153 @@
+void 字初期値(int Ｍ番号, int フォント)
+{
+	if (Ｍ番号 != 0)
+	{
+		SYS_ASSERTE_AREA_ID(Ｍ番号);
+		SYS_字初期値(Ｍ番号, フォント);
+		return;
+	}
+	for (Ｍ番号 = 1; Ｍ番号 < 40; ++Ｍ番号)
+	{
+		SYS_字初期値(Ｍ番号, フォント);
+	}
+}
+
+void 字サイズ初期値(int Ｍ番号, int サイズ)
+{
+	if (サイズ < 1)
+	{
+		SYS_ERROR("サイズ=%d" % サイズ, 0);
+		サイズ = 20;
+	}
+	if (Ｍ番号 != 0)
+	{
+		SYS_ASSERTE_AREA_ID(Ｍ番号);
+		SYS_字サイズ初期値(Ｍ番号, サイズ);
+		return;
+	}
+	for (Ｍ番号 = 1; Ｍ番号 < 40; ++Ｍ番号)
+	{
+		SYS_字サイズ初期値(Ｍ番号, サイズ);
+	}
+}
+
+void 字太初期値(int _Ｍ番号, int _太さ)
+{
+	int _v = _太さ;
+	if (_v < 1)
+	{
+		SYS_ERROR("太さ = %d" % _太さ, 0);
+		_v = 400;
+	}
+	if (_Ｍ番号 != 0)
+	{
+		SYS_ASSERTE_AREA_ID(_Ｍ番号);
+		SYS_字太初期値(_Ｍ番号, _v);
+	}
+	else
+	{
+		int _i;
+		for (_i = 1; _i < 40; ++_i)
+		{
+			SYS_字太初期値(_i, _v);
+		}
+	}
+}
+
+void 字色初期値(int Ｍ番号, int Ｒ, int Ｇ, int Ｂ)
+{
+	if (Ｍ番号 != 0)
+	{
+		SYS_ASSERTE_AREA_ID(Ｍ番号);
+		SYS_字色初期値(Ｍ番号, Ｒ, Ｇ, Ｂ);
+		return;
+	}
+	for (Ｍ番号 = 1; Ｍ番号 < 40; ++Ｍ番号)
+	{
+		SYS_字色初期値(Ｍ番号, Ｒ, Ｇ, Ｂ);
+	}
+}
+
+void 字速度初期値(int Ｍ番号, int 時間)
+{
+	if (Ｍ番号 != 0)
+	{
+		SYS_ASSERTE_AREA_ID(Ｍ番号);
+		SYS_字速度初期値(Ｍ番号, 時間);
+		return;
+	}
+	for (Ｍ番号 = 1; Ｍ番号 < 40; ++Ｍ番号)
+	{
+		SYS_字速度初期値(Ｍ番号, 時間);
+	}
+}
+
+void 字飾り初期値(int Ｍ番号, int 上太さ, int 右太さ, int 下太さ, int 左太さ, int Ｒ, int Ｇ, int Ｂ)
+{
+	if (上太さ < 0)
+	{
+		SYS_ERROR("上太さ = %d" % 上太さ, 0);
+		上太さ = 0;
+	}
+	if (右太さ < 0)
+	{
+		SYS_ERROR("右太さ = %d" % 右太さ, 0);
+		右太さ = 0;
+	}
+	if (下太さ < 0)
+	{
+		SYS_ERROR("下太さ = %d" % 下太さ, 0);
+		下太さ = 0;
+	}
+	if (左太さ < 0)
+	{
+		SYS_ERROR("左太さ = %d" % 左太さ, 0);
+		左太さ = 0;
+	}
+	float EdgeWeight = Math.Max(Math.Max(上太さ, 右太さ), Math.Max(下太さ, 左太さ));
+	if (EdgeWeight < 0.0)
+	{
+		EdgeWeight = 0.0;
+	}
+	if (Ｍ番号 != 0)
+	{
+		SYS_ASSERTE_AREA_ID(Ｍ番号);
+		SYS_字飾り初期値(Ｍ番号, EdgeWeight, Ｒ, Ｇ, Ｂ);
+		return;
+	}
+	for (Ｍ番号 = 1; Ｍ番号 < 40; ++Ｍ番号)
+	{
+		SYS_字飾り初期値(Ｍ番号, EdgeWeight, Ｒ, Ｇ, Ｂ);
+	}
+}
+
+void Ａ＿メッセージウィンドウ＿フォント縁取り幅初期設定(int メッセージウィンドウ番号, float 縁取り幅)
+{
+	if (メッセージウィンドウ番号 != 0)
+	{
+		SYS_ASSERTE_AREA_ID(メッセージウィンドウ番号);
+		ref CMessageWindowModel MessageWindowModel = g_MessageWindowModelManager.GetMessageWindow(メッセージウィンドウ番号);
+		MessageWindowModel.SetEdgeWeight(縁取り幅);
+		return;
+	}
+	for (メッセージウィンドウ番号 = 1; メッセージウィンドウ番号 < 40; メッセージウィンドウ番号++)
+	{
+		ref CMessageWindowModel MessageWindowModel = g_MessageWindowModelManager.GetMessageWindow(メッセージウィンドウ番号);
+		MessageWindowModel.SetEdgeWeight(縁取り幅);
+	}
+}
+
+void 字間隔(int Ｍ番号, int 字間, int 行間)
+{
+	if (Ｍ番号 != 0)
+	{
+		SYS_ASSERTE_AREA_ID(Ｍ番号);
+		SYS_字間隔(Ｍ番号, 字間, 行間);
+		return;
+	}
+	for (Ｍ番号 = 1; Ｍ番号 < 40; ++Ｍ番号)
+	{
+		SYS_字間隔(Ｍ番号, 字間, 行間);
+	}
+}
+

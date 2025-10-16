@@ -1,0 +1,215 @@
+void BattleResult::addExpBonus(string key, int value)
+{
+	if (g_battleCalcMode)
+	{
+		return;
+	}
+	if (this.isExistExpBonus(key))
+	{
+		return;
+	}
+	BattleBonus b;
+	b.init(key, value);
+	this.expBonus_.PushBack(b);
+}
+
+bool BattleResult::isExistExpBonus(string key)
+{
+	int i;
+	for (i = 0; i < this.expBonus_.Numof(); ++i)
+	{
+		if (this.expBonus_[i].getName() == key)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool BattleResult::isExistGoldBonus(string key)
+{
+	int i;
+	for (i = 0; i < this.goldBonus_.Numof(); ++i)
+	{
+		if (this.goldBonus_[i].getName() == key)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void BattleResult::addGoldBonus(string key, int value)
+{
+	if (g_battleCalcMode)
+	{
+		return;
+	}
+	if (this.isExistGoldBonus(key))
+	{
+		return;
+	}
+	BattleBonus b;
+	b.init(key, value);
+	this.goldBonus_.PushBack(b);
+}
+
+void BattleResult::setInfo(BattleInfomation info)
+{
+	this.itemId_ = info.getItemId();
+	this.itemProbability_ = info.getItemProbability();
+	this.info_ = info;
+}
+
+bool BattleResult::isGetItemByLot()
+{
+	return RAND(100) <= this.itemProbability_;
+}
+
+int BattleResult::getExp()
+{
+	return this.info_.getExp();
+}
+
+int BattleResult::getGold()
+{
+	return this.info_.getGold();
+}
+
+string BattleResult::getItemId()
+{
+	return this.itemId_;
+}
+
+void BattleResult::getExpBonus(ref array@BattleBonus result)
+{
+	result.Free();
+	result.Alloc(this.expBonus_.Numof());
+	result.Copy(0, this.expBonus_, 0, this.expBonus_.Numof());
+}
+
+void BattleResult::getGoldBonus(ref array@BattleBonus result)
+{
+	result.Free();
+	result.Alloc(this.goldBonus_.Numof());
+	result.Copy(0, this.goldBonus_, 0, this.goldBonus_.Numof());
+}
+
+void BattleResult::reset()
+{
+	this.info_.reset();
+	this.battleEndEvent_ = "";
+	this.itemId_ = "";
+	this.itemProbability_ = 0;
+	this.expBonus_.Free();
+	this.goldBonus_.Free();
+	this.playerId_ = "";
+	this.resultMessage_ = "";
+	this.battleEndMessage_.Free();
+}
+
+int BattleResult::getExpCountedBonus()
+{
+	return this.info_.getExp() * this.getBonusRatio(this.expBonus_);
+}
+
+int BattleResult::getGoldCountedBonus()
+{
+	return this.info_.getGold() * this.getBonusRatio(this.goldBonus_);
+}
+
+float BattleResult::getBonusRatio(ref array@BattleBonus b)
+{
+	int per = this.getTotalPer(b);
+	return (per + 100) / 100.0;
+}
+
+int BattleResult::getExpBonusTotalPer()
+{
+	return this.getTotalPer(this.expBonus_);
+}
+
+int BattleResult::getGoldBonusTotalPer()
+{
+	return this.getTotalPer(this.goldBonus_);
+}
+
+int BattleResult::getTotalPer(ref array@BattleBonus b)
+{
+	int per;
+	int i;
+	for (i = 0; i < b.Numof(); ++i)
+	{
+		per += b[i].getValue();
+	}
+	return per;
+}
+
+void BattleResult::countDownItemProbability()
+{
+	DG_GetItemProbabilityCallback fn;
+	fn = EX_String("アイテム取得確率減算関数", "");
+	if (fn.Numof() == 0)
+	{
+		pass("アイテム取得確率減算関数がありません");
+		fn = "testItemProbability";
+	}
+	this.itemProbability_ = fn(this.itemProbability_);
+}
+
+int testItemProbability(int val)
+{
+	return val * 0.7;
+}
+
+int BattleResult::getItemProbability()
+{
+	return this.itemProbability_;
+}
+
+void BattleResult::setFinalAttacker(string playerId)
+{
+	this.playerId_ = playerId;
+}
+
+string BattleResult::getFinalAttacker()
+{
+	return this.playerId_;
+}
+
+void BattleResult::setResultMessage(string msg)
+{
+	this.resultMessage_ = msg;
+}
+
+string BattleResult::getResultMessage()
+{
+	return this.resultMessage_;
+}
+
+BattleInfomation BattleResult::getBattleInfomation()
+{
+	return this.info_;
+}
+
+void BattleResult::addBattleEndMessage(string msg)
+{
+	this.battleEndMessage_.PushBack(msg);
+}
+
+void BattleResult::getBattleEndMessage(ref array@string msg)
+{
+	msg.Alloc(this.battleEndMessage_.Numof());
+	msg.Copy(0, this.battleEndMessage_, 0, this.battleEndMessage_.Numof());
+}
+
+void BattleResult::setBattleEndEvent(string eventName)
+{
+	this.battleEndEvent_ = eventName;
+}
+
+string BattleResult::getBattleEndEvent()
+{
+	return this.battleEndEvent_;
+}
+

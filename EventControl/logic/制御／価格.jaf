@@ -1,0 +1,79 @@
+int 制御／価格／オート(ref Item item, int count)
+{
+	int price;
+	int base;
+	base = item.getPrice();
+	switch (count)
+	{
+	case 0:
+		price = base;
+		break;
+	case 1:
+		price = (base * 12) / 10;
+		break;
+	case 2:
+		price = (base * 14) / 10;
+		break;
+	case 3:
+		price = (base * 20) / 10;
+		break;
+	case 4:
+		price = (base * 26) / 10;
+		break;
+	case 5:
+		price = (base * 32) / 10;
+		break;
+	case 6:
+		price = (base * 50) / 10;
+		break;
+	case 7:
+		price = (base * 68) / 10;
+		break;
+	case 8:
+		price = (base * 86) / 10;
+		break;
+	default:
+		price = (base * (140 + (count - 8) * 54)) / 10;
+		break;
+	}
+	return price;
+}
+
+int 制御／価格／世色癌２(ref Item item, int count)
+{
+	int base;
+	int price;
+	base = 400;
+	switch (count)
+	{
+	case 0:
+	case 1:
+	case 2:
+		price = base * Math.Pow(1.2, count);
+		break;
+	default:
+		price = base * Math.Pow(2.4, count);
+		break;
+	}
+	return price;
+}
+
+int 制御／価格／世色癌３(ref Item item, int count)
+{
+	int base;
+	int price;
+	base = 1600;
+	switch (count)
+	{
+	case 0:
+	case 1:
+	case 2:
+		price = base * Math.Pow(1.2, count);
+		break;
+	default:
+		price = base * Math.Pow(2.4, count);
+		break;
+	}
+	return price;
+}
+

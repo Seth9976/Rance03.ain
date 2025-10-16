@@ -1,0 +1,95 @@
+string AdvSound::resolveMusicName(string name)
+{
+	string n = name;
+	if (this.isExistSoundName(n))
+	{
+		return name;
+	}
+	n = "音楽／ＡＤＶ／" + name;
+	if (this.isExistSoundName(n))
+	{
+		return n;
+	}
+	n = "音楽／" + name;
+	if (this.isExistSoundName(n))
+	{
+		return n;
+	}
+	advErr("見つからない音楽やで:%s" % name);
+	return "";
+}
+
+bool AdvSound::isExistSoundName(string name)
+{
+	return KiwiSoundEngine.IsExistFile(name);
+}
+
+bool AdvSound::isExistFxName(string name)
+{
+	return this.isExistSoundName(name);
+}
+
+void AdvSound::playLoopSound(string loopSound, int fadeTime)
+{
+	string n = this.resolveFxName(loopSound);
+	Ａ＿ループ効果音１(n, -1, fadeTime);
+	this.isPlayingLoopSound_ = true;
+}
+
+void AdvSound::stopLoopSound(int fadeTime)
+{
+	Ａ＿ループ効果音停止(fadeTime);
+	this.isPlayingLoopSound_ = false;
+}
+
+string AdvSound::resolveFxName(string name)
+{
+	string n = name;
+	if (this.isExistFxName(n))
+	{
+		return n;
+	}
+	n = "効果音／" + name;
+	if (this.isExistFxName(n))
+	{
+		return n;
+	}
+	advErr("見つからない効果音:%s" % name);
+	return "";
+}
+
+void AdvSound::playSound(string soundName, bool isStopOnClick)
+{
+	string n = this.resolveFxName(soundName);
+	if (n.Find("ループ") >= 0)
+	{
+		string temp = "%s／ＮＬＰ" % soundName;
+		if (this.isExistFxName(temp))
+		{
+			n = temp;
+		}
+		else
+		{
+			pass("代替効果音が見つからない");
+		}
+	}
+	if (isStopOnClick)
+	{
+		Ａ＿効果音非継続(n, -1, -1);
+	}
+	else
+	{
+		効果音(n, -1, -1);
+	}
+}
+
+bool AdvSound::isPlayingMusic()
+{
+	return this.isPlayingMusic_;
+}
+
+bool AdvSound::isPlayingLoopSound()
+{
+	return this.isPlayingLoopSound_;
+}
+

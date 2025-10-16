@@ -1,0 +1,303 @@
+void 制御／移動(string cardId)
+{
+	if (getCardInfomationFromId(cardId).getEventCallback() != "")
+	{
+		return;
+	}
+	if (g_playerCommonParam.getBadConditionTurn("痛風") != 0 && RAND(3) == 1)
+	{
+		制御／罠／ダメージ("痛風", 50.0);
+	}
+	else if (制御／パーティ／ゼロスリースキル確認("ユラン") && 制御／数値フラグ確認("スタア") != 1 && RAND(16) == 1)
+	{
+		制御／移動／ユラン();
+		制御／数値フラグ設定("スタア", 1);
+	}
+	else if (制御／パーティ／ゼロスリースキル確認("イェリコ") && 制御／数値フラグ確認("みぃつけた！") != 1 && RAND(16) == 1)
+	{
+		制御／移動／イェリコ();
+		制御／数値フラグ設定("みぃつけた！", 1);
+	}
+	else if (制御／パーティ／ゼロスリースキル確認("バーニング") && 制御／数値フラグ確認("闇焔の波動") != 1 && RAND(16) == 1)
+	{
+		制御／移動／バーニング();
+		制御／数値フラグ設定("闇焔の波動", 1);
+	}
+	else if (制御／アイテム確認("毎度ありストラップ") != 0 && RAND(256) == 1)
+	{
+		制御／アイテム削除("毎度ありストラップ", 1, false);
+	}
+	else if (制御／アイテム確認("丹下犬ストラップ") != 0 && RAND(256) == 1)
+	{
+		制御／アイテム削除("丹下犬ストラップ", 1, false);
+	}
+	else if (制御／アイテム確認("守り神様ストラップ") != 0 && RAND(256) == 1)
+	{
+		制御／アイテム削除("守り神様ストラップ", 1, false);
+	}
+}
+
+void 制御／移動／ユラン()
+{
+	int consecutive;
+	int rank;
+	consecutive = getPlayerFromId("ユラン").getConsecutiveBattleCount();
+	rank = RAND(consecutive + 1);
+	if (rank > 11)
+	{
+		rank = 11;
+	}
+	string itemId;
+	switch (RAND(rank))
+	{
+	case 1:
+		if (RAND(3) != 1)
+		{
+			itemId = "珍味1";
+		}
+		else
+		{
+			itemId = "世色癌1";
+		}
+		break;
+	case 2:
+		if (RAND(3) != 1)
+		{
+			itemId = "換金2";
+		}
+		else
+		{
+			itemId = "アサクヒロク1";
+		}
+		break;
+	case 3:
+		if (RAND(3) != 1)
+		{
+			itemId = "珍味2";
+		}
+		else
+		{
+			itemId = "世色癌2";
+		}
+		break;
+	case 4:
+		if (RAND(3) != 1)
+		{
+			itemId = "珍味3";
+		}
+		else
+		{
+			itemId = "アサクヒロク2";
+		}
+		break;
+	case 5:
+		if (RAND(3) != 1)
+		{
+			itemId = "換金4";
+		}
+		else
+		{
+			itemId = "マヨネーズ";
+		}
+		break;
+	case 6:
+		if (RAND(3) != 1)
+		{
+			itemId = "珍味4";
+		}
+		else
+		{
+			itemId = "世色癌3";
+		}
+		break;
+	case 7:
+		if (RAND(3) != 1)
+		{
+			itemId = "換金5";
+		}
+		else
+		{
+			itemId = "アサクヒロク3";
+		}
+		break;
+	case 8:
+		if (RAND(3) != 1)
+		{
+			itemId = "女の子の秘蜜";
+		}
+		else
+		{
+			itemId = "ピッキングドリル";
+		}
+		break;
+	case 9:
+		if (RAND(3) != 1)
+		{
+			itemId = "徳用魔池";
+		}
+		else
+		{
+			itemId = "珍味5";
+		}
+		break;
+	case 10:
+		if (RAND(3) != 1)
+		{
+			itemId = "バラバラ時計";
+		}
+		else
+		{
+			itemId = "世色癌4";
+		}
+		break;
+	case 11:
+		if (RAND(3) != 1)
+		{
+			itemId = "換金6";
+		}
+		else
+		{
+			itemId = "コンビーフの鍵";
+		}
+		break;
+	}
+	g_playerCommonParam.addItem(itemId);
+	DialogInfomation info;
+	info.setCaption("ユランのファンと遭遇！");
+	info.setMessage("きゃいきゃい駆け寄ってきて、|%sを、|差し入れて去っていった！" % getItemFromId(itemId).getName());
+	info.setPictureImageName("システム／ダイアログ／写真／ユラン");
+	openDialog(info);
+}
+
+void 制御／移動／イェリコ()
+{
+	int consecutive;
+	int rank;
+	consecutive = getPlayerFromId("イェリコ").getConsecutiveBattleCount();
+	rank = RAND(consecutive + 1);
+	if (rank > 11)
+	{
+		rank = 11;
+	}
+	int gold;
+	if (EV("ＥＶ／居館／一階／入口／ジル前", -2147483648))
+	{
+		gold = 98415;
+	}
+	else if (EV("ＥＶ／居館／一階／入口／初回", -2147483648))
+	{
+		gold = 32805;
+	}
+	else if (EV("ＥＶ／宿屋／入る／セル", -2147483648))
+	{
+		gold = 3645;
+	}
+	else if (EV("ＥＶ／ラジール屋敷／司令官室／Ｈ後", -2147483648))
+	{
+		gold = 405;
+	}
+	else if (EV("ＥＶ／解放軍司令部／カスタム／初回", -2147483648))
+	{
+		gold = 135;
+	}
+	else
+	{
+		gold = 45;
+	}
+	switch (rank)
+	{
+	case 1:
+		gold = (gold * 20) / 100;
+		break;
+	case 2:
+		gold = (gold * 40) / 100;
+		break;
+	case 3:
+		gold = (gold * 60) / 100;
+		break;
+	case 4:
+		gold = (gold * 80) / 100;
+		break;
+	case 5:
+		break;
+	case 6:
+		gold = (gold * 120) / 100;
+		break;
+	case 7:
+		gold = (gold * 140) / 100;
+		break;
+	case 8:
+		gold = (gold * 160) / 100;
+		break;
+	case 9:
+		gold = (gold * 180) / 100;
+		break;
+	case 10:
+		gold = (gold * 200) / 100;
+		break;
+	case 11:
+		gold = (gold * 300) / 100;
+		break;
+	}
+	g_playerCommonParam.addGold(gold);
+	DialogInfomation info;
+	info.setCaption("イェリコが金をみぃつけた！");
+	info.setMessage("大人の目線では見えない死角から、|%dGOLDを見つけていた！|がっちり没収した！" % gold);
+	info.setPictureImageName("システム／ダイアログ／写真／イェリコ");
+	openDialog(info);
+}
+
+void 制御／移動／バーニング()
+{
+	int consecutive;
+	int rank;
+	consecutive = getPlayerFromId("バーニング").getConsecutiveBattleCount();
+	rank = RAND(consecutive + 1);
+	if (rank > 11)
+	{
+		rank = 11;
+	}
+	string desc;
+	switch (RAND(rank))
+	{
+	case 1:
+		desc = "（衝動を抑えなくては……|　内にある闇の焔を……）";
+		break;
+	case 2:
+		desc = "（ぐっ……静まれ……|　闇の焔は全てを無に……）";
+		break;
+	case 3:
+		desc = "（この凄まじい破壊衝動……|　みんな俺から離れてくれ……！）";
+		break;
+	case 4:
+		desc = "（手加減できん……|　俺はただ燃え狂うのみ……）";
+		break;
+	case 5:
+		desc = "（共鳴している……？|　俺の焔と似た何かが近くに……）";
+		break;
+	case 6:
+		desc = "（まずい……巻き爪だ！|　早く危機を切り抜けねば……）";
+		break;
+	case 7:
+		desc = "（記憶が混濁している……|　確定申告したか思い出せん……）";
+		break;
+	case 8:
+		desc = "（やはり予約すべきだったか……|　しかし今月はもう一本……）";
+		break;
+	case 9:
+		desc = "（視界が闇で塗り潰されていく……|　徹夜で観たのがまずかっ……）";
+		break;
+	case 10:
+		desc = "（昼は手堅くコロッケそばで……|　だがトマトカレーは期間限定……）";
+		break;
+	case 11:
+		desc = "（洗濯物がたまってきたな……|　今週の天気はどうだったか……）";
+		break;
+	}
+	DialogInfomation info;
+	info.setCaption("バーニングの闇焔の波動が疼く！");
+	info.setMessage(desc);
+	info.setPictureImageName("システム／ダイアログ／写真／バーニング");
+	openDialog(info);
+}
+

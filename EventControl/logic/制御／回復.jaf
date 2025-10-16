@@ -1,0 +1,241 @@
+void 制御／回復／天然足湯()
+{
+	制御／回復(150);
+	DialogInfomation info;
+	info.setCaption("天然足湯につかった！");
+	info.setMessage("じんわり疲労が消えていく|編成パーティはHPが、|それぞれ150回復した！");
+	info.setPictureImageName("システム／ダイアログ／写真／天然足湯");
+	openDialog(info);
+}
+
+void 制御／回復／仮眠室()
+{
+	制御／回復(200);
+	DialogInfomation info;
+	info.setCaption("仮眠室で仮眠した！");
+	info.setMessage("まだ寝ていたいが出発だ|編成パーティはHPが、|それぞれ200回復した！");
+	info.setPictureImageName("システム／ダイアログ／写真／天然足湯");
+	openDialog(info);
+}
+
+void 制御／回復／混浴温泉()
+{
+	制御／回復(400);
+	DialogInfomation info;
+	info.setCaption("混浴温泉につかった！");
+	info.setMessage("いろいろリフレッシュした|編成パーティはHPが、|それぞれ400回復した！");
+	info.setPictureImageName("システム／ダイアログ／写真／混浴温泉");
+	openDialog(info);
+}
+
+void 制御／回復／ミ／リスの洞窟()
+{
+	if (!EV("ＥＶ／ミ／リスの洞窟／初回", -2147483648))
+	{
+		ＥＶ／ミ／リスの洞窟／初回();
+	}
+	else
+	{
+		ＥＶ／ミ／リスの洞窟／汎用();
+	}
+	制御／回復(2000);
+	DialogInfomation info;
+	info.setCaption("神官の辻ヒーリング！");
+	info.setMessage("編成パーティはHPが、|それぞれ2000回復した！");
+	info.setPictureImageName("システム／ダイアログ／写真／回復");
+	openDialog(info);
+}
+
+void 制御／回復／ミ／悪魔回廊()
+{
+	if (!EV("ＥＶ／ミ／悪魔回廊／初回", -2147483648))
+	{
+		ＥＶ／ミ／悪魔回廊／初回();
+	}
+	else
+	{
+		ＥＶ／ミ／悪魔回廊／汎用();
+	}
+	制御／回復(2000);
+	DialogInfomation info;
+	info.setCaption("神官の辻ヒーリング！");
+	info.setMessage("編成パーティはHPが、|それぞれ2000回復した！");
+	info.setPictureImageName("システム／ダイアログ／写真／回復");
+	openDialog(info);
+}
+
+void 制御／回復／ミ／地上灯台()
+{
+	if (!EV("ＥＶ／ミ／地上灯台／初回", -2147483648))
+	{
+		ＥＶ／ミ／地上灯台／初回();
+	}
+	else
+	{
+		ＥＶ／ミ／地上灯台／汎用();
+	}
+	制御／回復(2000);
+	DialogInfomation info;
+	info.setCaption("神官の辻ヒーリング！");
+	info.setMessage("編成パーティはHPが、|それぞれ2000回復した！");
+	info.setPictureImageName("システム／ダイアログ／写真／回復");
+	openDialog(info);
+}
+
+void 制御／回復／ミ／烈火鉱山()
+{
+	if (!制御／パーティ／プレイヤー確認("志津香"))
+	{
+		ＥＶ／ミ／烈火鉱山／汎用();
+	}
+	else if (!EV("ＥＶ／ミ／烈火鉱山／初回", -2147483648))
+	{
+		ＥＶ／ミ／烈火鉱山／初回();
+	}
+	else
+	{
+		ＥＶ／ミ／烈火鉱山／汎用();
+	}
+	制御／回復(2000);
+	DialogInfomation info;
+	info.setCaption("神官の辻ヒーリング！");
+	info.setMessage("編成パーティはHPが、|それぞれ2000回復した！");
+	info.setPictureImageName("システム／ダイアログ／写真／回復");
+	openDialog(info);
+}
+
+void 制御／回復／ミ／迷子の森()
+{
+	if (!制御／パーティ／プレイヤー確認("志津香"))
+	{
+		ＥＶ／ミ／迷子の森／汎用();
+	}
+	else if (!EV("ＥＶ／ミ／迷子の森／初回", -2147483648))
+	{
+		ＥＶ／ミ／迷子の森／初回();
+	}
+	else
+	{
+		ＥＶ／ミ／迷子の森／汎用();
+	}
+	制御／回復(2000);
+	DialogInfomation info;
+	info.setCaption("神官の辻ヒーリング！");
+	info.setMessage("編成パーティはHPが、|それぞれ2000回復した！");
+	info.setPictureImageName("システム／ダイアログ／写真／回復");
+	openDialog(info);
+}
+
+void 制御／回復／ミ／ハイパービル()
+{
+	if (制御／パーティ／プレイヤー確認("シィル") || !制御／パーティ／プレイヤー確認("志津香"))
+	{
+		ＥＶ／ミ／ハイパービル／汎用();
+	}
+	else if (!EV("ＥＶ／ミ／ハイパービル／初回", -2147483648))
+	{
+		ＥＶ／ミ／ハイパービル／初回();
+	}
+	else
+	{
+		ＥＶ／ミ／ハイパービル／汎用();
+	}
+	制御／回復(2000);
+	DialogInfomation info;
+	info.setCaption("神官の辻ヒーリング！");
+	info.setMessage("編成パーティはHPが、|それぞれ2000回復した！");
+	info.setPictureImageName("システム／ダイアログ／写真／回復");
+	openDialog(info);
+}
+
+void 制御／回復／ミ／ホッホ峡／マリア()
+{
+	ＥＶ／ミ／ホッホ峡／マリア();
+	制御／回復(2000);
+	DialogInfomation info;
+	info.setCaption("神官の辻ヒーリング！");
+	info.setMessage("編成パーティはHPが、|それぞれ2000回復した！");
+	info.setPictureImageName("システム／ダイアログ／写真／回復");
+	openDialog(info);
+}
+
+void 制御／回復／ミ／ホッホ峡／ミリ()
+{
+	ＥＶ／ミ／ホッホ峡／ミリ();
+	制御／回復(2000);
+	DialogInfomation info;
+	info.setCaption("神官の辻ヒーリング！");
+	info.setMessage("編成パーティはHPが、|それぞれ2000回復した！");
+	info.setPictureImageName("システム／ダイアログ／写真／回復");
+	openDialog(info);
+}
+
+void 制御／回復／ミ／ホッホ峡／レイラ()
+{
+	ＥＶ／ミ／ホッホ峡／レイラ();
+	制御／回復(2000);
+	DialogInfomation info;
+	info.setCaption("神官の辻ヒーリング！");
+	info.setMessage("編成パーティはHPが、|それぞれ2000回復した！");
+	info.setPictureImageName("システム／ダイアログ／写真／回復");
+	openDialog(info);
+}
+
+void 制御／回復／ミ／ホッホ峡／かなみ()
+{
+	ＥＶ／ミ／ホッホ峡／かなみ();
+	制御／回復(2000);
+	DialogInfomation info;
+	info.setCaption("神官の辻ヒーリング！");
+	info.setMessage("編成パーティはHPが、|それぞれ2000回復した！");
+	info.setPictureImageName("システム／ダイアログ／写真／回復");
+	openDialog(info);
+}
+
+void 制御／回復／ミ／ホッホ峡／ランス()
+{
+	ＥＶ／ミ／ホッホ峡／ランス();
+	制御／回復(2000);
+	DialogInfomation info;
+	info.setCaption("神官の辻ヒーリング！");
+	info.setMessage("編成パーティはHPが、|それぞれ2000回復した！");
+	info.setPictureImageName("システム／ダイアログ／写真／回復");
+	openDialog(info);
+}
+
+void 制御／回復／ミ／下水道()
+{
+	if (!EV("ＥＶ／ミ／下水道／初回", -2147483648))
+	{
+		ＥＶ／ミ／下水道／初回();
+	}
+	else
+	{
+		ＥＶ／ミ／下水道／汎用();
+	}
+	制御／回復(2000);
+	DialogInfomation info;
+	info.setCaption("神官の辻ヒーリング！");
+	info.setMessage("編成パーティはHPが、|それぞれ2000回復した！");
+	info.setPictureImageName("システム／ダイアログ／写真／回復");
+	openDialog(info);
+}
+
+void 制御／回復(int val)
+{
+	array@string players;
+	g_party.getPlayerIdList(players);
+	int i;
+	for (i = 0; i < players.Numof(); ++i)
+	{
+		string pId;
+		pId = players[i];
+		if (getPlayerFromId(pId).getHp() != 0)
+		{
+			int afterHp;
+			afterHp = getPlayerFromId(pId).getHp() + val;
+			getPlayerFromId(pId).setHp(afterHp);
+		}
+	}
+}
+

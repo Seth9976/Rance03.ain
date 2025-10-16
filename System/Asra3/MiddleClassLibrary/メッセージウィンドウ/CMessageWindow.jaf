@@ -1,0 +1,238 @@
+CMessageWindow::CMessageWindow()
+{
+	this.m_Exist = false;
+	this.m_Active = false;
+	this.m_Flat = false;
+	this.m_InactiveMultipleColor.Set(255, 255, 255, 255);
+	this.m_OffsetZ = 0;
+}
+
+CMessageWindow::~CMessageWindow()
+{
+	this.Release();
+}
+
+void CMessageWindow::Release()
+{
+	if (!this.m_Exist)
+	{
+		return;
+	}
+	PARTS_Release(this.GetPartsNumber());
+	Ｐ＿表示設定(this.GetPartsNumber(), false);
+	this.m_Active = false;
+	this.m_Exist = false;
+	this.m_Flat = false;
+	this.m_InactiveMultipleColor.Set(255, 255, 255, 255);
+	this.m_OffsetZ = 0;
+}
+
+bool CMessageWindow::IsExist()
+{
+	return this.m_Exist;
+}
+
+bool CMessageWindow::Create(int MessageWindowNumber)
+{
+	this.m_MessageWindowNumber = MessageWindowNumber;
+	ref CMessageWindowModel a = g_MessageWindowModelManager.GetMessageWindow(MessageWindowNumber);
+	if (!a.GetFlatFileName().Empty())
+	{
+		Ｐ＿フラット設定(this.GetPartsNumber(), a.GetFlatFileName(), 1);
+		this.m_Flat = true;
+		this.m_Exist = true;
+	}
+	else if (!a.GetCGName().Empty())
+	{
+		Ｐ＿ＣＧ設定(this.GetPartsNumber(), a.GetCGName(), 1);
+		this.m_Flat = false;
+		this.m_Exist = true;
+	}
+	else
+	{
+		this.m_Exist = false;
+	}
+	if (this.m_Exist)
+	{
+		Ｐ＿座標設定(this.GetPartsNumber(), a.GetX(), a.GetY());
+		this.UpdateAlpha();
+		this.UpdateMulColor();
+		Ｐ＿表示設定(this.GetPartsNumber(), true);
+	}
+	this.m_InactiveMultipleColor = a.GetInactiveMultipleColor();
+	if (this.m_Exist)
+	{
+		Ｐ＿メッセージウィンドウ表示連動設定(this.GetPartsNumber(), true);
+	}
+	return true;
+}
+
+int CMessageWindow::GetMessageWindowNumber()
+{
+	return this.m_MessageWindowNumber;
+}
+
+void CMessageWindow::SetShow(bool Show)
+{
+	if (!this.IsExist())
+	{
+		return;
+	}
+	Ｐ＿表示設定(this.GetPartsNumber(), Show);
+}
+
+bool CMessageWindow::IsShow()
+{
+	if (!this.IsExist())
+	{
+		return false;
+	}
+	return Ｐ＿表示設定取得(this.GetPartsNumber());
+}
+
+void CMessageWindow::UpdatePos()
+{
+	ref CMessageWindowModel a = g_MessageWindowModelManager.GetMessageWindow(this.m_MessageWindowNumber);
+	Ｐ＿座標設定(this.GetPartsNumber(), a.GetX(), a.GetY());
+}
+
+void CMessageWindow::SetOffsetZ(int OffsetZ)
+{
+	this.m_OffsetZ = OffsetZ;
+}
+
+int CMessageWindow::GetOffsetZ()
+{
+	return this.m_OffsetZ;
+}
+
+void CMessageWindow::UpdateZ()
+{
+	if (!this.IsExist())
+	{
+		return;
+	}
+	Ｐ＿Ｚ座標設定(this.GetPartsNumber(), g_MessageWindowModelManager.GetZ() + this.m_OffsetZ);
+}
+
+void CMessageWindow::SetPartsLayer(int ID)
+{
+	Ｐ＿親設定(this.GetPartsNumber(), ID);
+}
+
+void CMessageWindow::UpdateAlpha()
+{
+	int AlphaRate = 255 * g_ConfigMessageWindowAlphaRate;
+	Ｐ＿アルファ値設定(this.GetPartsNumber(), AlphaRate);
+}
+
+void CMessageWindow::UpdateMulColor()
+{
+	int ResultR;
+	int ResultG;
+	int ResultB;
+	if (this.m_Active)
+	{
+		ResultR = 255;
+		ResultG = 255;
+		ResultB = 255;
+	}
+	else
+	{
+		ResultR = this.m_InactiveMultipleColor.GetR();
+		ResultG = this.m_InactiveMultipleColor.GetG();
+		ResultB = this.m_InactiveMultipleColor.GetB();
+	}
+	int MulR = g_MessageWindowModelManager.GetMessageWindowMulColorR();
+	int MulG = g_MessageWindowModelManager.GetMessageWindowMulColorG();
+	int MulB = g_MessageWindowModelManager.GetMessageWindowMulColorB();
+	ResultR = ResultR + (MulR - ResultR) * (1.0 - g_ConfigMessageWindowMulColorRate);
+	ResultG = ResultG + (MulG - ResultG) * (1.0 - g_ConfigMessageWindowMulColorRate);
+	ResultB = ResultB + (MulB - ResultB) * (1.0 - g_ConfigMessageWindowMulColorRate);
+	if (ResultR < 0)
+	{
+		ResultR = 0;
+	}
+	else if (ResultR > 255)
+	{
+		ResultR = 255;
+	}
+	if (ResultG < 0)
+	{
+		ResultG = 0;
+	}
+	else if (ResultG > 255)
+	{
+		ResultG = 255;
+	}
+	if (ResultB < 0)
+	{
+		ResultB = 0;
+	}
+	else if (ResultB > 255)
+	{
+		ResultB = 255;
+	}
+	Ｐ＿乗算色設定(this.GetPartsNumber(), ResultR, ResultG, ResultB);
+}
+
+void CMessageWindow::UpdateActiveState(bool Active)
+{
+	if (!this.IsExist())
+	{
+		return;
+	}
+	this.m_Active = Active;
+	this.UpdateMulColor();
+}
+
+bool CMessageWindow::IsFlat()
+{
+	return this.m_Flat;
+}
+
+bool CMessageWindow::IsOverFlatWaitFrame()
+{
+	if (!this.IsExist())
+	{
+		return true;
+	}
+	if (!this.IsShow())
+	{
+		return true;
+	}
+	if (!this.IsFlat())
+	{
+		return true;
+	}
+	ref CMessageWindowModel MessageWindowModel = g_MessageWindowModelManager.GetMessageWindow(this.m_MessageWindowNumber);
+	if (AFL_Parts_GetPartsFlatCurrentFrameNumber(this.GetPartsNumber(), 1) >= MessageWindowModel.m_FlatShowWaitFrameNumber)
+	{
+		return true;
+	}
+	return false;
+}
+
+void CMessageWindow::BackFlatBeginFrame()
+{
+	if (!this.IsExist())
+	{
+		return;
+	}
+	Ｐ＿フラット開始フレーム移動(this.GetPartsNumber(), 1);
+}
+
+void CMessageWindow::StepFlatFinalFrame()
+{
+	if (!this.IsExist())
+	{
+		return;
+	}
+	Ｐ＿フラット最終フレームステップ(this.GetPartsNumber(), 1);
+}
+
+int CMessageWindow::GetPartsNumber()
+{
+	return 1000000000 + this.m_MessageWindowNumber;
+}
+

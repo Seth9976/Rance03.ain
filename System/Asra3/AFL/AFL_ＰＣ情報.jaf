@@ -1,0 +1,32 @@
+string AFL_PCInfo_GetCPUInfo()
+{
+	string VenderName;
+	string BrandName;
+	int Signature;
+	int CPUFlag;
+	SystemService.GetCPUInfo(VenderName, Signature, CPUFlag, BrandName);
+	return BrandName;
+}
+
+int AFL_PCInfo_GetMemoryInfo()
+{
+	int Max;
+	int Use;
+	SystemService.GetMemoryInfo(Max, Use);
+	return Max;
+}
+
+string AFL_PCInfo_GetOSInfo()
+{
+	string Text;
+	SystemService.GetOSInfo(Text);
+	return Text;
+}
+
+string AFL_PCInfo_GetScreenInfo()
+{
+	string Text;
+	SystemService.GetScreenInfo(Text);
+	return Text;
+}
+

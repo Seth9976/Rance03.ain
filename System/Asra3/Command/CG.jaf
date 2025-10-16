@@ -1,0 +1,33 @@
+bool Ａ＿ＣＧ存在確認(string CGName)
+{
+	return CGManager.IsExist(CGName);
+}
+
+int Ａ＿ＣＧ幅取得(string CGName)
+{
+	int Width;
+	int Height;
+	int Bpp;
+	bool ExistPixel = false;
+	bool ExistAlpha = false;
+	if (!CGManager.GetInfo(CGName, Width, Height, Bpp, ExistPixel, ExistAlpha))
+	{
+		return 0;
+	}
+	return Width;
+}
+
+int Ａ＿ＣＧ高さ取得(string CGName)
+{
+	int Width;
+	int Height;
+	int Bpp;
+	bool ExistPixel = false;
+	bool ExistAlpha = false;
+	if (!CGManager.GetInfo(CGName, Width, Height, Bpp, ExistPixel, ExistAlpha))
+	{
+		return 0;
+	}
+	return Height;
+}
+

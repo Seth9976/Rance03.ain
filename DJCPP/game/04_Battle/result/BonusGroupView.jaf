@@ -1,0 +1,132 @@
+BonusGroupView::BonusGroupView()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void BonusGroupView::init(ref array@BattleBonus bonus, int totalVal, int valueOrigin, bool isExp)
+{
+	this.bonus_.Alloc(bonus.Numof());
+	this.bonus_.Copy(0, bonus, 0, bonus.Numof());
+	this.totalVal_ = totalVal;
+	this.valueOrigin_ = valueOrigin;
+	this.isExp_ = isExp;
+	if (!this.bonus_.Empty())
+	{
+		this.bonusView_.Alloc(Math.Min(this.bonus_.Numof(), 3));
+		int i;
+		for (i = 0; i < this.bonusView_.Numof(); ++i)
+		{
+			this.bonusView_[i].init(this.bonus_[i], false);
+			if (this.isExp_)
+			{
+				this.bonusView_[i].setPos(51, 141 + i * 22);
+			}
+			else
+			{
+				this.bonusView_[i].setPos(151, 351 + i * 22);
+			}
+		}
+	}
+	this.initParts();
+}
+
+void BonusGroupView::initParts()
+{
+	if (this.isExp_)
+	{
+		this.parts_[0].init("システム／リザルト／ＥＸＰ下地", 0);
+		this.parts_[1].initAsCgPlaneImage("システム／リザルト／ＥＸＰ下地", 255, 255, 255);
+		this.parts_[2].init("システム／リザルト／ＥＸＰ斜め線", 0);
+	}
+	else
+	{
+		this.parts_[0].init("システム／リザルト／ＧＯＬＤ下地", 0);
+		this.parts_[1].initAsCgPlaneImage("システム／リザルト／ＧＯＬＤ下地", 255, 255, 255);
+		this.parts_[2].init("システム／リザルト／ＧＯＬＤ斜め線", 0);
+	}
+	this.parts_[4].initAsNumber("システム／数字／幅１８／赤黒", NULL);
+	NumberPartsInfomation n;
+	n.setSameWidth(42);
+	n.setSpan(-4);
+	this.parts_[3].initAsNumber("システム／数字／幅４２／グラデ", n);
+	createPartsGroup(this.parent_, this.parts_, 3530);
+	this.setPartsPos();
+}
+
+void BonusGroupView::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void BonusGroupView::setPartsPos()
+{
+	if (this.isExp_)
+	{
+		this.parts_[0].setPos(529.0, 293.0);
+		this.parts_[1].setPos(529.0, 293.0);
+		this.parts_[3].setPos(326.0, 263.0);
+		this.parts_[4].setPos(293.0, 138.0);
+		this.parts_[2].setPos(-1.0, 161.0);
+	}
+	else
+	{
+		this.parts_[0].setPos(529.0, 503.0);
+		this.parts_[1].setPos(529.0, 503.0);
+		this.parts_[3].setPos(426.0, 473.0);
+		this.parts_[4].setPos(383.0, 348.0);
+		this.parts_[2].setPos(-3.0, 371.0);
+	}
+	this.parts_[0].setOrigin(3);
+	this.parts_[1].setOrigin(3);
+	this.parts_[3].setOrigin(2);
+	this.parts_[4].setOrigin(3);
+	this.parts_[2].setOrigin(7);
+}
+
+void BonusGroupView::update()
+{
+}
+
+void BonusGroupView::fadeIn(bool val, DG_GeneralCallback cb)
+{
+	int i;
+	for (i = 0; i < this.bonusView_.Numof(); ++i)
+	{
+		this.bonusView_[i].fadeIn(val, val ? i * 50 : 0, NULL);
+	}
+	this.setPartsShow();
+	if (val)
+	{
+		PartsMotion m;
+		m.setAlpha(255, 0, 0);
+		m.setTime(700);
+		this.parts_[1].runMotion(m, cb);
+		PartsMotion m2;
+		int w = this.parts_[2].getWidth();
+		int h = this.parts_[2].getHeight();
+		m2.setCgRangeMove(0, 0, 0, h, 0, 0, w, h, 2);
+		m2.setTime(700);
+		this.parts_[2].runMotion(m2, NULL);
+		PartsMotion m3;
+		m3.setKey(15, 0, this.totalVal_, 0);
+		m3.setTime(350);
+		this.parts_[3].runMotion(m3, NULL);
+		PartsMotion m4;
+		m4.setKey(15, 0, this.valueOrigin_, 0);
+		m4.setTime(350);
+		this.parts_[4].runMotion(m4, NULL);
+	}
+	else
+	{
+		PartsMotion m;
+		m.setMove(0, 0, -700, 0, 2);
+		m.setTime(150);
+		this.parent_.runMotion(m, cb);
+	}
+}
+

@@ -1,0 +1,10 @@
+void ムービー(string ファイル名, bool キーキャンセル, int nBackColorR, int nBackColorG, int nBackColorB)
+{
+	SYS_Movie_Play(ファイル名, キーキャンセル, nBackColorR, nBackColorG, nBackColorB, SYS_SOUNDGROUP_BGM());
+}
+
+void Ａ＿ムービー＿効果音(string ファイル名, bool キーキャンセル, int nBackColorR, int nBackColorG, int nBackColorB)
+{
+	SYS_Movie_Play(ファイル名, キーキャンセル, nBackColorR, nBackColorG, nBackColorB, SYS_SOUNDGROUP_SE());
+}
+

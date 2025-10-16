@@ -1,0 +1,254 @@
+void SceneAdvEditor::init()
+{
+	this.isFinish_ = false;
+	array@string n;
+	n.PushBack("立ち絵(向かい)");
+	n.PushBack("立ち絵(手前)");
+	n.PushBack("背景");
+	n.PushBack("メッセージ1行目");
+	n.PushBack("メッセージ2行目");
+	n.PushBack("メッセージ3行目");
+	n.PushBack("名札");
+	n.PushBack("メニューを消す");
+	n.PushBack("メッセージを実行");
+	n.PushBack("シーンエディタを終了");
+	this.stand_[0].init(-200, -373, 0, "立ち絵／");
+	this.stand_[1].init(-50, -373, 1, "立ち絵背／");
+	int i;
+	for (i = 0; i < this.btn_.Numof(); ++i)
+	{
+		this.btn_[i].init("システム／ボタン／幅１７０", n[i], "", true);
+		this.btn_[i].setClickCallback(this.onClick, i);
+	}
+	for (i = 0; i < 3; ++i)
+	{
+		this.btn_[i].setPos(227 + 210 * i, 130);
+	}
+	for (i = 0; i < 4; ++i)
+	{
+		this.btn_[3 + i].setPos(163, 270 + i * 74);
+	}
+	for (i = 0; i < 3; ++i)
+	{
+		this.btn_[7 + i].setPos(227 + i * 210, 600);
+	}
+	this.initParts();
+}
+
+void SceneAdvEditor::initParts()
+{
+	this.parts_[0].initAsPlaneImage(824, 668, 0, 0, 0, 255);
+	this.parts_[1].initAsText("立ち絵と背景", 30, true, 256, 255, 255, 255);
+	this.parts_[2].initAsText("メッセージの設定", 30, true, 256, 255, 255, 255);
+	this.parts_[0].setAlpha(160.0);
+	createPartsGroup(this.parent_, this.parts_, 3999);
+	this.parts_[0].setPos(512.0, 384.0);
+	this.parts_[1].setPos(512.0, 90.0);
+	this.parts_[2].setPos(512.0, 230.0);
+	this.parts_[0].setOrigin(5);
+	this.parts_[1].setOrigin(8);
+	this.parts_[2].setOrigin(8);
+}
+
+void SceneAdvEditor::onClick(int index)
+{
+	this.menuIndex_ = index;
+	if (this.menuIndex_ == 9)
+	{
+		this.fadeIn(false, this.onFinishFadeOut);
+	}
+	else
+	{
+		this.fadeIn(false, this.onFinishButtonFadeOut);
+	}
+}
+
+void SceneAdvEditor::onFinishButtonFadeOut()
+{
+	this.showMenu();
+	this.fadeIn(true, NULL);
+}
+
+void SceneAdvEditor::showMenu()
+{
+	string r;
+	bool isInDetail = false;
+	switch (this.menuIndex_)
+	{
+	case 0:
+		string sel = this.selected_[0];
+		int result = openAdvObjectList(sel, 0, sel);
+		if (result == 0)
+		{
+			if (sel == "")
+			{
+				this.stand_[0].hide(1, true);
+			}
+			else
+			{
+				this.stand_[0].show(sel, 1, true);
+			}
+			this.selected_[0] = sel;
+		}
+		break;
+	case 1:
+		string sel = this.selected_[1];
+		int result = openAdvObjectList(sel, 1, sel);
+		if (result == 0)
+		{
+			if (sel == "")
+			{
+				this.stand_[1].hide(1, true);
+			}
+			else
+			{
+				this.stand_[1].show(sel, 1, true);
+			}
+			this.selected_[1] = sel;
+		}
+		break;
+	case 2:
+		string sel = this.selected_[2];
+		int result = openAdvObjectList(sel, 2, sel);
+		if (result == 0)
+		{
+			if (sel == "")
+			{
+				this.bg_.hide(2, 200, true);
+			}
+			else
+			{
+				this.bg_.show(sel, 2, 200, true);
+			}
+			this.selected_[2] = sel;
+		}
+		break;
+	case 6:
+		string sel = this.selected_[3];
+		int result = openAdvObjectList(sel, 3, sel);
+		if (result == 0)
+		{
+			this.selected_[3] = sel;
+			this.parts_[6].init("システム／名札／" + this.selected_[3], 0);
+			this.parts_[6].setParent(this.parent_.getPartsNumber());
+			this.parts_[6].setPos(363.0, 522.0);
+			this.parts_[6].setOrigin(4);
+			this.parts_[6].setZ(10.0);
+		}
+		break;
+	case 3:
+	case 4:
+	case 5:
+		int n = this.menuIndex_ - 3;
+		this.inputText(this.msg_[n]);
+		this.parts_[3 + n].initAsText(this.msg_[n], 30, true, 256, 255, 255, 255);
+		this.parts_[3 + n].setParent(this.parent_.getPartsNumber());
+		this.parts_[3 + n].setPos(363.0, 270 + n * 74 + 30);
+		this.parts_[3 + n].setOrigin(4);
+		this.parts_[3 + n].setZ(10.0);
+		break;
+	case 7:
+		キー待ち(false);
+		break;
+	case 8:
+		if (!this.selected_[3].Empty())
+		{
+			●名札(this.selected_[3], "");
+		}
+		else
+		{
+			●ト書き();
+		}
+		S(this.msg_[0]);
+		R();
+		S(this.msg_[1]);
+		R();
+		S(this.msg_[2]);
+		A();
+		■枠消去();
+		break;
+	}
+}
+
+void SceneAdvEditor::inputText(ref string result)
+{
+	Parts parent;
+	array@Parts p[2];
+	p[0].initAsPlaneImage(600, 100, 0, 0, 0, 255);
+	p[0].setAlpha(200.0);
+	p[0].setPos(512.0, 384.0);
+	p[0].setOrigin(5);
+	p[1].initAsText("テキストを入力してください(20文字まで)", 30, true, 256, 255, 255, 255);
+	p[1].setPos(512.0, 379.0);
+	p[1].setOrigin(2);
+	createPartsGroup(parent, p, 4000);
+	parent.setShow(true);
+	int i;
+	for (i = 0; i < p.Numof(); ++i)
+	{
+		p[i].setShow(true);
+	}
+	文字入力エリア(0, 302, 389, 4500, "");
+	文字入力エリア２(0, 420, 32, 80, 80, 80, 200, -2147483648, -2147483648, -2147483648, -2147483648);
+	文字入力エリアクリッピング文字数設定(0, 20);
+	string r;
+	文字入力(1, result);
+	result = result.GetPart(0, 20);
+}
+
+void SceneAdvEditor::showButton(bool val)
+{
+	int i;
+	for (i = 0; i < this.btn_.Numof(); ++i)
+	{
+		this.btn_[i].setShow(val);
+	}
+}
+
+void SceneAdvEditor::fadeButton(bool val)
+{
+	int i;
+	for (i = 0; i < this.btn_.Numof(); ++i)
+	{
+		this.btn_[i].fadeIn(val);
+	}
+}
+
+void SceneAdvEditor::run()
+{
+	this.fadeIn(true, NULL);
+}
+
+void SceneAdvEditor::fadeIn(bool val, DG_GeneralCallback cb)
+{
+	this.fadeButton(val);
+	this.fadeParts(val);
+	this.cbTimer_.setTimer(300, cb);
+}
+
+void SceneAdvEditor::fadeParts(bool val)
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+	this.parent_.runMotion(getStandardMotion(val ? 0 : 1), NULL);
+}
+
+bool SceneAdvEditor::update()
+{
+	if (!this.cbTimer_.isRunning() && g_mouse.isClick(1))
+	{
+		playCancel();
+		this.fadeIn(false, this.onFinishFadeOut);
+	}
+	return !this.isFinish_;
+}
+
+void SceneAdvEditor::onFinishFadeOut()
+{
+	this.isFinish_ = true;
+}
+

@@ -1,0 +1,256 @@
+void SceneShop::init(string shopId, string shopName)
+{
+	this.id_ = shopId;
+	this.shopName_ = shopName;
+	ref Shop s = getShopFromId(this.id_);
+	array@string list;
+	s.getItemIdList(list);
+	list.Sort(&sortFunctionItemIdByIndex);
+	this.eraseNotUpgradableSkillItem(list);
+	this.listView_.init(list, true);
+	this.listView_.setOnClickCallback(this.onClickItem);
+	this.oldPlaceName_ = g_playerCommonParam.getPlaceName();
+	g_playerCommonParam.setPlaceName(this.shopName_);
+	this.commonParamView_.init();
+	this.initButton();
+	this.initParts();
+}
+
+void SceneShop::initButton()
+{
+	this.btnExit_.init("システム／ボタン／幅１７０", "やめる", "", true);
+	this.btnExit_.setPos(840, 494);
+	this.btnExit_.setZ(4500);
+	this.btnExit_.setClickCallback(this.onClickExit, 0);
+	this.btnCamp_.init("システム／ボタン／幅６０", "PT", "", false);
+	this.btnCamp_.setPos(771, 494);
+	this.btnCamp_.setZ(4500);
+	this.btnCamp_.setClickCallback(this.onClickParty, 0);
+}
+
+void SceneShop::initParts()
+{
+	this.parts_[0].initAsFlat("システム／武器屋／背景");
+	this.parts_[1].initAsFlat("システム／武器屋／タイトル");
+	this.parts_[0].setZ(4100.0);
+	this.parts_[1].setZ(4400.0);
+	createPartsGroup(this.parent_, this.parts_, 0);
+	this.setPartsShow();
+}
+
+void SceneShop::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void SceneShop::onClickExit(int id)
+{
+	this.state_ = 1;
+	this.fadeObject(false, this.onFinishFadeOut);
+	g_music.play(this.lastBgmId_, 2000, false);
+}
+
+void SceneShop::onClickParty(int id)
+{
+	this.state_ = 1;
+	this.fadeObject(false, this.onFinishFadeOutToParty);
+}
+
+void SceneShop::onFinishFadeOutToParty()
+{
+	openParty(true);
+	this.fadeObject(true, this.onFinishFadeInFromParty);
+}
+
+void SceneShop::onFinishFadeInFromParty()
+{
+	this.state_ = 0;
+}
+
+void SceneShop::onFinishFadeOut()
+{
+	this.state_ = 2;
+}
+
+void SceneShop::run()
+{
+	this.lastBgmId_ = g_music.getPlayingMusicId();
+	g_music.play("音楽／システム／店", 2000, false);
+	this.fadeObject(true, NULL);
+}
+
+void SceneShop::fadeObject(bool val, DG_GeneralCallback cb)
+{
+	g_advStand[0].setShopMode(val);
+	if (val)
+	{
+		this.listView_.fadeIn(val, cb);
+	}
+	else
+	{
+		this.listView_.fadeIn(val, cb);
+	}
+	this.fadeInFlat(val);
+	this.commonParamView_.fadeIn(val);
+	this.btnExit_.fadeIn(val);
+	this.btnCamp_.fadeIn(val);
+}
+
+void SceneShop::fadeInFlat(bool val)
+{
+	if (val)
+	{
+		int i;
+		for (i = 0; i < this.parts_.Numof(); ++i)
+		{
+			this.parts_[i].setPos(0.0, 0.0);
+			this.parts_[i].setAlpha(255.0);
+			this.parts_[i].startFlat(false, 1.0);
+		}
+	}
+	else
+	{
+		int i;
+		for (i = 0; i < this.parts_.Numof(); ++i)
+		{
+			PartsMotion m;
+			m.setMove(0, 0, 500, 0, 1);
+			m.setAlpha(255, 0, 0);
+			m.setTime(150);
+			this.parts_[i].runMotion(m, NULL);
+		}
+	}
+}
+
+bool SceneShop::update()
+{
+	if (g_mouse.isClick(1) && this.state_ == 0)
+	{
+		playCancel();
+		g_music.play(this.lastBgmId_, 2000, false);
+		this.state_ = 1;
+		this.fadeObject(false, this.onFinishFadeOut);
+	}
+	if (this.state_ == 2)
+	{
+		this.release();
+		return false;
+	}
+	return true;
+}
+
+void SceneShop::release()
+{
+	g_playerCommonParam.setPlaceName(this.oldPlaceName_);
+}
+
+void SceneShop::onClickItem(string itemId)
+{
+	ref Item item = getItemFromId(itemId);
+	int price = item.getShopPrice();
+	if (item.getType() == 0)
+	{
+		string old = this.upgradeSkill(item.getSkillId());
+		ref PlayerSkill s = getPlayerSkillFromId(item.getSkillId());
+		string sn = getPlayerFromId(s.getPlayerId()).getShortName();
+		DialogInfomation info;
+		info.setCaption("新しい装備を買った！");
+		string msg = "%sのバトルスキル、|%sは、|%sにパワーアップ！" % sn % getPlayerSkillFromId(old).getName() % s.getName();
+		info.setPictureImageName("システム／ダイアログ／写真／%s" % sn);
+		info.setMessage(msg);
+		openDialog(info);
+		this.listView_.eraseFromList(itemId);
+		this.eraseLowLevelSkillItem();
+	}
+	else
+	{
+		g_playerCommonParam.addItem(itemId);
+	}
+	g_sysSound.play(6, "効果音／購入");
+	g_playerCommonParam.setGold(g_playerCommonParam.getGold() - price);
+	this.listView_.updateState();
+}
+
+void SceneShop::eraseLowLevelSkillItem()
+{
+	int count = this.listView_.getCount();
+	int i;
+	while (i < this.listView_.getCount())
+	{
+		string itemId = this.listView_.getId(i);
+		Item item;
+		item = getItemFromId(itemId);
+		if (item.getType() == 0 && !this.isSkillUpgradable(item.getSkillId()))
+		{
+			this.listView_.eraseIndex(i);
+		}
+		else
+		{
+			++i;
+		}
+	}
+}
+
+void SceneShop::eraseNotUpgradableSkillItem(ref array@string itemIdList)
+{
+	int i;
+	while (i < itemIdList.Numof())
+	{
+		ref Item item = getItemFromId(itemIdList[i]);
+		if (item.getType() == 0 && !this.isSkillUpgradable(item.getSkillId()))
+		{
+			itemIdList.Erase(i);
+		}
+		else
+		{
+			++i;
+		}
+	}
+}
+
+bool SceneShop::isSkillUpgradable(string skillId)
+{
+	int i;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		if (g_player[i].isJoin() && g_player[i].isAttackSkillUpgradable(skillId))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+string SceneShop::upgradeSkill(string skillId)
+{
+	int i;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		if (g_player[i].isAttackSkillUpgradable(skillId))
+		{
+			return g_player[i].upgradeSkill(skillId);
+		}
+	}
+	return "";
+}
+
+int sortFunctionItemIdByIndex(string lhs, string rhs)
+{
+	ref Item iLhs = getItemFromId(lhs);
+	ref Item iRhs = getItemFromId(rhs);
+	if (iLhs.getIndex() > iRhs.getIndex())
+	{
+		return 1;
+	}
+	if (iLhs.getIndex() < iRhs.getIndex())
+	{
+		return -1;
+	}
+	return 0;
+}
+

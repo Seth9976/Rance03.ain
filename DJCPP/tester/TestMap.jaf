@@ -1,0 +1,132 @@
+void test_Map_Place()
+{
+	int i;
+	for (i = 0; i < g_mapPlace.Numof(); ++i)
+	{
+		string n = "caption:%s x:%d y:%d image:%s" % g_mapPlace[i].getCaption() % g_mapPlace[i].getX() % g_mapPlace[i].getY() % g_mapPlace[i].getImageName();
+		pass(n);
+	}
+}
+
+void test_Map_PlaceButton()
+{
+	array@MapPlaceButton btn;
+	btn.Alloc(g_mapPlace.Numof());
+	int i;
+	for (i = 0; i < btn.Numof(); ++i)
+	{
+		btn[i].init(0, g_mapPlace[i].getId(), NULL, 0);
+		btn[i].fadeIn(true);
+	}
+	while (true)
+	{
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_Map_Background()
+{
+	testMapBg.init();
+	testMapBg.fadeIn(true, NULL);
+	int i;
+	while (true)
+	{
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+		if (g_mouse.isClick(0))
+		{
+			testMapBg.setFocus(g_mapPlace[i].getX(), g_mapPlace[i].getY());
+			i = (i + 1) % g_mapPlace.Numof();
+		}
+	}
+}
+
+void test_Map_BgAndButton()
+{
+	testMapBg.init();
+	testMapBg.fadeIn(true, NULL);
+	array@MapPlaceButton btn;
+	btn.Alloc(g_mapPlace.Numof());
+	int i;
+	for (i = 0; i < btn.Numof(); ++i)
+	{
+		btn[i].init(testMapBg.getParentPartsNumber(), g_mapPlace[i].getId(), "test_Map_ButtonClick", i);
+		btn[i].fadeIn(true);
+		btn[i].setParent(testMapBg.getParentPartsNumber());
+	}
+	i = 0;
+	while (true)
+	{
+		g_frameManager.updateFrame();
+		g_gameObjectManager.update();
+	}
+}
+
+void test_Map_ButtonClick(int id)
+{
+	testMapBg.setFocus(g_mapPlace[id].getX(), g_mapPlace[id].getY());
+}
+
+void test_Map_EncountProbability()
+{
+	int i;
+	for (i = 0; i < g_mapEncountProbability.Numof(); ++i)
+	{
+		array@int hit[4];
+		int j;
+		for (j = 0; j < 10000; ++j)
+		{
+			hit[g_mapEncountProbability[i].getHitCount()]++;
+		}
+		pass("nodeCount:%d 0:%d 1:%d 2:%d 3:%d" % g_mapEncountProbability[i].getNodeCount() % hit[0] % hit[1] % hit[2] % hit[3]);
+	}
+}
+
+void debugSetMapAllChain()
+{
+	g_mapChain.addChain("アイス", "烈火鉱山", true);
+	g_mapChain.addChain("アイス", "ティティ湖", true);
+	g_mapChain.addChain("アイス", "カンラ", true);
+	g_mapChain.addChain("烈火鉱山", "ティティ湖", true);
+	g_mapChain.addChain("烈火鉱山", "リスの洞窟", true);
+	g_mapChain.addChain("ティティ湖", "カンラ", true);
+	g_mapChain.addChain("カンラ", "悪魔回廊", true);
+	g_mapChain.addChain("カンラ", "ラジール", true);
+	g_mapChain.addChain("悪魔回廊", "カスタム", true);
+	g_mapChain.addChain("ラジール", "カスタム", true);
+	g_mapChain.addChain("ラジール", "地上灯台", true);
+	g_mapChain.addChain("ラジール", "迷子の森", true);
+	g_mapChain.addChain("ラジール", "レッド", true);
+	g_mapChain.addChain("レッド", "ハイパービル", true);
+	g_mapChain.addChain("レッド", "ジオ", true);
+	g_mapChain.addChain("ジオ", "Mランド", true);
+	g_mapChain.addChain("ジオ", "オク", true);
+	g_mapChain.addChain("オク", "ノース", true);
+	g_mapChain.addChain("オク", "サウス", true);
+	g_mapChain.addChain("ノース", "城下町", true);
+	g_mapChain.addChain("サウス", "城下町", true);
+	g_mapChain.addChain("城下町", "居館", true);
+	int i;
+	for (i = 0; i < g_mapChain.getCount(); ++i)
+	{
+		g_mapChain.setNew(i, i % 3 == 0);
+	}
+}
+
+void test_ExLoading_MapEncountMonsterGroup()
+{
+	int i;
+	for (i = 0; i < g_mapEncountMonsterGroup.Numof(); ++i)
+	{
+		string s = "%s" % g_mapEncountMonsterGroup[i].getId();
+		int j;
+		for (j = 0; j < g_mapEncountMonsterGroup[i].getMonsterCount(); ++j)
+		{
+			s += "|%d:%s" % j % g_mapEncountMonsterGroup[i].getMonsterId(j);
+		}
+		s += "|exp:%d|gold:%d|item:%s|prob:%d" % g_mapEncountMonsterGroup[i].getExp() % g_mapEncountMonsterGroup[i].getGold() % g_mapEncountMonsterGroup[i].getItemId() % g_mapEncountMonsterGroup[i].getItemProbability();
+		pass(s);
+	}
+}
+

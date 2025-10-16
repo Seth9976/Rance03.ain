@@ -1,0 +1,24 @@
+bool EnquiteYesNoDialog::open(string activityFileName)
+{
+	this.clicked_ = -1;
+	Ｐ＿アクティビティ実行(activityFileName, this.onLoad, NULL, NULL);
+	return this.clicked_ == 0;
+}
+
+void EnquiteYesNoDialog::onLoad(string activityFileName, string activityName)
+{
+	this.activityFileName_ = activityFileName;
+	this.activityName_ = activityName;
+	setCursorClickSoundToActivity(activityName);
+	this.btnOk_.init(this.activityName_, "はい", 0);
+	this.btnCancel_.init(this.activityName_, "いいえ", 1);
+	this.btnOk_.setOnClickCallback(this.onClick);
+	this.btnCancel_.setOnClickCallback(this.onClick);
+}
+
+void EnquiteYesNoDialog::onClick(int id)
+{
+	this.clicked_ = id;
+	AFL_Activity_End();
+}
+

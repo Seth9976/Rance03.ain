@@ -1,0 +1,153 @@
+void DungeonCard::init(string infoId, int openType)
+{
+	this.dataId_ = infoId;
+	this.openType_ = openType;
+	this.reset();
+}
+
+void DungeonCard::setCardOpenCallback(DG_GeneralCallback cardOpenCallback)
+{
+	this.cardOpenCallback_ = cardOpenCallback;
+}
+
+void DungeonCard::setCardChangedCallback(DG_GeneralCallback cardChangedCallback)
+{
+	this.cardChangedCallback_ = cardChangedCallback;
+}
+
+void DungeonCard::initCardType()
+{
+	if (isDungeonCardId(this.dataId_))
+	{
+		this.cardTypeId_ = this.dataId_;
+	}
+	else
+	{
+		this.cardTypeId_ = this.getFromRandomId(this.dataId_);
+	}
+}
+
+void DungeonCard::openCard()
+{
+	if (!this.isOpen_)
+	{
+		this.isOpen_ = true;
+		this.cardOpenCallback_();
+	}
+}
+
+string DungeonCard::getCardTypeId()
+{
+	if (this.cardTypeId_ == "")
+	{
+		this.initCardType();
+	}
+	return this.cardTypeId_;
+}
+
+string DungeonCard::getDataId()
+{
+	return this.dataId_;
+}
+
+void DungeonCard::changeCardType(string typeId)
+{
+	if (this.cardChangeType_ == 2)
+	{
+		return;
+	}
+	this.cardTypeId_ = typeId;
+	this.isOpen_ = true;
+	this.cardChangeType_ = 1;
+	this.cardChangedCallback_();
+}
+
+void DungeonCard::changeCardTypePermanent(string typeId)
+{
+	this.cardTypeId_ = typeId;
+	this.isOpen_ = true;
+	this.cardChangeType_ = 2;
+	this.cardChangedCallback_();
+}
+
+bool DungeonCard::isOpen()
+{
+	return this.isOpen_;
+}
+
+string DungeonCard::getFromRandomId(string randomId)
+{
+	array@string n;
+	int i;
+	for (i = 0; i < 6; ++i)
+	{
+		string t = EX_SA2String("ランダムカードグループ", randomId, "c%d" % (i + 1), "");
+		if (!t.Empty())
+		{
+			n.PushBack(t);
+		}
+	}
+	return n[RAND(n.Numof()) - 1];
+}
+
+void DungeonCard::reset()
+{
+	if (this.cardChangeType_ == 0 || this.cardChangeType_ == 1)
+	{
+		this.initCardType();
+		this.resetOpenState();
+	}
+	else
+	{
+		this.isOpen_ = true;
+	}
+}
+
+void DungeonCard::resetOpenState()
+{
+	switch (this.openType_)
+	{
+	case 0:
+		this.isOpen_ = true;
+		break;
+	case 1:
+		this.isOpen_ = false;
+		break;
+	case 2:
+		this.isOpen_ = RAND(2) == 1;
+		break;
+	}
+}
+
+bool isDungeonCardId(string id)
+{
+	int l;
+	int r = g_cardInfomation.Numof() - 1;
+	while (true)
+	{
+		int c = (l + r) / 2;
+		if (id < g_cardInfomation[c].getId())
+		{
+			r = c - 1;
+		}
+		else if (id > g_cardInfomation[c].getId())
+		{
+			l = c + 1;
+		}
+		else
+		{
+			return true;
+		}
+		if (l > r)
+		{
+			break;
+		}
+	}
+	return false;
+}
+
+int DungeonCard::getOpenType()
+{
+	return this.openType_;
+}
+

@@ -1,0 +1,16 @@
+void BattleLog::add(string msg, int type)
+{
+	if (g_battleCalcMode)
+	{
+		return;
+	}
+	this.log_.PushBack(msg);
+	this.type_.PushBack(type);
+	this.callback_(msg, type);
+}
+
+void BattleLog::setOnAddCallback(DG_OnLogAddCallback callback)
+{
+	this.callback_ = callback;
+}
+

@@ -1,0 +1,153 @@
+CSystemButtonModel::CSystemButtonModel()
+{
+	this.m_X = -2147483648;
+	this.m_Y = -2147483648;
+	this.m_Z = 1;
+	this.m_InvalidByReminisceMode = false;
+	this.m_PixelDecide = true;
+	this.m_FlatButton = false;
+	this.m_FlatDisable = false;
+	this.m_FlatCover = false;
+}
+
+void CSystemButtonModel::SetButtonModel(int X, int Y, int Z, string PlainName, string OnCursorName, string KeyDownName, sys_btn_fnc_t CommandFunc, bool PixelDecide)
+{
+	this.m_X = X;
+	this.m_Y = Y;
+	this.m_Z = Z;
+	this.m_PlainName = PlainName;
+	this.m_OnCursorName = OnCursorName;
+	this.m_KeyDownName = KeyDownName;
+	this.m_FunctionObject = CommandFunc;
+	this.m_PixelDecide = PixelDecide;
+}
+
+void CSystemButtonModel::SetCGButtonModel(int X, int Y, int Z, string PlainName, string OnCursorName, string KeyDownName, sys_btn_fnc_t CommandFunc, bool PixelDecide)
+{
+	this.SetButtonModel(X, Y, Z, PlainName, OnCursorName, KeyDownName, CommandFunc, PixelDecide);
+	this.m_FlatButton = false;
+}
+
+void CSystemButtonModel::SetFlatButtonModel(int X, int Y, int Z, string PlainName, string OnCursorName, string KeyDownName, sys_btn_fnc_t CommandFunc, bool PixelDecide)
+{
+	this.SetButtonModel(X, Y, Z, PlainName, OnCursorName, KeyDownName, CommandFunc, PixelDecide);
+	this.m_FlatButton = true;
+}
+
+void CSystemButtonModel::SetCGButtonModelForReminisceMode(string CoverName)
+{
+	this.m_CoverName = CoverName;
+	this.m_InvalidByReminisceMode = true;
+	this.m_FlatCover = false;
+}
+
+void CSystemButtonModel::SetFlatButtonModelForReminisceMode(string CoverName)
+{
+	this.m_CoverName = CoverName;
+	this.m_InvalidByReminisceMode = true;
+	this.m_FlatCover = true;
+}
+
+void CSystemButtonModel::SetDisableCG(string Name)
+{
+	this.m_DisableName = Name;
+	this.m_FlatDisable = false;
+}
+
+void CSystemButtonModel::SetDisableFlat(string Name)
+{
+	this.m_DisableName = Name;
+	this.m_FlatDisable = true;
+}
+
+void CSystemButtonModel::SetIsEnableSystemButtonFunc(FTIsEnableSystemButton Func)
+{
+	this.m_IsEnableSystemButtonFunc = Func;
+}
+
+bool CSystemButtonModel::IsEnable()
+{
+	if (this.m_IsEnableSystemButtonFunc.Numof() != 0)
+	{
+		if (!this.m_IsEnableSystemButtonFunc())
+		{
+			return false;
+		}
+	}
+	if (_g_回想中 && this.m_InvalidByReminisceMode)
+	{
+		return false;
+	}
+	return true;
+}
+
+sys_btn_fnc_t CSystemButtonModel::GetFunction()
+{
+	return this.m_FunctionObject;
+}
+
+int CSystemButtonModel::GetX()
+{
+	return this.m_X;
+}
+
+int CSystemButtonModel::GetY()
+{
+	return this.m_Y;
+}
+
+int CSystemButtonModel::GetZ()
+{
+	return this.m_Z;
+}
+
+string CSystemButtonModel::GetPlainName()
+{
+	return this.m_PlainName;
+}
+
+string CSystemButtonModel::GetOnCursorName()
+{
+	return this.m_OnCursorName;
+}
+
+string CSystemButtonModel::GetKeyDownName()
+{
+	return this.m_KeyDownName;
+}
+
+string CSystemButtonModel::GetDisableName()
+{
+	return this.m_DisableName;
+}
+
+string CSystemButtonModel::GetCoverName()
+{
+	return this.m_CoverName;
+}
+
+bool CSystemButtonModel::IsInvalidByReminisceMode()
+{
+	return this.m_InvalidByReminisceMode;
+}
+
+bool CSystemButtonModel::IsPixelDecide()
+{
+	return this.m_PixelDecide;
+}
+
+bool CSystemButtonModel::IsFlatButton()
+{
+	return this.m_FlatButton;
+}
+
+bool CSystemButtonModel::IsFlatDisable()
+{
+	return this.m_FlatDisable;
+}
+
+bool CSystemButtonModel::IsFlatCover()
+{
+	return this.m_FlatCover;
+}
+

@@ -1,0 +1,214 @@
+SceneTargetPlayerSelect::SceneTargetPlayerSelect()
+{
+	this.clicked_ = -1;
+	this.state_ = 0;
+}
+
+void SceneTargetPlayerSelect::init(int targetMode)
+{
+	this.targetMode_ = targetMode;
+	this.initCharcterList();
+	this.initButton();
+	this.initParts();
+	this.setButtonState();
+}
+
+void SceneTargetPlayerSelect::setButtonState()
+{
+	if (this.targetMode_ == 1)
+	{
+		this.setButtonEnableByExp();
+	}
+	this.setButtonDisableDead();
+}
+
+void SceneTargetPlayerSelect::run()
+{
+	this.fadeIn(true);
+}
+
+void SceneTargetPlayerSelect::onFinishFade()
+{
+	if (this.state_ == 1)
+	{
+		this.state_ = 2;
+	}
+	else
+	{
+		this.state_ = 4;
+	}
+}
+
+void SceneTargetPlayerSelect::setButtonEnableByExp()
+{
+	int i;
+	for (i = 0; i < this.btnPlayer_.Numof(); ++i)
+	{
+		ref Player p = getPlayerFromId(this.playerId_[i]);
+		this.btnPlayer_[i].setEnable(p.getExp() >= p.getNextExp() && p.getMaxLevel() != p.getLevel());
+	}
+}
+
+void SceneTargetPlayerSelect::setButtonDisableDead()
+{
+	int i;
+	for (i = 0; i < this.btnPlayer_.Numof(); ++i)
+	{
+		ref Player p = getPlayerFromId(this.playerId_[i]);
+		if (this.btnPlayer_[i].isEnable())
+		{
+			if (p.getHp() == 0)
+			{
+				this.btnPlayer_[i].setEnable(false);
+			}
+		}
+	}
+}
+
+void SceneTargetPlayerSelect::initButton()
+{
+	this.btnPlayer_.Alloc(this.playerId_.Numof());
+	int c = this.playerId_.Numof();
+	int i;
+	for (i = 0; i < this.btnPlayer_.Numof(); ++i)
+	{
+		this.btnPlayer_[i].init(this.playerId_[i], this.onClick);
+	}
+	string cap;
+	if (this.targetMode_ == 1)
+	{
+		cap = "キャンプに戻る";
+	}
+	else
+	{
+		cap = "やめる";
+	}
+	this.btnClose_.init("システム／ボタン／幅１７０", cap, "", true);
+	this.btnClose_.setPos(840, 494);
+	this.btnClose_.setZ(5100);
+	this.btnClose_.setClickCallback(this.onClickCancel, 0);
+	this.setButtonPos();
+}
+
+void SceneTargetPlayerSelect::setButtonPos()
+{
+	int c = this.playerId_.Numof();
+	int vCount = (c + 4) / 5;
+	int btnWidth = 142;
+	int btnHeight = 136;
+	int totalH = vCount * btnHeight + (vCount - 1) * 10;
+	int startY = 384 - totalH / 2;
+	int i;
+	for (i = 0; i < this.btnPlayer_.Numof(); ++i)
+	{
+		int n;
+		if (i / 5 == vCount - 1)
+		{
+			n = (c + 4) % 5 + 1;
+		}
+		else
+		{
+			n = 5;
+		}
+		int totalW = btnWidth * n + 15 * (n - 1);
+		int startX = 405 - totalW / 2;
+		int x = startX + (i % 5) * (btnWidth + 15);
+		int y = startY + (i / 5) * (btnHeight + 10);
+		this.btnPlayer_[i].setPos(x, y);
+	}
+}
+
+void SceneTargetPlayerSelect::initCharcterList()
+{
+	this.playerId_.Free();
+	int i;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		if (g_player[i].isJoin())
+		{
+			this.playerId_.PushBack(g_player[i].getId());
+		}
+	}
+}
+
+void SceneTargetPlayerSelect::initParts()
+{
+	this.parts_[0].initAsFlat("システム／キャラクター選択／%s" % (this.targetMode_ == 0 ? "アイテム" : "レベルアップ"));
+	createPartsGroup(this.parent_, this.parts_, 5000);
+	this.setPartsShow();
+}
+
+void SceneTargetPlayerSelect::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+bool SceneTargetPlayerSelect::update()
+{
+	if (!this.timerCb_.isRunning() && g_mouse.isClick(1))
+	{
+		playCancel();
+		this.fadeIn(false);
+	}
+	return !this.isFinish();
+}
+
+void SceneTargetPlayerSelect::onClickCancel(int id)
+{
+	this.fadeIn(false);
+}
+
+void SceneTargetPlayerSelect::onClick(string playerId)
+{
+	int i;
+	for (i = 0; i < this.playerId_.Numof(); ++i)
+	{
+		if (this.playerId_[i] == playerId)
+		{
+			this.clicked_ = i;
+		}
+	}
+	this.fadeIn(false);
+}
+
+void SceneTargetPlayerSelect::fadeButton(bool val)
+{
+	int i;
+	for (i = 0; i < this.btnPlayer_.Numof(); ++i)
+	{
+		this.btnPlayer_[i].fadeIn(val, val ? i * 15 : 0, NULL);
+	}
+}
+
+bool SceneTargetPlayerSelect::isFinish()
+{
+	return this.state_ == 4;
+}
+
+void SceneTargetPlayerSelect::fadeIn(bool val)
+{
+	this.fadeButton(val);
+	this.btnClose_.fadeIn(val);
+	this.parent_.runMotion(getStandardMotion(val ? 0 : 1), NULL);
+	if (val)
+	{
+		this.parts_[0].startFlat(false, 1.0);
+	}
+	this.timerCb_.setTimer((val ? 200 : 125) + 50, this.onFinishFade);
+	this.state_ = val ? 1 : 3;
+}
+
+string SceneTargetPlayerSelect::getTargetPlayerId()
+{
+	if (this.clicked_ == -1)
+	{
+		return "";
+	}
+	return this.playerId_[this.clicked_];
+}
+

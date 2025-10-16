@@ -1,0 +1,99 @@
+void test_Scene_Camp()
+{
+	g_playerCommonParam.setEnableLevelGod(true);
+	g_player[1].setPartyNamePlateCgName("システム／編成／名札／かなみ");
+	int i;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		if (RAND(2) == 1)
+		{
+			g_player[i].setHp((RAND(100) * g_player[i].getMaxHp()) / 100.0);
+		}
+		if (RAND(3) == 1)
+		{
+			g_player[i].setHp(0);
+		}
+		if (RAND(4) == 1)
+		{
+			g_player[i].setHp(1);
+		}
+		g_player[i].setExp(RAND(100000));
+	}
+	debugPlayerJoinAll();
+	test_Party_Organize();
+	openCamp(0);
+}
+
+void test_Player_CommonParamView()
+{
+	g_playerCommonParam.setPlaceName("テスト場所");
+	PlayerCommonParamView view;
+	view.init();
+	view.fadeIn(true);
+	while (true)
+	{
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+}
+
+void test_MemoView()
+{
+	MemoView memoView;
+	memoView.init("てすとてきすとです。ああああああ|ああ|いいうえこかいｓｄｋｄｊｆ");
+	memoView.fadeIn(true);
+	while (true)
+	{
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+}
+
+void test_CampCharacterIcon()
+{
+	CampHopIcon icon;
+	icon.init("システム／キャンプ／ＳＤ／ランス");
+	icon.run();
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+}
+
+void test_CampIcon()
+{
+	test_LevelMaxAndPartyOrganize();
+	CampIcon icon;
+	icon.init(NULL);
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		if (g_mouse.isClick(0))
+		{
+			icon.fadeIn(false);
+		}
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+}
+
+void test_Scene_ReplaySelection()
+{
+	SceneReplaySelection scene;
+	array@string n[10];
+	int i;
+	for (i = 0; i < n.Numof(); ++i)
+	{
+		n[i] = "テストあｓｄｆあｓｄｆ%D" % i;
+	}
+	openReplayDialog(n);
+}
+

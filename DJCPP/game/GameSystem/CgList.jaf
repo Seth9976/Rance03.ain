@@ -1,0 +1,67 @@
+void CgList::init(string thumbnailCg, string baseName, array@string cg)
+{
+	this.cgName_.Free();
+	this.thumbnailCg_ = thumbnailCg;
+	if (cg.Empty())
+	{
+		this.cgName_.PushBack(baseName);
+	}
+	else
+	{
+		this.cgName_.Alloc(cg.Numof());
+		int i;
+		for (i = 0; i < this.cgName_.Numof(); ++i)
+		{
+			if (Ａ＿ＣＧ存在確認(cg[i]))
+			{
+				this.cgName_[i] = cg[i];
+			}
+			else if (Ａ＿ＣＧ存在確認(baseName + cg[i]))
+			{
+				this.cgName_[i] = baseName + cg[i];
+			}
+			else
+			{
+				pass("base:%s inside:%s は存在しません" % baseName % cg[i]);
+			}
+		}
+	}
+}
+
+void CgList::getShownCgList(ref array@string cgList)
+{
+	cgList.Free();
+	int i;
+	for (i = 0; i < this.cgName_.Numof(); ++i)
+	{
+		if (ＣＧモード確認(this.cgName_[i]))
+		{
+			cgList.PushBack(this.cgName_[i]);
+		}
+	}
+}
+
+string CgList::getThumbnailCg()
+{
+	return this.thumbnailCg_;
+}
+
+bool CgList::isAvailable()
+{
+	int i;
+	for (i = 0; i < this.cgName_.Numof(); ++i)
+	{
+		if (ＣＧモード確認(this.cgName_[i]))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void CgList::getAllCgList(ref array@string cgList)
+{
+	cgList.Alloc(this.cgName_.Numof());
+	cgList.Copy(0, this.cgName_, 0, this.cgName_.Numof());
+}
+

@@ -1,0 +1,57 @@
+void EnquiteSendingPage::resetIsClickExit()
+{
+	pass("");
+	this.isClickExit_ = false;
+}
+
+void EnquiteSendingPage::init(string activityFileName, string activityName)
+{
+	this.activityFileName_ = activityFileName;
+	this.activityName_ = activityName;
+	this.isClickExit_ = false;
+	this.btnSend_.init(this.activityName_, "SYS_アンケートを送信する", 0);
+	this.btnSend_.setOnClickCallback(this.onClickSend);
+	this.btnExit_.init(this.activityName_, "SYS_タイトル画面に戻る:0", 0);
+	this.btnExit_.setOnClickCallback(this.onClickExit);
+}
+
+void EnquiteSendingPage::onClickExit(int id)
+{
+	pass("");
+	this.isClickExit_ = true;
+}
+
+void EnquiteSendingPage::onClickSend(int id)
+{
+	this.isClickExit_ = false;
+	EnquiteYesNoDialog dialog;
+	if (dialog.open("アンケート／送信確認"))
+	{
+		g_globalGameFlag.setInt("アンケート送信", 1);
+		if (!AFL_Config_Network_GetEnableConnection())
+		{
+			openNetworkConnection();
+		}
+		if (AFL_Config_Network_GetEnableConnection())
+		{
+			g_enquiteSender.createId();
+			if (g_enquiteSender.send())
+			{
+				EnquiteInfoDialog info;
+				info.open("アンケート／送信成功");
+				AFL_Activity_End();
+			}
+			else
+			{
+				EnquiteInfoDialog info;
+				info.open("アンケート／送信失敗");
+			}
+		}
+	}
+}
+
+bool EnquiteSendingPage::isClickExit()
+{
+	return this.isClickExit_;
+}
+

@@ -1,0 +1,20 @@
+CReplacePair::CReplacePair()
+{
+}
+
+void CReplacePair::SetPair(string Src, string Dest)
+{
+	this.m_Src = Src;
+	this.m_Dest = Dest;
+}
+
+string CReplacePair::GetSrc()
+{
+	return this.m_Src;
+}
+
+string CReplacePair::GetDest()
+{
+	return this.m_Dest;
+}
+

@@ -1,0 +1,19 @@
+bool AFL_MemoryModeEvent_Begin()
+{
+	_g_回想中 = true;
+	return SYS_セーブ実行(-5, "", "");
+}
+
+void AFL_MemoryModeEvent_End()
+{
+	SYS_StopSE();
+	SYS_StopVoice();
+	SYS_ロード実行(-5);
+}
+
+void AFL_MemoryModeEvent_Cleanup()
+{
+	SYS_セーブファイル削除(-5);
+	_g_回想中 = false;
+}
+

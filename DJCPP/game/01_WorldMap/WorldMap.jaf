@@ -1,0 +1,197 @@
+WorldMap::WorldMap()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+	this.isShownNewBranch_ = false;
+}
+
+void WorldMap::showNewBranch(DG_GeneralCallback onFinishShowNewBranchCallback)
+{
+	this.onFinishShowNewBranchCallback_ = onFinishShowNewBranchCallback;
+	this.innerShowNewBranch();
+}
+
+void WorldMap::innerShowNewBranch()
+{
+	int i;
+	for (i = 0; i < this.branch_.Numof(); ++i)
+	{
+		if (g_mapChain.isNew(i))
+		{
+			g_mapChain.setNew(i, false);
+			this.focusBranchIndex_ = i;
+			int x;
+			int y;
+			this.branch_[i].getCenter(x, y);
+			this.hvScroller_.moveFocus(x, y, this.onFinishMoveFocus);
+			return;
+		}
+	}
+	this.isShownNewBranch_ = true;
+	this.onFinishShowNewBranchCallback_();
+}
+
+void WorldMap::onFinishMoveFocus()
+{
+	this.branch_[this.focusBranchIndex_].showNewBranch(this.onFinishShowNewBranch);
+}
+
+void WorldMap::onFinishShowNewBranch()
+{
+	this.innerShowNewBranch();
+}
+
+void WorldMap::init(string placeId)
+{
+	this.currentPlaceId_ = placeId;
+	ref MapPlace pl = getMapPlaceFromId(this.currentPlaceId_);
+	this.partsBg_.init("システム／マップ", 0);
+	this.hvScroller_.init(pl.getX(), pl.getY(), this.partsBg_.getWidth(), this.partsBg_.getHeight());
+	this.partsBg_.setParent(this.hvScroller_.getPartsNumber());
+	this.mapFrame_.init();
+	this.initPlayerIcon();
+	this.initCloud();
+	this.initPlaceButton();
+	this.initBranch();
+	this.initParts();
+	this.showObject(true);
+}
+
+void WorldMap::initPlayerIcon()
+{
+	int type = getPlayerFromId("ランス").isJoin() ? 0 : 1;
+	this.playerIcon_.init(type, this.hvScroller_.getPartsNumber(), this.currentPlaceId_);
+}
+
+void WorldMap::initCloud()
+{
+	int i;
+	for (i = 0; i < this.cloud_.Numof(); ++i)
+	{
+		this.cloud_[i].init(this.hvScroller_.getPartsNumber());
+	}
+}
+
+void WorldMap::showObject(bool val)
+{
+	this.partsBg_.setShow(val);
+	this.partsLesus_.setShow(val);
+	this.playerIcon_.fadeIn(val);
+}
+
+void WorldMap::initBranch()
+{
+	this.branch_.Alloc(g_mapChain.getCount());
+	int i;
+	for (i = 0; i < this.branch_.Numof(); ++i)
+	{
+		MapChainInfo chain;
+		g_mapChain.getChain(i, chain);
+		this.branch_[i].init(chain, this.hvScroller_.getPartsNumber());
+	}
+}
+
+void WorldMap::initPlaceButton()
+{
+	this.btnPlace_.Alloc(g_mapPlace.Numof());
+	int i;
+	for (i = 0; i < this.btnPlace_.Numof(); ++i)
+	{
+		this.btnPlace_[i].init(this.hvScroller_.getPartsNumber(), g_mapPlace[i].getId(), this.onPlaceButtonClick, i);
+	}
+}
+
+void WorldMap::onPlaceButtonClick(int index)
+{
+	this.onClickPlaceCallback_(g_mapPlace[index].getId());
+}
+
+void WorldMap::initParts()
+{
+	this.partsLesus_.init("システム／マップ／建物／リーザス城", 0);
+	this.partsLesus_.setPos(1701.0, 193.0);
+	this.partsLesus_.setOrigin(5);
+	this.partsLesus_.setParent(this.hvScroller_.getPartsNumber());
+}
+
+void WorldMap::setPartsShow()
+{
+}
+
+void WorldMap::setPartsPos()
+{
+}
+
+void WorldMap::update()
+{
+	if (this.isFollowPlayer_)
+	{
+		int x;
+		int y;
+		this.playerIcon_.getCurrentPos(x, y);
+		this.hvScroller_.setCameraTarget(x, y);
+	}
+	if (g_mouse.getWheel() > 0)
+	{
+		openBackLog();
+	}
+}
+
+void WorldMap::setFollowPlayerIcon(bool val)
+{
+	this.isFollowPlayer_ = val;
+	this.hvScroller_.setCameraFollowMode(this.isFollowPlayer_);
+}
+
+void WorldMap::movePlayerIcon(int fx, int fy, int tx, int ty, DG_GeneralCallback onFinishMoveIconCallback)
+{
+	this.playerIcon_.moveTo(fx, fy, tx, ty, onFinishMoveIconCallback);
+}
+
+void WorldMap::moveFocus(int x, int y, DG_GeneralCallback onFinishCallback)
+{
+	this.hvScroller_.moveFocus(x, y, onFinishCallback);
+}
+
+void WorldMap::setOnClickPlaceCallback(DG_OnClickPlaceCallback onClickPlaceCallback)
+{
+	this.onClickPlaceCallback_ = onClickPlaceCallback;
+}
+
+void WorldMap::fadeIn(bool val, int time, DG_GeneralCallback onFinishCallback)
+{
+	this.hvScroller_.fadeIn(val, time, onFinishCallback);
+	this.fadePlaceButton(val);
+	this.fadeBranch(val);
+	this.mapFrame_.fadeIn(val, NULL);
+}
+
+void WorldMap::fadeBranch(bool val)
+{
+	int i;
+	for (i = 0; i < this.branch_.Numof(); ++i)
+	{
+		if (this.isShownNewBranch_ || !g_mapChain.isNew(i))
+		{
+			this.branch_[i].fadeIn(val);
+		}
+	}
+}
+
+void WorldMap::fadePlaceButton(bool val)
+{
+	int i;
+	for (i = 0; i < this.btnPlace_.Numof(); ++i)
+	{
+		this.btnPlace_[i].fadeIn(val);
+	}
+}
+
+void WorldMap::setPlaceButtonClickable(bool val)
+{
+	int i;
+	for (i = 0; i < this.btnPlace_.Numof(); ++i)
+	{
+		this.btnPlace_[i].setClickable(val);
+	}
+}
+

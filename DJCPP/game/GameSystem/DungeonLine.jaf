@@ -1,0 +1,50 @@
+void DungeonLine::init(int dungeonWidth, int depthPos)
+{
+	this.card_.Alloc(dungeonWidth);
+	this.depthPos_ = depthPos;
+}
+
+void DungeonLine::setDungeonCard(int index, string typeId, int openType)
+{
+	this.card_[index].init(typeId, openType);
+}
+
+ref DungeonCard DungeonLine::getDungeonCard(int index)
+{
+	if (0 <= index && index < this.card_.Numof())
+	{
+		return this.card_[index];
+	}
+	return NULL;
+}
+
+void DungeonLine::debugOut()
+{
+	string n;
+	int i;
+	for (i = 0; i < this.card_.Numof(); ++i)
+	{
+		n += "[%s]" % getCardInfomationFromId(this.card_[i].getCardTypeId()).getId();
+	}
+	pass(n);
+}
+
+int DungeonLine::getWidth()
+{
+	return this.card_.Numof();
+}
+
+int DungeonLine::getDepthPos()
+{
+	return this.depthPos_;
+}
+
+void DungeonLine::reset()
+{
+	int i;
+	for (i = 0; i < this.card_.Numof(); ++i)
+	{
+		this.card_[i].reset();
+	}
+}
+

@@ -1,0 +1,52 @@
+DungeonBackground::DungeonBackground()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void DungeonBackground::init(string dungeonId)
+{
+	this.dungeon_ <- getDungeonFromId(dungeonId);
+	int i;
+	for (i = 0; i < this.sideObject_.Numof(); ++i)
+	{
+		this.sideObject_[i].init(this.dungeon_.getFlatName(i), i);
+	}
+	this.initParts();
+}
+
+void DungeonBackground::update()
+{
+}
+
+void DungeonBackground::fadeIn(bool val, DG_GeneralCallback onFinish)
+{
+	this.setPartsShow();
+	PartsMotion m;
+	m = getStandardMotion(val ? 0 : 1);
+	m.setTime(val ? 500 : 300);
+	this.partsBg_.runMotion(m, onFinish);
+	int i;
+	for (i = 0; i < this.sideObject_.Numof(); ++i)
+	{
+		this.sideObject_[i].fadeIn(val, NULL);
+	}
+}
+
+void DungeonBackground::initParts()
+{
+	this.partsBg_.init(this.dungeon_.getBackGroundImageName(), 0);
+	this.partsBg_.setPos(0.0, 0.0);
+	this.partsBg_.setZ(1000.0);
+	this.partsBg_.setShow(true);
+	this.setPartsPos();
+}
+
+void DungeonBackground::setPartsShow()
+{
+	this.partsBg_.setShow(true);
+}
+
+void DungeonBackground::setPartsPos()
+{
+}
+

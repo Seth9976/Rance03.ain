@@ -1,0 +1,45 @@
+void AFL_KeepPreviousView_SetMode(bool KeepPreviousViewMode)
+{
+	ChipmunkSpriteEngine.KeepPreviousView_SetMode(KeepPreviousViewMode);
+}
+
+bool AFL_KeepPreviousView_GetMode()
+{
+	return ChipmunkSpriteEngine.KeepPreviousView_GetMode();
+}
+
+void AFL_View_Update(bool 未読既読スキップ)
+{
+	SYS_View_Update(未読既読スキップ, false, 0.0);
+}
+
+int AFL_View_GetDefaultWidth()
+{
+	return SystemService.GetDefaultViewWidth();
+}
+
+int AFL_View_GetDefaultHeight()
+{
+	return SystemService.GetDefaultViewHeight();
+}
+
+int AFL_View_GetWidth()
+{
+	return SystemService.GetViewWidth();
+}
+
+int AFL_View_GetHeight()
+{
+	return SystemService.GetViewHeight();
+}
+
+void AFL_View_SetResizableMode(bool ResizableMode)
+{
+	SystemService.SetViewResizableMode(ResizableMode);
+}
+
+bool AFL_View_IsResizableMode()
+{
+	return SystemService.IsViewResizableMode();
+}
+

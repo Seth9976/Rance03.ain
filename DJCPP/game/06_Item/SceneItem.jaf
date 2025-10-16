@@ -1,0 +1,129 @@
+void SceneItem::init()
+{
+	this.isFinish_ = false;
+	g_playerCommonParam.getItemList(this.itemIdList_);
+	this.listView_.init(this.itemIdList_, false);
+	this.listView_.setOnClickCallback(this.onClick);
+	this.initButton();
+	this.parts_[0].initAsFlat("システム／アイテム使用／背景");
+	this.parts_[1].initAsFlat("システム／アイテム使用／タイトル");
+	this.parts_[0].setZ(4100.0);
+	this.parts_[1].setZ(4400.0);
+	createPartsGroup(this.parent_, this.parts_, 0);
+	this.setPartsShow();
+}
+
+void SceneItem::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void SceneItem::initButton()
+{
+	this.btnExit_.init("システム／ボタン／幅１７０", "やめる", "", true);
+	this.btnExit_.setPos(840, 494);
+}
+
+void SceneItem::run()
+{
+	this.fadeObject(true);
+}
+
+void SceneItem::fadeObject(bool val)
+{
+	this.listView_.fadeIn(val, NULL);
+	this.btnExit_.fadeIn(val);
+	if (val)
+	{
+		int i;
+		for (i = 0; i < this.parts_.Numof(); ++i)
+		{
+			this.parts_[i].startFlat(false, 1.0);
+		}
+	}
+	else
+	{
+		int i;
+		for (i = 0; i < this.parts_.Numof(); ++i)
+		{
+			PartsMotion m;
+			m.setMove(0, 0, 500, 0, 1);
+			m.setAlpha(255, 0, 0);
+			m.setTime(150);
+			this.parts_[i].runMotion(m, NULL);
+		}
+	}
+	if (!val)
+	{
+		this.timerCb_.setTimer(200, this.onFinishFadeOut);
+	}
+}
+
+void SceneItem::onFinishFadeOut()
+{
+	this.isFinish_ = true;
+}
+
+bool SceneItem::update()
+{
+	if (!this.timerCb_.isRunning() && (g_mouse.isClick(1) || this.btnExit_.isClick()))
+	{
+		if (g_mouse.isClick(1))
+		{
+			playCancel();
+		}
+		this.fadeObject(false);
+	}
+	return !this.isFinish_;
+}
+
+void SceneItem::onClick(string itemId)
+{
+	ref Item item = getItemFromId(itemId);
+	if (item.getTargetType() == 0)
+	{
+		this.btnExit_.setShow(false);
+		this.btnExit_.update();
+		string id = openTargetPlayerSelect(0);
+		this.btnExit_.fadeIn(true);
+		if (!id.Empty())
+		{
+			this.useItem(itemId, getPlayerFromId(id));
+		}
+	}
+	else
+	{
+		this.useItem(itemId, NULL);
+	}
+	this.updateListView(itemId);
+}
+
+void SceneItem::updateListView(string itemId)
+{
+	if (g_playerCommonParam.getItemCount(itemId) == 0)
+	{
+		this.listView_.eraseFromList(itemId);
+	}
+	else
+	{
+		this.listView_.updateState();
+	}
+}
+
+void SceneItem::useItem(string itemId, ref Player player)
+{
+	g_playerCommonParam.useItem(itemId);
+	DG_UseItemCallback fn;
+	fn = EX_String("アイテム使用コールバック関数", "");
+	if (fn.Numof() == 0)
+	{
+		pass("アイテムコールバックがありません");
+	}
+	fn(itemId, player);
+}
+

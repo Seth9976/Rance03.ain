@@ -1,0 +1,223 @@
+DungeonPlayerPieceGroup::DungeonPlayerPieceGroup()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void DungeonPlayerPieceGroup::init(bool isRanceOnlyMode)
+{
+	this.isRanceOnlyMode_ = isRanceOnlyMode;
+	this.reset();
+}
+
+void DungeonPlayerPieceGroup::reset()
+{
+	if (this.isRanceOnlyMode_)
+	{
+		this.piece_.Alloc(1);
+		this.piece_[0].val <- new DungeonPlayerPiece;
+		this.piece_[0].val.init("", 0);
+	}
+	else
+	{
+		array@string pIds;
+		getAlivePlayerList(pIds);
+		shuffleIds(pIds);
+		this.sortIds(pIds);
+		this.piece_.Alloc(pIds.Numof());
+		int i;
+		for (i = 0; i < this.piece_.Numof(); ++i)
+		{
+			this.piece_[i].val <- new DungeonPlayerPiece;
+			this.piece_[i].val.init(pIds[i], i);
+		}
+	}
+}
+
+void shuffleIds(ref array@string list)
+{
+	if (list.Numof() <= 1)
+	{
+		return;
+	}
+	int i;
+	int n = list.Numof();
+	for (i = 0; i < 100; ++i)
+	{
+		int l = RAND(n) - 1;
+		int r = RAND(n) - 1;
+		if (l != r)
+		{
+			list[l] <=> list[r];
+		}
+	}
+}
+
+void DungeonPlayerPieceGroup::update()
+{
+}
+
+void DungeonPlayerPieceGroup::fadeIn(bool val, unknown_delegate onFinish)
+{
+	int i;
+	for (i = 0; i < this.piece_.Numof(); ++i)
+	{
+		this.piece_[i].val.fadeIn(val);
+	}
+}
+
+void DungeonPlayerPieceGroup::moveFront()
+{
+	int i;
+	for (i = 0; i < this.piece_.Numof(); ++i)
+	{
+		this.piece_[i].val.moveFront();
+	}
+}
+
+void DungeonPlayerPieceGroup::moveSideWays(bool isLeft)
+{
+	int i;
+	for (i = 0; i < this.piece_.Numof(); ++i)
+	{
+		this.piece_[i].val.moveSideWays(isLeft);
+	}
+}
+
+void DungeonPlayerPieceGroup::updateCharacter()
+{
+	if (this.isRanceOnlyMode_)
+	{
+		return;
+	}
+	array@string current;
+	array@string updated;
+	current.Alloc(this.piece_.Numof());
+	int i;
+	for (i = 0; i < current.Numof(); ++i)
+	{
+		current[i] = this.piece_[i].val.getId();
+	}
+	getAlivePlayerList(updated);
+	current.Sort();
+	updated.Sort();
+	if (this.isChanged(current, updated))
+	{
+		array@string erase;
+		array@string add;
+		int i;
+		int j;
+		i = 0;
+		j = 0;
+		while (true)
+		{
+			if (updated.Numof() <= j)
+			{
+				++i;
+				j = 0;
+			}
+			if (current.Numof() <= i || updated.Numof() <= j)
+			{
+				break;
+			}
+			if (current[i] == updated[j])
+			{
+				current.Erase(i);
+				updated.Erase(j);
+			}
+			else
+			{
+				++j;
+			}
+		}
+		this.moveToErase(current);
+		this.addPiece(updated);
+		this.reposition();
+	}
+}
+
+bool DungeonPlayerPieceGroup::isChanged(ref array@string l, ref array@string r)
+{
+	if (l.Numof() != r.Numof())
+	{
+		return true;
+	}
+	int i;
+	for (i = 0; i < l.Numof(); ++i)
+	{
+		if (l[i] != r[i])
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void DungeonPlayerPieceGroup::reposition()
+{
+	array@string ids;
+	int i;
+	for (i = 0; i < this.piece_.Numof(); ++i)
+	{
+		ids.PushBack(this.piece_[i].val.getId());
+	}
+	shuffleIds(ids);
+	this.sortIds(ids);
+	for (i = 0; i < this.piece_.Numof(); ++i)
+	{
+		int j;
+		for (j = 0; j < ids.Numof(); ++j)
+		{
+			if (ids[j] == this.piece_[i].val.getId())
+			{
+				this.piece_[i].val.changePosition(j);
+			}
+		}
+	}
+}
+
+void DungeonPlayerPieceGroup::moveToErase(ref array@string eraseIds)
+{
+	int i;
+	for (i = 0; i < eraseIds.Numof(); ++i)
+	{
+		int j;
+		for (j = 0; j < this.piece_.Numof(); ++j)
+		{
+			if (eraseIds[i] == this.piece_[j].val.getId())
+			{
+				this.piece_.Erase(j);
+				break;
+			}
+		}
+	}
+}
+
+void DungeonPlayerPieceGroup::addPiece(ref array@string addIds)
+{
+	int i;
+	for (i = 0; i < addIds.Numof(); ++i)
+	{
+		this.piece_.Realloc(this.piece_.Numof() + 1);
+		this.piece_[this.piece_.Numof() - 1].val <- new DungeonPlayerPiece;
+		this.piece_[this.piece_.Numof() - 1].val.init(addIds[i], i);
+	}
+}
+
+void DungeonPlayerPieceGroup::sortIds(ref array@string pIds)
+{
+	pIds.Sort(&sortFunctionDungeonPiece);
+}
+
+int sortFunctionDungeonPiece(string lhs, string rhs)
+{
+	if (getPlayerFromId(lhs).getFormationPriority() > getPlayerFromId(rhs).getFormationPriority())
+	{
+		return 1;
+	}
+	if (getPlayerFromId(lhs).getFormationPriority() < getPlayerFromId(rhs).getFormationPriority())
+	{
+		return -1;
+	}
+	return 0;
+}
+

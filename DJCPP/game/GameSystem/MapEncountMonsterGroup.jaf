@@ -1,0 +1,82 @@
+void MapEncountMonsterGroup::getMonsterList(ref array@string result)
+{
+	int i;
+	for (i = 0; i < this.monsterId_.Numof(); ++i)
+	{
+		if (!this.monsterId_[i].Empty())
+		{
+			result.PushBack(this.monsterId_[i]);
+		}
+	}
+}
+
+void MapEncountMonsterGroup::init(string id)
+{
+	string key = "マップエンカウントモンスターグループ情報";
+	this.id_ = id;
+	this.addMonsterId(EX_SA2String(key, id, "mId1", ""));
+	this.addMonsterId(EX_SA2String(key, id, "mId2", ""));
+	this.addMonsterId(EX_SA2String(key, id, "mId3", ""));
+	this.addMonsterId(EX_SA2String(key, id, "mId4", ""));
+	this.addMonsterId(EX_SA2String(key, id, "mId5", ""));
+	this.addMonsterId(EX_SA2String(key, id, "mId6", ""));
+	this.gold_ = EX_SA2Int(key, id, "gold", 0);
+	this.exp_ = EX_SA2Int(key, id, "exp", 0);
+	this.itemId_ = EX_SA2String(key, id, "item", "");
+	this.itemProbability_ = EX_SA2Int(key, id, "itemProbability", 0);
+	this.musicId_ = EX_SA2String(key, id, "musicId", "");
+}
+
+void MapEncountMonsterGroup::addMonsterId(string id)
+{
+	if (id == "")
+	{
+		return;
+	}
+	this.monsterId_.PushBack(id);
+}
+
+string MapEncountMonsterGroup::getId()
+{
+	return this.id_;
+}
+
+string MapEncountMonsterGroup::getMonsterId(int index)
+{
+	if (0 <= index && index < this.monsterId_.Numof())
+	{
+		return this.monsterId_[index];
+	}
+	return "";
+}
+
+int MapEncountMonsterGroup::getMonsterCount()
+{
+	return this.monsterId_.Numof();
+}
+
+int MapEncountMonsterGroup::getGold()
+{
+	return this.gold_;
+}
+
+int MapEncountMonsterGroup::getExp()
+{
+	return this.exp_;
+}
+
+string MapEncountMonsterGroup::getItemId()
+{
+	return this.itemId_;
+}
+
+int MapEncountMonsterGroup::getItemProbability()
+{
+	return this.itemProbability_;
+}
+
+string MapEncountMonsterGroup::getMusicId()
+{
+	return this.musicId_;
+}
+

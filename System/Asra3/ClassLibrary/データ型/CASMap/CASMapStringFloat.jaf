@@ -1,0 +1,131 @@
+void SASMapStringFloatPair::Set(ref string k, ref float v)
+{
+	this.Key = k;
+	this.Value = v;
+}
+
+int SASMapStringFloatPair::Compare(ref string k)
+{
+	if (k < this.Key)
+	{
+		return 1;
+	}
+	if (k > this.Key)
+	{
+		return -1;
+	}
+	return 0;
+}
+
+CASMapStringFloat::CASMapStringFloat()
+{
+}
+
+CASMapStringFloat::~CASMapStringFloat()
+{
+}
+
+int CASMapStringFloat::GetNearIndex(ref string Key)
+{
+	if (this.m_List.Numof() == 0)
+	{
+		return -1;
+	}
+	int r = this.m_List.Numof() - 1;
+	int l;
+	while (l < r)
+	{
+		int m = r + l >> 1;
+		int comp = this.m_List[m].Compare(Key);
+		if (comp > 0)
+		{
+			r = m - 1;
+		}
+		else if (comp < 0)
+		{
+			l = m + 1;
+		}
+		else
+		{
+			return m;
+		}
+	}
+	return l;
+}
+
+int CASMapStringFloat::GetIndex(ref string Key)
+{
+	int i = this.GetNearIndex(Key);
+	if (i == -1)
+	{
+		return -1;
+	}
+	if (this.m_List[i].Compare(Key) == 0)
+	{
+		return i;
+	}
+	return -1;
+}
+
+void CASMapStringFloat::Set(string Key, float Value)
+{
+	SASMapStringFloatPair Pair;
+	Pair.Key = Key;
+	Pair.Value = Value;
+	int i = this.GetNearIndex(Key);
+	if (i == -1)
+	{
+		this.m_List.PushBack(Pair);
+		return;
+	}
+	int comp = this.m_List[i].Compare(Key);
+	int size = this.m_List.Numof();
+	if (comp == 0)
+	{
+		this.m_List[i] = Pair;
+	}
+	else if (comp > 0)
+	{
+		this.m_List.Insert(i, Pair);
+	}
+	else if (i + 1 != size)
+	{
+		this.m_List.Insert(i + 1, Pair);
+	}
+	else
+	{
+		this.m_List.PushBack(Pair);
+	}
+}
+
+float CASMapStringFloat::Get(string Key)
+{
+	float Default;
+	int Index = this.GetIndex(Key);
+	if (Index == -1)
+	{
+		return Default;
+	}
+	return this.m_List[Index].Value;
+}
+
+void CASMapStringFloat::Remove(string Key)
+{
+	int Index = this.GetIndex(Key);
+	if (Index == -1)
+	{
+		return;
+	}
+	this.m_List.Erase(Index);
+}
+
+bool CASMapStringFloat::IsExist(string Key)
+{
+	return this.GetIndex(Key) != -1;
+}
+
+void CASMapStringFloat::Clear()
+{
+	this.m_List.Free();
+}
+

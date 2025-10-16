@@ -1,0 +1,61 @@
+CASPartsLayer::CASPartsLayer()
+{
+	this.m_LayerID = -1;
+	this.m_PrevLayerID = -1;
+	this.AddTopLayer();
+}
+
+CASPartsLayer::~CASPartsLayer()
+{
+	this.Erase();
+}
+
+int CASPartsLayer::Add(int ID)
+{
+	if (this.m_LayerID != -1)
+	{
+		return 0;
+	}
+	this.m_PrevLayerID = AFL_Parts_GetActiveLayer();
+	this.m_LayerID = AFL_Parts_AddLayer(ID);
+	return this.m_LayerID;
+}
+
+int CASPartsLayer::AddTopLayer()
+{
+	if (this.m_LayerID != -1)
+	{
+		return 0;
+	}
+	this.m_PrevLayerID = AFL_Parts_GetActiveLayer();
+	this.m_LayerID = AFL_Parts_AddTopLayer();
+	return this.m_LayerID;
+}
+
+void CASPartsLayer::Erase()
+{
+	if (this.m_LayerID == -1)
+	{
+		return;
+	}
+	AFL_Parts_EraseLayer(this.m_LayerID);
+	AFL_Parts_SetActiveLayer(this.m_PrevLayerID);
+	this.m_PrevLayerID = -1;
+	this.m_LayerID = -1;
+}
+
+int CASPartsLayer::GetID()
+{
+	return this.m_LayerID;
+}
+
+int CASPartsLayer::GetIndex()
+{
+	return AFL_Parts_GetLayerIndex(this.m_LayerID);
+}
+
+void CASPartsLayer::Active()
+{
+	AFL_Parts_SetActiveLayer(this.m_LayerID);
+}
+

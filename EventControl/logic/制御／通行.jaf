@@ -1,0 +1,138 @@
+bool 制御／通行確認／リスの洞窟の鍵()
+{
+	if (g_playerCommonParam.getItemCount("リスの洞窟の鍵") > 0)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool 制御／通行確認／汎用扉()
+{
+	if (g_playerCommonParam.getItemCount("スカウトキー") > 0)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool 制御／通行確認／防犯扉()
+{
+	if (g_playerCommonParam.getItemCount("ピッキングドリル") > 0)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool 制御／通行確認／カッパーマトック()
+{
+	if (g_playerCommonParam.getItemCount("カッパーマトック") > 0)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool 制御／通行確認／シルバーマトック()
+{
+	if (g_playerCommonParam.getItemCount("シルバーマトック") > 0)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool 制御／通行確認／ミラクルミ()
+{
+	if (g_playerCommonParam.getItemCount("ミラクルミ") > 0)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool 制御／通行確認／丸山ワクチン()
+{
+	if (g_playerCommonParam.getItemCount("丸山ワクチン") > 0)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool 制御／通行確認／下水道管理者証()
+{
+	if (g_playerCommonParam.getItemCount("下水道管理者証") > 0)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool 制御／通行確認／食品衛生管理者証()
+{
+	if (g_playerCommonParam.getItemCount("食品衛生管理者証") > 0)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool 制御／通行確認／夏への鍵()
+{
+	if (g_playerCommonParam.getItemCount("夏への鍵") > 0)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool 制御／通行確認／最後だけの鍵()
+{
+	if (g_playerCommonParam.getItemCount("最後だけの鍵") > 0)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool 制御／通行確認／コンビーフの鍵()
+{
+	if (g_playerCommonParam.getItemCount("コンビーフの鍵") > 0)
+	{
+		return true;
+	}
+	return false;
+}
+
+void 制御／通行／リスの洞窟の鍵()
+{
+	制御／アイテム削除("リスの洞窟の鍵", 1, true);
+}
+
+void 制御／通行／汎用扉()
+{
+	制御／アイテム削除("スカウトキー", 1, true);
+}
+
+void 制御／通行／防犯扉()
+{
+	制御／アイテム削除("ピッキングドリル", 1, true);
+}
+
+void 制御／通行／カッパーマトック()
+{
+	制御／アイテム削除("カッパーマトック", 1, true);
+}
+
+void 制御／通行／シルバーマトック()
+{
+	制御／アイテム削除("シルバーマトック", 1, true);
+}
+
+void 制御／通行／コンビーフの鍵()
+{
+	制御／アイテム削除("コンビーフの鍵", 1, true);
+}
+

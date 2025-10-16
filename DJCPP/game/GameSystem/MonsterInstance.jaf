@@ -1,0 +1,212 @@
+void MonsterInstance::init(string monsterId, int position, int instanceIndex, int arrivalTurn)
+{
+	this.reset();
+	this.position_ = position;
+	this.id_ = monsterId;
+	this.maxHp_ = getMonsterFromId(monsterId).getHp();
+	this.hp_ = this.maxHp_;
+	this.attackHp_ = this.maxHp_;
+	this.instanceIndex_ = instanceIndex;
+	this.arrivalTurn_ = arrivalTurn;
+}
+
+void MonsterInstance::reset()
+{
+	this.isChanged_ = false;
+	this.id_ = "";
+	this.hp_ = 0;
+	this.maxHp_ = 0;
+	this.instanceIndex_ = -1;
+	this.position_ = -1;
+	this.arrivalTurn_ = -1;
+	this.positionCallback_.Clear();
+	this.hpCallback_.Clear();
+	this.buffIdList_.Free();
+	this.addBuffCallback_.Clear();
+	this.eraseBuffCallback_.Clear();
+}
+
+int MonsterInstance::setHp(int val)
+{
+	int lost;
+	if (this.maxHp_ < val)
+	{
+		lost = val - this.maxHp_;
+	}
+	else if (val < 0)
+	{
+		lost = -val;
+	}
+	this.hp_ = Math.Max(0, Math.Min(val, this.maxHp_));
+	this.hpCallback_(this.hp_);
+	return lost;
+}
+
+int MonsterInstance::getHp()
+{
+	return this.hp_;
+}
+
+int MonsterInstance::getMaxHp()
+{
+	return getMonsterFromId(this.id_).getHp();
+}
+
+int MonsterInstance::getPosition()
+{
+	return this.position_;
+}
+
+void MonsterInstance::setPosition(int val)
+{
+	int old = this.position_;
+	this.position_ = Math.Max(0, Math.Min(3, val));
+	if (old != this.position_)
+	{
+		this.positionCallback_();
+	}
+}
+
+string MonsterInstance::getId()
+{
+	return this.id_;
+}
+
+void MonsterInstance::setOnChangePositionCallback(DG_GeneralCallback cb)
+{
+	this.positionCallback_ = cb;
+}
+
+DG_GeneralCallback MonsterInstance::getOnChangePositionCallback()
+{
+	return this.positionCallback_;
+}
+
+void MonsterInstance::setOnChangeHpCallback(DG_OnChangeHp hpCallback)
+{
+	this.hpCallback_ = hpCallback;
+}
+
+void MonsterInstance::addBuff(string buffId)
+{
+	if (!this.isExistBuff(buffId) && this.isAvailableBuffId(buffId))
+	{
+		this.buffIdList_.PushBack(buffId);
+		this.addBuffCallback_(buffId);
+	}
+}
+
+bool MonsterInstance::isExistBuff(string buffId)
+{
+	return this.buffIdList_.Find(0, this.buffIdList_.Numof(), buffId) >= 0;
+}
+
+void MonsterInstance::eraseBuff(string id)
+{
+	if (id == "")
+	{
+		this.buffIdList_.Free();
+	}
+	else if (this.isExistBuff(id))
+	{
+		int index = this.buffIdList_.Find(0, this.buffIdList_.Numof(), id);
+		this.buffIdList_.Erase(index);
+		this.eraseBuffCallback_(id);
+	}
+}
+
+void MonsterInstance::eraseBuffByType(int type)
+{
+	int i;
+	while (i < this.buffIdList_.Numof())
+	{
+		string id = this.buffIdList_[i];
+		if (getMonsterBuffFromId(id).getType() == type)
+		{
+			this.buffIdList_.Erase(i);
+			this.eraseBuffCallback_(id);
+		}
+		else
+		{
+			++i;
+		}
+	}
+}
+
+bool MonsterInstance::isAvailableBuffId(string id)
+{
+	ref MonsterBuff b = getMonsterBuffFromId(id);
+	return b !== NULL;
+}
+
+void MonsterInstance::setBuffCallback(DG_OnChangeBuff onAdd, DG_OnChangeBuff onErase)
+{
+	this.addBuffCallback_ = onAdd;
+	this.eraseBuffCallback_ = onErase;
+}
+
+void MonsterInstance::getBuffIdList(ref array@string result, int type)
+{
+	result.Free();
+	if (this.buffIdList_.Empty())
+	{
+		return;
+	}
+	if (type == -1)
+	{
+		result.Alloc(this.buffIdList_.Numof());
+		result.Copy(0, this.buffIdList_, 0, this.buffIdList_.Numof());
+	}
+	else
+	{
+		int i;
+		for (i = 0; i < this.buffIdList_.Numof(); ++i)
+		{
+			if (getMonsterBuffFromId(this.buffIdList_[i]).getType() == type)
+			{
+				result.PushBack(this.buffIdList_[i]);
+			}
+		}
+	}
+}
+
+int MonsterInstance::getInstanceIndex()
+{
+	return this.instanceIndex_;
+}
+
+int MonsterInstance::getArrivalTurn()
+{
+	return this.arrivalTurn_;
+}
+
+MonsterAttack MonsterInstance::getAttack(int turn)
+{
+	int n = turn - this.arrivalTurn_;
+	ref Monster m = getMonsterFromId(this.id_);
+	return m.getAttack(n, (float(this.attackHp_) / float(this.maxHp_)) * 100.0);
+}
+
+void MonsterInstance::updateAttackHp()
+{
+	this.attackHp_ = this.hp_;
+}
+
+void MonsterInstance::clearCallback()
+{
+	this.positionCallback_.Clear();
+	this.hpCallback_.Clear();
+	this.addBuffCallback_.Clear();
+	this.eraseBuffCallback_.Clear();
+}
+
+bool MonsterInstance::isChanged()
+{
+	return this.isChanged_;
+}
+
+void MonsterInstance::setChanged(bool val)
+{
+	this.isChanged_ = val;
+}
+

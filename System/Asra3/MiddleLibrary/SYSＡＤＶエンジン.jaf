@@ -1,0 +1,147 @@
+void SYS_ADVEngine_Run(string Folder, DG_NotifyHandler ReleaseSceneFunc)
+{
+	if (!system.IsDebugMode())
+	{
+		return;
+	}
+	string GameFolderPath;
+	SystemService.GetGameFolderPath(GameFolderPath);
+	GameFolderPath += "\\..";
+	string BaseFolder = Folder.Length() == 0 ? GameFolderPath : Folder;
+	SYS_ADVEngine_RunNest(BaseFolder, ReleaseSceneFunc);
+}
+
+void SYS_ADVEngine_RunNest(string FolderPath, DG_NotifyHandler ReleaseSceneFunc)
+{
+	if (!system.IsDebugMode())
+	{
+		return;
+	}
+	for (; ; )
+	{
+		array@string FolderList;
+		if (!FileOperation.GetFolderList(FolderPath, FolderList))
+		{
+			system.Output("フォルダリストの作成に失敗しました\n");
+			return;
+		}
+		array@string List;
+		if (!FileOperation.GetFileList(FolderPath, List))
+		{
+			system.Output("ファイルリストの作成に失敗しました\n");
+			return;
+		}
+		array@string FileList;
+		int i;
+		for (i = 0; i < List.Numof(); ++i)
+		{
+			if (List[i].Length() <= 3)
+			{
+				continue;
+			}
+			if (List[i].GetPart(List[i].Length() - 3, 3) != "jaf")
+			{
+				continue;
+			}
+			FileList.PushBack(List[i]);
+		}
+		int Index;
+		選択肢(2147483647, "■■■■■ フォルダリスト ■■■■■", 0);
+		int FolderListBase = Index;
+		int FolderListIndex;
+		for (FolderListIndex = 0; FolderListIndex < FolderList.Numof(); ++Index, ++FolderListIndex)
+		{
+			選択肢(Index, FolderList[FolderListIndex], 0);
+		}
+		選択肢(2147483647, "", 0);
+		選択肢(2147483647, "■■■■■  ファイルリスト ■■■■■", 0);
+		int FileListBase = Index;
+		int FileListIndex;
+		for (FileListIndex = 0; FileListIndex < FileList.Numof(); ++Index, ++FileListIndex)
+		{
+			選択肢(Index, FileList[FileListIndex], 0);
+		}
+		選択肢(2147483647, "-----------------", 0);
+		選択肢(Index, "戻る", 0);
+		int 結果 = テスト選択();
+		if (Index < 結果)
+		{
+			FileList.Free();
+			List.Free();
+			FolderList.Free();
+			continue;
+		}
+		if (結果 < 0 || Index == 結果)
+		{
+			FileList.Free();
+			List.Free();
+			FolderList.Free();
+			break;
+		}
+		FolderListIndex = 結果 - FolderListBase;
+		if (0 <= FolderListIndex && FolderListIndex < FolderList.Numof())
+		{
+			SYS_ADVEngine_RunNest(FolderPath + "\\" + FolderList[FolderListIndex], ReleaseSceneFunc);
+			FileList.Free();
+			List.Free();
+			FolderList.Free();
+			continue;
+		}
+		FileListIndex = 結果 - FileListBase;
+		if (0 <= FileListIndex && FileListIndex < FileList.Numof())
+		{
+			CADVEngine ADV;
+			ADV.SetReleaseSceneFunc(ReleaseSceneFunc);
+			ADV.Execute(FolderPath + "\\" + FileList[FileListIndex]);
+			FileList.Free();
+			List.Free();
+			FolderList.Free();
+			continue;
+		}
+	}
+}
+
+int SYS_Script_GetArgumentValue_int(string FunctionName, int Step, int Index)
+{
+	int Value;
+	if (!ADVEngine.GetArgumentValue_int(Value, FunctionName, Step, Index))
+	{
+		system.Output("int値として取得できませんでした。0を使用します。\n");
+		return 0;
+	}
+	return Value;
+}
+
+float SYS_Script_GetArgumentValue_float(string FunctionName, int Step, int Index)
+{
+	float Value;
+	if (!ADVEngine.GetArgumentValue_float(Value, FunctionName, Step, Index))
+	{
+		system.Output("float値として取得できませんでした。0.0fを使用します。\n");
+		return 0.0;
+	}
+	return Value;
+}
+
+bool SYS_Script_GetArgumentValue_bool(string FunctionName, int Step, int Index)
+{
+	int Value;
+	if (!ADVEngine.GetArgumentValue_bool(Value, FunctionName, Step, Index))
+	{
+		system.Output("bool値として取得できませんでした。falseを使用します。\n");
+		return false;
+	}
+	return Value != 0;
+}
+
+string SYS_Script_GetArgumentValue_string(string FunctionName, int Step, int Index)
+{
+	string Value;
+	if (!ADVEngine.GetArgumentValue_string(Value, FunctionName, Step, Index))
+	{
+		system.Output("string値として取得できませんでした。空文字を使用します。\n");
+		return "";
+	}
+	return Value;
+}
+

@@ -1,0 +1,134 @@
+Music::Music()
+{
+	this.nowPlay_ = this.lastPlay_ = "";
+	this.forcePlayMusic_ = "";
+}
+
+void Music::play(string musicId, int fadeTime, bool isContinue)
+{
+	if (this.nowPlay_ == musicId)
+	{
+		return;
+	}
+	if (this.nowPlay_ != "")
+	{
+		this.savePlayPosition(this.nowPlay_);
+	}
+	this.lastPlay_ = this.nowPlay_;
+	this.nowPlay_ = musicId;
+	if (this.forcePlayMusic_ != "")
+	{
+		musicId = this.forcePlayMusic_;
+	}
+	this.innerPlay(musicId, fadeTime == -2147483648 ? 0 : fadeTime, isContinue);
+}
+
+void Music::fadeOut(int fadeTime)
+{
+	if (this.nowPlay_ == "")
+	{
+		return;
+	}
+	if (this.forcePlayMusic_ != "")
+	{
+		this.innerPlay(this.forcePlayMusic_, fadeTime, false);
+	}
+	else
+	{
+		this.savePlayPosition(this.nowPlay_);
+		this.innerPlay("", fadeTime, false);
+	}
+	this.lastPlay_ = this.nowPlay_;
+	this.nowPlay_ = "";
+}
+
+void Music::savePlayPosition(string musicId)
+{
+	int index = this.getLastPlayedPositionIndexFromId(musicId);
+	if (index != -1)
+	{
+		this.lastPlayedPos_[index].position = AFL_BGM_GetPlayPos();
+	}
+	else
+	{
+		MusicLastPlayedPosition p;
+		p.musicId = musicId;
+		p.position = AFL_BGM_GetPlayPos();
+		this.lastPlayedPos_.PushBack(p);
+	}
+}
+
+int Music::getLastPlayedPositionIndexFromId(string musicId)
+{
+	int i;
+	for (i = 0; i < this.lastPlayedPos_.Numof(); ++i)
+	{
+		if (this.lastPlayedPos_[i].musicId == musicId)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+void Music::playLastPlayedMusic()
+{
+	this.play(this.lastPlay_, -2147483648, false);
+}
+
+string Music::getPlayingMusicId()
+{
+	return 再生中音楽名取得();
+}
+
+string Music::getLastPlayedMusicName()
+{
+	return this.lastPlay_;
+}
+
+int Music::getLength()
+{
+	return AFL_BGM_GetPlayLength();
+}
+
+int Music::getPlayingPosition()
+{
+	return AFL_BGM_GetPlayPos();
+}
+
+void Music::forcePlay(string musicId)
+{
+	this.forcePlayMusic_ = musicId;
+	if (musicId == "")
+	{
+		this.innerPlay(this.nowPlay_, 2000, false);
+	}
+	else
+	{
+		this.innerPlay(this.forcePlayMusic_, 2000, false);
+	}
+}
+
+void Music::innerPlay(string musicId, int time, bool isContinue)
+{
+	if (isContinue)
+	{
+		int index = this.getLastPlayedPositionIndexFromId(musicId);
+		AFL_BGM_Play(musicId, 1.0, 2000);
+		if (index != -1)
+		{
+			AFL_BGM_Seek(this.lastPlayedPos_[index].position);
+		}
+	}
+	else
+	{
+		AFL_BGM_Play(musicId, 1.0, time);
+	}
+	this.handler_(musicId);
+}
+
+void Music::addHandlerFunc(FuncOnMusicPlay callbackFunc)
+{
+	this.handler_ += callbackFunc;
+}
+

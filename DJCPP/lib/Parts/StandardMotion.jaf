@@ -1,0 +1,17 @@
+PartsMotion getStandardMotion(int type)
+{
+	PartsMotion m;
+	switch (type)
+	{
+	case 0:
+		m.setKey(2, 0, 255, 0);
+		m.setTime(200);
+		break;
+	case 1:
+		m.setKey(2, 255, 0, 0);
+		m.setTime(125);
+		break;
+	}
+	return m;
+}
+

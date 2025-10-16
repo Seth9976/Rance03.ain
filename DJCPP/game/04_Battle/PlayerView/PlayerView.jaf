@@ -1,0 +1,141 @@
+PlayerView::PlayerView()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void PlayerView::init(string id)
+{
+	this.player_ <- getPlayerFromId(id);
+	this.buffView_.init(id);
+	this.hpBar_.init(this.player_.getHp(), this.player_.getMaxHp(), true, "システム／ＨＰ／下地／%s" % this.player_.getShortName());
+	this.stand_.init(id);
+	this.setPos();
+}
+
+void PlayerView::resetPos()
+{
+	getBattlePlayerViewPosition(this.player_.getId(), this.x_, this.y_);
+	this.stand_.move(this.x_, this.y_);
+	int min;
+	int max;
+	g_party.getPlayerSkillIndexMinMax(min, max, this.player_.getId());
+	float n = (min + max) / 2.0;
+	this.hpBar_.move(n * 113.0 + 35.0, n * 14.0 + 458.0);
+	this.buffView_.move((n * 113.0 + 35.0 + 159.0) - 55.0, (n * 14.0 + 458.0) - 3.0);
+}
+
+void PlayerView::showDeadMotion()
+{
+	this.stand_.showDeadMotion();
+}
+
+void PlayerView::setPos()
+{
+	this.setPosStand();
+	this.setPosHpBarBuffView();
+}
+
+void PlayerView::fadeIn(bool val)
+{
+	if (this.player_.getHp() > 0)
+	{
+		this.hpBar_.fadeIn(val, NULL);
+		this.buffView_.fadeIn(val);
+		this.stand_.fadeIn(val, NULL);
+	}
+}
+
+void PlayerView::setPosStand()
+{
+	getBattlePlayerViewPosition(this.player_.getId(), this.x_, this.y_);
+	this.stand_.setPos(this.x_, this.y_);
+}
+
+void PlayerView::setPosHpBarBuffView()
+{
+	int min;
+	int max;
+	g_party.getPlayerSkillIndexMinMax(min, max, this.player_.getId());
+	float n = (min + max) / 2.0;
+	this.hpBar_.setPos(n * 113.0 + 35.0, n * 14.0 + 458.0);
+	this.buffView_.setPos((n * 113.0 + 35.0 + 159.0) - 55.0, (n * 14.0 + 458.0) - 3.0);
+}
+
+void PlayerView::update()
+{
+}
+
+void PlayerView::setFocus(bool val)
+{
+	this.stand_.setFocus(val);
+}
+
+void PlayerView::setDamage(int val, string effectName, bool isDamage, int delay, DG_GeneralCallback onFinishShowDamageCallback)
+{
+	this.onFinishShowDamageCallback_ = onFinishShowDamageCallback;
+	this.damage_.init(val, effectName, isDamage, false, false, 0);
+	this.damage_.setPos(this.x_, this.y_ + 80, 0, 160);
+	this.damage_.run(delay, this.onFinishShowDamage);
+	if (isDamage)
+	{
+		this.stand_.showDamageMotion();
+	}
+	if (this.player_.getHp() == 0)
+	{
+		this.hpBar_.changeValue(this.player_.getHp(), this.hideHpBar);
+	}
+	else
+	{
+		this.hpBar_.changeValue(this.player_.getHp(), NULL);
+	}
+}
+
+void PlayerView::hideHpBar()
+{
+	this.hpBar_.fadeIn(false, NULL);
+}
+
+void PlayerView::onFinishShowDamage()
+{
+	this.onFinishShowDamageCallback_();
+}
+
+void PlayerView::popupMessage(string msg, DG_GeneralCallback cb)
+{
+	this.popup_.init(msg);
+	this.popup_.setPos(this.x_, this.y_ + 80);
+	this.popup_.popup(1000, cb);
+}
+
+void PlayerView::hidePopup()
+{
+	this.popup_.fadeIn(false);
+}
+
+void PlayerView::updateHp()
+{
+	this.hpBar_.changeValue(this.player_.getHp(), NULL);
+}
+
+string PlayerView::getId()
+{
+	return this.player_.getId();
+}
+
+void PlayerView::showEffect(string effectName)
+{
+	this.effect_.init(effectName);
+	this.effect_.setPos(this.x_, this.y_);
+	this.effect_.run(3);
+}
+
+bool PlayerView::isMotion()
+{
+	return this.stand_.isMotion();
+}
+
+void PlayerView::updateBuffView()
+{
+	this.buffView_.updateState();
+}
+

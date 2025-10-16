@@ -1,0 +1,35 @@
+void AFL_InputText_Begin(int InputTextAreaNumber, string Text)
+{
+	g_InputText.Begin(InputTextAreaNumber, Text, true);
+}
+
+void AFL_InputHalfText_Begin(int InputTextAreaNumber, string Text)
+{
+	g_InputText.Begin(InputTextAreaNumber, Text, false);
+}
+
+void AFL_InputText_Update()
+{
+	g_InputText.Update();
+}
+
+void AFL_InputText_End()
+{
+	g_InputText.End();
+}
+
+bool AFL_InputText_IsEnd()
+{
+	return g_InputText.IsEnd();
+}
+
+string AFL_InputText_GetText()
+{
+	return g_InputText.GetInputText();
+}
+
+bool AFL_InputText_IsConverting()
+{
+	return g_InputText.IsConverting();
+}
+

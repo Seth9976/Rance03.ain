@@ -1,0 +1,44 @@
+PartsBranch::PartsBranch()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void PartsBranch::init(int parentPartsNumber)
+{
+	this.parts_.init("システム／マップ／ライン", 0);
+	this.parts_.setShow(true);
+	this.parts_.setOrigin(5);
+	this.parts_.setAlpha(180.0);
+	this.parts_.setZ(30.0);
+	if (parentPartsNumber != 0)
+	{
+		this.parts_.setParent(parentPartsNumber);
+	}
+}
+
+void PartsBranch::setPos(int x1, int y1, int x2, int y2)
+{
+	this.parts_.setPos((x1 + x2) / 2, (y1 + y2) / 2);
+	float dx = x2 - x1;
+	float dy = y2 - y1;
+	float d = Math.Sqrt(dx * dx + dy * dy);
+	this.parts_.setCgRange(0, 0, int(d) & -16, this.parts_.getHeight());
+	float rot = (Math.Atan2(dy, dx) / 3.141592) * 180.0;
+	this.parts_.setXYRot(rot);
+}
+
+void PartsBranch::update()
+{
+}
+
+void PartsBranch::setShow(bool val)
+{
+	this.parts_.setShow(val);
+}
+
+void PartsBranch::fadeIn(bool val, DG_GeneralCallback onFinishCallback)
+{
+	this.parts_.setShow(true);
+	this.parts_.runMotion(getStandardMotion(val ? 0 : 1), onFinishCallback);
+}
+

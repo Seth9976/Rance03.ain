@@ -1,0 +1,861 @@
+CMessageTextView::CMessageTextView()
+{
+	this.m_DrawSpriteFadeTotalTime = 200;
+}
+
+void CMessageTextView::Clear()
+{
+	this.m_MessageDrawParts.Free();
+	this.m_DrawCharList.Free();
+}
+
+void CMessageTextView::CreateDrawCharList(ref CMessageTextModel MessageTextModel)
+{
+	this.Clear();
+	int Time;
+	int CurrentMessageWindowNumber = -1;
+	int NumofMessage = MessageTextModel.GetNumofMessage();
+	int DrawX;
+	int DrawY;
+	int Message;
+	for (Message = 0; Message < NumofMessage; )
+	{
+		ref CMessageText MessageText = MessageTextModel.GetMessage(Message);
+		if (MessageText.nType == 3)
+		{
+			this.FreezeDrawCharListBeforeC();
+			Time = 0;
+			Message++;
+			continue;
+		}
+		int MessageEnd;
+		for (MessageEnd = Message; MessageEnd < NumofMessage; MessageEnd++)
+		{
+			if (MessageTextModel.GetMessage(MessageEnd).nType == 1)
+			{
+				MessageEnd++;
+				break;
+			}
+			else if (MessageTextModel.GetMessage(MessageEnd).nType == 3)
+			{
+				break;
+			}
+		}
+		int Index;
+		for (Index = Message; Index < MessageEnd; Index++)
+		{
+			ref CMessageText MessageText = MessageTextModel.GetMessage(Index);
+			if (CurrentMessageWindowNumber != MessageText.MessageWindowNumber)
+			{
+				this.GetHomePosition(MessageText.MessageWindowNumber, DrawX, DrawY);
+				CurrentMessageWindowNumber = MessageText.MessageWindowNumber;
+			}
+		}
+		int MaxCharHeight = this.CalcMaxCharHeight(MessageTextModel, Message, MessageEnd, CurrentMessageWindowNumber);
+		this.CreateDrawChar(MessageTextModel, Message, MessageEnd, MaxCharHeight, Time, DrawX, DrawY);
+		Message = MessageEnd;
+	}
+	this.MoveTextPosForLayout(MessageTextModel);
+}
+
+void CMessageTextView::GetHomePosition(int MessageWindowNumber, ref int DrawX, ref int DrawY)
+{
+	int Index;
+	for (Index = this.m_DrawCharList.Numof() - 1; Index >= 0; --Index)
+	{
+		ref SDrawChar Char = this.m_DrawCharList[Index];
+		if (Char.nType != 0)
+		{
+			continue;
+		}
+		if (Char.MessageWindowNumber != MessageWindowNumber)
+		{
+			continue;
+		}
+		DrawX = Char.nX + Char.nWidth + Char.CharSpace;
+		DrawY = Char.nY;
+		return;
+	}
+	ref CMessageWindowModel MessageWindow = g_MessageWindowModelManager.GetMessageWindow(MessageWindowNumber);
+	CASRect TextAreaRect;
+	TextAreaRect = MessageWindow.GetTextAreaRect();
+	DrawX = TextAreaRect.GetX();
+	DrawY = TextAreaRect.GetY();
+}
+
+int CMessageTextView::CalcMaxCharHeight(ref CMessageTextModel MessageTextModel, int Begin, int End, int MessageWindowNumber)
+{
+	int Result = g_MessageWindowModelManager.GetMessageWindow(MessageWindowNumber).GetFontSize();
+	int Index;
+	for (Index = Begin; Index < End; Index++)
+	{
+		ref CMessageText Message = MessageTextModel.GetMessage(Index);
+		if (Message.nType != 0 && Message.nType != 1)
+		{
+			continue;
+		}
+		int Height = this.CalcCharHeight(Message);
+		if (Result < Height)
+		{
+			Result = Height;
+		}
+	}
+	return Result;
+}
+
+int CMessageTextView::CalcCharHeight(ref CMessageText Message)
+{
+	int nMaxSize = Math.Max(Math.Ceil(this.DecideFontWeight(Message)), Math.Ceil(this.DecideFontEdgeWeight(Message))) * 2;
+	return this.DecideFontSize(Message) + nMaxSize;
+}
+
+void CMessageTextView::CreateDrawChar(ref CMessageTextModel MessageTextModel, int Begin, int End, int MaxCharHeight, ref int Time, ref int DrawX, ref int DrawY)
+{
+	float _fSpeedRatio = SYS_メッセージ速度比率();
+	int Index;
+	for (Index = Begin; Index < End; Index++)
+	{
+		ref CMessageText Message = MessageTextModel.GetMessage(Index);
+		int CharSpeed = this.CalcCharSpeed(Message) * _fSpeedRatio;
+		switch (Message.nType)
+		{
+		case 0:
+			this.CreateDrawCharFromMessage(Message, MaxCharHeight, Time, CharSpeed, MessageTextModel, DrawX, DrawY);
+			break;
+		case 1:
+			this.CreateDrawCharNewLine(Message, MaxCharHeight, DrawX, DrawY);
+			break;
+		case 2:
+			SDrawChar _Char;
+			_Char.nType = 1;
+			_Char.MessageWindowNumber = Message.MessageWindowNumber;
+			_Char.Voice = Message.Voice;
+			this.m_DrawCharList.PushBack(_Char);
+			break;
+		case 3:
+			break;
+		}
+	}
+}
+
+void CMessageTextView::CreateDrawCharFromMessage(ref CMessageText Message, int MaxCharHeight, ref int Time, int CharSpeed, ref CMessageTextModel MessageTextModel, ref int DrawX, ref int DrawY)
+{
+	int nWeightSize = Math.Max(Math.Ceil(this.DecideFontWeight(Message)), Math.Ceil(this.DecideFontEdgeWeight(Message))) * 2;
+	int CharHeight = this.DecideFontSize(Message) + nWeightSize;
+	int nCharSpaceWidth = g_MessageWindowModelManager.GetMessageWindow(Message.MessageWindowNumber).字間;
+	SDrawChar _Char;
+	_Char.nType = 0;
+	_Char.MessageWindowNumber = Message.MessageWindowNumber;
+	_Char.CharSpace = nCharSpaceWidth;
+	_Char.Height = CharHeight;
+	_Char.MaxHeightInLine = MaxCharHeight;
+	this.SetCharSpritePropertyFromMessageText(_Char, Message, MessageTextModel);
+	ref string MessageText = Message.MessageText;
+	int nMessageLength = MessageText.Length();
+	int Char;
+	for (Char = 0; Char < nMessageLength; Char++)
+	{
+		_Char.CharText = MessageText.GetPart(Char, 1);
+		_Char.nX = DrawX;
+		_Char.nY = DrawY;
+		if (_Char.CharText == "―")
+		{
+			int nNumofDashChar;
+			++Char;
+			for (; Char < MessageText.Length(); ++Char)
+			{
+				if (MessageText.GetPart(Char, 1) != "―")
+				{
+					--Char;
+					break;
+				}
+				_Char.CharText += "―";
+				nNumofDashChar++;
+			}
+			int TextWidth;
+			int TextHeight;
+			PARTS_TextParts_CalcSize(_Char.Property, _Char.CharText, TextWidth, TextHeight, nCharSpaceWidth, 0);
+			_Char.nWidth = TextWidth + nCharSpaceWidth;
+			DrawX += TextWidth + nCharSpaceWidth;
+			_Char.nTime = Time;
+			Time += CharSpeed * nNumofDashChar;
+		}
+		else
+		{
+			int TextWidth;
+			int TextHeight;
+			PARTS_TextParts_CalcSize(_Char.Property, _Char.CharText, TextWidth, TextHeight, 0, 0);
+			_Char.nWidth = TextWidth;
+			DrawX += TextWidth + nCharSpaceWidth;
+			_Char.nTime = Time;
+			Time += CharSpeed;
+		}
+		this.m_DrawCharList.PushBack(_Char);
+	}
+}
+
+void CMessageTextView::CreateDrawCharNewLine(ref CMessageText Message, int MaxCharHeight, ref int DrawX, ref int DrawY)
+{
+	ref CMessageWindowModel MessageWindow = g_MessageWindowModelManager.GetMessageWindow(Message.MessageWindowNumber);
+	CASRect TextAreaRect;
+	TextAreaRect = MessageWindow.GetTextAreaRect();
+	DrawX = TextAreaRect.GetX();
+	DrawY += MaxCharHeight;
+	DrawY += MessageWindow.行間;
+}
+
+void CMessageTextView::FreezeDrawCharListBeforeC()
+{
+	int Index;
+	for (Index = 0; Index < this.m_DrawCharList.Numof(); )
+	{
+		switch (this.m_DrawCharList[Index].nType)
+		{
+		case 0:
+			this.m_DrawCharList[Index].nTime = 0;
+			Index++;
+			break;
+		case 1:
+			this.m_DrawCharList.Erase(Index);
+			break;
+		default:
+			Index++;
+		}
+	}
+}
+
+void CMessageTextView::SetCharSpritePropertyFromMessageText(ref SDrawChar _Char, ref CMessageText Message, ref CMessageTextModel MessageTextModel)
+{
+	int Red = this.DecideFontColorR(Message);
+	int Green = this.DecideFontColorG(Message);
+	int Blue = this.DecideFontColorB(Message);
+	_Char.DefaultRed = Red;
+	_Char.DefaultGreen = Green;
+	_Char.DefaultBlue = Blue;
+	if (AFL_Config_ChangesReadTextColor() && MessageTextModel.IsReadMessage(Message))
+	{
+		AFL_Config_GetReadTextColor(AFL_Config_GetReadTextColorIndex(), Red, Green, Blue);
+	}
+	_Char.Property.SetType(this.DecideFontType(Message));
+	_Char.Property.SetSize(this.DecideFontSize(Message));
+	_Char.Property.SetColor(CF_CASColor(Red, Green, Blue, 255));
+	_Char.Property.SetBoldWeight(this.DecideFontWeight(Message));
+	_Char.Property.SetEdgeWeight(this.DecideFontEdgeWeight(Message));
+	_Char.Property.SetEdgeColor(CF_CASColor(this.DecideFontEdgeColorR(Message), this.DecideFontEdgeColorG(Message), this.DecideFontEdgeColorB(Message), 255));
+}
+
+int CMessageTextView::DecideFontType(ref CMessageText MessageText)
+{
+	if (MessageText.Ｍフォント != -1)
+	{
+		return MessageText.Ｍフォント;
+	}
+	return g_MessageWindowModelManager.GetMessageWindow(MessageText.MessageWindowNumber).フォント;
+}
+
+int CMessageTextView::DecideFontSize(ref CMessageText MessageText)
+{
+	if (MessageText.Ｍサイズ != -1)
+	{
+		return MessageText.Ｍサイズ;
+	}
+	return g_MessageWindowModelManager.GetMessageWindow(MessageText.MessageWindowNumber).GetFontSize();
+}
+
+int CMessageTextView::DecideFontColorR(ref CMessageText MessageText)
+{
+	if (MessageText.ＭＲ != -1)
+	{
+		return MessageText.ＭＲ;
+	}
+	return g_MessageWindowModelManager.GetMessageWindow(MessageText.MessageWindowNumber).文字Ｒ;
+}
+
+int CMessageTextView::DecideFontColorG(ref CMessageText MessageText)
+{
+	if (MessageText.ＭＧ != -1)
+	{
+		return MessageText.ＭＧ;
+	}
+	return g_MessageWindowModelManager.GetMessageWindow(MessageText.MessageWindowNumber).文字Ｇ;
+}
+
+int CMessageTextView::DecideFontColorB(ref CMessageText MessageText)
+{
+	if (MessageText.ＭＢ != -1)
+	{
+		return MessageText.ＭＢ;
+	}
+	return g_MessageWindowModelManager.GetMessageWindow(MessageText.MessageWindowNumber).文字Ｂ;
+}
+
+float CMessageTextView::DecideFontWeight(ref CMessageText MessageText)
+{
+	if (MessageText.Ｍ太さ != -1 && MessageText.Ｍ太さ != -2147483648)
+	{
+		return this.CalcFontWeight(MessageText.Ｍ太さ);
+	}
+	return g_MessageWindowModelManager.GetMessageWindow(MessageText.MessageWindowNumber).GetFontRealWeight();
+}
+
+float CMessageTextView::DecideFontEdgeWeight(ref CMessageText MessageText)
+{
+	if (MessageText.Ｍ縁取り幅 >= 0.0)
+	{
+		return MessageText.Ｍ縁取り幅;
+	}
+	return g_MessageWindowModelManager.GetMessageWindow(MessageText.MessageWindowNumber).GetEdgeWeight();
+}
+
+int CMessageTextView::DecideFontEdgeColorR(ref CMessageText MessageText)
+{
+	if (MessageText.Ｍ縁取りＲ != -1)
+	{
+		return MessageText.Ｍ縁取りＲ;
+	}
+	return g_MessageWindowModelManager.GetMessageWindow(MessageText.MessageWindowNumber).GetEdgeColorR();
+}
+
+int CMessageTextView::DecideFontEdgeColorG(ref CMessageText MessageText)
+{
+	if (MessageText.Ｍ縁取りＧ != -1)
+	{
+		return MessageText.Ｍ縁取りＧ;
+	}
+	return g_MessageWindowModelManager.GetMessageWindow(MessageText.MessageWindowNumber).GetEdgeColorG();
+}
+
+int CMessageTextView::DecideFontEdgeColorB(ref CMessageText MessageText)
+{
+	if (MessageText.Ｍ縁取りＢ != -1)
+	{
+		return MessageText.Ｍ縁取りＢ;
+	}
+	return g_MessageWindowModelManager.GetMessageWindow(MessageText.MessageWindowNumber).GetEdgeColorB();
+}
+
+float CMessageTextView::CalcFontWeight(int Weight)
+{
+	if (Weight <= 400)
+	{
+		return 0.0;
+	}
+	float fWeight = ((Weight - 400) * 2.0) / 600.0;
+	if (fWeight > 2.0)
+	{
+		fWeight = 2.0;
+	}
+	return fWeight;
+}
+
+int CMessageTextView::CalcCharSpeed(ref CMessageText Message)
+{
+	if (Message.Ｍ速度 != -1)
+	{
+		return Message.Ｍ速度;
+	}
+	return g_MessageWindowModelManager.GetMessageWindow(Message.MessageWindowNumber).文字速度;
+}
+
+void CMessageTextView::Draw(ref CMessageTextModel MessageTextModel)
+{
+	this.CreateDrawCharList(MessageTextModel);
+	PARTS_BeginMotion();
+	this.DrawCharList();
+}
+
+void CMessageTextView::DrawAll(ref CMessageTextModel MessageTextModel)
+{
+	this.CreateDrawCharList(MessageTextModel);
+	this.DrawCharListAll();
+}
+
+int CMessageTextView::CalcTotalTime()
+{
+	int TotalTime;
+	int Index;
+	for (Index = 0; Index < this.m_DrawCharList.Numof(); Index++)
+	{
+		TotalTime += this.m_DrawCharList[Index].nTime;
+	}
+	return TotalTime;
+}
+
+void CMessageTextView::DrawCharList()
+{
+	SYS_メッセージモード更新();
+	int Index;
+	float _fSpeedRatio = SYS_メッセージ速度比率();
+	int TotalTime = this.CalcTotalTime();
+	if (_fSpeedRatio > 0.0 && g_MessageWindowModelManager.GetMessageWindow(g_MessageWindowStatusManager.GetActiveMessageWindowNumber()).文字速度 != 0 && TotalTime != 0)
+	{
+		CASTimer Timer;
+		Timer.Reset();
+		for (; Index < this.m_DrawCharList.Numof(); Index++)
+		{
+			if (this.m_DrawCharList[Index].nTime > 0)
+			{
+				break;
+			}
+			this.DrawChar(this.m_DrawCharList[Index], true, false);
+		}
+		this.FixAllDrawCharListAlphaRate();
+		sys_btn_fnc_t OnCursorSystemButton;
+		for (; ; )
+		{
+			if (this.IsWheelRotate())
+			{
+				break;
+			}
+			if (Index >= this.m_DrawCharList.Numof() && this.IsFinishedDrawCharListFadeIn())
+			{
+				break;
+			}
+			if (SYS_全文スキップ中確認())
+			{
+				break;
+			}
+			if (SYS_スキップ中確認())
+			{
+				break;
+			}
+			if (this.IsKeysDown())
+			{
+				break;
+			}
+			if (this.IsJoyKeysDown())
+			{
+				break;
+			}
+			float _fTime = Timer.Get();
+			if (Index < this.m_DrawCharList.Numof())
+			{
+				if (this.m_DrawCharList[Index].nTime <= _fTime)
+				{
+					if (this.DrawChar(this.m_DrawCharList[Index], true, true))
+					{
+						Index++;
+					}
+				}
+			}
+			sys_btn_fnc_t PrevOnCursorSystemButton = OnCursorSystemButton;
+			g_SystemButtonViewList.Update();
+			OnCursorSystemButton = g_SystemButtonViewList.GetSelectedFunc();
+			if (!SYS_IsSame_sys_btn_fnc_t(PrevOnCursorSystemButton, OnCursorSystemButton) && OnCursorSystemButton.Numof() != 0)
+			{
+				g_SystemButtonViewList.PlayOnCursorSound();
+			}
+			this.UpdateDrawCharListAlphaRate(_fTime, this.m_DrawSpriteFadeTotalTime);
+			PARTS_UpdateMotion(true);
+			AFL_View_Update(true);
+			PrevOnCursorSystemButton.Clear();
+		}
+		OnCursorSystemButton.Clear();
+	}
+	for (; Index < this.m_DrawCharList.Numof(); Index++)
+	{
+		this.DrawChar(this.m_DrawCharList[Index], true, false);
+	}
+	this.FixAllDrawCharListAlphaRate();
+	PARTS_UpdateMotion(true);
+	AFL_View_Update(true);
+}
+
+bool CMessageTextView::IsFinishedDrawCharListFadeIn()
+{
+	int nIndex;
+	for (nIndex = 0; nIndex < this.m_MessageDrawParts.Numof(); nIndex++)
+	{
+		ref CMessageDrawParts MessageDrawParts = this.m_MessageDrawParts[nIndex];
+		if (MessageDrawParts.IsFixed())
+		{
+			continue;
+		}
+		if (MessageDrawParts.GetAlphaRate() < 255)
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+void CMessageTextView::UpdateDrawCharListAlphaRate(float fTime, float fTimeLength)
+{
+	int nIndex;
+	for (nIndex = 0; nIndex < this.m_MessageDrawParts.Numof(); nIndex++)
+	{
+		ref CMessageDrawParts MessageDrawParts = this.m_MessageDrawParts[nIndex];
+		if (MessageDrawParts.IsFixed())
+		{
+			continue;
+		}
+		int nTime = MessageDrawParts.GetTime();
+		int nAlphaRate = Math.Min(Math.Max(((fTime - nTime) * 255.0) / fTimeLength, 0), 255);
+		MessageDrawParts.SetAlphaRate(nAlphaRate);
+	}
+}
+
+void CMessageTextView::FixAllDrawCharListAlphaRate()
+{
+	int nIndex;
+	for (nIndex = 0; nIndex < this.m_MessageDrawParts.Numof(); nIndex++)
+	{
+		this.m_MessageDrawParts[nIndex].SetFixed();
+	}
+}
+
+void CMessageTextView::DrawCharListAll()
+{
+	int Index;
+	for (Index = 0; Index < this.m_DrawCharList.Numof(); Index++)
+	{
+		this.DrawChar(this.m_DrawCharList[Index], false, false);
+	}
+}
+
+bool CMessageTextView::DrawChar(ref SDrawChar _Char, bool _bEffect, bool bAlphaFadeInFinishedCheck)
+{
+	switch (_Char.nType)
+	{
+	case 0:
+		this.m_MessageDrawParts.Realloc(this.m_MessageDrawParts.Numof() + 1);
+		ref CMessageDrawParts MessageDrawParts = this.m_MessageDrawParts[this.m_MessageDrawParts.Numof() - 1];
+		MessageDrawParts.SetCharSprite(_Char.nTime, _Char.MessageWindowNumber);
+		MessageDrawParts.SetFontProperty(_Char.Property);
+		MessageDrawParts.SetFontCharSpace(_Char.CharSpace);
+		MessageDrawParts.SetText(_Char.CharText);
+		int nBaseX = g_MessageWindowModelManager.GetMessageWindow(_Char.MessageWindowNumber).GetX();
+		int nBaseY = g_MessageWindowModelManager.GetMessageWindow(_Char.MessageWindowNumber).GetY();
+		int nBaseZ = g_MessageWindowModelManager.GetZ() + g_MessageWindowManager.GetOffsetZ(_Char.MessageWindowNumber);
+		int OffsetTextZRange = g_MessageWindowModelManager.GetTextOffsetZ();
+		int CharX = nBaseX + _Char.nX;
+		int CharY = nBaseY + _Char.nY + (_Char.MaxHeightInLine - _Char.Height);
+		MessageDrawParts.SetPos(CharX, CharY);
+		MessageDrawParts.SetZ(nBaseZ + OffsetTextZRange);
+		MessageDrawParts.SetShow(true);
+		MessageDrawParts.SetAlphaRate(255);
+		MessageDrawParts.SetDefaultFontColor(_Char.DefaultRed, _Char.DefaultGreen, _Char.DefaultBlue);
+		MessageDrawParts.SetAddColor(_Char.Red, _Char.Green, _Char.Blue);
+		if (g_DrawMessageCharFunction.Numof() != 0)
+		{
+			g_DrawMessageCharFunction(_Char.CharText);
+		}
+		break;
+	case 1:
+		if (_bEffect && !_Char.Voice.Empty() && !SYS_スキップ中確認() && !SYS_全文スキップ中確認())
+		{
+			SYS_PlayVoice(_Char.Voice);
+		}
+		break;
+	}
+	return true;
+}
+
+bool CMessageTextView::IsKeysDown()
+{
+	if (AFL_IsKeyDown(1) || AFL_IsKeyDown(13) || AFL_IsKeyDown(2) || AFL_IsKeyDown(27) || AFL_IsKeyDown(32) || AFL_IsKeyDown(65) || AFL_IsKeyDown(83) || AFL_IsKeyDown(4) || AFL_IsKeyDown(90) || AFL_IsKeyDown(33) || AFL_IsKeyDown(8) || AFL_IsKeyDown(36) || AFL_IsKeyDown(38) || AFL_IsKeyDown(40))
+	{
+		return true;
+	}
+	return false;
+}
+
+bool CMessageTextView::IsJoyKeysDown()
+{
+	int JoyKey;
+	for (JoyKey = 5; JoyKey <= 20; JoyKey++)
+	{
+		if (AFL_Joystick_IsKeyDown(0, JoyKey))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool CMessageTextView::IsWheelRotate()
+{
+	if (SYS_ホイールフォア即確認())
+	{
+		SYS_バックログオープン通知();
+		return true;
+	}
+	if (!SYS_スキップ中確認())
+	{
+		if (SYS_ホイールバック確認())
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void CMessageTextView::ClearMessageTextAndSetHome(int MessageWindowNumber)
+{
+	int Index;
+	for (Index = 0; Index < this.m_MessageDrawParts.Numof(); )
+	{
+		if (this.m_MessageDrawParts[Index].GetMessageWindowNumber() == MessageWindowNumber)
+		{
+			this.m_MessageDrawParts.Erase(Index);
+		}
+		else
+		{
+			Index++;
+		}
+	}
+	this.m_DrawCharList.Free();
+}
+
+void CMessageTextView::SetShow(bool bShow)
+{
+	int Index;
+	for (Index = 0; Index < this.m_MessageDrawParts.Numof(); Index++)
+	{
+		this.m_MessageDrawParts[Index].SetShow(bShow);
+	}
+}
+
+void CMessageTextView::UpdateZByMessageWindowZChanged()
+{
+	int Index;
+	for (Index = 0; Index < this.m_MessageDrawParts.Numof(); Index++)
+	{
+		this.m_MessageDrawParts[Index].UpdateZByMessageWindowZChanged();
+	}
+}
+
+void CMessageTextView::MoveTextPosForLayout(ref CMessageTextModel MessageTextModel)
+{
+	array@int MessageWindowNumberList;
+	array@int LayoutTypeList;
+	this.GetNeedLayoutMessageWindowNumberList(MessageWindowNumberList, LayoutTypeList, MessageTextModel);
+	if (MessageWindowNumberList.Empty())
+	{
+		return;
+	}
+	this.MoveTextXPosForLayout(MessageWindowNumberList, LayoutTypeList);
+	this.MoveTextYPosForLayout(MessageWindowNumberList, LayoutTypeList);
+}
+
+void CMessageTextView::GetNeedLayoutMessageWindowNumberList(ref array@int MessageWindowNumberList, ref array@int LayoutTypeList, ref CMessageTextModel MessageTextModel)
+{
+	int NumofMessage = MessageTextModel.GetNumofMessage();
+	int Message;
+	for (Message = 0; Message < NumofMessage; Message++)
+	{
+		ref CMessageText MessageText = MessageTextModel.GetMessage(Message);
+		if (MessageText.nType != 0)
+		{
+			continue;
+		}
+		if (MessageText.Ｍ配置 == 1)
+		{
+			continue;
+		}
+		if (MessageWindowNumberList.Find(0, MessageWindowNumberList.Numof(), MessageText.MessageWindowNumber) != -1)
+		{
+			continue;
+		}
+		MessageWindowNumberList.PushBack(MessageText.MessageWindowNumber);
+		LayoutTypeList.PushBack(MessageText.Ｍ配置);
+	}
+}
+
+void CMessageTextView::MoveTextXPosForLayout(ref array@int MessageWindowNumberList, ref array@int LayoutTypeList)
+{
+	int WindowIndex;
+	for (WindowIndex = 0; WindowIndex < MessageWindowNumberList.Numof(); WindowIndex++)
+	{
+		int MessageWindowNumber = MessageWindowNumberList[WindowIndex];
+		int LayoutType = LayoutTypeList[WindowIndex];
+		this.MoveTextXPosOnWindow(MessageWindowNumber, LayoutType);
+	}
+}
+
+void CMessageTextView::MoveTextXPosOnWindow(int MessageWindowNumber, int LayoutType)
+{
+	ref CMessageWindowModel MessageWindow = g_MessageWindowModelManager.GetMessageWindow(MessageWindowNumber);
+	CASRect TextAreaRect;
+	TextAreaRect = MessageWindow.GetTextAreaRect();
+	if (TextAreaRect.GetWidth() <= 0 || TextAreaRect.GetHeight() <= 0)
+	{
+		return;
+	}
+	if (LayoutType == 1 || LayoutType == 4 || LayoutType == 7)
+	{
+		return;
+	}
+	int TargetY = -2147483648;
+	int TotalWidth;
+	int LastCharSpace;
+	int BeginIndex;
+	int CharIndex;
+	for (CharIndex = 0; CharIndex < this.m_DrawCharList.Numof(); )
+	{
+		ref SDrawChar Char = this.m_DrawCharList[CharIndex];
+		if (Char.MessageWindowNumber != MessageWindowNumber)
+		{
+			continue;
+		}
+		if (TargetY == -2147483648)
+		{
+			TargetY = Char.nY;
+		}
+		else if (TargetY != Char.nY)
+		{
+			TotalWidth -= LastCharSpace;
+			int OffsetX = this.CalcOffsetX(TextAreaRect.GetWidth() - TotalWidth, LayoutType);
+			int n;
+			for (n = BeginIndex; n < CharIndex; n++)
+			{
+				ref SDrawChar TargetChar = this.m_DrawCharList[n];
+				if (TargetChar.MessageWindowNumber != MessageWindowNumber)
+				{
+					continue;
+				}
+				TargetChar.nX += OffsetX;
+			}
+			TargetY = -2147483648;
+			TotalWidth = 0;
+			LastCharSpace = 0;
+			BeginIndex = CharIndex;
+			continue;
+		}
+		TotalWidth += Char.nWidth + Char.CharSpace;
+		LastCharSpace = Char.CharSpace;
+		++CharIndex;
+	}
+	TotalWidth -= LastCharSpace;
+	int OffsetX = this.CalcOffsetX(TextAreaRect.GetWidth() - TotalWidth, LayoutType);
+	int n;
+	for (n = BeginIndex; n < CharIndex; n++)
+	{
+		ref SDrawChar TargetChar = this.m_DrawCharList[n];
+		if (TargetChar.MessageWindowNumber != MessageWindowNumber)
+		{
+			continue;
+		}
+		TargetChar.nX += OffsetX;
+	}
+}
+
+int CMessageTextView::CalcOffsetX(int Width, int LayoutType)
+{
+	switch (LayoutType)
+	{
+	case 1:
+	case 4:
+	case 7:
+		return 0;
+	case 2:
+	case 5:
+	case 8:
+		return Width / 2;
+	}
+	return Width;
+}
+
+void CMessageTextView::MoveTextYPosForLayout(ref array@int MessageWindowNumberList, ref array@int LayoutTypeList)
+{
+	int WindowIndex;
+	for (WindowIndex = 0; WindowIndex < MessageWindowNumberList.Numof(); WindowIndex++)
+	{
+		int MessageWindowNumber = MessageWindowNumberList[WindowIndex];
+		int LayoutType = LayoutTypeList[WindowIndex];
+		this.MoveTextYPosOnWindow(MessageWindowNumber, LayoutType);
+	}
+}
+
+void CMessageTextView::MoveTextYPosOnWindow(int MessageWindowNumber, int LayoutType)
+{
+	ref CMessageWindowModel MessageWindow = g_MessageWindowModelManager.GetMessageWindow(MessageWindowNumber);
+	CASRect TextAreaRect;
+	TextAreaRect = MessageWindow.GetTextAreaRect();
+	if (TextAreaRect.GetWidth() <= 0 || TextAreaRect.GetHeight() <= 0)
+	{
+		return;
+	}
+	if (LayoutType == 1 || LayoutType == 2 || LayoutType == 3)
+	{
+		return;
+	}
+	int MinY = 2147483647;
+	int MaxY = -2147483648;
+	int CharIndex;
+	for (CharIndex = 0; CharIndex < this.m_DrawCharList.Numof(); CharIndex++)
+	{
+		ref SDrawChar Char = this.m_DrawCharList[CharIndex];
+		if (Char.MessageWindowNumber != MessageWindowNumber)
+		{
+			continue;
+		}
+		if (MinY > Char.nY)
+		{
+			MinY = Char.nY;
+		}
+		if (MaxY < Char.nY + Char.MaxHeightInLine)
+		{
+			MaxY = Char.nY + Char.MaxHeightInLine;
+		}
+	}
+	if (MinY == 2147483647 || MaxY == -2147483648)
+	{
+		return;
+	}
+	int TotalHeight = MaxY - MinY;
+	int OffsetY = this.CalcOffsetY(TextAreaRect.GetHeight() - TotalHeight, LayoutType);
+	for (CharIndex = 0; CharIndex < this.m_DrawCharList.Numof(); CharIndex++)
+	{
+		ref SDrawChar Char = this.m_DrawCharList[CharIndex];
+		if (Char.MessageWindowNumber != MessageWindowNumber)
+		{
+			continue;
+		}
+		Char.nY += OffsetY;
+	}
+}
+
+int CMessageTextView::CalcOffsetY(int Height, int LayoutType)
+{
+	switch (LayoutType)
+	{
+	case 1:
+	case 2:
+	case 3:
+		return 0;
+	case 4:
+	case 5:
+	case 6:
+		return Height / 2;
+	}
+	return Height;
+}
+
+void CMessageTextView::GetTextPartsNumberList(ref array@int List)
+{
+	int Index;
+	for (Index = 0; Index < this.m_MessageDrawParts.Numof(); Index++)
+	{
+		List.PushBack(this.m_MessageDrawParts[Index].GetPartsNumber());
+	}
+}
+
+void CMessageTextView::GetTextFontColorList(ref array@CASColor List)
+{
+	int Index;
+	for (Index = 0; Index < this.m_MessageDrawParts.Numof(); Index++)
+	{
+		List.PushBack(CF_CASColor(this.m_MessageDrawParts[Index].GetDefaultFontRed(), this.m_MessageDrawParts[Index].GetDefaultFontGreen(), this.m_MessageDrawParts[Index].GetDefaultFontBlue(), 255));
+	}
+}
+
+void CMessageTextView::SetPartsLayer(int ID)
+{
+	int Index;
+	for (Index = 0; Index < this.m_MessageDrawParts.Numof(); Index++)
+	{
+		Ｐ＿親設定(this.m_MessageDrawParts[Index].GetPartsNumber(), ID);
+	}
+}
+

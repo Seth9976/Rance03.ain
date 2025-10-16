@@ -1,0 +1,98 @@
+ThumbnailButton::ThumbnailButton()
+{
+	this.gameObjectId_ = g_gameObjectManager.addFocusObject(this.update, this.isHover);
+}
+
+void ThumbnailButton::init(string thumbnailCg, bool isAvailable, int parentPartsNumber)
+{
+	this.imageName_ = thumbnailCg;
+	this.isAvailable_ = isAvailable;
+	this.parentPartsNumber_ = parentPartsNumber;
+	this.initParts();
+	this.setPartsShow();
+}
+
+void ThumbnailButton::initParts()
+{
+	this.parts_[0].init("システム／サムネイル／下地", 0);
+	if (this.isAvailable_)
+	{
+		if (Ａ＿ＣＧ存在確認(this.imageName_))
+		{
+			this.parts_[1].init(this.imageName_, 0);
+		}
+		else
+		{
+			pass("noimage" + this.imageName_);
+			this.parts_[1].initAsPlaneImage(205, 154, 200, 128, 128, 255);
+		}
+	}
+	this.parts_[2].initAsCgPlaneImage("システム／サムネイル／下地", 255, 255, 0);
+	this.parts_[2].setAlpha(128.0);
+	createPartsGroup(this.parent_, this.parts_, 6000);
+	this.parent_.setParent(this.parentPartsNumber_);
+	this.setPartsPos();
+}
+
+void ThumbnailButton::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void ThumbnailButton::setPartsPos()
+{
+	this.parts_[1].setPos(3.0, 3.0);
+}
+
+void ThumbnailButton::update()
+{
+	this.updateHover();
+	this.parts_[2].setShow(this.isHover_);
+	if (g_mouse.isClickWithFocus(this.gameObjectId_))
+	{
+		this.cb_(this.index_);
+	}
+	if (!this.lastHover_ && this.isHover_)
+	{
+		playCursor();
+	}
+	if (this.isHover_ && g_mouse.onDown(0))
+	{
+		playClick();
+	}
+	this.lastHover_ = this.isHover_;
+}
+
+void ThumbnailButton::updateHover()
+{
+	this.isHover_ = this.parent_.getAlpha() == 255 && this.isAvailable_ && AFL_Parts_IsPointIn(this.parts_[0].getPartsNumber(), g_mouse.getX(), g_mouse.getY(), 1);
+}
+
+bool ThumbnailButton::isHover()
+{
+	this.updateHover();
+	return this.isHover_;
+}
+
+void ThumbnailButton::setPos(int x, int y)
+{
+	this.parent_.setPos(x, y);
+}
+
+void ThumbnailButton::setOnClickCallback(DG_ThumbnailButtonClickCallback cb, int index)
+{
+	this.cb_ = cb;
+	this.index_ = index;
+}
+
+void ThumbnailButton::fadeIn(bool val)
+{
+	this.setPartsShow();
+	this.parent_.runMotion(getStandardMotion(val ? 0 : 1), NULL);
+}
+

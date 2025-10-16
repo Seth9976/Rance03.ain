@@ -1,0 +1,119 @@
+float AFL_Parts_GetUpperLeftPosX(int PartsNumber, int State)
+{
+	return PartsEngine.Parts_GetPartsUpperLeftPosX(PartsNumber, 1);
+}
+
+float AFL_Parts_GetUpperLeftPosY(int PartsNumber, int State)
+{
+	return PartsEngine.Parts_GetPartsUpperLeftPosY(PartsNumber, 1);
+}
+
+int AFL_Parts_GetWidth(int PartsNumber, int State)
+{
+	return PartsEngine.Parts_GetPartsWidth(PartsNumber, State);
+}
+
+int AFL_Parts_GetHeight(int PartsNumber, int State)
+{
+	return PartsEngine.Parts_GetPartsHeight(PartsNumber, State);
+}
+
+int AFL_Parts_WaitForClick(FTPARTS_WaitForClickCallback Func, bool キーキャンセル)
+{
+	return PARTS_WaitForClick(Func, キーキャンセル);
+}
+
+void AFL_Parts_EndWaitForClick(int PartsNumber)
+{
+	PARTS_EndWaitForClick(PartsNumber);
+}
+
+void AFL_Parts_SetStatus(int PartsNumber, int State)
+{
+	PartsEngine.Parts_SetInputState(PartsNumber, State);
+}
+
+int AFL_Parts_GetStatus(int PartsNumber)
+{
+	return PartsEngine.Parts_GetInputState(PartsNumber);
+}
+
+void AFL_Parts_SetLockInputState(int PartsNumber, bool Lock)
+{
+	PARTS_SetLockInputState(PartsNumber, Lock);
+}
+
+bool AFL_Parts_IsLockInputState(int PartsNumber)
+{
+	return PARTS_IsLockInputState(PartsNumber);
+}
+
+void AFL_Parts_PlaySound(int PartsNumber, int State)
+{
+	PartsEngine.Parts_PlaySound(PartsNumber, State);
+}
+
+void AFL_Parts_PlayOnCursorSound(int PartsNumber)
+{
+	PartsEngine.Parts_PlaySound(PartsNumber, 2);
+}
+
+void AFL_Parts_PlayClickSound(int PartsNumber)
+{
+	PartsEngine.Parts_PlaySound(PartsNumber, 3);
+}
+
+bool AFL_Parts_IsPointIn(int PartsNumber, int nX, int nY, int State)
+{
+	return PartsEngine.Parts_IsCursorIn(PartsNumber, nX, nY, State);
+}
+
+void AFL_Parts_SetZByBaseZ(int PartsNumber, int PosZ, int BasePosZ)
+{
+	SYS_ASSERTE_Z(PosZ);
+	SYS_ASSERTE_BASEZ(BasePosZ);
+	PartsEngine.SetComponentPosZ(PartsNumber, PosZ + BasePosZ);
+}
+
+int AFL_Parts_AddLayer(int ID)
+{
+	return PARTS_AddLayer(ID);
+}
+
+int AFL_Parts_AddTopLayer()
+{
+	int Numof = AFL_Parts_NumofLayer();
+	int TopLayer = AFL_Parts_GetLayerID(Numof - 1);
+	return AFL_Parts_AddLayer(TopLayer);
+}
+
+void AFL_Parts_EraseLayer(int ID)
+{
+	PARTS_EraseLayer(ID);
+}
+
+int AFL_Parts_SetActiveLayer(int ID)
+{
+	return PARTS_SetActiveLayer(ID);
+}
+
+int AFL_Parts_GetActiveLayer()
+{
+	return PARTS_GetActiveLayer();
+}
+
+int AFL_Parts_GetLayerIndex(int ID)
+{
+	return PARTS_GetLayerIndex(ID);
+}
+
+int AFL_Parts_GetLayerID(int Index)
+{
+	return PARTS_GetLayerID(Index);
+}
+
+int AFL_Parts_NumofLayer()
+{
+	return PARTS_NumofLayer();
+}
+

@@ -1,0 +1,197 @@
+void debugGetScenarioFunctionName(ref array@string list)
+{
+	list.Free();
+	array@string n;
+	AFL_Debug_GetFunctionNameList(n);
+	int i;
+	for (i = 0; i < n.Numof(); ++i)
+	{
+		if (n[i].GetPart(0, 3) == "ＥＶ／")
+		{
+			list.PushBack(n[i]);
+		}
+	}
+}
+
+void debugScenarioTest()
+{
+	array@DebugFunctionTextIndexMap map;
+	debugCreateScenarioTestTextIndexMap(map);
+	DebugTextIndexMapSelecter selecter;
+	selecter.setBaseCategory("ＥＶ");
+	selecter.run(map, "", "debugScenarioExecute");
+}
+
+void debugScenarioTestAllRun()
+{
+	array@string list;
+	debugGetScenarioFunctionName(list);
+	int i;
+	for (i = 0; i < list.Numof(); ++i)
+	{
+		debugInnerScenarioExecute(list[i]);
+	}
+}
+
+void debugScenarioKidokuFlag()
+{
+	array@DebugFunctionTextIndexMap map;
+	debugCreateScenarioTestTextIndexMap(map);
+	DebugTextIndexMapSelecter selecter;
+	selecter.setBaseCategory("ＥＶ");
+	selecter.run(map, "debugScenarioTestSelectShowFlag", "debugScenarioKidokuFlagExecute");
+}
+
+void debugInitScenarioFunc(ref array@DebugFunctionTextIndexMap textIndexMap, ref array@string tmp)
+{
+	textIndexMap.Alloc(tmp.Numof());
+	int i;
+	for (i = 0; i < textIndexMap.Numof(); ++i)
+	{
+		textIndexMap[i].init(tmp[i], tmp[i], "", "／");
+	}
+}
+
+void debugCreateScenarioTestTextIndexMap(ref array@DebugFunctionTextIndexMap textIndexMap)
+{
+	array@string tmp;
+	debugGetScenarioFunctionName(tmp);
+	debugInitScenarioFunc(textIndexMap, tmp);
+}
+
+void debugScenarioExecute(ref DebugFunctionTextIndexMap stFunc)
+{
+	g_scenarioTestFunc.update(stFunc.getIndexName());
+	debugInnerScenarioExecute(stFunc.getIndexName());
+}
+
+void debugInnerScenarioExecute(string func)
+{
+	AdvFunc fn;
+	fn = func;
+	fn();
+	debugCheckAdvNonReleaseObject(func);
+	g_advCommandHistory.Free();
+	g_advStand[0].hide(0, true);
+	g_advStand[1].hide(0, true);
+	g_advBackGround.hide(0, 200, true);
+	g_advNamePlate.hide();
+	g_advEventCg.hide(-1, 0);
+	g_advFullScreenEffect.hide(1, 0);
+	■音楽停止(2000);
+	■ループ効果音停止(2000);
+	g_advCommandHistory.Free();
+}
+
+void debugCheckAdvNonReleaseObject(string funcName)
+{
+	int i;
+	for (i = 0; i < g_advStand.Numof(); ++i)
+	{
+		if (g_advStand[i].isShow())
+		{
+			advErr("%s:立ち絵が残っています" % funcName);
+		}
+	}
+	if (g_advBackGround.isShow())
+	{
+		advErr("%s:背景が残っています" % funcName);
+	}
+	if (g_advMessageWindow.isShow())
+	{
+		advErr("%s:メッセージウインドウが残っています" % funcName);
+	}
+	if (g_advEventCg.isShow())
+	{
+		advErr("%s:ビジュアルが残っています" % funcName);
+	}
+	if (g_music.getPlayingMusicId() != "")
+	{
+		advErr("%s:音楽が残っています" % funcName);
+	}
+}
+
+void debugScenarioKidokuFlagExecute(ref DebugFunctionTextIndexMap stFunc)
+{
+	if (EV(stFunc.getIndexName(), -2147483648))
+	{
+		EV(stFunc.getIndexName(), 0);
+	}
+	else
+	{
+		EV(stFunc.getIndexName(), 1);
+	}
+}
+
+string debugScenarioTestSelectShowFlag(ref array@string list, string head)
+{
+	int i;
+	for (i = 0; i < list.Numof(); ++i)
+	{
+		string id = head + list[i];
+		if (isExistFunction(id))
+		{
+			選択肢(i, "[%s]%s" % (EV(id, -2147483648) == true ? "○" : "－") % id, 0);
+		}
+		else
+		{
+			選択肢(i, "----%s" % id, 0);
+		}
+	}
+	int r = テスト選択();
+	if (r != -1)
+	{
+		return list[r];
+	}
+	return "";
+}
+
+void debugScenarioTest2()
+{
+	array@string groups;
+	string key = "デバッグシナテス情報";
+	int height = EX_Height(key);
+	int i;
+	for (i = 0; i < height; ++i)
+	{
+		string g = EX_RA2String(key, i, "group", "");
+		if (groups.Empty() || groups[groups.Numof() - 1] != g)
+		{
+			groups.PushBack(g);
+		}
+	}
+	while (true)
+	{
+		int i;
+		for (i = 0; i < groups.Numof(); ++i)
+		{
+			選択肢(i, groups[i], 0);
+		}
+		int gr = テスト選択();
+		if (gr < 0)
+		{
+			break;
+		}
+		while (true)
+		{
+			for (i = 0; i < height; ++i)
+			{
+				if (EX_RA2String(key, i, "group", "") == groups[gr])
+				{
+					選択肢(i, EX_RA2String(key, i, "funcName", ""), 0);
+				}
+			}
+			int r = テスト選択();
+			if (r < 0)
+			{
+				break;
+			}
+			DG_GeneralCallback cb;
+			cb = EX_RA2String(key, r, "funcName", "");
+			cb();
+			全消去();
+			cb.Clear();
+		}
+	}
+}
+

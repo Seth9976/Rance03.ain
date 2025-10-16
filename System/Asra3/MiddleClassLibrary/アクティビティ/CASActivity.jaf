@@ -1,0 +1,342 @@
+CActivityDestinationData::CActivityDestinationData()
+{
+}
+
+void CActivityDestinationData::SetDestinationName(string ActivityName)
+{
+	this.m_DestinationName = ActivityName;
+}
+
+string CActivityDestinationData::GetDestinationName()
+{
+	return this.m_DestinationName;
+}
+
+void CActivityDestinationData::SetDestinationData(string Data)
+{
+	this.m_DestinationData = Data;
+}
+
+string CActivityDestinationData::GetDestinationData()
+{
+	return this.m_DestinationData;
+}
+
+CActivityIntentData::CActivityIntentData()
+{
+	this.Clear();
+}
+
+void CActivityIntentData::Clear()
+{
+	this.m_Destination.Free();
+	this.m_IntentType = 0;
+}
+
+bool CActivityIntentData::Empty()
+{
+	if (!this.m_Destination.Empty())
+	{
+		return false;
+	}
+	if (this.m_IntentType != 0)
+	{
+		return false;
+	}
+	return true;
+}
+
+void CActivityIntentData::AddDestination(string ActivityName)
+{
+	if (ActivityName.Empty())
+	{
+		return;
+	}
+	this.m_Destination.Realloc(this.m_Destination.Numof() + 1);
+	this.m_Destination[this.m_Destination.Numof() - 1].SetDestinationName(ActivityName);
+}
+
+void CActivityIntentData::AddRangeDestination(ref array@string NameList)
+{
+	if (NameList === NULL)
+	{
+		return;
+	}
+	int Index;
+	for (Index = 0; Index < NameList.Numof(); ++Index)
+	{
+		this.AddDestination(NameList[Index]);
+	}
+}
+
+void CActivityIntentData::AddDestinationData(string Data)
+{
+	this.m_Destination.Realloc(this.m_Destination.Numof() + 1);
+	this.m_Destination[this.m_Destination.Numof() - 1].SetDestinationData(Data);
+}
+
+bool CActivityIntentData::IsExistDestination()
+{
+	return !this.m_Destination.Empty();
+}
+
+void CActivityIntentData::SetIntentType(int Type)
+{
+	this.m_IntentType = Type;
+}
+
+int CActivityIntentData::GetIntentType()
+{
+	return this.m_IntentType;
+}
+
+bool CActivityIntentData::IsSaveActivity()
+{
+	return this.m_IntentType == 0;
+}
+
+bool CActivityIntentData::IsRemoveActivity()
+{
+	return this.m_IntentType == 1;
+}
+
+bool CActivityIntentData::IsRemoveAllActivity()
+{
+	return this.m_IntentType == 2;
+}
+
+void SActivityNamePair::Set(string FileName, string Name)
+{
+	this.m_FileName = FileName;
+	this.m_Name = Name;
+}
+
+CASPartsActivity::CASPartsActivity()
+{
+	this.m_EndKey.Free();
+	this.m_ActivityName.Free();
+	this.m_IntentData.Clear();
+}
+
+CActivityIntentData CASPartsActivity::Run(CActivityIntentData IntentData, DG_PARTS_LoadedActivityHandler dgLoadedObject, DG_PARTS_ReleasingActivityHandler dgReleasingObject, DG_PARTS_IntentActivityHandler dgIntentActivityEvent)
+{
+	CASPartsLayer Layer;
+	if (!this.LoadActivity(IntentData, dgLoadedObject))
+	{
+		return this.m_EmptyIntentData;
+	}
+	IntentData = this.RunLoop(IntentData, dgLoadedObject, dgReleasingObject, dgIntentActivityEvent);
+	if (!this.ReleaseActivity(dgReleasingObject))
+	{
+		return this.m_EmptyIntentData;
+	}
+	return IntentData;
+}
+
+CActivityIntentData CASPartsActivity::RunLoop(CActivityIntentData IntentData, DG_PARTS_LoadedActivityHandler dgLoadedObject, DG_PARTS_ReleasingActivityHandler dgReleasingObject, DG_PARTS_IntentActivityHandler dgIntentActivityEvent)
+{
+	for (; ; )
+	{
+		全表示(1, 100);
+		IntentData = this.UpdateActivity(dgIntentActivityEvent);
+		if (!IntentData.IsSaveActivity())
+		{
+			break;
+		}
+		for (; ; )
+		{
+			CASPartsActivity PartsActivity;
+			IntentData = PartsActivity.Run(IntentData, dgLoadedObject, dgReleasingObject, dgIntentActivityEvent);
+			if (IntentData.IsRemoveAllActivity())
+			{
+				return IntentData;
+			}
+			if (IntentData.IsRemoveActivity() && !IntentData.IsExistDestination())
+			{
+				break;
+			}
+		}
+	}
+	return IntentData;
+}
+
+CActivityIntentData CASPartsActivity::UpdateActivity(DG_PARTS_IntentActivityHandler dgIntentActivityEvent)
+{
+	this.m_IntentData.Clear();
+	g_EndActivity = false;
+	PARTS_BeginInput();
+	for (; ; )
+	{
+		AFL_View_Update(true);
+		if (this.IsClickEndKey() || g_EndActivity)
+		{
+			this.m_IntentData.SetIntentType(1);
+		}
+		if (!this.m_IntentData.Empty())
+		{
+			bool Cancel = false;
+			dgIntentActivityEvent(Cancel);
+			if (Cancel)
+			{
+				g_EndActivity = false;
+				this.m_IntentData.Clear();
+				continue;
+			}
+			break;
+		}
+	}
+	PARTS_EndInput();
+	g_EndActivity = false;
+	return this.m_IntentData;
+}
+
+bool CASPartsActivity::IsClickEndKey()
+{
+	int Index;
+	for (Index = 0; Index < this.m_EndKey.Numof(); ++Index)
+	{
+		if (this.m_EndKey[Index].IsClick(-2147483648))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool CASPartsActivity::LoadActivity(CActivityIntentData ActivityIntentData, DG_PARTS_LoadedActivityHandler dgObject)
+{
+	int LastZ;
+	this.m_ActivityName.Free();
+	int i;
+	for (i = 0; i < ActivityIntentData.m_Destination.Numof(); ++i)
+	{
+		ref CActivityDestinationData Destination = ActivityIntentData.m_Destination[i];
+		string FileName = Destination.GetDestinationName();
+		string Data = Destination.GetDestinationData();
+		string Name = SYS_Activity_GetFreeName(FileName);
+		if (Data.Empty())
+		{
+			if (!SYS_Activity_ReadFile(Name, FileName))
+			{
+				DIALOG_OK("アクティビティの読み込みに失敗しました【%s】" % FileName);
+				return false;
+			}
+		}
+		else if (!SYS_Activity_LoadEXText(Name, Data))
+		{
+			DIALOG_OK("バイナリアクティビティの読み込みに失敗しました");
+			return false;
+		}
+		if (!this.BindEndType(Name))
+		{
+			DIALOG_OK("終了条件の構築に失敗しました【%s】" % FileName);
+			return false;
+		}
+		if (!this.BindEndEvent(Name))
+		{
+			DIALOG_OK("終了用のイベント構築に失敗しました【%s】" % FileName);
+			return false;
+		}
+		int RootPartsNumber = SYS_Activity_GetPartsNumber(Name, "ルートパーツ");
+		if (RootPartsNumber == 0)
+		{
+			DIALOG_OK("アクティビティデータにルートパーツが存在しませんでした【%s】" % FileName);
+			return false;
+		}
+		Ｐ＿Ｚ座標設定(RootPartsNumber, LastZ);
+		LastZ = PARTS_GetAbsoluteMaxZ(RootPartsNumber) + 1;
+		int Find = FileName.Find(".pact");
+		if (Find != -1 && FileName.Length() - 5 == Find)
+		{
+			FileName = FileName.GetPart(0, Find);
+		}
+		SActivityNamePair Pair;
+		Pair.Set(FileName, Name);
+		this.m_ActivityName.PushBack(Pair);
+	}
+	for (i = 0; i < this.m_ActivityName.Numof(); ++i)
+	{
+		dgObject(this.m_ActivityName[i].m_FileName, this.m_ActivityName[i].m_Name);
+	}
+	return true;
+}
+
+bool CASPartsActivity::BindEndEvent(string ActivityName)
+{
+	int NumofParts = SYS_Activity_NumofParts(ActivityName);
+	int Index;
+	for (Index = 0; Index < NumofParts; ++Index)
+	{
+		string PartsName;
+		int PartsNumber;
+		if (!SYS_Activity_GetParts(Index, ActivityName, PartsName, PartsNumber))
+		{
+			DIALOG_OK("パーツの取得に失敗しました");
+			return false;
+		}
+		if (!SYS_Activity_IsExistIntentData(ActivityName, PartsName))
+		{
+			continue;
+		}
+		AFL_Parts_AddMouseLClickEvent(PartsNumber, this.MouseLClickEvent);
+	}
+	return true;
+}
+
+bool CASPartsActivity::BindEndType(string ActivityName)
+{
+	array@int KeyList;
+	SYS_Activity_GetEndKeyList(ActivityName, KeyList);
+	int Index;
+	for (Index = 0; Index < KeyList.Numof(); ++Index)
+	{
+		this.m_EndKey.Realloc(this.m_EndKey.Numof() + 1);
+		this.m_EndKey[this.m_EndKey.Numof() - 1].Init(KeyList[Index], true);
+	}
+	return true;
+}
+
+bool CASPartsActivity::ReleaseActivity(DG_PARTS_ReleasingActivityHandler dgReleasingObject)
+{
+	int ActivityIndex;
+	for (ActivityIndex = 0; ActivityIndex < this.m_ActivityName.Numof(); ++ActivityIndex)
+	{
+		string FileName = this.m_ActivityName[ActivityIndex].m_FileName;
+		string Name = this.m_ActivityName[ActivityIndex].m_Name;
+		dgReleasingObject(FileName, Name);
+		if (!SYS_Activity_Release(Name))
+		{
+			DIALOG_OK("アクティビティの開放に失敗しました【%s】\n" % Name);
+			return false;
+		}
+	}
+	return true;
+}
+
+void CASPartsActivity::MouseLClickEvent(int ID, int MouseX, int MouseY)
+{
+	string ActivityName = this.GetActivityName(ID);
+	string PartsName = SYS_Activity_GetPartsName(ActivityName, ID);
+	if (SYS_Activity_IsExistIntentData(ActivityName, PartsName))
+	{
+		array@string List;
+		SYS_Activity_GetIntentDataDestination(ActivityName, PartsName, List);
+		this.m_IntentData.AddRangeDestination(List);
+		this.m_IntentData.SetIntentType(SYS_Activity_GetIntentDataType(ActivityName, PartsName));
+	}
+}
+
+string CASPartsActivity::GetActivityName(int PartsNumber)
+{
+	int ActivityIndex;
+	for (ActivityIndex = 0; ActivityIndex < this.m_ActivityName.Numof(); ++ActivityIndex)
+	{
+		string Name = this.m_ActivityName[ActivityIndex].m_Name;
+		if (SYS_Activity_IsExistPartsByNumber(Name, PartsNumber))
+		{
+			return Name;
+		}
+	}
+	return "";
+}
+

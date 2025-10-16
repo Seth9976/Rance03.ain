@@ -1,0 +1,176 @@
+PartsMotion::PartsMotion()
+{
+	this.clear();
+}
+
+void PartsMotion::clear()
+{
+	this.delay_ = 0;
+	this.time_ = 200;
+	this.swingCount_ = 5;
+	this.soundName_ = "";
+	this.key_.Free();
+	this.key_.Alloc(18);
+}
+
+void PartsMotion::setMove(int fromX, int fromY, int toX, int toY, int motionType)
+{
+	this.key_[0].set(fromX, toX, motionType);
+	this.key_[1].set(fromY, toY, motionType);
+}
+
+void PartsMotion::setCgRangeMove(int fromLeft, int fromTop, int fromRight, int fromBottom, int toLeft, int toTop, int toRight, int toBottom, int motionType)
+{
+	this.key_[11].set(fromLeft, toLeft, motionType);
+	this.key_[13].set(fromRight, toRight, motionType);
+	this.key_[12].set(fromTop, toTop, motionType);
+	this.key_[14].set(fromBottom, toBottom, motionType);
+}
+
+void PartsMotion::setSwingCount(int val)
+{
+	this.swingCount_ = val;
+}
+
+int PartsMotion::getKeyFrom(int key)
+{
+	return this.key_[key].getFrom();
+}
+
+int PartsMotion::getKeyMotionType(int key)
+{
+	return this.key_[key].getMotionType();
+}
+
+int PartsMotion::getKeyTo(int key)
+{
+	return this.key_[key].getTo();
+}
+
+bool PartsMotion::isKeyEnable(int key)
+{
+	return this.key_[key].isEnable();
+}
+
+void PartsMotion::setSoundName(string soundName)
+{
+	this.soundName_ = soundName;
+}
+
+string PartsMotion::getSoundName()
+{
+	return this.soundName_;
+}
+
+void PartsMotion::setLoopSoundNumber(int number)
+{
+	this.loopSoundNumber_ = number;
+}
+
+int PartsMotion::getLoopSoundNumber()
+{
+	return this.loopSoundNumber_;
+}
+
+int PartsMotion::getSwingCount()
+{
+	return this.swingCount_;
+}
+
+void PartsMotion::setTime(int time)
+{
+	this.time_ = time;
+}
+
+int PartsMotion::getTime()
+{
+	return this.time_;
+}
+
+void PartsMotion::setDelay(int delay)
+{
+	this.delay_ = delay;
+}
+
+int PartsMotion::getDelay()
+{
+	return this.delay_;
+}
+
+void PartsMotion::setKey(int key, int from, int to, int motionType)
+{
+	this.key_[key].set(from, to, motionType);
+}
+
+void PartsMotion::setAlpha(int from, int to, int motionType)
+{
+	this.setKey(2, from, to, motionType);
+}
+
+void PartsMotion::setScaling(int from, int to, int motionType)
+{
+	this.setKey(6, from, to, motionType);
+}
+
+void PartsMotion::setShakeLevel(int from, int to, int motionType)
+{
+	this.setKey(7, from, to, motionType);
+	this.setKey(8, from, to, motionType);
+}
+
+void PartsMotion::loadFromEx(string keyBaseName)
+{
+	array@string keyName;
+	keyName.PushBack("X");
+	keyName.PushBack("Y");
+	keyName.PushBack("ALPHA");
+	keyName.PushBack("ROT_XY");
+	keyName.PushBack("ROT_XZ");
+	keyName.PushBack("ROT_YZ");
+	keyName.PushBack("SCALING");
+	keyName.PushBack("SHAKE_X");
+	keyName.PushBack("SHAKE_Y");
+	keyName.PushBack("SWING_X");
+	keyName.PushBack("SWING_Y");
+	keyName.PushBack("CGRANGE_LEFT");
+	keyName.PushBack("CGRANGE_TOP");
+	keyName.PushBack("CGRANGE_RIGHT");
+	keyName.PushBack("CGRANGE_BOTTOM");
+	keyName.PushBack("NUMBER");
+	keyName.PushBack("SPECULAR");
+	int i;
+	for (i = 0; i < keyName.Numof(); ++i)
+	{
+		string key = keyBaseName + keyName[i];
+		if (EX_IsExist(key))
+		{
+			int from = EX_AInt(key, 0, -2147483648);
+			int to = EX_AInt(key, 1, -2147483648);
+			int type = EX_AInt(key, 2, 0);
+			this.setKey(i, from, to, type);
+		}
+	}
+	if (EX_IsExist(keyBaseName + "TIME"))
+	{
+		this.setTime(EX_Int(keyBaseName + "TIME", 0));
+	}
+	if (EX_IsExist(keyBaseName + "DELAY"))
+	{
+		this.setTime(EX_Int(keyBaseName + "DELAY", 0));
+	}
+}
+
+void loadPartsMotionArrayFromEx(string defineName, ref array@PartsMotion motionArray)
+{
+	array@string nodeName;
+	EX_GetNodeNameList(defineName, nodeName);
+	motionArray.Free();
+	motionArray.Alloc(nodeName.Numof());
+	int i;
+	for (i = 0; i < nodeName.Numof(); ++i)
+	{
+		string keyBaseName = "%s.%s." % defineName % nodeName[i];
+		motionArray[i].loadFromEx(keyBaseName);
+	}
+}
+

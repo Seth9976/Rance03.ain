@@ -1,0 +1,270 @@
+AdvSelectionButton::AdvSelectionButton()
+{
+	this.gameObjectId_ = g_gameObjectManager.addFocusObject(this.update, this.isHover);
+}
+
+void AdvSelectionButton::init(string advSelectionButtonId, int buttonIndex, int maxCount, bool isCastleMode)
+{
+	this.isCastleMode_ = isCastleMode;
+	this.id_ = advSelectionButtonId;
+	this.buttonIndex_ = buttonIndex;
+	this.maxCount_ = maxCount;
+	this.initParts();
+}
+
+void AdvSelectionButton::setOnClickCallback(DG_OnClickAdvSelectionButtonCallback cb, int index)
+{
+	this.index_ = index;
+	this.cb_ = cb;
+}
+
+void AdvSelectionButton::initParts()
+{
+	ref AdvSelectionButtonInfomation info = getAdvSelectionButtonInfomationFromId(this.id_);
+	this.parts_[0].init("システム／場所移動／ボタン", 0);
+	if (info === NULL)
+	{
+		this.parts_[2].initAsText(this.id_, 22, false, 256, 255, 255, 255);
+	}
+	else
+	{
+		this.parts_[1].init(info.getImageName(), 0);
+		this.parts_[2].initAsText(info.getCaption(), 22, false, 256, 255, 255, 255);
+	}
+	this.width_ = this.parts_[0].getWidth() / 4;
+	createPartsGroup(this.parent_, this.parts_, 3600);
+	this.setPartsPos();
+	this.setPartsShow();
+}
+
+void AdvSelectionButton::setButtonBaseCgRange()
+{
+	int n;
+	if (this.isHover_)
+	{
+		n = 1;
+		if (g_mouse.isDown(0))
+		{
+			n = 2;
+		}
+	}
+	this.parts_[0].setCgRange(n * this.width_, 0, this.width_, this.parts_[0].getHeight());
+}
+
+void AdvSelectionButton::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+}
+
+void AdvSelectionButton::setPartsPos()
+{
+	this.parts_[1].setPos(61.0, 10.0);
+	this.parts_[1].setOrigin(8);
+	this.parts_[2].setPos(this.width_ / 2, 125.0);
+	this.parts_[2].setOrigin(8);
+	int x;
+	int y;
+	this.getButtonPos(x, y);
+	this.parent_.setPos(x, y);
+}
+
+void AdvSelectionButton::getButtonPos(ref int x, ref int y)
+{
+	switch (this.id_)
+	{
+	case "セーブの碑へ行く":
+		x = 556;
+		y = 530;
+		return;
+	case "ロードの碑へ行く":
+		x = 716;
+		y = 510;
+		return;
+	case "街を出る":
+		x = 876;
+		y = 490;
+		return;
+	case "居館一階を出る":
+		x = 876;
+		y = 490;
+		return;
+	}
+	if (this.isCastleMode_)
+	{
+		int span = 20;
+		int width = 150;
+		int w = width * 4 + span * 3;
+		int left = 512 - w / 2;
+		int i;
+		for (i = 0; i < this.maxCount_; ++i)
+		{
+			x = left + (this.buttonIndex_ % 4) * (width + span);
+			y = 100 + (this.buttonIndex_ / 4) * 200;
+		}
+	}
+	else
+	{
+		switch (this.maxCount_)
+		{
+		case 1:
+			x = 674;
+			y = 165;
+			break;
+		case 2:
+			x = 594 + this.buttonIndex_ * 160;
+			y = 175 + this.buttonIndex_ * -20;
+			break;
+		case 3:
+			x = 514 + this.buttonIndex_ * 160;
+			y = 185 + this.buttonIndex_ * -20;
+			break;
+		case 4:
+			switch (this.buttonIndex_)
+			{
+			case 0:
+				x = 554;
+				y = 90;
+				break;
+			case 1:
+				x = 714;
+				y = 70;
+				break;
+			case 2:
+				x = 634;
+				y = 280;
+				break;
+			case 3:
+				x = 794;
+				y = 260;
+				break;
+			}
+			break;
+		case 5:
+		default:
+			switch (this.buttonIndex_)
+			{
+			case 0:
+				x = 514;
+				y = 90;
+				break;
+			case 1:
+				x = 674;
+				y = 70;
+				break;
+			case 2:
+				x = 834;
+				y = 50;
+				break;
+			case 3:
+				x = 594;
+				y = 280;
+				break;
+			case 4:
+				x = 754;
+				y = 260;
+				break;
+			case 5:
+				x = 0;
+				y = 0;
+				break;
+			case 6:
+				x = 200;
+				y = 0;
+				break;
+			case 7:
+				x = 400;
+				y = 0;
+				break;
+			}
+			break;
+		}
+	}
+}
+
+void AdvSelectionButton::update()
+{
+	this.updateHover();
+	this.setButtonBaseCgRange();
+	if (g_mouse.isClickWithFocus(this.gameObjectId_))
+	{
+		this.cb_(this.index_);
+	}
+	if (!this.lastHover_ && this.isHover_)
+	{
+		playCursor();
+	}
+	if (this.isHover_ && g_mouse.onDown(0))
+	{
+		playClick();
+	}
+	this.lastHover_ = this.isHover_;
+}
+
+void AdvSelectionButton::updateHover()
+{
+	this.isHover_ = this.parent_.isShow() && !this.parent_.isMotion() && this.parts_[0].isHit(g_mouse.getX(), g_mouse.getY());
+}
+
+void AdvSelectionButton::setPos(int x, int y)
+{
+	this.parent_.setPos(x, y);
+}
+
+void AdvSelectionButton::fadeIn(bool val, int delay)
+{
+	this.parent_.setShow(true);
+	if (val)
+	{
+		array@PartsMotion m[2];
+		m[0].setAlpha(0, 0, 0);
+		m[0].setTime(delay);
+		m[1].setAlpha(0, 255, 0);
+		m[1].setKey(5, -80, 0, 7);
+		m[1].setTime(300);
+		this.parts_[0].runMotionArray(m, NULL);
+		m.Free();
+		array@PartsMotion m[2];
+		m[0].setTime(delay + 200);
+		m[0].setAlpha(0, 0, 0);
+		m[1].setAlpha(0, 255, 0);
+		m[1].setKey(5, -80, 0, 7);
+		m[1].setTime(400);
+		this.parts_[1].runMotionArray(m, NULL);
+		m.Free();
+		array@PartsMotion m[2];
+		m[0].setTime(delay + 400);
+		m[0].setAlpha(0, 0, 0);
+		m[1].setTime(150);
+		m[1].setAlpha(0, 255, 0);
+		this.parts_[2].runMotionArray(m, NULL);
+		m.Free();
+		array@PartsMotion m[2];
+		int x;
+		int y;
+		this.getButtonPos(x, y);
+		m[0].setTime(delay);
+		m[1].setMove(x, y - 100, x, y, 1);
+		m[1].setTime(400);
+		this.parent_.runMotionArray(m, NULL);
+	}
+	else
+	{
+		this.parent_.runMotion(getStandardMotion(val ? 0 : 1), NULL);
+	}
+}
+
+bool AdvSelectionButton::isHover()
+{
+	this.updateHover();
+	return this.isHover_;
+}
+
+string AdvSelectionButton::getId()
+{
+	return this.id_;
+}
+

@@ -1,0 +1,55 @@
+void SceneLevelGod::init()
+{
+	this.state_ = 0;
+}
+
+void SceneLevelGod::run()
+{
+	setGameMode(false);
+	制御／レベルアップ／入る();
+	restoreGameMode();
+}
+
+bool SceneLevelGod::update()
+{
+	if (this.state_ == 0)
+	{
+		string r = openTargetPlayerSelect(1);
+		if (r != "")
+		{
+			this.result_ <- new LevelUpResult;
+			this.result_.init(r);
+			this.result_.fadeIn(true, NULL);
+			g_sysSound.play(6, "効果音／レベルアップ");
+			getPlayerFromId(r).levelUp();
+			this.state_ = 1;
+		}
+		else
+		{
+			setGameMode(false);
+			制御／レベルアップ／出る();
+			restoreGameMode();
+			return false;
+		}
+	}
+	else if (this.state_ == 1)
+	{
+		if (g_mouse.isClick(0) || g_mouse.isClick(1))
+		{
+			this.state_ = 2;
+			this.result_.fadeIn(false, this.onFinishFadeOut);
+		}
+	}
+	return true;
+}
+
+void SceneLevelGod::onFinishFadeOut()
+{
+	this.result_ <- NULL;
+	this.state_ = 0;
+}
+
+void SceneLevelGod::onClick(string playerId)
+{
+}
+

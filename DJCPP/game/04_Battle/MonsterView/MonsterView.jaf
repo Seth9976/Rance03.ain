@@ -1,0 +1,292 @@
+MonsterView::MonsterView()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+	this.isDeadMotionFinish_ = false;
+}
+
+bool MonsterView::isShownName()
+{
+	return this.isShownName_;
+}
+
+void MonsterView::init(ref MonsterInstance instance, string battleBackGroundId, int turn)
+{
+	this.isShownName_ = false;
+	this.isChanged_ = false;
+	this.turn_ = turn;
+	this.battleBackGroundId_ = battleBackGroundId;
+	this.instance_ <- instance;
+	this.monster_ <- getMonsterFromId(this.instance_.getId());
+	this.initViewObject();
+}
+
+void MonsterView::resetPosition()
+{
+	this.onChangePosition();
+}
+
+void MonsterView::initAsChange(ref MonsterInstance instance, string battleBackGroundId, int turn)
+{
+	this.init(instance, battleBackGroundId, turn);
+	this.isChanged_ = true;
+}
+
+void MonsterView::getIn()
+{
+	if (this.isChanged_)
+	{
+		g_sysSound.play(3, "効果音／モンスター変化");
+		this.stand_.changeIn();
+		this.infos_.init(this.instance_);
+		this.infos_.resetAttackView(this.instance_.getAttack(this.turn_));
+		this.infos_.fadeIn(true, NULL);
+	}
+	else
+	{
+		this.stand_.movePosition();
+	}
+}
+
+void MonsterView::initViewObject()
+{
+	this.stand_.init(this.instance_, this.battleBackGroundId_);
+	this.initNameParts();
+	this.initMonsterInfoView();
+}
+
+void MonsterView::initMonsterInfoView()
+{
+	this.infos_.init(this.instance_);
+	this.updateInfoView();
+}
+
+void MonsterView::setTurn(int val)
+{
+	this.turn_ = val;
+	this.updateInfoView();
+}
+
+void MonsterView::updateInfoView()
+{
+	this.infos_.resetAttackView(this.instance_.getAttack(this.turn_));
+}
+
+bool MonsterView::isFixedPosition()
+{
+	return this.monster_.isFixedPosition();
+}
+
+void MonsterView::initNameParts()
+{
+	int x;
+	int y;
+	if (this.monster_.isFixedPosition())
+	{
+		this.monster_.getNamePosition(x, y);
+	}
+	else
+	{
+		getMonsterInfomationPosition(x, y, this.instance_.getPosition());
+		y -= 50;
+	}
+	this.partsName_.initAsText(this.monster_.getName(), 48, true, 256, 255, 255, 255);
+	this.partsName_.setZ(2800.0);
+	this.partsName_.setShow(false);
+	this.partsName_.setPos(x, y);
+	this.partsName_.setOrigin(5);
+}
+
+void MonsterView::update()
+{
+}
+
+void MonsterView::setFocus(bool val)
+{
+	this.stand_.setFocus(val);
+}
+
+void MonsterView::onChangePosition()
+{
+	this.stand_.movePosition();
+	if (this.infos_.isNotShow())
+	{
+		this.infos_.fadeIn(true, NULL);
+	}
+	else
+	{
+		this.infos_.movePosition();
+	}
+}
+
+void MonsterView::setDamage(int val, string effectName, bool isDamage, int type, int delay, DG_GeneralCallback onFinishShowDamageCallback)
+{
+	this.onFinishShowDamageCallback_ = onFinishShowDamageCallback;
+	this.initDamage(val, effectName, isDamage, type);
+	this.runDamage(isDamage, delay);
+	this.infos_.changeValue();
+}
+
+void MonsterView::runDamage(bool isDamage, int delay)
+{
+	if (this.instance_.getHp() > 0)
+	{
+		this.cbDamageTimer_.setTimer(800, this.onFinishShowDamage);
+		this.damage_.run(delay, NULL);
+		if (isDamage)
+		{
+			this.stand_.showDamage(NULL);
+		}
+	}
+	else if (this.monster_.getDeadMotionType() == 2)
+	{
+		this.damage_.run(delay, NULL);
+		this.stand_.showDamage(this.onFinishShowDamage);
+	}
+	else
+	{
+		this.cbDamageTimer_.setTimer(900, this.onFinishShowDamage);
+		this.damage_.run(delay, NULL);
+		this.stand_.showDamage(this.onFinishDeadMotion);
+	}
+}
+
+void MonsterView::initDamage(int val, string effectName, bool isDamage, int type)
+{
+	bool isCritical = false;
+	bool isDefence = false;
+	bool isMessage = false;
+	int resistType;
+	int x;
+	int y;
+	this.getDamagePosition(x, y);
+	this.getShowDamageTypeFromTargetInfoType(type, isCritical, isDefence, isMessage, resistType);
+	this.damage_.init(val, effectName, isDamage, isCritical, isDefence, resistType);
+	this.damage_.setPos(x, y, 0, 0);
+	this.damage_.setEffectZ(this.stand_.getBaseZ() + 10);
+}
+
+void MonsterView::onFinishDeadMotion()
+{
+	this.isDeadMotionFinish_ = true;
+}
+
+void MonsterView::onFinishShowDamage()
+{
+	this.onFinishShowDamageCallback_();
+}
+
+void MonsterView::showAttack()
+{
+	this.stand_.showAttack();
+}
+
+void MonsterView::setTargetMark(bool val)
+{
+	this.infos_.showTargetMark(val);
+}
+
+void MonsterView::showEffect(string flatName)
+{
+	int x;
+	int y;
+	this.getDamagePosition(x, y);
+	this.effect_.init(flatName);
+	this.effect_.setPos(x, y);
+	this.effect_.setZ(this.stand_.getBaseZ() + 10);
+	this.effect_.run(3);
+}
+
+void getMonsterInfomationPosition(ref int x, ref int y, int position)
+{
+	switch (position)
+	{
+	case 0:
+		x = 664;
+		y = 342;
+		break;
+	case 1:
+		x = 754;
+		y = 282;
+		break;
+	case 2:
+		x = 844;
+		y = 222;
+		break;
+	default:
+		x = 934;
+		y = 162;
+		break;
+	}
+}
+
+void MonsterView::getDamagePosition(ref int x, ref int y)
+{
+	this.stand_.getCenter(x, y);
+}
+
+bool MonsterView::isChanged()
+{
+	return this.isChanged_;
+}
+
+void MonsterView::showName(DG_GeneralCallback onFinishShowNameCallback)
+{
+	array@PartsMotion m[3];
+	m[0].setScaling(300, 100, 1);
+	m[0].setAlpha(0, 255, 0);
+	m[0].setTime(150);
+	m[1].setTime(400);
+	m[2].setTime(150);
+	m[2].setAlpha(255, 0, 0);
+	this.cbTimer_.setTimer(550, onFinishShowNameCallback);
+	this.isShownName_ = true;
+	this.partsName_.setShow(true);
+	this.partsName_.runMotionArray(m, NULL);
+}
+
+void MonsterView::onFinishShowName()
+{
+	this.onFinishShowNameCallback_();
+	this.partsName_.runMotion(getStandardMotion(1), NULL);
+}
+
+void MonsterView::getShowDamageTypeFromTargetInfoType(int type, ref bool isCritical, ref bool isDefence, ref bool isMessage, ref int resistType)
+{
+	isCritical = type % 10;
+	isDefence = (type / 1000) % 10;
+	isMessage = (type / 10000) % 10;
+	if ((type / 100) % 10 != 0)
+	{
+		resistType = 2;
+	}
+	else if ((type / 10) % 10 != 0)
+	{
+		resistType = 1;
+	}
+	else
+	{
+		resistType = 0;
+	}
+}
+
+void MonsterView::resetChanged()
+{
+	this.isChanged_ = false;
+}
+
+void MonsterView::fadeOut()
+{
+	this.stand_.fadeOut();
+	this.infos_.fadeIn(false, NULL);
+}
+
+bool MonsterView::isDeadMotionFinish()
+{
+	return this.isDeadMotionFinish_;
+}
+
+void MonsterView::updateBuffView()
+{
+	this.infos_.updateBuffView();
+}
+

@@ -1,0 +1,274 @@
+void SceneParty::init(bool isShowBg)
+{
+	this.isFinish_ = false;
+	this.isShowBg_ = isShowBg;
+	gameGetJoinedPlayer(this.playerList_);
+	this.initButtons();
+	this.initSkillButton();
+	this.stand_.init();
+	this.bg_.init(this.isShowBg_);
+	this.status_.init(this.playerList_);
+	this.changeCenter(int(g_common_isWithOutSkillInformation));
+}
+
+void SceneParty::onClickToggleInformation(int index)
+{
+	g_common_isWithOutSkillInformation = !int(g_common_isWithOutSkillInformation);
+	this.changeCenter(int(g_common_isWithOutSkillInformation));
+}
+
+void SceneParty::changeCenter(bool isWithOutInfomation)
+{
+	this.bg_.changeCenter(isWithOutInfomation);
+	this.stand_.changeCenter(isWithOutInfomation);
+	this.changeCenterSkillIcon(isWithOutInfomation);
+	this.status_.changeCenter(isWithOutInfomation);
+	this.changeCenterPlayerLRButton(isWithOutInfomation);
+}
+
+void SceneParty::changeCenterSkillIcon(bool isWithOutInfomation)
+{
+	int i;
+	for (i = 0; i < this.skillIcon_.Numof(); ++i)
+	{
+		this.skillIcon_[i].changeCenter(isWithOutInfomation);
+	}
+}
+
+void SceneParty::initButtons()
+{
+	this.btnLR_[0].init("システム／ページ送り／前へ", "", "", false);
+	this.btnLR_[1].init("システム／ページ送り／次へ", "", "", false);
+	this.btnLR_[0].setClickCallback(this.onClickStandGroupMoveButton, 0);
+	this.btnLR_[1].setClickCallback(this.onClickStandGroupMoveButton, 1);
+	int offset = int(g_common_isWithOutSkillInformation) ? 0 : 100;
+	this.btnLR_[0].setPos(420 + offset, 434);
+	this.btnLR_[1].setPos(800 + offset, 434);
+	if (this.isShowBg_)
+	{
+		this.btnExit_.init("システム／ボタン／幅１７０", "戻る", "", true);
+	}
+	else
+	{
+		this.btnExit_.init("システム／ボタン／幅１７０", "キャンプに戻る", "", true);
+	}
+	this.btnExit_.setPos(840, 494);
+	this.btnToggleInfo_.init("システム／スキル説明ボタン", "", "", false);
+	this.btnToggleInfo_.setPos(958, 434);
+	this.btnToggleInfo_.setClickCallback(this.onClickToggleInformation, 0);
+}
+
+void SceneParty::changeCenterPlayerLRButton(bool isWithOutInfomation)
+{
+	int i;
+	for (i = 0; i < this.btnLR_.Numof(); ++i)
+	{
+		PartsMotion m;
+		int x = 420 + i * 380;
+		if (isWithOutInfomation)
+		{
+			m.setMove(x + 100, 434, x, 434, 1);
+		}
+		else
+		{
+			m.setMove(x, 434, x + 100, 434, 1);
+		}
+		this.btnLR_[i].runMotion(m);
+	}
+}
+
+void SceneParty::fadeButton(bool val)
+{
+	this.fadeButtonLR(val);
+	this.fadeSkillIcon(val);
+	this.btnExit_.fadeIn(val);
+	this.btnToggleInfo_.fadeIn(val);
+}
+
+void SceneParty::fadeSkillIcon(bool val)
+{
+	int i;
+	for (i = 0; i < this.skillIcon_.Numof(); ++i)
+	{
+		this.skillIcon_[i].fadeIn(val, NULL);
+	}
+}
+
+void SceneParty::fadeButtonLR(bool val)
+{
+	int i;
+	for (i = 0; i < this.btnLR_.Numof(); ++i)
+	{
+		this.btnLR_[i].fadeIn(val);
+	}
+}
+
+void SceneParty::onClickStandGroupMoveButton(int index)
+{
+	this.setNextPlayer(index != 0);
+}
+
+void SceneParty::run()
+{
+	this.selector_.init(this.onClickSkillSelector);
+	this.fadeObject(true);
+}
+
+bool SceneParty::update()
+{
+	if (!this.timerCb_.isRunning() && (g_mouse.isClick(1) || this.btnExit_.isClick()))
+	{
+		if (g_mouse.isClick(1))
+		{
+			playCancel();
+		}
+		if (g_party.empty())
+		{
+			this.showWarningNoPartyMembers();
+		}
+		else if (this.isNoAlivePlayers())
+		{
+			this.showWarningNoAlivePlayers();
+		}
+		else
+		{
+			this.fadeObject(false);
+		}
+	}
+	int i;
+	for (i = 0; i < this.skillIcon_.Numof(); ++i)
+	{
+		this.skillIcon_[i].setFloatingPosition(this.stand_.getFloatingPosition());
+	}
+	this.status_.setFloatingPosition(this.stand_.getFloatingPosition());
+	return !this.isFinish_;
+}
+
+bool SceneParty::isNoAlivePlayers()
+{
+	array@string pIds;
+	g_party.getPlayerIdList(pIds);
+	int i;
+	for (i = 0; i < pIds.Numof(); ++i)
+	{
+		if (getPlayerFromId(pIds[i]).getHp() > 0)
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+void SceneParty::fadeObject(bool val)
+{
+	this.status_.fadeIn(val);
+	this.bg_.fadeIn(val);
+	this.selector_.fadeIn(val);
+	this.fadeButton(val);
+	this.stand_.fadeIn(val);
+	if (!val)
+	{
+		this.timerCb_.setTimer(250, this.onFinishFadeOut);
+	}
+}
+
+void SceneParty::onFinishFadeOut()
+{
+	this.isFinish_ = true;
+}
+
+void SceneParty::initSkillButton()
+{
+	array@string pId;
+	gameGetJoinedPlayer(pId);
+	int i;
+	for (i = 0; i < this.skillIcon_.Numof(); ++i)
+	{
+		this.skillIcon_[i].init(pId, i);
+		this.skillIcon_[i].setClickCallback(this.onClickSkillButton);
+	}
+	array@string skills;
+	g_party.getSkillIdList(skills);
+	for (i = 0; i < skills.Numof(); ++i)
+	{
+		this.setEquiped(skills[i], true);
+	}
+}
+
+void SceneParty::onClickSkillButton(string skillId)
+{
+	string s = skillId;
+	if (!g_party.isExist(s))
+	{
+		string pId = getPlayerSkillFromId(s).getPlayerId();
+		if (g_party.add(s))
+		{
+			g_sysSound.play(6, "効果音／スキル装備");
+			int skillIndex = g_party.getIndexFromId(s);
+			this.setEquiped(skillId, true);
+			this.selector_.add(skillIndex, s);
+		}
+	}
+	else
+	{
+		int skillIndex = g_party.getIndexFromId(s);
+		if (skillIndex != -1)
+		{
+			g_sysSound.play(6, "効果音／キャンセル");
+			g_party.erase(skillIndex);
+			this.setEquiped(skillId, false);
+			this.selector_.erase(skillIndex);
+		}
+	}
+}
+
+void SceneParty::setEquiped(string skillId, bool val)
+{
+	int i;
+	for (i = 0; i < this.skillIcon_.Numof(); ++i)
+	{
+		this.skillIcon_[i].setEquiped(skillId, val);
+	}
+}
+
+void SceneParty::onClickSkillSelector(int index)
+{
+	string id = g_party.getAttackSkillId(index);
+	g_party.erase(index);
+	this.selector_.erase(index);
+	g_sysSound.play(6, "効果音／キャンセル");
+	this.setEquiped(id, false);
+}
+
+void SceneParty::showWarningNoAlivePlayers()
+{
+	DialogInfomation info;
+	info.setCaption("戦闘に参加していません");
+	info.setMessage("使用可能なバトルスキルを、|最低1つはセットしてください");
+	info.setPictureImageName("システム／ダイアログ／写真／情報");
+	openDialog(info);
+}
+
+void SceneParty::showWarningNoPartyMembers()
+{
+	DialogInfomation info;
+	info.setCaption("戦闘に参加していません");
+	info.setMessage("使用可能なバトルスキルを、|最低1つはセットしてください");
+	info.setPictureImageName("システム／ダイアログ／写真／情報");
+	openDialog(info);
+}
+
+void SceneParty::setNextPlayer(bool val)
+{
+	float current = this.stand_.getFloatingPosition();
+	float last = current;
+	current += val ? 1 : -1;
+	current = roundOff(current);
+	current = Math.MaxF(0.0, Math.MinF(this.playerList_.Numof() - 1, current));
+	if (last == current)
+	{
+		return;
+	}
+	this.stand_.setPos(current);
+}
+

@@ -1,0 +1,161 @@
+CMessageDrawParts::CMessageDrawParts()
+{
+	this.m_bFixed = false;
+	this.m_PartsNumber = PARTS_GetFreeSystemPartsNumber();
+}
+
+CMessageDrawParts::~CMessageDrawParts()
+{
+	if (this.m_PartsNumber == -1)
+	{
+		return;
+	}
+	PARTS_Release(this.m_PartsNumber);
+	this.m_PartsNumber = -1;
+}
+
+void CMessageDrawParts::SetCharSprite(int nTime, int MessageWindowNumber)
+{
+	this.m_MessageWindowNumber = MessageWindowNumber;
+	this.m_nTime = nTime;
+	this.m_bFixed = false;
+}
+
+void CMessageDrawParts::SetFixed()
+{
+	this.m_bFixed = true;
+	Ｐ＿アルファ値設定(this.m_PartsNumber, 255);
+}
+
+int CMessageDrawParts::GetTime()
+{
+	return this.m_nTime;
+}
+
+int CMessageDrawParts::GetMessageWindowNumber()
+{
+	return this.m_MessageWindowNumber;
+}
+
+bool CMessageDrawParts::IsFixed()
+{
+	return this.m_bFixed;
+}
+
+void CMessageDrawParts::SetAlphaRate(int AlphaRate)
+{
+	Ｐ＿アルファ値設定(this.m_PartsNumber, AlphaRate);
+}
+
+int CMessageDrawParts::GetAlphaRate()
+{
+	return Ｐ＿アルファ値取得(this.m_PartsNumber);
+}
+
+void CMessageDrawParts::SetPos(int X, int Y)
+{
+	Ｐ＿座標設定(this.m_PartsNumber, X, Y);
+}
+
+void CMessageDrawParts::SetZ(int Z)
+{
+	Ｐ＿Ｚ座標設定(this.m_PartsNumber, Z);
+}
+
+void CMessageDrawParts::SetShow(bool Show)
+{
+	Ｐ＿表示設定(this.m_PartsNumber, Show);
+}
+
+void CMessageDrawParts::SetAddColor(int Red, int Green, int Blue)
+{
+	Ｐ＿加算色設定(this.m_PartsNumber, Red, Green, Blue);
+}
+
+void CMessageDrawParts::UpdateZByMessageWindowZChanged()
+{
+	int Z = g_MessageWindowModelManager.GetZ() + g_MessageWindowManager.GetOffsetZ(this.m_MessageWindowNumber) + 1;
+	Ｐ＿Ｚ座標設定(this.m_PartsNumber, Z);
+}
+
+void CMessageDrawParts::SetText(string Text)
+{
+	Ｐ＿テキスト設定(this.m_PartsNumber, Text, 1);
+}
+
+void CMessageDrawParts::SetFontProperty(ref CASCharSpriteProperty Property)
+{
+	CASColor Color;
+	Color = Property.GetColor();
+	CASColor EdgeColor;
+	EdgeColor = Property.GetEdgeColor();
+	this.SetFont(Property.GetType());
+	this.SetFontSize(Property.GetSize());
+	this.SetFontBoldWeight(Property.GetBoldWeight());
+	this.SetFontEdgeWeight(Property.GetEdgeWeight());
+	this.SetFontColor(Color.GetR(), Color.GetG(), Color.GetB());
+	this.SetFontEdgeColor(EdgeColor.GetR(), EdgeColor.GetG(), EdgeColor.GetB());
+}
+
+void CMessageDrawParts::SetFont(int Type)
+{
+	Ｐ＿フォント種類設定(this.m_PartsNumber, Type, 1);
+}
+
+void CMessageDrawParts::SetFontSize(int Size)
+{
+	Ｐ＿フォントサイズ設定(this.m_PartsNumber, Size, 1);
+}
+
+void CMessageDrawParts::SetFontBoldWeight(float Weight)
+{
+	Ｐ＿フォント太字幅設定(this.m_PartsNumber, Weight, 1);
+}
+
+void CMessageDrawParts::SetFontEdgeWeight(float Weight)
+{
+	Ｐ＿フォント縁取り幅設定(this.m_PartsNumber, Weight, 1);
+}
+
+void CMessageDrawParts::SetFontColor(int ColorR, int ColorG, int ColorB)
+{
+	Ｐ＿フォント色設定(this.m_PartsNumber, ColorR, ColorG, ColorB, 1);
+}
+
+void CMessageDrawParts::SetFontEdgeColor(int ColorR, int ColorG, int ColorB)
+{
+	Ｐ＿フォント縁取り色設定(this.m_PartsNumber, ColorR, ColorG, ColorB, 1);
+}
+
+void CMessageDrawParts::SetFontCharSpace(int Space)
+{
+	Ｐ＿テキスト字間隔設定(this.m_PartsNumber, Space, 1);
+}
+
+void CMessageDrawParts::SetDefaultFontColor(int Red, int Green, int Blue)
+{
+	this.m_DefaultRed = Red;
+	this.m_DefaultGreen = Green;
+	this.m_DefaultBlue = Blue;
+}
+
+int CMessageDrawParts::GetDefaultFontRed()
+{
+	return this.m_DefaultRed;
+}
+
+int CMessageDrawParts::GetDefaultFontGreen()
+{
+	return this.m_DefaultGreen;
+}
+
+int CMessageDrawParts::GetDefaultFontBlue()
+{
+	return this.m_DefaultBlue;
+}
+
+int CMessageDrawParts::GetPartsNumber()
+{
+	return this.m_PartsNumber;
+}
+

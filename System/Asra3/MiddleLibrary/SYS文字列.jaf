@@ -1,0 +1,49 @@
+string SYS_ToUpper(string Src)
+{
+	int Length = Src.Length();
+	int i;
+	for (i = 0; i < Length; ++i)
+	{
+		if (Src[i] >= 'a' && Src[i] <= 'z')
+		{
+			Src[i] = Src[i] + -32;
+		}
+		else if (Src[i] >= 'ａ' && Src[i] <= 'ｚ')
+		{
+			Src[i] = Src[i] + -8448;
+		}
+	}
+	return Src;
+}
+
+string SYS_ToLower(string Src)
+{
+	int Length = Src.Length();
+	int i;
+	for (i = 0; i < Length; ++i)
+	{
+		if (Src[i] >= 'A' && Src[i] <= 'Z')
+		{
+			Src[i] = Src[i] + ' ';
+		}
+		else if (Src[i] >= 'Ａ' && Src[i] <= 'Ｚ')
+		{
+			Src[i] = Src[i] + 8448;
+		}
+	}
+	return Src;
+}
+
+int SYS_FindLast(string Src, string Key)
+{
+	int Result = -1;
+	int FindPos = Src.Find(Key);
+	while (FindPos != -1)
+	{
+		Result += FindPos + 1;
+		Src = Src.GetPart(FindPos + 1, Src.Length());
+		FindPos = Src.Find(Key);
+	}
+	return Result;
+}
+

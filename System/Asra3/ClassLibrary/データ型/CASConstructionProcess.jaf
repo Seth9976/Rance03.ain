@@ -1,0 +1,586 @@
+CASConstructionProcess::CASConstructionProcess()
+{
+	this.Clear();
+}
+
+void CASConstructionProcess::Clear()
+{
+	this.m_Command = -1;
+	this.m_InterpolationType = 1;
+	this.m_nSrcX = 0;
+	this.m_nSrcY = 0;
+	this.m_nSrcWidth = 0;
+	this.m_nSrcHeight = 0;
+	this.m_nDestX = 0;
+	this.m_nDestY = 0;
+	this.m_nDestX2 = 0;
+	this.m_nDestY2 = 0;
+	this.m_nDestWidth = 0;
+	this.m_nDestHeight = 0;
+	this.m_nR = 0;
+	this.m_nG = 0;
+	this.m_nB = 0;
+	this.m_nA = 0;
+	this.m_nR2 = 0;
+	this.m_nG2 = 0;
+	this.m_nB2 = 0;
+	this.m_CharSpace = 0;
+	this.m_LineSpace = 0;
+	this.m_FullSize = false;
+	this.m_Text = "";
+	this.m_CGName = "";
+	CASCharSpriteProperty Property;
+	this.m_Font = Property;
+}
+
+void CASConstructionProcess::SetCreate(int nWidth, int nHeight)
+{
+	this.Clear();
+	this.m_Command = 0;
+	this.m_nDestWidth = nWidth;
+	this.m_nDestHeight = nHeight;
+}
+
+void CASConstructionProcess::SetCreatePixelOnly(int nWidth, int nHeight)
+{
+	this.Clear();
+	this.m_Command = 1;
+	this.m_nDestWidth = nWidth;
+	this.m_nDestHeight = nHeight;
+}
+
+void CASConstructionProcess::SetCreateCG(string CGName)
+{
+	this.Clear();
+	this.m_Command = 2;
+	this.m_CGName = CGName;
+}
+
+void CASConstructionProcess::SetFill(int nX, int nY, int nWidth, int nHeight, int nR, int nG, int nB)
+{
+	this.Clear();
+	this.m_Command = 3;
+	this.m_nDestX = nX;
+	this.m_nDestY = nY;
+	this.m_nDestWidth = nWidth;
+	this.m_nDestHeight = nHeight;
+	this.m_nR = nR;
+	this.m_nG = nG;
+	this.m_nB = nB;
+}
+
+void CASConstructionProcess::SetFillAlphaColor(int nX, int nY, int nWidth, int nHeight, int nR, int nG, int nB, int nA)
+{
+	this.Clear();
+	this.m_Command = 4;
+	this.m_nDestX = nX;
+	this.m_nDestY = nY;
+	this.m_nDestWidth = nWidth;
+	this.m_nDestHeight = nHeight;
+	this.m_nR = nR;
+	this.m_nG = nG;
+	this.m_nB = nB;
+	this.m_nA = nA;
+}
+
+void CASConstructionProcess::SetFillAMap(int nX, int nY, int nWidth, int nHeight, int nAlpha)
+{
+	this.Clear();
+	this.m_Command = 5;
+	this.m_nDestX = nX;
+	this.m_nDestY = nY;
+	this.m_nDestWidth = nWidth;
+	this.m_nDestHeight = nHeight;
+	this.m_nA = nAlpha;
+}
+
+void CASConstructionProcess::SetFillWithAlpha(int nX, int nY, int nWidth, int nHeight, int nR, int nG, int nB, int nA)
+{
+	this.Clear();
+	this.m_Command = 6;
+	this.m_nDestX = nX;
+	this.m_nDestY = nY;
+	this.m_nDestWidth = nWidth;
+	this.m_nDestHeight = nHeight;
+	this.m_nR = nR;
+	this.m_nG = nG;
+	this.m_nB = nB;
+	this.m_nA = nA;
+}
+
+void CASConstructionProcess::SetFillGradationHorizon(int nX, int nY, int nWidth, int nHeight, int nTopR, int nTopG, int nTopB, int nBottomR, int nBottomG, int nBottomB)
+{
+	this.Clear();
+	this.m_Command = 9;
+	this.m_nDestX = nX;
+	this.m_nDestY = nY;
+	this.m_nDestWidth = nWidth;
+	this.m_nDestHeight = nHeight;
+	this.m_nR = nTopR;
+	this.m_nG = nTopG;
+	this.m_nB = nTopB;
+	this.m_nR2 = nBottomR;
+	this.m_nG2 = nBottomG;
+	this.m_nB2 = nBottomB;
+}
+
+void CASConstructionProcess::SetDrawRect(int nX, int nY, int nWidth, int nHeight, int nR, int nG, int nB)
+{
+	this.Clear();
+	this.m_Command = 10;
+	this.m_nDestX = nX;
+	this.m_nDestY = nY;
+	this.m_nDestWidth = nWidth;
+	this.m_nDestHeight = nHeight;
+	this.m_nR = nR;
+	this.m_nG = nG;
+	this.m_nB = nB;
+}
+
+void CASConstructionProcess::SetCutCGBlend(string CGName, int DestX, int DestY, int SrcX, int SrcY, int DestWidth, int DestHeight, int InterpolationType)
+{
+	this.Clear();
+	this.m_Command = 11;
+	this.m_CGName = CGName;
+	this.m_nDestX = DestX;
+	this.m_nDestY = DestY;
+	this.m_nDestWidth = DestWidth;
+	this.m_nDestHeight = DestHeight;
+	this.m_nSrcX = SrcX;
+	this.m_nSrcY = SrcY;
+	this.m_InterpolationType = InterpolationType;
+}
+
+void CASConstructionProcess::SetCutCGCopy(string CGName, int DestX, int DestY, int SrcX, int SrcY, int DestWidth, int DestHeight, int InterpolationType)
+{
+	this.Clear();
+	this.m_Command = 12;
+	this.m_CGName = CGName;
+	this.m_nDestX = DestX;
+	this.m_nDestY = DestY;
+	this.m_nDestWidth = DestWidth;
+	this.m_nDestHeight = DestHeight;
+	this.m_nSrcX = SrcX;
+	this.m_nSrcY = SrcY;
+	this.m_InterpolationType = InterpolationType;
+}
+
+void CASConstructionProcess::SetCutCGScaleBlend(string CGName, int DestX, int DestY, int DestWidth, int DestHeight, int SrcX, int SrcY, int SrcWidth, int SrcHeight, int InterpolationType)
+{
+	this.Clear();
+	this.m_Command = 13;
+	this.m_CGName = CGName;
+	this.m_nDestX = DestX;
+	this.m_nDestY = DestY;
+	this.m_nDestWidth = DestWidth;
+	this.m_nDestHeight = DestHeight;
+	this.m_nSrcX = SrcX;
+	this.m_nSrcY = SrcY;
+	this.m_nSrcWidth = SrcWidth;
+	this.m_nSrcHeight = SrcHeight;
+	this.m_InterpolationType = InterpolationType;
+}
+
+void CASConstructionProcess::SetCutCGScaleCopy(string CGName, int DestX, int DestY, int DestWidth, int DestHeight, int SrcX, int SrcY, int SrcWidth, int SrcHeight, int InterpolationType)
+{
+	this.Clear();
+	this.m_Command = 14;
+	this.m_CGName = CGName;
+	this.m_nDestX = DestX;
+	this.m_nDestY = DestY;
+	this.m_nDestWidth = DestWidth;
+	this.m_nDestHeight = DestHeight;
+	this.m_nSrcX = SrcX;
+	this.m_nSrcY = SrcY;
+	this.m_nSrcWidth = SrcWidth;
+	this.m_nSrcHeight = SrcHeight;
+	this.m_InterpolationType = InterpolationType;
+}
+
+void CASConstructionProcess::SetGrayFilter(int nX, int nY, int nWidth, int nHeight, bool FullSize)
+{
+	this.Clear();
+	this.m_Command = 15;
+	this.m_nDestX = nX;
+	this.m_nDestY = nY;
+	this.m_nDestWidth = nWidth;
+	this.m_nDestHeight = nHeight;
+	this.m_FullSize = FullSize;
+}
+
+void CASConstructionProcess::SetAddFilter(int nX, int nY, int nWidth, int nHeight, int nR, int nG, int nB, bool FullSize)
+{
+	this.Clear();
+	this.m_Command = 16;
+	this.m_nDestX = nX;
+	this.m_nDestY = nY;
+	this.m_nDestWidth = nWidth;
+	this.m_nDestHeight = nHeight;
+	this.m_nR = nR;
+	this.m_nG = nG;
+	this.m_nB = nB;
+	this.m_FullSize = FullSize;
+}
+
+void CASConstructionProcess::SetMulFilter(int nX, int nY, int nWidth, int nHeight, int nR, int nG, int nB, bool FullSize)
+{
+	this.Clear();
+	this.m_Command = 17;
+	this.m_nDestX = nX;
+	this.m_nDestY = nY;
+	this.m_nDestWidth = nWidth;
+	this.m_nDestHeight = nHeight;
+	this.m_nR = nR;
+	this.m_nG = nG;
+	this.m_nB = nB;
+	this.m_FullSize = FullSize;
+}
+
+void CASConstructionProcess::SetDrawLine(int nX1, int nY1, int nX2, int nY2, int nR, int nG, int nB, int nA)
+{
+	this.Clear();
+	this.m_Command = 18;
+	this.m_nDestX = nX1;
+	this.m_nDestY = nY1;
+	this.m_nDestX2 = nX2;
+	this.m_nDestY2 = nY2;
+	this.m_nR = nR;
+	this.m_nG = nG;
+	this.m_nB = nB;
+	this.m_nA = nA;
+}
+
+void CASConstructionProcess::SetDrawText(int nX, int nY, string Text, ref CASCharSpriteProperty Property, int CharSpace, int LineSpace)
+{
+	this.Clear();
+	this.m_Command = 7;
+	this.m_nDestX = nX;
+	this.m_nDestY = nY;
+	this.m_Text = Text;
+	this.m_Font = Property;
+	this.m_CharSpace = CharSpace;
+	this.m_LineSpace = LineSpace;
+}
+
+void CASConstructionProcess::SetCopyText(int nX, int nY, string Text, ref CASCharSpriteProperty Property, int CharSpace, int LineSpace)
+{
+	this.Clear();
+	this.m_Command = 8;
+	this.m_nDestX = nX;
+	this.m_nDestY = nY;
+	this.m_Text = Text;
+	this.m_Font = Property;
+	this.m_CharSpace = CharSpace;
+	this.m_LineSpace = LineSpace;
+}
+
+void CASConstructionProcess::SetCutCGAlphaBlend(string CGName, int DestX, int DestY, int SrcX, int SrcY, int DestWidth, int DestHeight, int InterpolationType)
+{
+	this.Clear();
+	this.m_Command = 19;
+	this.m_CGName = CGName;
+	this.m_nDestX = DestX;
+	this.m_nDestY = DestY;
+	this.m_nDestWidth = DestWidth;
+	this.m_nDestHeight = DestHeight;
+	this.m_nSrcX = SrcX;
+	this.m_nSrcY = SrcY;
+	this.m_InterpolationType = InterpolationType;
+}
+
+void CASConstructionProcess::SetCutCGScaleAlphaBlend(string CGName, int DestX, int DestY, int DestWidth, int DestHeight, int SrcX, int SrcY, int SrcWidth, int SrcHeight, int InterpolationType)
+{
+	this.Clear();
+	this.m_Command = 20;
+	this.m_CGName = CGName;
+	this.m_nDestX = DestX;
+	this.m_nDestY = DestY;
+	this.m_nDestWidth = DestWidth;
+	this.m_nDestHeight = DestHeight;
+	this.m_nSrcX = SrcX;
+	this.m_nSrcY = SrcY;
+	this.m_nSrcWidth = SrcWidth;
+	this.m_nSrcHeight = SrcHeight;
+	this.m_InterpolationType = InterpolationType;
+}
+
+void CASConstructionProcess::SetCutCGOnlyAlpha(string CGName, int DestX, int DestY, int SrcX, int SrcY, int DestWidth, int DestHeight, int InterpolationType)
+{
+	this.Clear();
+	this.m_Command = 21;
+	this.m_CGName = CGName;
+	this.m_nDestX = DestX;
+	this.m_nDestY = DestY;
+	this.m_nDestWidth = DestWidth;
+	this.m_nDestHeight = DestHeight;
+	this.m_nSrcX = SrcX;
+	this.m_nSrcY = SrcY;
+	this.m_InterpolationType = InterpolationType;
+}
+
+void CASConstructionProcess::SetCutCGScaleOnlyAlpha(string CGName, int DestX, int DestY, int DestWidth, int DestHeight, int SrcX, int SrcY, int SrcWidth, int SrcHeight, int InterpolationType)
+{
+	this.Clear();
+	this.m_Command = 22;
+	this.m_CGName = CGName;
+	this.m_nDestX = DestX;
+	this.m_nDestY = DestY;
+	this.m_nDestWidth = DestWidth;
+	this.m_nDestHeight = DestHeight;
+	this.m_nSrcX = SrcX;
+	this.m_nSrcY = SrcY;
+	this.m_nSrcWidth = SrcWidth;
+	this.m_nSrcHeight = SrcHeight;
+	this.m_InterpolationType = InterpolationType;
+}
+
+int CASConstructionProcess::GetCommand()
+{
+	return this.m_Command;
+}
+
+int CASConstructionProcess::GetInterpolationType()
+{
+	return this.m_InterpolationType;
+}
+
+int CASConstructionProcess::GetSrcX()
+{
+	return this.m_nSrcX;
+}
+
+int CASConstructionProcess::GetSrcY()
+{
+	return this.m_nSrcY;
+}
+
+int CASConstructionProcess::GetSrcWidth()
+{
+	return this.m_nSrcWidth;
+}
+
+int CASConstructionProcess::GetSrcHeight()
+{
+	return this.m_nSrcHeight;
+}
+
+int CASConstructionProcess::GetDestX()
+{
+	return this.m_nDestX;
+}
+
+int CASConstructionProcess::GetDestY()
+{
+	return this.m_nDestY;
+}
+
+int CASConstructionProcess::GetDestX2()
+{
+	return this.m_nDestX2;
+}
+
+int CASConstructionProcess::GetDestY2()
+{
+	return this.m_nDestY2;
+}
+
+int CASConstructionProcess::GetDestWidth()
+{
+	return this.m_nDestWidth;
+}
+
+int CASConstructionProcess::GetDestHeight()
+{
+	return this.m_nDestHeight;
+}
+
+int CASConstructionProcess::GetR()
+{
+	return this.m_nR;
+}
+
+int CASConstructionProcess::GetG()
+{
+	return this.m_nG;
+}
+
+int CASConstructionProcess::GetB()
+{
+	return this.m_nB;
+}
+
+int CASConstructionProcess::GetA()
+{
+	return this.m_nA;
+}
+
+int CASConstructionProcess::GetR2()
+{
+	return this.m_nR2;
+}
+
+int CASConstructionProcess::GetG2()
+{
+	return this.m_nG2;
+}
+
+int CASConstructionProcess::GetB2()
+{
+	return this.m_nB2;
+}
+
+int CASConstructionProcess::GetCharSpace()
+{
+	return this.m_CharSpace;
+}
+
+int CASConstructionProcess::GetLineSpace()
+{
+	return this.m_LineSpace;
+}
+
+ref CASCharSpriteProperty CASConstructionProcess::GetFontProperty()
+{
+	return this.m_Font;
+}
+
+string CASConstructionProcess::GetText()
+{
+	return this.m_Text;
+}
+
+string CASConstructionProcess::GetCGName()
+{
+	return this.m_CGName;
+}
+
+bool CASConstructionProcess::IsFullSize()
+{
+	return this.m_FullSize;
+}
+
+void CASConstructionProcess::SetCommand(int Type)
+{
+	this.m_Command = Type;
+}
+
+void CASConstructionProcess::SetInterpolationType(int Type)
+{
+	this.m_InterpolationType = Type;
+}
+
+void CASConstructionProcess::SetSrcX(int PosX)
+{
+	this.m_nSrcX = PosX;
+}
+
+void CASConstructionProcess::SetSrcY(int PosY)
+{
+	this.m_nSrcY = PosY;
+}
+
+void CASConstructionProcess::SetSrcWidth(int Width)
+{
+	this.m_nSrcWidth = Width;
+}
+
+void CASConstructionProcess::SetSrcHeight(int Height)
+{
+	this.m_nSrcHeight = Height;
+}
+
+void CASConstructionProcess::SetDestX(int PosX)
+{
+	this.m_nDestX = PosX;
+}
+
+void CASConstructionProcess::SetDestY(int PosY)
+{
+	this.m_nDestY = PosY;
+}
+
+void CASConstructionProcess::SetDestX2(int PosX)
+{
+	this.m_nDestX2 = PosX;
+}
+
+void CASConstructionProcess::SetDestY2(int PosY)
+{
+	this.m_nDestY2 = PosY;
+}
+
+void CASConstructionProcess::SetDestWidth(int Width)
+{
+	this.m_nDestWidth = Width;
+}
+
+void CASConstructionProcess::SetDestHeight(int Height)
+{
+	this.m_nDestHeight = Height;
+}
+
+void CASConstructionProcess::SetR(int Red)
+{
+	this.m_nR = Red;
+}
+
+void CASConstructionProcess::SetG(int Green)
+{
+	this.m_nG = Green;
+}
+
+void CASConstructionProcess::SetB(int Blue)
+{
+	this.m_nB = Blue;
+}
+
+void CASConstructionProcess::SetA(int Alpha)
+{
+	this.m_nA = Alpha;
+}
+
+void CASConstructionProcess::SetR2(int Red)
+{
+	this.m_nR2 = Red;
+}
+
+void CASConstructionProcess::SetG2(int Green)
+{
+	this.m_nG2 = Green;
+}
+
+void CASConstructionProcess::SetB2(int Blue)
+{
+	this.m_nB2 = Blue;
+}
+
+void CASConstructionProcess::SetCharSpace(int Space)
+{
+	this.m_CharSpace = Space;
+}
+
+void CASConstructionProcess::SetLineSpace(int Space)
+{
+	this.m_LineSpace = Space;
+}
+
+void CASConstructionProcess::SetFontProperty(ref CASCharSpriteProperty Property)
+{
+	this.m_Font = Property;
+}
+
+void CASConstructionProcess::SetText(string Text)
+{
+	this.m_Text = Text;
+}
+
+void CASConstructionProcess::SetCGName(string Name)
+{
+	this.m_CGName = Name;
+}
+
+void CASConstructionProcess::SetFullSize(bool Full)
+{
+	this.m_FullSize = Full;
+}
+

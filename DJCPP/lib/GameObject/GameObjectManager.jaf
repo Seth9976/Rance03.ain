@@ -1,0 +1,131 @@
+int GameObjectManager::addFocusObject(DELEGATE_UPDATE_METHOD cbUpdate, DELEGATE_FOCUSED_METHOD cbFocused)
+{
+	GameObject m;
+	m.setId(this.getNewObjectId());
+	m.setObjectName(system.GetFuncStackName(1));
+	m.setUpdateMethod(cbUpdate);
+	m.setFocusedMethod(cbFocused);
+	this.gameObject_.PushBack(m);
+	return m.getId();
+}
+
+int GameObjectManager::addObject(DELEGATE_UPDATE_METHOD cbUpdate)
+{
+	GameObject m;
+	m.setId(this.getNewObjectId());
+	m.setObjectName(system.GetFuncStackName(1));
+	m.setUpdateMethod(cbUpdate);
+	this.gameObject_.PushBack(m);
+	return m.getId();
+}
+
+int GameObjectManager::addIndependentObject(DELEGATE_UPDATE_METHOD cbUpdate)
+{
+	GameObject m;
+	m.setId(this.getNewObjectId());
+	m.setObjectName(system.GetFuncStackName(1));
+	m.setUpdateMethod(cbUpdate);
+	m.setIndependentObject(true);
+	this.gameObject_.PushBack(m);
+	return m.getId();
+}
+
+void GameObjectManager::update()
+{
+	int i;
+	while (i < this.gameObject_.Numof())
+	{
+		if (this.gameObject_[i].isAlive())
+		{
+			if (!this.gameObject_[i].isStacked())
+			{
+				this.gameObject_[i].callUpdateMethod();
+			}
+			++i;
+		}
+		else
+		{
+			this.gameObject_.Erase(i);
+		}
+	}
+}
+
+void GameObjectManager::pushScene()
+{
+	this.stackGameObject(true);
+}
+
+void GameObjectManager::popScene()
+{
+	this.stackGameObject(false);
+}
+
+void GameObjectManager::stackGameObject(bool val)
+{
+	int i;
+	while (i < this.gameObject_.Numof())
+	{
+		if (!this.gameObject_[i].isAlive())
+		{
+			this.gameObject_.Erase(i);
+		}
+		else
+		{
+			if (val)
+			{
+				this.gameObject_[i].addSceneStackLevel();
+			}
+			else
+			{
+				this.gameObject_[i].decSceneStackLevel();
+			}
+			++i;
+		}
+	}
+}
+
+void GameObjectManager::setSceneStackLevel(int id, int level)
+{
+	int i;
+	for (i = 0; i < this.gameObject_.Numof(); ++i)
+	{
+		if (this.gameObject_[i].getId() == id)
+		{
+			this.gameObject_[i].setSceneStackLevel(level);
+			return;
+		}
+	}
+}
+
+int GameObjectManager::getSceneStackLevel(int id)
+{
+	int i;
+	for (i = 0; i < this.gameObject_.Numof(); ++i)
+	{
+		if (this.gameObject_[i].getId() == id)
+		{
+			return this.gameObject_[i].getSceneStackLevel();
+		}
+	}
+	return 0;
+}
+
+int GameObjectManager::getNewObjectId()
+{
+	this.objectId_ = this.objectId_ + 1 & 65535;
+	return this.objectId_;
+}
+
+int GameObjectManager::getFocusedObjectId()
+{
+	int i;
+	for (i = 0; i < this.gameObject_.Numof(); ++i)
+	{
+		if (!this.gameObject_[i].isStacked() && this.gameObject_[i].callFocuedMethod())
+		{
+			return this.gameObject_[i].getId();
+		}
+	}
+	return -1;
+}
+

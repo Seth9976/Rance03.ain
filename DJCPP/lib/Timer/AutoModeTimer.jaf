@@ -1,0 +1,27 @@
+AutoModeTimer::AutoModeTimer()
+{
+	this.reset();
+}
+
+void AutoModeTimer::reset()
+{
+	this.lastTime_ = -1;
+}
+
+bool AutoModeTimer::isSkipFrame()
+{
+	if (g_mouse.isClick(0))
+	{
+		return true;
+	}
+	else if (this.lastTime_ == -1)
+	{
+		this.lastTime_ = g_globalTimer.getTime();
+	}
+	else if (g_globalTimer.getTime() - this.lastTime_ > 1200)
+	{
+		return true;
+	}
+	return false;
+}
+

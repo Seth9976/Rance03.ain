@@ -1,0 +1,19 @@
+void EnquiteInfoDialog::open(string activityFileName)
+{
+	Ｐ＿アクティビティ実行(activityFileName, this.onLoad, NULL, NULL);
+}
+
+void EnquiteInfoDialog::onLoad(string activityFileName, string activityName)
+{
+	this.activityFileName_ = activityFileName;
+	this.activityName_ = activityName;
+	setCursorClickSoundToActivity(activityName);
+	AFL_Parts_AddWholeMouseLClickEvent(this.onClick);
+	AFL_Parts_AddWholeMouseRClickEvent(this.onClick);
+}
+
+void EnquiteInfoDialog::onClick(int partsNumber, int mouseX, int mouseY)
+{
+	AFL_Activity_End();
+}
+

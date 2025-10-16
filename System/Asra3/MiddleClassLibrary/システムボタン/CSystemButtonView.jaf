@@ -1,0 +1,147 @@
+CSystemButtonView::CSystemButtonView()
+{
+	this.m_FirstUpdate = true;
+	this.m_ButtonIndex = -2147483648;
+	this.m_State = -2147483648;
+	this.m_Show = true;
+}
+
+void CSystemButtonView::Create(int ButtonIndex)
+{
+	this.m_ButtonIndex = ButtonIndex;
+	this.m_Parts.Create();
+	PARTS_SetWantSaveBackScene(this.m_Parts.GetPartsNumber(), false);
+}
+
+void CSystemButtonView::Delete()
+{
+	this.m_Parts.Release();
+	this.m_FirstUpdate = true;
+	this.m_ButtonIndex = -2147483648;
+	this.m_State = -2147483648;
+}
+
+void CSystemButtonView::SetPartsLayer(int ID)
+{
+	if (!this.m_Parts.IsExist())
+	{
+		return;
+	}
+	Ｐ＿親設定(this.m_Parts.GetPartsNumber(), ID);
+}
+
+void CSystemButtonView::RecreateButtonByState(int MessageWindowNumber, int ButtonIndex, int State)
+{
+	if (!this.m_Parts.IsExist())
+	{
+		this.m_Parts.Create();
+	}
+	ref CSystemButtonModelMap ModelMap = g_SystemButtonModelMap;
+	string Name;
+	bool IsFlat = false;
+	switch (State)
+	{
+	case 0:
+		Name = ModelMap.GetPlainName(MessageWindowNumber, ButtonIndex);
+		IsFlat = ModelMap.IsFlatButton(MessageWindowNumber, ButtonIndex);
+		break;
+	case 1:
+		Name = ModelMap.GetOnCursorName(MessageWindowNumber, ButtonIndex);
+		IsFlat = ModelMap.IsFlatButton(MessageWindowNumber, ButtonIndex);
+		break;
+	case 2:
+		Name = ModelMap.GetKeyDownName(MessageWindowNumber, ButtonIndex);
+		if (Name.Empty())
+		{
+			Name = ModelMap.GetOnCursorName(MessageWindowNumber, ButtonIndex);
+		}
+		IsFlat = ModelMap.IsFlatButton(MessageWindowNumber, ButtonIndex);
+		break;
+	case 3:
+		if (_g_回想中 && ModelMap.IsInvalidByReminisceMode(MessageWindowNumber, ButtonIndex))
+		{
+			Name = ModelMap.GetCoverName(MessageWindowNumber, ButtonIndex);
+			IsFlat = ModelMap.IsFlatCover(MessageWindowNumber, ButtonIndex);
+		}
+		else
+		{
+			Name = ModelMap.GetDisableName(MessageWindowNumber, ButtonIndex);
+			IsFlat = ModelMap.IsFlatDisable(MessageWindowNumber, ButtonIndex);
+		}
+		break;
+	}
+	if (Name.Empty())
+	{
+		this.m_Parts.Release();
+		this.m_Parts.Create();
+	}
+	else if (!IsFlat)
+	{
+		this.m_Parts.SetCG(Name, 1);
+	}
+	else
+	{
+		this.m_Parts.SetFlat(Name);
+	}
+	this.m_Parts.SetPos(ModelMap.GetX(MessageWindowNumber, ButtonIndex), ModelMap.GetY(MessageWindowNumber, ButtonIndex));
+	this.m_Parts.SetZ(ModelMap.GetZ(MessageWindowNumber, ButtonIndex));
+}
+
+void CSystemButtonView::Update()
+{
+	int MessageWindowNumber = g_SystemButtonViewList.GetMessageWindowNumber();
+	int ButtonCount = g_SystemButtonModelMap.GetButtonCount(MessageWindowNumber);
+	if (this.m_ButtonIndex < 0 || this.m_ButtonIndex >= ButtonCount)
+	{
+		system.Error("m_ButtonIndex = %d\ng_SystemButtonModelMap.GetButtonCount(%d) = %d\n" % this.m_ButtonIndex % MessageWindowNumber % ButtonCount);
+		return;
+	}
+	if (this.m_FirstUpdate)
+	{
+		this.RecreateButtonByState(MessageWindowNumber, this.m_ButtonIndex, 0);
+		this.m_FirstUpdate = false;
+	}
+	this.m_State = this.UpdateState();
+	this.RecreateButtonByState(MessageWindowNumber, this.m_ButtonIndex, this.m_State);
+	if (this.m_Parts.IsExist())
+	{
+		this.m_Parts.SetShow(this.m_Show);
+	}
+}
+
+int CSystemButtonView::UpdateState()
+{
+	int MessageWindowNumber = g_SystemButtonViewList.GetMessageWindowNumber();
+	if (!g_SystemButtonModelMap.IsEnable(MessageWindowNumber, this.m_ButtonIndex))
+	{
+		return 3;
+	}
+	if (this.m_Parts.IsExist())
+	{
+		int PartsNumber = this.m_Parts.GetPartsNumber();
+		bool IsPixelDecide = g_SystemButtonModelMap.IsPixelDecide(MessageWindowNumber, this.m_ButtonIndex);
+		Ｐ＿ピクセル判定設定(PartsNumber, IsPixelDecide);
+		if (Ｐ＿オンカーソル判定(this.m_Parts.GetPartsNumber(), 1))
+		{
+			if (AFL_IsKeyDown(1))
+			{
+				return 2;
+			}
+			return 1;
+		}
+	}
+	return 0;
+}
+
+void CSystemButtonView::SetShow(bool Show)
+{
+	this.m_Show = Show;
+	this.m_FirstUpdate = true;
+	this.Update();
+}
+
+bool CSystemButtonView::IsSelecting()
+{
+	return this.m_State == 1 || this.m_State == 2;
+}
+

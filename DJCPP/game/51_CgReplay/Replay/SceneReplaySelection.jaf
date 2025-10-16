@@ -1,0 +1,104 @@
+SceneReplaySelection::SceneReplaySelection()
+{
+	this.isFadeOutFinish_ = false;
+}
+
+void SceneReplaySelection::init(array@string selection)
+{
+	this.clickedIndex_ = -2;
+	this.selection_.Alloc(selection.Numof());
+	this.selection_.Copy(0, selection, 0, selection.Numof());
+	this.initBg();
+	this.initButton();
+}
+
+void SceneReplaySelection::initBg()
+{
+	this.partsBg_.initAsPlaneImage(1024, 768, 0, 0, 0, 160);
+	this.partsBg_.setZ(8500.0);
+}
+
+void SceneReplaySelection::initButton()
+{
+	this.btn_.Alloc(this.selection_.Numof());
+	int i;
+	for (i = 0; i < this.btn_.Numof(); ++i)
+	{
+		this.btn_[i].init("システム／ボタン／幅２８２", this.selection_[i], "", true);
+		this.btn_[i].setClickCallback(this.onClick, i);
+		this.btn_[i].setZ(8550);
+	}
+	this.btn_[this.btn_.Numof() - 1].setOnFinishFadeOutCallback(this.onFinishFadeOut);
+}
+
+void SceneReplaySelection::run()
+{
+	this.fadeIn(true);
+}
+
+bool SceneReplaySelection::update()
+{
+	if (this.isFadeOutFinish_)
+	{
+		return false;
+	}
+	if (this.clickedIndex_ == -2 && g_mouse.isClick(1))
+	{
+		playCancel();
+		this.clickedIndex_ = -1;
+		this.fadeIn(false);
+	}
+	return true;
+}
+
+void SceneReplaySelection::fadeIn(bool val)
+{
+	int i;
+	for (i = 0; i < this.btn_.Numof(); ++i)
+	{
+		int x;
+		int y;
+		this.getPos(x, y, i);
+		array@PartsMotion m[1];
+		if (val)
+		{
+			m[0].setTime(250);
+			m[0].setMove(371, 360, x, y, 1);
+			m[0].setAlpha(0, 255, 0);
+		}
+		else
+		{
+			m[0].setTime(100);
+			m[0].setMove(x, y, 371, 360, 1);
+			m[0].setAlpha(255, 0, 0);
+		}
+		this.btn_[i].fadeInCustomized(val, m);
+	}
+	this.partsBg_.setShow(true);
+	this.partsBg_.runMotion(getStandardMotion(val ? 0 : 1), NULL);
+}
+
+void SceneReplaySelection::onClick(int index)
+{
+	this.clickedIndex_ = index;
+	this.fadeIn(false);
+}
+
+int SceneReplaySelection::getClickedIndex()
+{
+	return this.clickedIndex_;
+}
+
+void SceneReplaySelection::getPos(ref int x, ref int y, int index)
+{
+	int c = this.selection_.Numof();
+	int h = c * 48 + (c - 1) * 8;
+	x = 371;
+	y = ((384 - h / 2) + index * 56) - 24;
+}
+
+void SceneReplaySelection::onFinishFadeOut()
+{
+	this.isFadeOutFinish_ = true;
+}
+

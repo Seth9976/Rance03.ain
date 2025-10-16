@@ -1,0 +1,464 @@
+string 制御／レベルアップメッセージ(string playerId, int level, string newSkillId)
+{
+	string msg;
+	if (level == getPlayerFromId(playerId).getMaxLevel())
+	{
+		switch (playerId)
+		{
+		case "ランス":
+			msg = "この辺で勘弁してやるか";
+			break;
+		case "シィル":
+			msg = "これ以上は無理です……";
+			break;
+		case "リア":
+			msg = "わーいダーリン、上限だよ";
+			break;
+		case "マリス":
+			msg = "あら、これで上限ですか";
+			break;
+		case "かなみ":
+			msg = "上限……うん、頑張った";
+			break;
+		case "フェリス":
+			msg = "限界まで酷使された……";
+			break;
+		case "マリア":
+			msg = "あっ、限界か……";
+			break;
+		case "志津香":
+			msg = "あとは戦い方次第って事ね";
+			break;
+		case "ミリ":
+			msg = "ふー、ここいらが限界か";
+			break;
+		case "ミル":
+			msg = "これで一人前かなっ！";
+			break;
+		case "セル":
+			msg = "これからも導き続けます";
+			break;
+		case "バレス":
+			msg = "長期戦もさすがに終局か";
+			break;
+		case "スー":
+			msg = "モウ強クナラナイノカ？";
+			break;
+		case "リック":
+			msg = "……ここからです";
+			break;
+		case "メナド":
+			msg = "ここまでよく頑張れたかな";
+			break;
+		case "ユラン":
+			msg = "私はここまでか……";
+			break;
+		case "レイラ":
+			msg = "これが限界、か……";
+			break;
+		case "ジュリア":
+			msg = "ほら、限界あげてあげて！";
+			break;
+		case "アテン":
+			msg = "とうとうこんなに……";
+			break;
+		case "ネカイ":
+			msg = "あらら、打ち止めみたいね";
+			break;
+		case "バーニング":
+			msg = "フランチェスカ……";
+			break;
+		case "イェリコ":
+			msg = "さいきょうになったぞ！";
+			break;
+		}
+	}
+	else if (newSkillId != "")
+	{
+		switch (playerId)
+		{
+		case "ランス":
+			msg = "むっ、閃いたぞ！";
+			break;
+		case "シィル":
+			msg = "あっ、閃きました！";
+			break;
+		case "リア":
+			msg = "あんぱんじゃむぱん♪";
+			break;
+		case "マリス":
+			msg = "更にリア様をお守りします";
+			break;
+		case "かなみ":
+			msg = "えーと、にんにんっ！";
+			break;
+		case "フェリス":
+			msg = "これが悪魔の力……";
+			break;
+		case "マリア":
+			msg = "いいこと思いついた！";
+			break;
+		case "志津香":
+			msg = "そろそろこれを使うわ";
+			break;
+		case "ミリ":
+			msg = "ふふふ、試してみるか？";
+			break;
+		case "ミル":
+			msg = "大人の階段のぼった！";
+			break;
+		case "セル":
+			msg = "天啓を得ました";
+			break;
+		case "バレス":
+			msg = "斬り合いでも負けんぞ";
+			break;
+		case "スー":
+			msg = "すー、覚エタ！";
+			break;
+		case "リック":
+			msg = "試したい事が増えました";
+			break;
+		case "メナド":
+			msg = "やってみようかな";
+			break;
+		case "ユラン":
+			msg = "幻夢剣の先を披露しよう";
+			break;
+		case "レイラ":
+			msg = "またひとつ開眼したわ";
+			break;
+		case "ジュリア":
+			msg = "ジュリアチャレンジ！";
+			break;
+		case "アテン":
+			msg = "もう勘弁して……";
+			break;
+		case "ネカイ":
+			msg = "おねーさんの秘めた力よん";
+			break;
+		case "バーニング":
+			msg = "この力を使えというのか";
+			break;
+		case "イェリコ":
+			msg = "どうだ、このちから！";
+			break;
+		}
+	}
+	else
+	{
+		switch (playerId)
+		{
+		case "ランス":
+			switch (RAND(3))
+			{
+			case 1:
+				msg = "よし、強くなったな";
+				break;
+			case 2:
+				msg = "どこまでも強くなるぞ";
+				break;
+			case 3:
+				msg = "向かうところ敵なしだ！";
+				break;
+			}
+			break;
+		case "シィル":
+			switch (RAND(3))
+			{
+			case 1:
+				msg = "これでもっと頑張れます";
+				break;
+			case 2:
+				msg = "ありがとうございます！";
+				break;
+			case 3:
+				msg = "わ、HPも回復しました！";
+				break;
+			}
+			break;
+		case "リア":
+			switch (RAND(3))
+			{
+			case 1:
+				msg = "ダーリン、嬉しい？";
+				break;
+			case 2:
+				msg = "これもダーリンの為ね！";
+				break;
+			case 3:
+				msg = "ダーーリーーン！！";
+				break;
+			}
+			break;
+		case "マリス":
+			switch (RAND(3))
+			{
+			case 1:
+				msg = "全てはリア様の為に";
+				break;
+			case 2:
+				msg = "力が増すのは助かりますね";
+				break;
+			case 3:
+				msg = "はい";
+				break;
+			}
+			break;
+		case "かなみ":
+			switch (RAND(3))
+			{
+			case 1:
+				msg = "忍者は日々が修行、よ";
+				break;
+			case 2:
+				msg = "技が冴えてきたわね";
+				break;
+			case 3:
+				msg = "やった！";
+				break;
+			}
+			break;
+		case "フェリス":
+			switch (RAND(3))
+			{
+			case 1:
+				msg = "あれっ、レベル上がるの？";
+				break;
+			case 2:
+				msg = "……強くなっちゃった";
+				break;
+			case 3:
+				msg = "レベル神、こっち見てる？";
+				break;
+			}
+			break;
+		case "マリア":
+			switch (RAND(3))
+			{
+			case 1:
+				msg = "バージョン更新っ！";
+				break;
+			case 2:
+				msg = "実践に勝るものはないわね";
+				break;
+			case 3:
+				msg = "ケーキでお祝いしましょ";
+				break;
+			}
+			break;
+		case "志津香":
+			switch (RAND(3))
+			{
+			case 1:
+				msg = "もっと、強く……！";
+				break;
+			case 2:
+				msg = "まだまだね……";
+				break;
+			case 3:
+				msg = "魔力が上がったわね、よし";
+				break;
+			}
+			break;
+		case "ミリ":
+			switch (RAND(3))
+			{
+			case 1:
+				msg = "おっと、強くなったな";
+				break;
+			case 2:
+				msg = "神様てのも美人でいいな";
+				break;
+			case 3:
+				msg = "いけるだけいくぜ";
+				break;
+			}
+			break;
+		case "ミル":
+			switch (RAND(3))
+			{
+			case 1:
+				msg = "わお、レベルアーップ！";
+				break;
+			case 2:
+				msg = "かれーなるせーちょー！";
+				break;
+			case 3:
+				msg = "もうたべごろだよ！";
+				break;
+			}
+			break;
+		case "セル":
+			switch (RAND(3))
+			{
+			case 1:
+				msg = "主よ、感謝します";
+				break;
+			case 2:
+				msg = "この力で迷える人々を……";
+				break;
+			case 3:
+				msg = "ああ……主よ……";
+				break;
+			}
+			break;
+		case "バレス":
+			switch (RAND(3))
+			{
+			case 1:
+				msg = "老いてなお盛ん、かの";
+				break;
+			case 2:
+				msg = "伸びること歩の如し";
+				break;
+			case 3:
+				msg = "儂も未だ道半ばじゃな";
+				break;
+			}
+			break;
+		case "スー":
+			switch (RAND(3))
+			{
+			case 1:
+				msg = "狩リノ腕、上ガッタ！";
+				break;
+			case 2:
+				msg = "すー、強ク……ナッタ？";
+				break;
+			case 3:
+				msg = "れべるあっぷダナ！";
+				break;
+			}
+			break;
+		case "リック":
+			switch (RAND(3))
+			{
+			case 1:
+				msg = "まだまだ、剣を磨きます";
+				break;
+			case 2:
+				msg = "強くなった……のですか";
+				break;
+			case 3:
+				msg = "未だ道は半ば……";
+				break;
+			}
+			break;
+		case "メナド":
+			switch (RAND(3))
+			{
+			case 1:
+				msg = "やれるだけやってみる！";
+				break;
+			case 2:
+				msg = "もっと頑張るよ！";
+				break;
+			case 3:
+				msg = "やった！";
+				break;
+			}
+			break;
+		case "ユラン":
+			switch (RAND(3))
+			{
+			case 1:
+				msg = "うん、よし……悪くない";
+				break;
+			case 2:
+				msg = "へぇ……強くなったよ";
+				break;
+			case 3:
+				msg = "翔ぼう……もっと先へ";
+				break;
+			}
+			break;
+		case "レイラ":
+			switch (RAND(3))
+			{
+			case 1:
+				msg = "もっと、もっともっと強く";
+				break;
+			case 2:
+				msg = "強くなる感覚……いいわね";
+				break;
+			case 3:
+				msg = "これであの人は越えたかな";
+				break;
+			}
+			break;
+		case "ジュリア":
+			switch (RAND(3))
+			{
+			case 1:
+				msg = "ジュリア、強くなった！";
+				break;
+			case 2:
+				msg = "ねぇねぇ、かっこいい？";
+				break;
+			case 3:
+				msg = "きゅっぴーん！";
+				break;
+			}
+			break;
+		case "アテン":
+			switch (RAND(3))
+			{
+			case 1:
+				msg = "さすがにもういいでしょ";
+				break;
+			case 2:
+				msg = "どこまでつきあえば……";
+				break;
+			case 3:
+				msg = "いいから帰してー！";
+				break;
+			}
+			break;
+		case "ネカイ":
+			switch (RAND(3))
+			{
+			case 1:
+				msg = "変わるわよ？";
+				break;
+			case 2:
+				msg = "んふふ♪";
+				break;
+			case 3:
+				msg = "立ち位置はここでいい？";
+				break;
+			}
+			break;
+		case "バーニング":
+			switch (RAND(3))
+			{
+			case 1:
+				msg = "蝶のように……！";
+				break;
+			case 2:
+				msg = "蜂のように……！";
+				break;
+			case 3:
+				msg = "とどまるところを知らんな";
+				break;
+			}
+			break;
+		case "イェリコ":
+			switch (RAND(3))
+			{
+			case 1:
+				msg = "それよりおかしをよこせ！";
+				break;
+			case 2:
+				msg = "みなぎってきたぞ！";
+				break;
+			case 3:
+				msg = "おりゃーっ！";
+				break;
+			}
+			break;
+		}
+	}
+	return msg;
+}
+

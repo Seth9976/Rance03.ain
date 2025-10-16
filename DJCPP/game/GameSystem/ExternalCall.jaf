@@ -1,0 +1,305 @@
+void gameChangeCard(string dungeonId, int x, int y, string newCardId)
+{
+	ref Dungeon d = getDungeonFromId(dungeonId);
+	ref DungeonLine l = d.getDungeonLine(y);
+	ref DungeonCard c = l.getDungeonCard(x + d.getWidth() / 2);
+	c.changeCardType(newCardId);
+}
+
+void gameChangeCardPermanent(string dungeonId, int x, int y, string newCardId)
+{
+	ref Dungeon d = getDungeonFromId(dungeonId);
+	ref DungeonLine l = d.getDungeonLine(y);
+	ref DungeonCard c = l.getDungeonCard(x + d.getWidth() / 2);
+	c.changeCardTypePermanent(newCardId);
+}
+
+void gameExitPlayerFromParty(string playerId)
+{
+	getPlayerFromId(playerId).setJoin(false);
+	array@int eraseIndex;
+	int i;
+	while (i < g_party.getCount())
+	{
+		string skillId = g_party.getAttackSkillId(i);
+		string pId = getPlayerSkillFromId(skillId).getPlayerId();
+		if (pId == playerId)
+		{
+			g_party.erase(i);
+		}
+		else
+		{
+			++i;
+		}
+	}
+}
+
+void gameCheckItemMax()
+{
+	int i;
+	for (i = 0; i < g_item.Numof(); ++i)
+	{
+		string id = g_item[i].getId();
+		if (g_playerCommonParam.getItemCount(id) > g_item[i].getMaxCount())
+		{
+			g_playerCommonParam.decItem(id);
+			DialogInfomation info;
+			info.setCaption("いっぱいいっぱい！");
+			info.setMessage("%sは、|もう持てないので投げ捨てた" % g_item[i].getName());
+			info.setPictureImageName("システム／ダイアログ／写真／情報");
+			openDialog(info);
+		}
+	}
+}
+
+void gameGetJoinedPlayer(ref array@string p)
+{
+	p.Free();
+	int i;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		if (g_player[i].isJoin())
+		{
+			p.PushBack(g_player[i].getId());
+		}
+	}
+}
+
+void gameAddAdvSelection(int id, string advSelectionId)
+{
+	AdvSelectionInfo info;
+	info.id = id;
+	info.advSelectionId = advSelectionId;
+	g_advSelectionInfo.PushBack(info);
+}
+
+int gameAdvSelection()
+{
+	array@string n;
+	n.Alloc(g_advSelectionInfo.Numof());
+	int i;
+	for (i = 0; i < g_advSelectionInfo.Numof(); ++i)
+	{
+		n[i] = g_advSelectionInfo[i].advSelectionId;
+	}
+	string result = openAdvSelection(n);
+	int resultId = -1;
+	for (i = 0; i < g_advSelectionInfo.Numof(); ++i)
+	{
+		if (g_advSelectionInfo[i].advSelectionId == result)
+		{
+			resultId = g_advSelectionInfo[i].id;
+		}
+	}
+	g_advSelectionInfo.Free();
+	return resultId;
+}
+
+int gameAdvSelection2()
+{
+	array@string n;
+	n.Alloc(g_advSelectionInfo.Numof());
+	int i;
+	for (i = 0; i < g_advSelectionInfo.Numof(); ++i)
+	{
+		n[i] = g_advSelectionInfo[i].advSelectionId;
+	}
+	string result = openAdvSelection2(n);
+	int resultId = -1;
+	for (i = 0; i < g_advSelectionInfo.Numof(); ++i)
+	{
+		if (g_advSelectionInfo[i].advSelectionId == result)
+		{
+			resultId = g_advSelectionInfo[i].id;
+		}
+	}
+	g_advSelectionInfo.Free();
+	return resultId;
+}
+
+void eraseNotSpecificGroupRankSkillId(ref array@string skillId, int groupRank)
+{
+	int i;
+	while (i < skillId.Numof())
+	{
+		ref PlayerSkill skill = getPlayerSkillFromId(skillId[i]);
+		if (skill.getGroupRank() != groupRank)
+		{
+			skillId.Erase(i);
+		}
+		else
+		{
+			++i;
+		}
+	}
+}
+
+string findNextSkillId(string skillId)
+{
+	ref PlayerSkill skill = getPlayerSkillFromId(skillId);
+	int i;
+	for (i = 0; i < g_attackSkill.Numof(); ++i)
+	{
+		if (g_attackSkill[i].getGroupId() == skill.getGroupId())
+		{
+			if (g_attackSkill[i].getGroupRank() == skill.getGroupRank() + 1)
+			{
+				return g_attackSkill[i].getId();
+			}
+		}
+	}
+	return "";
+}
+
+ref BadCondition getBadConditionFromId(string id)
+{
+	int i;
+	for (i = 0; i < g_badCondition.Numof(); ++i)
+	{
+		if (g_badCondition[i].getId() == id)
+		{
+			return g_badCondition[i];
+		}
+	}
+	pass("そんなbadConditionないで:%s" % id);
+	return NULL;
+}
+
+string getSkillIdNextRankFromOrganizedParty(int rank)
+{
+	array@string skillId;
+	g_party.getSkillIdList(skillId);
+	eraseNotSpecificGroupRankSkillId(skillId, rank);
+	if (skillId.Empty())
+	{
+		return "";
+	}
+	array@string nextSkill;
+	getAvailableNextSkillFromList(nextSkill, skillId);
+	if (nextSkill.Empty())
+	{
+		return "";
+	}
+	return nextSkill[RAND(nextSkill.Numof()) - 1];
+}
+
+string getSkillIdNextRankFromJoinedPlayer(int rank)
+{
+	array@string skillId;
+	getJoinedPlayerSkill(skillId);
+	eraseNotSpecificGroupRankSkillId(skillId, rank);
+	if (skillId.Empty())
+	{
+		return "";
+	}
+	array@string nextSkill;
+	getAvailableNextSkillFromList(nextSkill, skillId);
+	if (nextSkill.Empty())
+	{
+		return "";
+	}
+	return nextSkill[RAND(nextSkill.Numof()) - 1];
+}
+
+void getJoinedPlayerSkill(ref array@string skillId)
+{
+	skillId.Free();
+	int i;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		if (g_player[i].isJoin())
+		{
+			int j;
+			for (j = 0; j < 4; ++j)
+			{
+				string n = g_player[i].getAttackSkillId(j);
+				if (n != "")
+				{
+					skillId.PushBack(n);
+				}
+			}
+		}
+	}
+}
+
+void getAvailableNextSkillFromList(ref array@string nextSkill, ref array@string source)
+{
+	int i;
+	for (i = 0; i < source.Numof(); ++i)
+	{
+		string n = findNextSkillId(source[i]);
+		if (n != "")
+		{
+			nextSkill.PushBack(n);
+		}
+	}
+}
+
+bool isCompleteMirrorPiece()
+{
+	int i;
+	for (i = 0; i < g_mirrorPiece.Numof(); ++i)
+	{
+		if (!g_mirrorPiece[i].isComplete())
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+void changeMapEncountProbability(int nodeCount, int noHit, int hit1, int hit2, int hit3)
+{
+	int i;
+	for (i = 0; i < g_mapEncountProbability.Numof(); ++i)
+	{
+		if (g_mapEncountProbability[i].getNodeCount() == nodeCount)
+		{
+			g_mapEncountProbability[i].change(noHit, hit1, hit2, hit3);
+		}
+	}
+}
+
+int getCoolTimeFromSkillId(string skillId)
+{
+	ref PlayerSkill s = getPlayerSkillFromId(skillId);
+	ref Player p = getPlayerFromId(s.getPlayerId());
+	return p.getCoolTime(skillId);
+}
+
+void gameAddBattleCount()
+{
+	array@string playerIds;
+	g_party.getPlayerIdList(playerIds);
+	int i;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		if (playerIds.Find(0, playerIds.Numof(), g_player[i].getId()) >= 0)
+		{
+			g_player[i].addTotalBattleCount();
+			g_player[i].addConsecutiveBattleCount();
+		}
+	}
+}
+
+void gameClearConsecutiveBattleCount()
+{
+	array@string playerIds;
+	g_party.getPlayerIdList(playerIds);
+	int i;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		if (playerIds.Find(0, playerIds.Numof(), g_player[i].getId()) < 0)
+		{
+			g_player[i].clearConsecutiveBattleCount();
+		}
+	}
+}
+
+void gameSetMemo(int index, string memo)
+{
+	g_gameFlagMap.setString("俺のメモ", memo);
+	int current = g_globalGameFlag.getInt("最大進行状況");
+	g_globalGameFlag.setInt("最大進行状況", Math.Max(index, current));
+}
+

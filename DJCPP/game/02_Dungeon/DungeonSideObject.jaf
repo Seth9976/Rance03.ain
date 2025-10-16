@@ -1,0 +1,101 @@
+DungeonSideObject::DungeonSideObject()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void DungeonSideObject::init(string flatName, int posType)
+{
+	this.flatName_ = flatName;
+	this.posType_ = posType;
+	this.inOutType_ = 0;
+	if (flatName != "")
+	{
+		this.initParts();
+	}
+}
+
+void DungeonSideObject::update()
+{
+}
+
+void DungeonSideObject::fadeIn(bool val, DG_GeneralCallback onFinish)
+{
+	if (this.flatName_ == "")
+	{
+		return;
+	}
+	this.setPartsShow();
+	if (val)
+	{
+		this.startFlat();
+	}
+	PartsMotion m;
+	m.setTime(val ? 500 : 200);
+	if (val)
+	{
+		m.setAlpha(0, 255, 0);
+	}
+	else
+	{
+		m.setAlpha(255, 0, 0);
+	}
+	switch (this.posType_)
+	{
+	case 0:
+		if (val)
+		{
+			m.setMove(-200, 0, 0, 0, 1);
+		}
+		else
+		{
+			m.setMove(0, 0, -200, 0, 1);
+		}
+		break;
+	case 1:
+		if (val)
+		{
+			m.setMove(200, 0, 0, 0, 1);
+		}
+		else
+		{
+			m.setMove(0, 0, 200, 0, 1);
+		}
+		break;
+	case 2:
+		if (val)
+		{
+			m.setMove(0, -100, 0, 0, 1);
+		}
+		else
+		{
+			m.setMove(0, 0, -100, 0, 1);
+		}
+		break;
+	}
+	this.parent_.runMotion(m, onFinish);
+}
+
+void DungeonSideObject::initParts()
+{
+	this.parent_.initAsDummy();
+	this.partsFlat_.initAsFlat("ダンジョン/%s" % this.flatName_);
+	this.partsFlat_.setZ(1700.0);
+	this.partsFlat_.setParent(this.parent_.getPartsNumber());
+	this.setPartsPos();
+}
+
+void DungeonSideObject::setPartsShow()
+{
+	this.parent_.setShow(true);
+	this.partsFlat_.setShow(true);
+}
+
+void DungeonSideObject::setPartsPos()
+{
+}
+
+void DungeonSideObject::startFlat()
+{
+	this.partsFlat_.startFlat(false, 1.0);
+}
+

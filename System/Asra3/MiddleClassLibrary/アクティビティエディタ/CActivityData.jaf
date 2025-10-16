@@ -1,0 +1,145 @@
+CActivityData::CActivityData()
+{
+}
+
+CActivityData::~CActivityData()
+{
+	this.Close();
+}
+
+bool CActivityData::Release()
+{
+	if (!this.m_HoldData)
+	{
+		return true;
+	}
+	if (!SYS_Activity_RemoveAllParts(this.m_HoldDataActivityName))
+	{
+		DIALOG_OK("パーツ全開放失敗\n");
+		return false;
+	}
+	if (!SYS_Activity_Release(this.m_HoldDataActivityName))
+	{
+		DIALOG_OK("アクティビティ削除失敗\n");
+		return false;
+	}
+	this.m_HoldData = false;
+	this.m_FileName = "";
+	this.m_HoldDataActivityName = "";
+	return true;
+}
+
+bool CActivityData::IsHoldActivity()
+{
+	return this.m_HoldData;
+}
+
+string CActivityData::GetFileName()
+{
+	return this.m_FileName;
+}
+
+string CActivityData::GetActivityName()
+{
+	return this.m_HoldDataActivityName;
+}
+
+bool CActivityData::Create(string FileName)
+{
+	if (!this.Release())
+	{
+		return false;
+	}
+	string CreatingActivityName = SYS_Activity_GetFreeName(FileName);
+	if (!SYS_Activity_Create(CreatingActivityName))
+	{
+		DIALOG_OK("アクティビティ作成失敗");
+		return false;
+	}
+	this.m_HoldData = true;
+	this.m_FileName = FileName;
+	this.m_HoldDataActivityName = CreatingActivityName;
+	return true;
+}
+
+bool CActivityData::Load(string FileName, int LayerID)
+{
+	if (!this.Release())
+	{
+		return false;
+	}
+	int PrevLayerID = AFL_Parts_SetActiveLayer(LayerID);
+	string CreatingActivityName = SYS_Activity_GetFreeName(FileName);
+	if (!SYS_Activity_ReadFile(CreatingActivityName, FileName))
+	{
+		DIALOG_OK("アクティビティ読み込み失敗");
+		return false;
+	}
+	AFL_Parts_SetActiveLayer(PrevLayerID);
+	this.m_HoldData = true;
+	this.m_FileName = FileName;
+	this.m_HoldDataActivityName = CreatingActivityName;
+	return true;
+}
+
+bool CActivityData::CloseWithWrite()
+{
+	if (!this.m_HoldData)
+	{
+		return true;
+	}
+	if (!SYS_Activity_WriteFile(this.m_HoldDataActivityName, this.m_FileName))
+	{
+		DIALOG_OK("アクティビティバイナリ書き出し失敗");
+		return false;
+	}
+	if (!this.Close())
+	{
+		return false;
+	}
+	return true;
+}
+
+bool CActivityData::Close()
+{
+	if (!this.Release())
+	{
+		return false;
+	}
+	return true;
+}
+
+bool CActivityData::SaveEXText(ref string Data)
+{
+	if (!this.m_HoldData)
+	{
+		return true;
+	}
+	if (!SYS_Activity_SaveEXText(Data, this.m_HoldDataActivityName))
+	{
+		DIALOG_OK("コピーデータ作成失敗");
+		return false;
+	}
+	return true;
+}
+
+bool CActivityData::LoadEXText(string FileName, string Data, int LayerID)
+{
+	if (!this.Release())
+	{
+		return false;
+	}
+	int PrevLayerID = AFL_Parts_SetActiveLayer(LayerID);
+	string CreatingActivityName = SYS_Activity_GetFreeName(FileName);
+	if (!SYS_Activity_LoadEXText(CreatingActivityName, Data))
+	{
+		DIALOG_OK("コピーデータ読み込み失敗\n");
+		return false;
+	}
+	AFL_Parts_SetActiveLayer(PrevLayerID);
+	this.m_HoldData = true;
+	this.m_FileName = FileName;
+	this.m_HoldDataActivityName = CreatingActivityName;
+	return true;
+}
+

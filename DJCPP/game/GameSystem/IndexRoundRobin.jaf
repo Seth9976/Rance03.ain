@@ -1,0 +1,57 @@
+void IndexRoundRobin::init(int count)
+{
+	this.count_ = count;
+	this.lastIndex_ = -1;
+}
+
+int IndexRoundRobin::get()
+{
+	if (this.count_ == 0)
+	{
+		return -1;
+	}
+	if (this.indexes_.Empty())
+	{
+		this.resetIndexes();
+	}
+	int val = this.indexes_[0];
+	this.indexes_.Erase(0);
+	return val;
+}
+
+void IndexRoundRobin::resetIndexes()
+{
+	int i;
+	for (i = 0; i < this.count_; ++i)
+	{
+		this.indexes_.PushBack(i);
+	}
+	this.shuffleIndexes();
+	if (this.lastIndex_ == this.indexes_[0])
+	{
+		int l;
+		int r = RAND(this.indexes_.Numof() - 1);
+		this.indexes_[l] <=> this.indexes_[r];
+	}
+	this.lastIndex_ = this.indexes_[this.indexes_.Numof() - 1];
+}
+
+void IndexRoundRobin::shuffleIndexes()
+{
+	if (this.indexes_.Numof() <= 1)
+	{
+		return;
+	}
+	int i;
+	int n = this.indexes_.Numof();
+	for (i = 0; i < n * 2; ++i)
+	{
+		int l = RAND(n) - 1;
+		int r = RAND(n) - 1;
+		if (l != r)
+		{
+			this.indexes_[l] <=> this.indexes_[r];
+		}
+	}
+}
+

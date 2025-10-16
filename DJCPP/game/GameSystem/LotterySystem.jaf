@@ -1,0 +1,90 @@
+void LotterySystem::clear()
+{
+	this.current_ = 0;
+	this.isReset_ = false;
+	this.ticket_.Free();
+}
+
+void LotterySystem::addIntKey(int key, int probability)
+{
+	if (probability == 0)
+	{
+		return;
+	}
+	LotteryTicket t;
+	t.keyInt_ = key;
+	t.probability_ = probability;
+	this.ticket_.PushBack(t);
+}
+
+void LotterySystem::addStringKey(string key, int probability)
+{
+	if (probability == 0)
+	{
+		return;
+	}
+	LotteryTicket t;
+	t.keyString_ = key;
+	t.probability_ = probability;
+	this.ticket_.PushBack(t);
+}
+
+int LotterySystem::drawInt(bool isEraseKey)
+{
+	int index = this.innerDraw();
+	int r = this.ticket_[index].keyInt_;
+	if (isEraseKey)
+	{
+		this.eraseKey(index);
+	}
+	return r;
+}
+
+string LotterySystem::drawString(bool isEraseKey)
+{
+	int index = this.innerDraw();
+	string r = this.ticket_[index].keyString_;
+	if (isEraseKey)
+	{
+		this.eraseKey(index);
+	}
+	return r;
+}
+
+void LotterySystem::eraseKey(int index)
+{
+	this.ticket_.Erase(index);
+	this.resetRange();
+}
+
+void LotterySystem::resetRange()
+{
+	this.current_ = 0;
+	int i;
+	for (i = 0; i < this.ticket_.Numof(); ++i)
+	{
+		this.ticket_[i].numberMin_ = this.current_;
+		this.ticket_[i].numberMax_ = (this.current_ + this.ticket_[i].probability_) - 1;
+		this.current_ = this.ticket_[i].numberMax_ + 1;
+	}
+}
+
+int LotterySystem::innerDraw()
+{
+	if (!this.isReset_)
+	{
+		this.resetRange();
+		this.isReset_ = true;
+	}
+	int r = RAND(this.current_) - 1;
+	int i;
+	for (i = 0; i < this.ticket_.Numof(); ++i)
+	{
+		if (this.ticket_[i].numberMin_ <= r && r <= this.ticket_[i].numberMax_)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+

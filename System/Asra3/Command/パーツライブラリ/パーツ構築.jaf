@@ -1,0 +1,237 @@
+void Ｐ＿構築手順＿作成(int パーツ番号, int 幅, int 高さ, int 状態)
+{
+	if (!PartsEngine.Parts_AddCreateToPartsConstructionProcess(パーツ番号, 幅, 高さ, 状態))
+	{
+		PARTS_Warning("Ｐ＿構築手順＿作成(パーツ番号 = %d, 幅 = %d, 高さ = %d, 状態 = %d)\n" % パーツ番号 % 幅 % 高さ % 状態);
+	}
+}
+
+void Ｐ＿構築手順＿ピクセル作成(int パーツ番号, int 幅, int 高さ, int 状態)
+{
+	if (!PartsEngine.Parts_AddCreatePixelOnlyToPartsConstructionProcess(パーツ番号, 幅, 高さ, 状態))
+	{
+		PARTS_Warning("Ｐ＿構築手順＿ピクセル作成(パーツ番号 = %d, 幅 = %d, 高さ = %d, 状態 = %d)\n" % パーツ番号 % 幅 % 高さ % 状態);
+	}
+}
+
+void Ｐ＿構築手順＿ＣＧ設定(int パーツ番号, string ＣＧ名, int 状態)
+{
+	if (!PartsEngine.Parts_AddCreateCGToProcess(パーツ番号, ＣＧ名, 状態))
+	{
+		PARTS_Warning("Ｐ＿構築手順＿ＣＧ設定(パーツ番号 = %d, ＣＧ名 = %s, 状態 = %d)\n" % パーツ番号 % ＣＧ名 % 状態);
+	}
+}
+
+void Ｐ＿構築手順＿色塗り(int パーツ番号, int Ｘ, int Ｙ, int 幅, int 高さ, int Ｒ, int Ｇ, int Ｂ, int アルファ, int 状態)
+{
+	if (アルファ == -1)
+	{
+		if (!PartsEngine.Parts_AddFillToPartsConstructionProcess(パーツ番号, Ｘ, Ｙ, 幅, 高さ, Ｒ, Ｇ, Ｂ, 状態))
+		{
+			PARTS_Warning("Ｐ＿構築手順＿色塗り(パーツ番号 = %d, Ｘ = %d, Ｙ = %d, 幅 = %d, 高さ = %d, Ｒ = %d, Ｇ = %d, Ｂ = %d, 状態 = %d)\n" % パーツ番号 % Ｘ % Ｙ % 幅 % 高さ % Ｒ % Ｇ % Ｂ % 状態);
+		}
+	}
+	else if (!PartsEngine.Parts_AddFillWithAlphaToPartsConstructionProcess(パーツ番号, Ｘ, Ｙ, 幅, 高さ, Ｒ, Ｇ, Ｂ, アルファ, 状態))
+	{
+		PARTS_Warning("Ｐ＿構築手順＿色塗り(パーツ番号 = %d, Ｘ = %d, Ｙ = %d, 幅 = %d, 高さ = %d, Ｒ = %d, Ｇ = %d, Ｂ = %d, アルファ = %d, 状態 = %d)\n" % パーツ番号 % Ｘ % Ｙ % 幅 % 高さ % Ｒ % Ｇ % Ｂ % アルファ % 状態);
+	}
+}
+
+void Ｐ＿構築手順＿アルファ塗り(int パーツ番号, int Ｘ, int Ｙ, int 幅, int 高さ, int アルファ, int 状態)
+{
+	if (!PartsEngine.Parts_AddFillAMapToPartsConstructionProcess(パーツ番号, Ｘ, Ｙ, 幅, 高さ, アルファ, 状態))
+	{
+		PARTS_Warning("Ｐ＿構築手順＿アルファ塗り(パーツ番号 = %d, Ｘ = %d, Ｙ = %d, 幅 = %d, 高さ = %d, アルファ = %d, 状態 = %d)\n" % パーツ番号 % Ｘ % Ｙ % 幅 % 高さ % アルファ % 状態);
+	}
+}
+
+void Ｐ＿構築手順＿ブレンド塗り(int パーツ番号, int Ｘ, int Ｙ, int 幅, int 高さ, int Ｒ, int Ｇ, int Ｂ, int アルファ, int 状態)
+{
+	if (!PartsEngine.Parts_AddFillAlphaColorToPartsConstructionProcess(パーツ番号, Ｘ, Ｙ, 幅, 高さ, Ｒ, Ｇ, Ｂ, アルファ, 状態))
+	{
+		PARTS_Warning("Ｐ＿構築手順＿ブレンド塗り(パーツ番号 = %d, Ｘ = %d, Ｙ = %d, 幅 = %d, 高さ = %d, Ｒ = %d, Ｇ = %d, Ｂ = %d, アルファ = %d, 状態 = %d)\n" % パーツ番号 % Ｘ % Ｙ % 幅 % 高さ % Ｒ % Ｇ % Ｂ % アルファ % 状態);
+	}
+}
+
+void Ｐ＿構築手順＿グラデーション(int パーツ番号, int Ｘ, int Ｙ, int 幅, int 高さ, int 上Ｒ, int 上Ｇ, int 上Ｂ, int 下Ｒ, int 下Ｇ, int 下Ｂ, int 状態)
+{
+	PartsEngine.Parts_AddFillGradationHorizonToPartsConstructionProcess(パーツ番号, Ｘ, Ｙ, 幅, 高さ, 上Ｒ, 上Ｇ, 上Ｂ, 下Ｒ, 下Ｇ, 下Ｂ, 状態);
+	if (!PartsEngine.Parts_AddFillGradationHorizonToPartsConstructionProcess(パーツ番号, Ｘ, Ｙ, 幅, 高さ, 上Ｒ, 上Ｇ, 上Ｂ, 下Ｒ, 下Ｇ, 下Ｂ, 状態))
+	{
+		PARTS_Warning("Ｐ＿構築手順＿グラデーション(パーツ番号 = %d, Ｘ = %d, Ｙ = %d, 幅 = %d, 高さ = %d, 上Ｒ = %d, 上Ｇ = %d, 上Ｂ = %d, 下Ｒ = %d, 下Ｇ = %d, 下Ｂ = %d, 状態 = %d)\n" % パーツ番号 % Ｘ % Ｙ % 幅 % 高さ % 上Ｒ % 上Ｇ % 上Ｂ % 下Ｒ % 下Ｇ % 下Ｂ % 状態);
+	}
+}
+
+void Ｐ＿構築手順＿テキストブレンド(int パーツ番号, int Ｘ, int Ｙ, string テキスト, CASCharSpriteProperty フォント, int 文字間隔, int 行間隔, int 状態)
+{
+	CASCharSpriteProperty Property;
+	Property = フォント;
+	CASColor Color;
+	Color = Property.GetColor();
+	CASColor EdgeColor;
+	EdgeColor = Property.GetEdgeColor();
+	if (!PartsEngine.Parts_AddDrawTextToPartsConstructionProcess(パーツ番号, Ｘ, Ｙ, テキスト, Property.GetType(), Property.GetSize(), Color.GetR(), Color.GetG(), Color.GetB(), Property.GetBoldWeight(), EdgeColor.GetR(), EdgeColor.GetG(), EdgeColor.GetB(), Property.GetEdgeWeight(), 文字間隔, 行間隔, 状態))
+	{
+		PARTS_Warning("Ｐ＿構築手順＿テキストブレンド(パーツ番号 = %d, Ｘ = %d, Ｙ = %d, テキスト = %s, 状態 = %d)\n" % パーツ番号 % Ｘ % Ｙ % テキスト % 状態);
+	}
+}
+
+void Ｐ＿構築手順＿テキストコピー(int パーツ番号, int Ｘ, int Ｙ, string テキスト, CASCharSpriteProperty フォント, int 文字間隔, int 行間隔, int 状態)
+{
+	CASCharSpriteProperty Property;
+	Property = フォント;
+	CASColor Color;
+	Color = Property.GetColor();
+	CASColor EdgeColor;
+	EdgeColor = Property.GetEdgeColor();
+	if (!PartsEngine.Parts_AddCopyTextToPartsConstructionProcess(パーツ番号, Ｘ, Ｙ, テキスト, Property.GetType(), Property.GetSize(), Color.GetR(), Color.GetG(), Color.GetB(), Property.GetBoldWeight(), EdgeColor.GetR(), EdgeColor.GetG(), EdgeColor.GetB(), Property.GetEdgeWeight(), 文字間隔, 行間隔, 状態))
+	{
+		PARTS_Warning("Ｐ＿構築手順＿テキストコピー(パーツ番号 = %d, Ｘ = %d, Ｙ = %d, テキスト = %s, 状態 = %d)\n" % パーツ番号 % Ｘ % Ｙ % テキスト % 状態);
+	}
+}
+
+void Ｐ＿構築手順＿矩形(int パーツ番号, int Ｘ, int Ｙ, int 幅, int 高さ, int Ｒ, int Ｇ, int Ｂ, int 状態)
+{
+	if (!PartsEngine.Parts_AddDrawRectToPartsConstructionProcess(パーツ番号, Ｘ, Ｙ, 幅, 高さ, Ｒ, Ｇ, Ｂ, 状態))
+	{
+		PARTS_Warning("Ｐ＿構築手順＿矩形(パーツ番号 = %d, Ｘ = %d, Ｙ = %d, 幅 = %d, 高さ = %d, Ｒ = %d, Ｇ = %d, Ｂ = %d, 状態 = %d)\n" % パーツ番号 % Ｘ % Ｙ % 幅 % 高さ % Ｒ % Ｇ % Ｂ % 状態);
+	}
+}
+
+void Ｐ＿構築手順＿ＣＧ部分ブレンド(int パーツ番号, string ＣＧ名, int 貼り付け先Ｘ, int 貼り付け先Ｙ, int 切り取り元Ｘ, int 切り取り元Ｙ, int 幅, int 高さ, int 状態)
+{
+	if (!PartsEngine.Parts_AddDrawCutCGToPartsConstructionProcess(パーツ番号, ＣＧ名, 貼り付け先Ｘ, 貼り付け先Ｙ, 幅, 高さ, 切り取り元Ｘ, 切り取り元Ｙ, 幅, 高さ, 1, 状態))
+	{
+		PARTS_Warning("Ｐ＿構築手順＿ＣＧ部分ブレンド(パーツ番号 = %d, ＣＧ名 = %s, 貼り付け先Ｘ = %d, 貼り付け先Ｙ = %d, 切り取り元Ｘ = %d, 切り取り元Ｙ = %d, 幅 = %d, 高さ = %d, 状態 = %d)\n" % パーツ番号 % ＣＧ名 % 貼り付け先Ｘ % 貼り付け先Ｙ % 切り取り元Ｘ % 切り取り元Ｙ % 幅 % 高さ % 状態);
+	}
+}
+
+void Ｐ＿構築手順＿ＣＧ部分コピー(int パーツ番号, string ＣＧ名, int 貼り付け先Ｘ, int 貼り付け先Ｙ, int 切り取り元Ｘ, int 切り取り元Ｙ, int 幅, int 高さ, int 状態)
+{
+	if (!PartsEngine.Parts_AddCopyCutCGToPartsConstructionProcess(パーツ番号, ＣＧ名, 貼り付け先Ｘ, 貼り付け先Ｙ, 幅, 高さ, 切り取り元Ｘ, 切り取り元Ｙ, 幅, 高さ, 1, 状態))
+	{
+		PARTS_Warning("Ｐ＿構築手順＿ＣＧ部分コピー(パーツ番号 = %d, ＣＧ名 = %s, 貼り付け先Ｘ = %d, 貼り付け先Ｙ = %d, 切り取り元Ｘ = %d, 切り取り元Ｙ = %d, 幅 = %d, 高さ = %d, 状態 = %d)\n" % パーツ番号 % ＣＧ名 % 貼り付け先Ｘ % 貼り付け先Ｙ % 切り取り元Ｘ % 切り取り元Ｙ % 幅 % 高さ % 状態);
+	}
+}
+
+void Ｐ＿構築手順＿ＣＧ部分拡大縮小ブレンド(int パーツ番号, string ＣＧ名, int 貼り付け先Ｘ, int 貼り付け先Ｙ, int 貼り付け先幅, int 貼り付け先高さ, int 切り取り元Ｘ, int 切り取り元Ｙ, int 切り取り元幅, int 切り取り元高さ, int 補間方法, int 状態)
+{
+	CASConstructionProcess Process;
+	Process.SetCutCGScaleBlend(ＣＧ名, 貼り付け先Ｘ, 貼り付け先Ｙ, 貼り付け先幅, 貼り付け先高さ, 切り取り元Ｘ, 切り取り元Ｙ, 切り取り元幅, 切り取り元高さ, 補間方法);
+	AFL_Parts_AddConstructProcess(パーツ番号, Process, 1);
+}
+
+void Ｐ＿構築手順＿ＣＧ部分拡大縮小コピー(int パーツ番号, string ＣＧ名, int 貼り付け先Ｘ, int 貼り付け先Ｙ, int 貼り付け先幅, int 貼り付け先高さ, int 切り取り元Ｘ, int 切り取り元Ｙ, int 切り取り元幅, int 切り取り元高さ, int 補間方法, int 状態)
+{
+	CASConstructionProcess Process;
+	Process.SetCutCGScaleCopy(ＣＧ名, 貼り付け先Ｘ, 貼り付け先Ｙ, 貼り付け先幅, 貼り付け先高さ, 切り取り元Ｘ, 切り取り元Ｙ, 切り取り元幅, 切り取り元高さ, 補間方法);
+	AFL_Parts_AddConstructProcess(パーツ番号, Process, 1);
+}
+
+void Ｐ＿構築手順＿白黒フィルタ(int パーツ番号, int Ｘ, int Ｙ, int 幅, int 高さ, int 状態)
+{
+	if (!PartsEngine.Parts_AddGrayFilterToPartsConstructionProcess(パーツ番号, Ｘ, Ｙ, 幅, 高さ, false, 状態))
+	{
+		PARTS_Warning("Ｐ＿構築手順＿白黒フィルタ(パーツ番号 = %d, Ｘ = %d, Ｙ = %d, 幅 = %d, 高さ = %d, 状態 = %d)\n" % パーツ番号 % Ｘ % Ｙ % 幅 % 高さ % 状態);
+	}
+}
+
+void Ｐ＿構築手順＿白黒フィルタ全(int パーツ番号, int 状態)
+{
+	if (!PartsEngine.Parts_AddGrayFilterToPartsConstructionProcess(パーツ番号, 0, 0, 0, 0, true, 状態))
+	{
+		PARTS_Warning("Ｐ＿構築手順＿白黒フィルタ全(パーツ番号 = %d, 状態 = %d)\n" % パーツ番号 % 状態);
+	}
+}
+
+void Ｐ＿構築手順＿加算フィルタ(int パーツ番号, int Ｘ, int Ｙ, int 幅, int 高さ, int Ｒ, int Ｇ, int Ｂ, int 状態)
+{
+	if (!PartsEngine.Parts_AddAddFilterToPartsConstructionProcess(パーツ番号, Ｘ, Ｙ, 幅, 高さ, Ｒ, Ｇ, Ｂ, false, 状態))
+	{
+		PARTS_Warning("Ｐ＿構築手順＿加算フィルタ(パーツ番号 = %d, Ｘ = %d, Ｙ = %d, 幅 = %d, 高さ = %d, Ｒ = %d, Ｇ = %d, Ｂ = %d, 状態 = %d)\n" % パーツ番号 % Ｘ % Ｙ % 幅 % 高さ % Ｒ % Ｇ % Ｂ % 状態);
+	}
+}
+
+void Ｐ＿構築手順＿加算フィルタ全(int パーツ番号, int Ｒ, int Ｇ, int Ｂ, int 状態)
+{
+	if (!PartsEngine.Parts_AddAddFilterToPartsConstructionProcess(パーツ番号, 0, 0, 0, 0, Ｒ, Ｇ, Ｂ, true, 状態))
+	{
+		PARTS_Warning("Ｐ＿構築手順＿加算フィルタ全(パーツ番号 = %d, Ｒ = %d, Ｇ = %d, Ｂ = %d, 状態 = %d)\n" % パーツ番号 % Ｒ % Ｇ % Ｂ % 状態);
+	}
+}
+
+void Ｐ＿構築手順＿乗算フィルタ(int パーツ番号, int Ｘ, int Ｙ, int 幅, int 高さ, int Ｒ, int Ｇ, int Ｂ, int 状態)
+{
+	if (!PartsEngine.Parts_AddMulFilterToPartsConstructionProcess(パーツ番号, Ｘ, Ｙ, 幅, 高さ, Ｒ, Ｇ, Ｂ, false, 状態))
+	{
+		PARTS_Warning("Ｐ＿構築手順＿乗算フィルタ(パーツ番号 = %d, Ｘ = %d, Ｙ = %d, 幅 = %d, 高さ = %d, Ｒ = %d, Ｇ = %d, Ｂ = %d, 状態 = %d)\n" % パーツ番号 % Ｘ % Ｙ % 幅 % 高さ % Ｒ % Ｇ % Ｂ % 状態);
+	}
+}
+
+void Ｐ＿構築手順＿乗算フィルタ全(int パーツ番号, int Ｒ, int Ｇ, int Ｂ, int 状態)
+{
+	if (!PartsEngine.Parts_AddMulFilterToPartsConstructionProcess(パーツ番号, 0, 0, 0, 0, Ｒ, Ｇ, Ｂ, true, 状態))
+	{
+		PARTS_Warning("Ｐ＿構築手順＿乗算フィルタ全(パーツ番号 = %d, Ｒ = %d, Ｇ = %d, Ｂ = %d, 状態 = %d)\n" % パーツ番号 % Ｒ % Ｇ % Ｂ % 状態);
+	}
+}
+
+void Ｐ＿構築手順＿線(int パーツ番号, int Ｘ１, int Ｙ１, int Ｘ２, int Ｙ２, int Ｒ, int Ｇ, int Ｂ, int Ａ, int 状態)
+{
+	if (!PartsEngine.Parts_AddDrawLineToPartsConstructionProcess(パーツ番号, Ｘ１, Ｙ１, Ｘ２, Ｙ２, Ｒ, Ｇ, Ｂ, Ａ, 状態))
+	{
+		PARTS_Warning("Ｐ＿構築手順＿線(パーツ番号 = %d, Ｘ = %d, Ｙ = %d, Ｘ = %d, Ｙ = %d, Ｒ = %d, Ｇ = %d, Ｂ = %d, Ａ = %d, 状態 = %d)\n" % パーツ番号 % Ｘ１ % Ｙ１ % Ｘ２ % Ｙ２ % Ｒ % Ｇ % Ｂ % Ａ % 状態);
+	}
+}
+
+void Ｐ＿構築手順＿ＣＧ部分アルファブレンド(int パーツ番号, string ＣＧ名, int 貼り付け先Ｘ, int 貼り付け先Ｙ, int 切り取り元Ｘ, int 切り取り元Ｙ, int 幅, int 高さ, int 状態)
+{
+	CASConstructionProcess Process;
+	Process.SetCutCGAlphaBlend(ＣＧ名, 貼り付け先Ｘ, 貼り付け先Ｙ, 切り取り元Ｘ, 切り取り元Ｙ, 幅, 高さ, 1);
+	AFL_Parts_AddConstructProcess(パーツ番号, Process, 1);
+}
+
+void Ｐ＿構築手順＿ＣＧ部分拡大縮小アルファブレンド(int パーツ番号, string ＣＧ名, int 貼り付け先Ｘ, int 貼り付け先Ｙ, int 貼り付け先幅, int 貼り付け先高さ, int 切り取り元Ｘ, int 切り取り元Ｙ, int 切り取り元幅, int 切り取り元高さ, int 補間方法, int 状態)
+{
+	CASConstructionProcess Process;
+	Process.SetCutCGScaleAlphaBlend(ＣＧ名, 貼り付け先Ｘ, 貼り付け先Ｙ, 貼り付け先幅, 貼り付け先高さ, 切り取り元Ｘ, 切り取り元Ｙ, 切り取り元幅, 切り取り元高さ, 補間方法);
+	AFL_Parts_AddConstructProcess(パーツ番号, Process, 1);
+}
+
+void Ｐ＿構築手順＿ＣＧ部分アルファ塗り(int パーツ番号, string ＣＧ名, int 貼り付け先Ｘ, int 貼り付け先Ｙ, int 切り取り元Ｘ, int 切り取り元Ｙ, int 幅, int 高さ, int 状態)
+{
+	CASConstructionProcess Process;
+	Process.SetCutCGOnlyAlpha(ＣＧ名, 貼り付け先Ｘ, 貼り付け先Ｙ, 切り取り元Ｘ, 切り取り元Ｙ, 幅, 高さ, 1);
+	AFL_Parts_AddConstructProcess(パーツ番号, Process, 1);
+}
+
+void Ｐ＿構築手順＿ＣＧ部分拡大縮小アルファ塗り(int パーツ番号, string ＣＧ名, int 貼り付け先Ｘ, int 貼り付け先Ｙ, int 貼り付け先幅, int 貼り付け先高さ, int 切り取り元Ｘ, int 切り取り元Ｙ, int 切り取り元幅, int 切り取り元高さ, int 補間方法, int 状態)
+{
+	CASConstructionProcess Process;
+	Process.SetCutCGScaleOnlyAlpha(ＣＧ名, 貼り付け先Ｘ, 貼り付け先Ｙ, 貼り付け先幅, 貼り付け先高さ, 切り取り元Ｘ, 切り取り元Ｙ, 切り取り元幅, 切り取り元高さ, 補間方法);
+	AFL_Parts_AddConstructProcess(パーツ番号, Process, 1);
+}
+
+void Ｐ＿構築手順＿初期化(int パーツ番号, int 状態)
+{
+	PartsEngine.Parts_ClearPartsConstructionProcess(パーツ番号, 状態);
+}
+
+void Ｐ＿構築ビルド(int パーツ番号, int 状態)
+{
+	if (!PartsEngine.Parts_BuildPartsConstructionProcess(パーツ番号, 状態))
+	{
+		PARTS_Warning("Ｐ＿構築ビルド(パーツ番号 = %d, 状態 = %d　ビルド中にエラーが発生しました。正しくビルドされていない可能性があります\n" % パーツ番号 % 状態);
+	}
+}
+
+void Ｐ＿構築表示範囲設定(int パーツ番号, int Ｘ, int Ｙ, int 幅, int 高さ, int 状態)
+{
+	PartsEngine.Parts_SetPartsConstructionSurfaceArea(パーツ番号, Ｘ, Ｙ, 幅, 高さ, 状態);
+}
+
+void Ｐ＿構築表示範囲取得(int パーツ番号, ref int Ｘ, ref int Ｙ, ref int 幅, ref int 高さ, int 状態)
+{
+	PartsEngine.GetConstructionSurfaceArea(パーツ番号, Ｘ, Ｙ, 幅, 高さ, 状態);
+}
+

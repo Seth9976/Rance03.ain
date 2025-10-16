@@ -1,0 +1,45 @@
+HorizontalLine::HorizontalLine()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void HorizontalLine::init()
+{
+	this.rot_ = 0;
+	this.parts_.init("システム／効果線／仮", 0);
+	float w = RAND(500) + 300;
+	float h = RAND(6) + 2;
+	this.parts_.setXScaling((w / 1024.0) * 100.0);
+	this.parts_.setYScaling((h / 8.0) * 100.0);
+	this.parts_.setAlpha(RAND(128) + 128);
+	this.parts_.setOrigin(5);
+	this.parts_.setShow(true);
+	this.parts_.setZ(30000.0);
+	this.resetMotion();
+}
+
+void HorizontalLine::resetMotion()
+{
+	int x = RAND(1024);
+	int y = RAND(768);
+	PartsMotion m;
+	m.setMove(x - Math.Cos(this.rot_) * 1400.0, y - Math.Sin(this.rot_) * 1200.0, x + Math.Cos(this.rot_) * 1400.0, y + Math.Sin(this.rot_) * 1200.0, 0);
+	m.setTime(300 + RAND(200));
+	this.parts_.runMotion(m, this.onFinish);
+}
+
+void HorizontalLine::onFinish()
+{
+	this.resetMotion();
+}
+
+void HorizontalLine::update()
+{
+}
+
+void HorizontalLine::setRot(int rot)
+{
+	this.rot_ = rot;
+	this.parts_.setXYRot(this.rot_);
+}
+

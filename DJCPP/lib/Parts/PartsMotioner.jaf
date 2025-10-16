@@ -1,0 +1,297 @@
+PartsMotioner::PartsMotioner()
+{
+	this.isLoopMotionActive_ = false;
+	this.isMotion_ = false;
+	this.motions_.Free();
+}
+
+void PartsMotioner::run(ref Parts parts, PartsMotion motionInfo)
+{
+	this.parts_ <- parts;
+	if (!this.isAvailable())
+	{
+		return;
+	}
+	this.addMotion(motionInfo);
+	this.startMotion();
+}
+
+void PartsMotioner::runArray(ref Parts parts, ref array@PartsMotion motions)
+{
+	this.parts_ <- parts;
+	if (!this.isAvailable())
+	{
+		return;
+	}
+	this.addMotionArray(motions);
+	this.startMotion();
+}
+
+void PartsMotioner::addMotion(PartsMotion motionInfo)
+{
+	if (this.isMotion())
+	{
+		this.finalize();
+	}
+	this.motions_.PushBack(motionInfo);
+}
+
+void PartsMotioner::addMotionArray(ref array@PartsMotion motions)
+{
+	if (this.isMotion())
+	{
+		this.finalize();
+	}
+	int i;
+	for (i = 0; i < motions.Numof(); ++i)
+	{
+		this.addMotion(motions[i]);
+	}
+}
+
+void PartsMotioner::update()
+{
+	if (!this.isAvailable())
+	{
+		return;
+	}
+	if (!this.motions_.Empty())
+	{
+		int now = this.motionTimer_.getTime();
+		if (now > this.motions_[0].getTime() + this.motions_[0].getDelay())
+		{
+			this.onMotionFinish();
+		}
+		else
+		{
+			this.onMotion(now);
+		}
+	}
+	this.updateLoopMotion(this.loopMotionTimer_.getTime());
+}
+
+void PartsMotioner::startMotion()
+{
+	if (this.motions_.Empty())
+	{
+		return;
+	}
+	this.centerX_ = this.parts_.getX();
+	this.centerY_ = this.parts_.getY();
+	this.playMotionSound(this.motions_[0]);
+	this.isMotion_ = true;
+	this.motionTimer_.reset();
+}
+
+void PartsMotioner::onMotion(int now)
+{
+	float t;
+	int rx;
+	int ry;
+	int sx;
+	int sy;
+	ref PartsMotion m = this.motions_[0];
+	if (now >= m.getDelay() + m.getTime())
+	{
+		t = 1.0;
+	}
+	else
+	{
+		t = Math.MaxF(0.0, float(now - m.getDelay()) / float(m.getTime()));
+	}
+	this.updateMotionKey(this.parts_.setX, m, 0, t);
+	this.updateMotionKey(this.parts_.setY, m, 1, t);
+	this.updateMotionKey(this.parts_.setAlpha, m, 2, t);
+	this.updateMotionKey(this.parts_.setXYRot, m, 3, t);
+	this.updateMotionKey(this.parts_.setXZRot, m, 4, t);
+	this.updateMotionKey(this.parts_.setYZRot, m, 5, t);
+	this.updateMotionKey(this.parts_.setScaling, m, 6, t);
+	this.updateMotionKey(this.parts_.setNumber, m, 15, t);
+	this.updateMotionKey(this.parts_.setCgRangeLeft, m, 11, t);
+	this.updateMotionKey(this.parts_.setCgRangeRight, m, 13, t);
+	this.updateMotionKey(this.parts_.setCgRangeTop, m, 12, t);
+	this.updateMotionKey(this.parts_.setCgRangeBottom, m, 14, t);
+	if (m.isKeyEnable(16))
+	{
+		int c = getMotionValue(m.getKeyMotionType(16), m.getKeyFrom(16), m.getKeyTo(16), t);
+		this.parts_.setAddColorValue(c, c, c);
+	}
+	if (m.isKeyEnable(17))
+	{
+		int c = getMotionValue(m.getKeyMotionType(17), m.getKeyFrom(17), m.getKeyTo(17), t);
+		this.parts_.setMultiColorValue(c, c, c);
+	}
+	if (m.isKeyEnable(7))
+	{
+		int sx = this.getShakeValue(m, 7, t);
+		if (m.isKeyEnable(0))
+		{
+			this.parts_.setX(this.parts_.getX() + sx);
+		}
+		else
+		{
+			this.parts_.setX(this.centerX_ + sx);
+		}
+	}
+	if (m.isKeyEnable(8))
+	{
+		int sy = this.getShakeValue(m, 8, t);
+		if (m.isKeyEnable(1))
+		{
+			this.parts_.setY(this.parts_.getY() + sy);
+		}
+		else
+		{
+			this.parts_.setY(this.centerY_ + sy);
+		}
+	}
+}
+
+float PartsMotioner::getShakeValue(ref PartsMotion m, int key, float t)
+{
+	if (t >= 1.0)
+	{
+		return 0.0;
+	}
+	int shake = getMotionValue(m.getKeyMotionType(key), m.getKeyFrom(key), m.getKeyTo(key), t);
+	return RAND(Math.Max(1, shake)) - shake / 2;
+}
+
+void PartsMotioner::updateMotionKey(DG_MOTION_UPDATE_METHOD method, ref PartsMotion m, int key, float t)
+{
+	if (m.isKeyEnable(key))
+	{
+		method(getMotionValue(m.getKeyMotionType(key), m.getKeyFrom(key), m.getKeyTo(key), t));
+	}
+}
+
+void PartsMotioner::onMotionFinish()
+{
+	this.setMotionLastFrame(this.motions_[0]);
+	this.motions_.Erase(0);
+	if (this.motions_.Empty())
+	{
+		this.isMotion_ = false;
+		this.parts_ <- NULL;
+		DG_GeneralCallback cb;
+		cb = this.dgOnFinish_;
+		this.dgOnFinish_.Clear();
+		cb();
+		cb.Clear();
+	}
+	else
+	{
+		this.playMotionSound(this.motions_[0]);
+		this.motionTimer_.reset();
+	}
+}
+
+bool PartsMotioner::isMotion()
+{
+	return this.isMotion_;
+}
+
+void PartsMotioner::setMotionLastFrame(ref PartsMotion m)
+{
+	this.onMotion(m.getDelay() + m.getTime() + 1000);
+	int n = m.getLoopSoundNumber();
+	if (n != 0)
+	{
+		g_loopSound.stopSound(n);
+	}
+}
+
+void PartsMotioner::finalize()
+{
+	if (!this.isAvailable())
+	{
+		return;
+	}
+	if (!this.isMotion())
+	{
+		return;
+	}
+	while (!this.motions_.Empty())
+	{
+		this.onMotionFinish();
+	}
+}
+
+void PartsMotioner::playMotionSound(ref PartsMotion motionInfo)
+{
+	string n = motionInfo.getSoundName();
+	if (n != "")
+	{
+		g_sysSound.play(0, n);
+	}
+}
+
+void PartsMotioner::updateLoopMotion(int nowTime)
+{
+	if (!this.isLoopMotionActive_)
+	{
+		return;
+	}
+	if (this.loopMotion_.isEnable(2))
+	{
+		int c = this.loopMotion_.get(2, nowTime);
+		this.parts_.setAddColorValue(c, c, c);
+	}
+	if (this.loopMotion_.isEnable(3))
+	{
+		this.parts_.setScaling(this.loopMotion_.get(3, nowTime));
+	}
+}
+
+void PartsMotioner::setLoopMotion(ref LoopMotionInfomation loopMotion)
+{
+	this.loopMotion_ = loopMotion;
+}
+
+void PartsMotioner::setActiveLoopMotion(bool val)
+{
+	if (!this.isAvailable())
+	{
+		return;
+	}
+	this.isLoopMotionActive_ = val;
+	if (!val)
+	{
+		this.parts_.setAddColorValue(0, 0, 0);
+		this.parts_.setScaling(100.0);
+	}
+}
+
+void PartsMotioner::runEx(ref Parts parts, string defineName)
+{
+	array@PartsMotion m;
+	loadPartsMotionArrayFromEx(defineName, m);
+	this.runArray(parts, m);
+}
+
+void PartsMotioner::setDelegateOnMotionFinish(DG_GeneralCallback onFinish)
+{
+	this.dgOnFinish_ += onFinish;
+}
+
+int PartsMotioner::getPartsNumber()
+{
+	if (!this.isAvailable())
+	{
+		return -1;
+	}
+	return this.parts_.getPartsNumber();
+}
+
+bool PartsMotioner::isAvailable()
+{
+	if (this.parts_ !== NULL)
+	{
+		if (this.parts_.isInitialized())
+		{
+			return true;
+		}
+	}
+	return false;
+}
+

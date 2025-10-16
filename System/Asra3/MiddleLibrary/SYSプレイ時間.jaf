@@ -1,0 +1,44 @@
+void SYS_PlayTime_Update()
+{
+	int CurrentTime = SYS_PlayTime_GetCurremt();
+	if (g_PrevPlayTime == CurrentTime)
+	{
+		return;
+	}
+	if (!g_PausePlayTimeCounter)
+	{
+		g_PlayMinuteTime += 1;
+		SYS_TotalPlayTime_SetMinuteTime(SYS_TotalPlayTime_GetMinuteTime() + 1);
+	}
+	g_PrevPlayTime = CurrentTime;
+}
+
+int SYS_PlayTime_GetCurremt()
+{
+	int Hour;
+	int Minute;
+	int Second;
+	SystemService.GetTime(Hour, Minute, Second);
+	return Hour * 60 + Minute;
+}
+
+void SYS_PlayTime_Reset()
+{
+	g_PrevPlayTime = SYS_PlayTime_GetCurremt();
+}
+
+int SYS_TotalPlayTime_GetMinuteTime()
+{
+	int MinuteTime;
+	if (!CommonSystemData.GetDataInt("Asra_TotalPlayTime", MinuteTime))
+	{
+		SYS_TotalPlayTime_SetMinuteTime(0);
+	}
+	return MinuteTime;
+}
+
+void SYS_TotalPlayTime_SetMinuteTime(int MinuteTime)
+{
+	CommonSystemData.SetDataInt("Asra_TotalPlayTime", MinuteTime);
+}
+

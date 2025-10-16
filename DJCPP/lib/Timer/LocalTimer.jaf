@@ -1,0 +1,14 @@
+LocalTimer::LocalTimer()
+{
+}
+
+void LocalTimer::reset()
+{
+	this.start_ = g_globalTimer.getTime();
+}
+
+int LocalTimer::getTime()
+{
+	return g_globalTimer.getTime() - this.start_;
+}
+

@@ -1,0 +1,35 @@
+void PlayerSkillState::initAvailable(int index, string skillId)
+{
+	this.isAvailable_ = true;
+	this.index_ = index;
+	this.skillId_ = skillId;
+}
+
+void PlayerSkillState::initNotAvailable(int index, string skillId, int availableLevel)
+{
+	this.isAvailable_ = false;
+	this.index_ = index;
+	this.skillId_ = skillId;
+	this.availableLevel_ = availableLevel;
+}
+
+int PlayerSkillState::getIndex()
+{
+	return this.index_;
+}
+
+bool PlayerSkillState::isAvailable()
+{
+	return this.isAvailable_;
+}
+
+string PlayerSkillState::getSkillId()
+{
+	return this.skillId_;
+}
+
+int PlayerSkillState::getAvailableLevel()
+{
+	return this.availableLevel_;
+}
+

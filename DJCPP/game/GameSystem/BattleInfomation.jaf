@@ -1,0 +1,131 @@
+BattleInfomation::BattleInfomation()
+{
+	this.reset();
+}
+
+void BattleInfomation::reset()
+{
+	this.monsterId_.Free();
+	this.gold_ = -1;
+	this.exp_ = -1;
+	this.musicId_ = "音楽／戦闘／通常";
+	this.itemId_ = "";
+	this.itemProbability_ = 0;
+	this.battleBackGroundId_ = "平野";
+}
+
+void BattleInfomation::addMonster(string monsterId)
+{
+	this.monsterId_.PushBack(monsterId);
+}
+
+void BattleInfomation::setMonsterArray(array@string monsterId)
+{
+	this.monsterId_.Free();
+	this.monsterId_.Alloc(monsterId.Numof());
+	this.monsterId_.Copy(0, monsterId, 0, monsterId.Numof());
+}
+
+void BattleInfomation::setGold(int gold)
+{
+	this.gold_ = gold;
+}
+
+void BattleInfomation::setExp(int exp)
+{
+	this.exp_ = exp;
+}
+
+void BattleInfomation::setItem(string id, int probability)
+{
+	this.itemId_ = id;
+	this.itemProbability_ = probability;
+}
+
+void BattleInfomation::setBattleBackGroundId(string battleBackGroundId)
+{
+	this.battleBackGroundId_ = battleBackGroundId;
+}
+
+void BattleInfomation::getMonsterId(ref array@string result)
+{
+	result.Free();
+	result.Alloc(this.monsterId_.Numof());
+	result.Copy(0, this.monsterId_, 0, this.monsterId_.Numof());
+}
+
+int BattleInfomation::getGold()
+{
+	return this.gold_;
+}
+
+int BattleInfomation::getExp()
+{
+	return this.exp_;
+}
+
+string BattleInfomation::getItemId()
+{
+	return this.itemId_;
+}
+
+int BattleInfomation::getItemProbability()
+{
+	return this.itemProbability_;
+}
+
+string BattleInfomation::getBattleBackGroundId()
+{
+	return this.battleBackGroundId_;
+}
+
+void BattleInfomation::setMusicId(string musicId)
+{
+	this.musicId_ = musicId;
+}
+
+string BattleInfomation::getMusicId()
+{
+	return this.musicId_;
+}
+
+void BattleInfomation::setExpFromMonster()
+{
+	int i;
+	this.exp_ = 0;
+	for (i = 0; i < this.monsterId_.Numof(); ++i)
+	{
+		this.exp_ += getMonsterFromId(this.monsterId_[i]).getExp();
+	}
+}
+
+void BattleInfomation::setGoldFromMonster()
+{
+	int i;
+	this.gold_ = 0;
+	for (i = 0; i < this.monsterId_.Numof(); ++i)
+	{
+		this.gold_ += getMonsterFromId(this.monsterId_[i]).getGold();
+	}
+}
+
+void BattleInfomation::setExtraBattleFlag(int val)
+{
+	this.extraBattleFlag_ = val;
+}
+
+int BattleInfomation::getExtraBattleFlag()
+{
+	return this.extraBattleFlag_;
+}
+
+void BattleInfomation::setEffectFlat(string flatName)
+{
+	this.flatName_ = flatName;
+}
+
+string BattleInfomation::getEffectFlatName()
+{
+	return this.flatName_;
+}
+

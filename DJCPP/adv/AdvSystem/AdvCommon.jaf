@@ -1,0 +1,37 @@
+void initAdvObject()
+{
+	メッセージエリア画面トランジション設定(0, 1, 0);
+	g_advStand[0].init(-200, -373, 0, "立ち絵／");
+	g_advStand[1].init(-50, -373, 1, "立ち絵背／");
+	g_advMessageWindow.init();
+}
+
+void RunPartsMotion()
+{
+	while (!g_partsMotionManager.isEmpty())
+	{
+		g_frameManager.updateFrame();
+		if (既読スキップ中確認() || 全文スキップ中確認())
+		{
+			g_partsMotionManager.finalize(-1);
+			g_frameManager.updateFrame();
+		}
+	}
+}
+
+void プロット設定()
+{
+}
+
+void ■プロット()
+{
+}
+
+void debugChirokTest()
+{
+}
+
+void advErr(string msg)
+{
+}
+

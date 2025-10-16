@@ -1,0 +1,83 @@
+PlayerBuffView::PlayerBuffView()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void PlayerBuffView::init(string playerId)
+{
+	this.player_ <- getPlayerFromId(playerId);
+	this.player_.getBuffIdList(this.idList_, -1);
+	this.player_.setBuffCallback(this.onAddBuff, this.onEraseBuff);
+	this.parent_.initAsDummy();
+	this.parent_.setZ(2850.0);
+	this.initParts();
+}
+
+void PlayerBuffView::initParts()
+{
+	this.parts_.Free();
+	this.parts_.Alloc(this.idList_.Numof());
+	int i;
+	for (i = 0; i < this.idList_.Numof(); ++i)
+	{
+		this.parts_[i].init(getPlayerBuffFromId(this.idList_[i]).getImageName(), 0);
+		this.parts_[i].setPos(-(i % 4) * 20, -(i / 4) * 25);
+		this.parts_[i].setOrigin(9);
+		this.parts_[i].setParent(this.parent_.getPartsNumber());
+	}
+	this.setPartsShow();
+}
+
+void PlayerBuffView::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void PlayerBuffView::setPartsPos()
+{
+}
+
+void PlayerBuffView::update()
+{
+}
+
+void PlayerBuffView::onAddBuff(string id)
+{
+}
+
+void PlayerBuffView::onEraseBuff(string id)
+{
+}
+
+void PlayerBuffView::updateState()
+{
+	this.player_.getBuffIdList(this.idList_, -1);
+	this.initParts();
+}
+
+void PlayerBuffView::setPos(int x, int y)
+{
+	this.x_ = x;
+	this.y_ = y;
+	this.parent_.setPos(x, y);
+}
+
+void PlayerBuffView::move(int x, int y)
+{
+	PartsMotion m;
+	m.setMove(this.x_, this.y_, x, y, 1);
+	this.parent_.runMotion(m, NULL);
+	this.x_ = x;
+	this.y_ = y;
+}
+
+void PlayerBuffView::fadeIn(bool val)
+{
+	this.parent_.runMotion(getStandardMotion(val ? 0 : 1), NULL);
+}
+

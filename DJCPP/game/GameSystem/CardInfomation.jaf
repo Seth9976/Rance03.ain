@@ -1,0 +1,83 @@
+void CardInfomation::init(string id)
+{
+	this.id_ = id;
+	this.loadParam();
+}
+
+void CardInfomation::loadParam()
+{
+	string key = "カード情報";
+	this.caption_ = EX_SA2String(key, this.id_, "caption", "");
+	this.imageName_ = EX_SA2String(key, this.id_, "imageName", "");
+	this.eventCallback_ = EX_SA2String(key, this.id_, "eventCallback", "");
+	this.fadeOutType_ = EX_SA2Int(key, this.id_, "fadeOutType", 0);
+	this.changeType_ = EX_SA2Int(key, this.id_, "changeType", 0);
+	this.clickableJudgeCallback_ = EX_SA2String(key, this.id_, "clickableJudgeCallback", "");
+	this.minimapIconImageName_ = EX_SA2String(key, this.id_, "minimapIconImageName", "");
+	this.bgImageName_ = EX_SA2String(key, this.id_, "bgImageName", "カード／裏");
+	if (this.bgImageName_ == "")
+	{
+		this.bgImageName_ = "カード／裏";
+	}
+}
+
+string CardInfomation::getId()
+{
+	return this.id_;
+}
+
+string CardInfomation::getCaption()
+{
+	return this.caption_;
+}
+
+string CardInfomation::getImageName()
+{
+	return this.imageName_;
+}
+
+string CardInfomation::getEventCallback()
+{
+	return this.eventCallback_;
+}
+
+string CardInfomation::getClickableJudgeCallback()
+{
+	return this.clickableJudgeCallback_;
+}
+
+bool CardInfomation::isClickable()
+{
+	if (this.clickableJudgeCallback_ == "通行可")
+	{
+		return true;
+	}
+	if (this.clickableJudgeCallback_ == "通行不可")
+	{
+		return false;
+	}
+	DG_CardClickableCallback fn;
+	fn.Add(this.clickableJudgeCallback_);
+	return fn();
+}
+
+int CardInfomation::getFadeOutType()
+{
+	return this.fadeOutType_;
+}
+
+int CardInfomation::getChangeType()
+{
+	return this.changeType_;
+}
+
+string CardInfomation::getMinimapIconImageName()
+{
+	return this.minimapIconImageName_;
+}
+
+string CardInfomation::getBgImageName()
+{
+	return this.bgImageName_;
+}
+

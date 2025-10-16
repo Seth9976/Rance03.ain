@@ -1,0 +1,63 @@
+void CASProjection::Set(float fWidth_, float fHeight_, float fNear_, float fFar_, float fDeg_)
+{
+	this.fWidth = fWidth_;
+	this.fHeight = fHeight_;
+	this.fNear = fNear_;
+	this.fFar = fFar_;
+	this.fDeg = fDeg_;
+}
+
+void CASProjection::SetNear(float Near)
+{
+	this.fNear = Near;
+}
+
+void CASProjection::SetFar(float Far)
+{
+	this.fFar = Far;
+}
+
+void CASProjection::SetDegree(float Degree)
+{
+	this.fDeg = Degree;
+}
+
+float CASProjection::GetWidth()
+{
+	return this.fWidth;
+}
+
+float CASProjection::GetHeight()
+{
+	return this.fHeight;
+}
+
+float CASProjection::GetNear()
+{
+	return this.fNear;
+}
+
+float CASProjection::GetFar()
+{
+	return this.fFar;
+}
+
+float CASProjection::GetDegree()
+{
+	return this.fDeg;
+}
+
+CASMatrix CASProjection::GetMatrix()
+{
+	float dN = this.fNear;
+	float dF = this.fFar;
+	float dPI = 3.141593;
+	float dHalfDeg = this.fDeg * 0.5;
+	float dTan = Math.Tan(dHalfDeg);
+	float dW = 1.0 / dTan;
+	float dH = this.fWidth / (dTan * this.fHeight);
+	CASMatrix Matrix;
+	Matrix.Set(dW, 0.0, 0.0, 0.0, 0.0, dH, 0.0, 0.0, 0.0, 0.0, dF / (dF - dN), 1.0, 0.0, 0.0, (-dN * dF) / (dF - dN), 0.0);
+	return Matrix;
+}
+

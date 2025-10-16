@@ -1,0 +1,53 @@
+string Shop::getId()
+{
+	return this.id_;
+}
+
+string Shop::getName()
+{
+	return this.name_;
+}
+
+string Shop::getImageName()
+{
+	return this.imageName_;
+}
+
+void Shop::init(string id, string name, string imageName)
+{
+	this.id_ = id;
+	this.name_ = name;
+	this.imageName_ = imageName;
+}
+
+void Shop::addItem(string id)
+{
+	int index = this.itemId_.Find(0, this.itemId_.Numof(), id);
+	if (index < 0)
+	{
+		this.itemId_.PushBack(id);
+	}
+}
+
+void Shop::clear()
+{
+	this.itemId_.Free();
+}
+
+void Shop::eraseItem(string id)
+{
+	int index = this.itemId_.Find(0, this.itemId_.Numof(), id);
+	if (index < 0)
+	{
+		return;
+	}
+	this.itemId_.Erase(index);
+}
+
+void Shop::getItemIdList(ref array@string id)
+{
+	id.Free();
+	id.Alloc(this.itemId_.Numof());
+	id.Copy(0, this.itemId_, 0, this.itemId_.Numof());
+}
+

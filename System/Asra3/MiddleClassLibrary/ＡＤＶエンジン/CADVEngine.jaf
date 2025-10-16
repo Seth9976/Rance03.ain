@@ -1,0 +1,619 @@
+CADVEngine::CADVEngine()
+{
+	this.m_F2.Init(113, true);
+	this.m_F3.Init(114, true);
+	this.m_F4.Init(115, true);
+	this.m_F5.Init(116, true);
+	this.m_Enter.Init(13, true);
+	this.m_Esc.Init(27, true);
+	this.m_RClick.Init(2, true);
+	this.m_ClickTime.Reset();
+}
+
+CADVEngine::~CADVEngine()
+{
+}
+
+void CADVEngine::SetReleaseSceneFunc(DG_NotifyHandler ReleaseSceneFunc)
+{
+	this.m_ReleaseSceneFunc = ReleaseSceneFunc;
+}
+
+void CADVEngine::ShowSplash()
+{
+	if (this.m_Splash.IsExist())
+	{
+		this.m_Splash.Release();
+	}
+	this.m_Splash.Create();
+	int Number = this.m_Splash.GetPartsNumber();
+	Ｐ＿親設定(Number, PARTS_GetSystemOverlayLayer());
+	Ｐ＿構築手順＿作成(Number, AFL_View_GetWidth(), AFL_View_GetHeight(), 1);
+	Ｐ＿構築手順＿色塗り(Number, 0, 0, AFL_View_GetWidth(), AFL_View_GetHeight(), 150, 150, 200, 120, 1);
+	Ｐ＿構築ビルド(Number, 1);
+	AFL_View_Update(true);
+}
+
+void CADVEngine::HideSplash()
+{
+	this.m_Splash.Release();
+}
+
+bool CADVEngine::GetFunctionName(ref string Name)
+{
+	int NumofFunc = ADVEngine.NumofFunctionName();
+	int i;
+	for (i = 0; i < NumofFunc; ++i)
+	{
+		string FunctionName;
+		ADVEngine.GetFunctionName(FunctionName, i);
+		if (!ADVEngine.AnalyseIf(FunctionName))
+		{
+			選択肢(i, "if解析に失敗 実行できません【%s】\n" % FunctionName, 0);
+			continue;
+		}
+		int NumofIf = ADVEngine.NumofIf(FunctionName);
+		選択肢(i, FunctionName + (NumofIf == 0 ? "" : " if有"), 0);
+	}
+	選択肢(-2147483648, "", 0);
+	選択肢(i, "戻る", 0);
+	int 結果 = テスト選択();
+	if (結果 < 0 || NumofFunc <= 結果)
+	{
+		return false;
+	}
+	ADVEngine.GetFunctionName(Name, 結果);
+	return true;
+}
+
+bool CADVEngine::SelectIfData(string FunctionName, ref string IfData)
+{
+	IfData = "";
+	int NumofIf = ADVEngine.NumofIf(FunctionName);
+	if (NumofIf == 0)
+	{
+		return true;
+	}
+	array@string List;
+	this.CreateIfDataList(List, NumofIf, "");
+	int i;
+	for (i = 0; i < List.Numof(); ++i)
+	{
+		選択肢(i, List[i], 0);
+	}
+	選択肢(-2147483648, "", 0);
+	選択肢(i, "戻る", 0);
+	string Text = "選択した関数内にあるifリスト\n";
+	for (i = 0; i < NumofIf; ++i)
+	{
+		string If;
+		ADVEngine.GetIf(If, FunctionName, i);
+		Text += "%Dつ目のif(" % (i + 1) + If + ")\n";
+	}
+	CASParts Parts;
+	Parts.Create();
+	Parts.SetFontSize(24, 1);
+	Parts.SetFontEdgeWeight(2.0, 1);
+	Parts.SetText(Text, 1);
+	Parts.SetPos(AFL_View_GetWidth() - 50, 50);
+	Parts.SetZ(32767);
+	Parts.SetOriginPosMode(3);
+	int 結果 = テスト選択();
+	if (結果 < 0 || List.Numof() <= 結果)
+	{
+		return false;
+	}
+	IfData = List[結果];
+	return true;
+}
+
+void CADVEngine::CreateIfDataList(ref array@string List, int NumofIf, string Data)
+{
+	if (NumofIf == 0)
+	{
+		List.PushBack(Data);
+		return;
+	}
+	this.CreateIfDataList(List, NumofIf - 1, Data + "X");
+	this.CreateIfDataList(List, NumofIf - 1, Data + "O");
+}
+
+bool CADVEngine::Reload()
+{
+	CASTimer Time;
+	Time.Reset();
+	ADVEngine.Release();
+	if (!ADVEngine.Load(this.m_FileName))
+	{
+		system.MsgBox("jafファイル読み込み失敗【%s】\n" % this.m_FileName);
+		return false;
+	}
+	EX_ReloadDebugEXFile();
+	if (!ADVEngine.AnalyseIf(this.m_FunctionName))
+	{
+		system.MsgBox("if解析に失敗しました【%s】\n" % this.m_FunctionName);
+		return false;
+	}
+	int NumofIf = ADVEngine.NumofIf(this.m_FunctionName);
+	if (NumofIf != this.m_IfData.Length())
+	{
+		system.MsgBox("関数内のifの数が変更されました%d->%d【%s】\n" % this.m_IfData.Length() % NumofIf % this.m_FunctionName);
+		return false;
+	}
+	if (!ADVEngine.AnalyseFunction(this.m_FunctionName, this.m_IfData))
+	{
+		return false;
+	}
+	this.m_NumofStep = ADVEngine.NumofStep(this.m_FunctionName);
+	this.m_CurrentStep = Math.Max(0, Math.Min(this.m_NumofStep - 1, this.m_CurrentStep));
+	this.LogLine("CADVEngine::Reload %d ms\n" % Time.Get());
+	return true;
+}
+
+void CADVEngine::End()
+{
+	if (!DIALOG_OKCANCEL("ＡＤＶエンジンを終了しますか？"))
+	{
+		return;
+	}
+	g_SkipKeyWait = true;
+	this.m_CurrentStep = this.m_NumofStep;
+}
+
+void CADVEngine::Execute(string FileName)
+{
+	if (!system.IsDebugMode())
+	{
+		return;
+	}
+	AFL_Parts_AddWholeMouseWheelEvent(this.MouseWheelEvent);
+	AFL_Parts_AddWholeKeyPressEvent(this.KeyPressEvent);
+	AFL_Parts_AddBeginUpdateEvent(this.BeginPartsUpdateEvent);
+	this.m_NumofStep = 0;
+	this.m_FunctionName = "";
+	this.m_FileName = "";
+	this.m_IfData = "";
+	if (!ADVEngine.Load(FileName))
+	{
+		system.Output("jafファイル読み込み失敗【%s】\n" % FileName);
+		return;
+	}
+	this.m_FileName = FileName;
+	EX_ReloadDebugEXFile();
+	while (true)
+	{
+		if (this.m_IfData == "")
+		{
+			if (!this.GetFunctionName(this.m_FunctionName))
+			{
+				break;
+			}
+		}
+		if (!this.SelectIfData(this.m_FunctionName, this.m_IfData))
+		{
+			continue;
+		}
+		if (!ADVEngine.AnalyseFunction(this.m_FunctionName, this.m_IfData))
+		{
+			continue;
+		}
+		this.m_NumofStep = ADVEngine.NumofStep(this.m_FunctionName);
+		this.LogLine("【%s】総ステップ数：%d" % this.m_FunctionName % this.m_NumofStep);
+		this.m_CurrentStep = 0;
+		this.m_UpdateScene = false;
+		this.m_UpdateText = false;
+		this.m_OpenUI = false;
+		SYS_SetEventInfoByADV(this.m_FileName, this.m_FunctionName);
+		this.Run();
+	}
+	g_SkipKeyWait = false;
+	g_FrameSkipAll = false;
+	ADVEngine.Release();
+	AFL_Parts_EraseBeginUpdateEvent(this.BeginPartsUpdateEvent);
+	AFL_Parts_EraseWholeKeyPressEvent(this.KeyPressEvent);
+	AFL_Parts_EraseWholeMouseWheelEvent(this.MouseWheelEvent);
+	SYS_SetEventInfoByADV("", "");
+}
+
+void CADVEngine::Run()
+{
+	this.m_CurrentStep = Math.Max(0, Math.Min(this.m_NumofStep - 1, this.m_CurrentStep));
+	this.ReleaseScene();
+	for (; this.m_CurrentStep < this.m_NumofStep; ++this.m_CurrentStep)
+	{
+		this.m_UpdateScene = false;
+		this.m_UpdateText = false;
+		g_SkipKeyWait = this.m_OpenUI;
+		this.RunStep(this.m_CurrentStep);
+		if (this.m_OpenUI)
+		{
+			Ｐ＿アクティビティ実行("Asra\\スクリプトＵＩ", this.LoadedActivityEvent, NULL, NULL);
+		}
+		bool IsShowSplash = this.m_UpdateScene || this.m_UpdateText;
+		if (IsShowSplash)
+		{
+			this.ShowSplash();
+		}
+		if (this.m_UpdateText && !this.Reload())
+		{
+			if (IsShowSplash)
+			{
+				this.HideSplash();
+			}
+			break;
+		}
+		if (this.m_UpdateScene)
+		{
+			this.SeekStep(this.m_CurrentStep - 1);
+		}
+		if (IsShowSplash)
+		{
+			this.HideSplash();
+		}
+	}
+	this.ReleaseScene();
+}
+
+void CADVEngine::SeekStep(int Step)
+{
+	CASTimer Time;
+	Time.Reset();
+	Step = Math.Max(0, Math.Min(this.m_NumofStep - 1, Step));
+	g_SkipKeyWait = true;
+	g_FrameSkipAll = true;
+	this.ReleaseScene();
+	for (this.m_CurrentStep = 0; this.m_CurrentStep <= Step; ++this.m_CurrentStep)
+	{
+		this.RunStep(this.m_CurrentStep);
+	}
+	this.m_CurrentStep = Step;
+	g_SkipKeyWait = false;
+	g_FrameSkipAll = false;
+	this.LogLine("CADVEngine::SeekStep %d ms\n" % Time.Get());
+}
+
+void CADVEngine::LoadedActivityEvent(string ActivityFileName, string ActivityName)
+{
+	this.m_ActivityName = ActivityName;
+	this.InitStepList(ActivityName);
+	this.InitUpdateTextButton(ActivityName);
+	this.InitEscapeWithUpdateButton(ActivityName);
+	this.InitEscapeButton(ActivityName);
+	this.InitEndButton(ActivityName);
+	this.InitBG(ActivityName);
+	this.InitDegugCheck(ActivityName);
+	this.m_PrevListBoxIndex = this.m_CurrentStep;
+}
+
+void CADVEngine::InitStepList(string ActivityName)
+{
+	int Number = SYS_Activity_GetPartsNumber(ActivityName, "SYS_ステップリスト");
+	if (Number == 0)
+	{
+		return;
+	}
+	AFL_Parts_EraseSelectedEvent(Number, this.SelectedEvent);
+	int i;
+	Ｐ＿リストボックス＿アイテム全削除(Number);
+	for (i = 0; i < this.m_NumofStep; ++i)
+	{
+		string Text = this.GetStepText(i);
+		Ｐ＿リストボックス＿アイテム追加(Number, Text);
+	}
+	this.m_CurrentStep = Math.Max(0, Math.Min(this.m_NumofStep - 1, this.m_CurrentStep));
+	Ｐ＿フォーカス設定(Number);
+	AFL_Parts_AddSelectedEvent(Number, this.SelectedEvent);
+	Ｐ＿リストボックス＿選択位置設定(Number, this.m_CurrentStep);
+	AFL_Parts_AddMouseLClickEvent(Number, this.ClickListBoxEvent);
+}
+
+void CADVEngine::InitUpdateTextButton(string ActivityName)
+{
+	int Number = SYS_Activity_GetPartsNumber(ActivityName, "SYS_テキスト更新");
+	if (Number == 0)
+	{
+		return;
+	}
+	AFL_Parts_AddMouseLClickEvent(Number, this.ClickUpdateTextButtonEvent);
+}
+
+void CADVEngine::InitEscapeWithUpdateButton(string ActivityName)
+{
+	int Number = SYS_Activity_GetPartsNumber(ActivityName, "SYS_移動して戻る");
+	if (Number == 0)
+	{
+		return;
+	}
+	AFL_Parts_AddMouseLClickEvent(Number, this.ClickEscapeWithUpdateButtonEvent);
+}
+
+void CADVEngine::InitEscapeButton(string ActivityName)
+{
+	int Number = SYS_Activity_GetPartsNumber(ActivityName, "SYS_戻る");
+	if (Number == 0)
+	{
+		return;
+	}
+	AFL_Parts_AddMouseLClickEvent(Number, this.ClickEscapeButtonEvent);
+}
+
+void CADVEngine::InitEndButton(string ActivityName)
+{
+	int Number = SYS_Activity_GetPartsNumber(ActivityName, "SYS_終了");
+	if (Number == 0)
+	{
+		return;
+	}
+	AFL_Parts_AddMouseLClickEvent(Number, this.ClickEndButtonEvent);
+}
+
+void CADVEngine::InitBG(string ActivityName)
+{
+	int Number = SYS_Activity_GetPartsNumber(ActivityName, "SYS_背景");
+	if (Number == 0)
+	{
+		return;
+	}
+	if (g_ADVEngine_UIPanel_PosX == -2147483648 && g_ADVEngine_UIPanel_PosY == -2147483648)
+	{
+		return;
+	}
+	Ｐ＿座標設定(Number, g_ADVEngine_UIPanel_PosX, g_ADVEngine_UIPanel_PosY);
+}
+
+void CADVEngine::InitDegugCheck(string ActivityName)
+{
+	int Number = SYS_Activity_GetPartsNumber(ActivityName, "SYS_デバッグ");
+	if (Number == 0)
+	{
+		return;
+	}
+	Ｐ＿チェックボックス＿チェック状態設定(Number, g_ADVEngine_EnableOutputLog);
+	AFL_Parts_AddChangedFlgEvent(Number, this.ChangeDebugCheckEvent);
+}
+
+void CADVEngine::SelectedEvent(int PartsNumber, int Selected)
+{
+	this.UpdateStepText(Selected);
+}
+
+void CADVEngine::UpdateStepText(int Step)
+{
+	int Number = SYS_Activity_GetPartsNumber(this.m_ActivityName, "SYS_ステップテキスト");
+	if (Number == 0)
+	{
+		return;
+	}
+	Ｐ＿テキスト設定(Number, "%04d/%04d" % (Step + 1) % this.m_NumofStep, 1);
+}
+
+int CADVEngine::GetSelectedIndexByActivityListbox()
+{
+	int Number = SYS_Activity_GetPartsNumber(this.m_ActivityName, "SYS_ステップリスト");
+	if (Number == 0)
+	{
+		return 0;
+	}
+	return Ｐ＿リストボックス＿選択位置取得(Number);
+}
+
+void CADVEngine::ClickUpdateTextButtonEvent(int PartsNumber, int MouseX, int MouseY)
+{
+	this.m_UpdateText = true;
+	AFL_Activity_End();
+	this.m_CurrentStep = this.GetSelectedIndexByActivityListbox();
+	this.m_UpdateScene = true;
+}
+
+void CADVEngine::ClickEscapeWithUpdateButtonEvent(int PartsNumber, int MouseX, int MouseY)
+{
+	AFL_Activity_End();
+	this.m_OpenUI = false;
+	this.m_CurrentStep = this.GetSelectedIndexByActivityListbox();
+	this.m_UpdateScene = true;
+}
+
+void CADVEngine::ClickEscapeButtonEvent(int PartsNumber, int MouseX, int MouseY)
+{
+	AFL_Activity_End();
+	this.m_OpenUI = false;
+	this.m_UpdateScene = true;
+}
+
+void CADVEngine::ClickEndButtonEvent(int PartsNumber, int MouseX, int MouseY)
+{
+	AFL_Activity_End();
+	this.m_OpenUI = false;
+	this.End();
+}
+
+void CADVEngine::ClickListBoxEvent(int PartsNumber, int MouseX, int MouseY)
+{
+	int Index = this.GetSelectedIndexByActivityListbox();
+	int Time = this.m_ClickTime.Get();
+	if (Time <= 500 && Index == this.m_PrevListBoxIndex)
+	{
+		this.ClickEscapeWithUpdateButtonEvent(PartsNumber, MouseX, MouseY);
+	}
+	this.m_PrevListBoxIndex = Index;
+	this.m_ClickTime.Reset();
+}
+
+void CADVEngine::ChangeDebugCheckEvent(int PartsNumber, bool Flg)
+{
+	g_ADVEngine_EnableOutputLog = Flg;
+}
+
+void CADVEngine::MouseWheelEvent(int PartsNumber, int Forward, int Back)
+{
+	int Number = SYS_Activity_GetPartsNumber(this.m_ActivityName, "SYS_ステップリスト");
+	if (Number == 0)
+	{
+		return;
+	}
+	if (Ｐ＿フォーカス確認(Number))
+	{
+		return;
+	}
+	int Diff = (Back - Forward) * 3;
+	int Current = Ｐ＿リストボックス＿スクロール位置取得(Number);
+	Ｐ＿リストボックス＿スクロール位置設定(Number, Current + Diff);
+}
+
+void CADVEngine::KeyPressEvent(int PartsNumber, int KeyCode)
+{
+	int Number = SYS_Activity_GetPartsNumber(this.m_ActivityName, "SYS_ステップリスト");
+	if (Number == 0)
+	{
+		return;
+	}
+	int Current = Ｐ＿リストボックス＿選択位置取得(Number);
+	int Diff;
+	if (KeyCode == 40)
+	{
+		Diff = 1;
+	}
+	else if (KeyCode == 38)
+	{
+		Diff = -1;
+	}
+	else if (KeyCode == 35)
+	{
+		Current = this.m_NumofStep;
+	}
+	else if (KeyCode == 36)
+	{
+		Current = 0;
+	}
+	else if (KeyCode == 34)
+	{
+		Diff = 10;
+	}
+	else if (KeyCode == 33)
+	{
+		Diff = -10;
+	}
+	Ｐ＿リストボックス＿選択位置設定(Number, Math.Max(0, Current + Diff));
+}
+
+void CADVEngine::RunStep(int Step)
+{
+	int CodeType = ADVEngine.GetCodeType(this.m_FunctionName, Step);
+	this.Log("【%s : %04d/%04d】" % this.m_FunctionName % (Step + 1) % this.m_NumofStep);
+	if (CodeType == 2)
+	{
+		this.DoMessage(this.m_FunctionName, Step);
+	}
+	else if (CodeType == 1)
+	{
+		this.DoFunctionCall(this.m_FunctionName, Step);
+	}
+}
+
+void CADVEngine::BeginPartsUpdateEvent(int PassedTime)
+{
+	int Number = SYS_Activity_GetPartsNumber(this.m_ActivityName, "SYS_背景");
+	if (Number != 0)
+	{
+		g_ADVEngine_UIPanel_PosX = Ｐ＿Ｘ座標取得(Number);
+		g_ADVEngine_UIPanel_PosY = Ｐ＿Ｙ座標取得(Number);
+	}
+	if (this.m_F3.IsClick(-2147483648))
+	{
+		ADVEngine.OpenFunctionFile(this.m_FunctionName, this.m_CurrentStep);
+	}
+	if (!this.m_OpenUI)
+	{
+		if (this.m_F2.IsClick(-2147483648))
+		{
+			this.m_OpenUI = true;
+		}
+		else if (this.m_F4.IsClick(-2147483648))
+		{
+			this.End();
+		}
+		else if (this.m_F5.IsClick(-2147483648))
+		{
+			this.m_UpdateScene = true;
+			this.m_UpdateText = true;
+		}
+		g_SkipKeyWait = g_SkipKeyWait || (this.m_OpenUI || this.m_UpdateScene || this.m_UpdateText);
+	}
+	else
+	{
+		if (this.m_F2.IsClick(-2147483648) || this.m_Esc.IsClick(-2147483648) || this.m_RClick.IsClick(-2147483648))
+		{
+			this.ClickEscapeButtonEvent(0, 0, 0);
+		}
+		else if (this.m_F4.IsClick(-2147483648))
+		{
+			this.ClickEndButtonEvent(0, 0, 0);
+		}
+		else if (this.m_F5.IsClick(-2147483648))
+		{
+			this.ClickUpdateTextButtonEvent(0, 0, 0);
+		}
+		if (this.m_Enter.IsClick(-2147483648))
+		{
+			this.ClickEscapeWithUpdateButtonEvent(0, 0, 0);
+		}
+	}
+}
+
+void CADVEngine::DoMessage(string FuncName, int Step)
+{
+	string Message;
+	ADVEngine.GetMessage(Message, FuncName, Step);
+	'' S(Message);
+	this.LogLine("○ メッセージ：%s" % Message);
+}
+
+void CADVEngine::DoFunctionCall(string FuncName, int Step)
+{
+	string CallFuncName;
+	ADVEngine.GetFuncName(CallFuncName, FuncName, Step);
+	if (!ADVEngine.BindFunction(FuncName, Step))
+	{
+		system.Output("× 関数が存在しないか、関数の戻り値がvoid以外です。\n");
+		system.Output("　 　-> ファイル名【%s】\n" % this.m_FileName);
+		system.Output("　 　-> 関数名【%s】\n" % FuncName);
+		system.Output("　 　-> ステップ【%d】\n" % (Step + 1));
+		system.Output("　 　-> 【%s】\n" % CallFuncName);
+		return;
+	}
+	int DelegateID = this.CreateDelegateObjectID(FuncName, Step);
+	CADVCallFunction AdvCallFunction;
+	AdvCallFunction.SYS_ADV_CallFunction(CallFuncName, FuncName, Step, DelegateID, g_ADVEngine_EnableOutputLog, this.GetStepText(Step));
+}
+
+int CADVEngine::CreateDelegateObjectID(string FuncName, int Step)
+{
+	return ADVEngine.CreateDelegateObjectID(FuncName, Step);
+}
+
+string CADVEngine::GetStepText(int Step)
+{
+	string Text;
+	ADVEngine.GetStepText(Text, this.m_FunctionName, Step);
+	return Text;
+}
+
+void CADVEngine::ReleaseScene()
+{
+	this.m_ReleaseSceneFunc();
+}
+
+void CADVEngine::Log(string Text)
+{
+	if (!system.IsDebugMode() || !g_ADVEngine_EnableOutputLog)
+	{
+		return;
+	}
+	system.Output("%s" % Text);
+}
+
+void CADVEngine::LogLine(string Text)
+{
+	this.Log("%s\n" % Text);
+}
+

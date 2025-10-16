@@ -1,0 +1,108 @@
+CAEPropertyCGDetection::CAEPropertyCGDetection()
+{
+	this.Release();
+}
+
+CAEPropertyCGDetection::~CAEPropertyCGDetection()
+{
+	this.Release();
+}
+
+void CAEPropertyCGDetection::Init(int LayoutID, ref CAEInstanceItem Item)
+{
+	this.Release();
+	if (Item === NULL)
+	{
+		return;
+	}
+	this.m_Item <- Item;
+	this.m_Panel.Init(LayoutID);
+	this.m_Panel.AddKeyDownEvent(this.KeyDownEvent);
+	this.m_Panel.AddMouseWheelEvent(this.MouseWheelEvent);
+	this.m_Panel.AddChangeTextEvent(this.ChangeTextEvent);
+	int ID = this.m_Item.GetID();
+	int X;
+	int Y;
+	int Width;
+	int Height;
+	Ｐ＿ＣＧ判定範囲取得(ID, X, Y, Width, Height);
+	this.m_Panel.AddTextBoxItem("ＣＧ名", Ｐ＿ＣＧ判定ＣＧ名取得(ID), true);
+	this.m_Panel.AddTextBoxItem("表示範囲／Ｘ", string(X), false);
+	this.m_Panel.AddTextBoxItem("表示範囲／Ｙ", string(Y), false);
+	this.m_Panel.AddTextBoxItem("表示範囲／幅", string(Width), false);
+	this.m_Panel.AddTextBoxItem("表示範囲／高さ", string(Height), false);
+}
+
+void CAEPropertyCGDetection::Release()
+{
+	this.m_dgMouseWheelEvent.Clear();
+	this.m_dgKeyDownEvent.Clear();
+	this.m_Item <- NULL;
+	this.m_Panel.Release();
+}
+
+void CAEPropertyCGDetection::KeyDownEvent(int ID, int KeyID)
+{
+	this.m_dgKeyDownEvent(ID, KeyID);
+}
+
+void CAEPropertyCGDetection::MouseWheelEvent(int ID, int Forward, int Back)
+{
+	this.m_dgMouseWheelEvent(ID, Forward, Back);
+}
+
+void CAEPropertyCGDetection::ChangeTextEvent(int ID)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	int X;
+	int Y;
+	int Width;
+	int Height;
+	Ｐ＿ＣＧ判定範囲取得(PartsID, X, Y, Width, Height);
+	if (Item.GetLabel() == "ＣＧ名")
+	{
+		Ｐ＿ＣＧ判定設定(PartsID, Ｐ＿Ｘ座標取得(PartsID), Ｐ＿Ｙ座標取得(PartsID), Item.GetTextBoxText());
+	}
+	else if (Item.GetLabel() == "表示範囲／Ｘ")
+	{
+		Ｐ＿ＣＧ判定範囲設定(PartsID, Item.GetTextBoxInt(), Y, Width, Height);
+	}
+	else if (Item.GetLabel() == "表示範囲／Ｙ")
+	{
+		Ｐ＿ＣＧ判定範囲設定(PartsID, X, Item.GetTextBoxInt(), Width, Height);
+	}
+	else if (Item.GetLabel() == "表示範囲／幅")
+	{
+		Ｐ＿ＣＧ判定範囲設定(PartsID, X, Y, Item.GetTextBoxInt(), Height);
+	}
+	else if (Item.GetLabel() == "表示範囲／高さ")
+	{
+		Ｐ＿ＣＧ判定範囲設定(PartsID, X, Y, Width, Item.GetTextBoxInt());
+	}
+}
+
+void CAEPropertyCGDetection::AddKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent += DelegateObject;
+}
+
+void CAEPropertyCGDetection::EraseKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent -= DelegateObject;
+}
+
+void CAEPropertyCGDetection::AddMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent += DelegateObject;
+}
+
+void CAEPropertyCGDetection::EraseMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent -= DelegateObject;
+}
+

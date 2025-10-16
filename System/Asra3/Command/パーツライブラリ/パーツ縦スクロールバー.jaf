@@ -1,0 +1,99 @@
+void Ｐ＿縦スクロールバー＿サイズ設定(int パーツ番号, int 幅, int 高さ)
+{
+	PartsEngine.SetVScrollbarSize(パーツ番号, 幅, 高さ);
+}
+
+void Ｐ＿縦スクロールバー＿上ボタン高さ設定(int パーツ番号, int 高さ)
+{
+	PartsEngine.SetVScrollbarUpHeight(パーツ番号, 高さ);
+}
+
+void Ｐ＿縦スクロールバー＿下ボタン高さ設定(int パーツ番号, int 高さ)
+{
+	PartsEngine.SetVScrollbarDownHeight(パーツ番号, 高さ);
+}
+
+int Ｐ＿縦スクロールバー＿上ボタン高さ取得(int パーツ番号)
+{
+	return PartsEngine.GetVScrollbarUpHeight(パーツ番号);
+}
+
+int Ｐ＿縦スクロールバー＿下ボタン高さ取得(int パーツ番号)
+{
+	return PartsEngine.GetVScrollbarDownHeight(パーツ番号);
+}
+
+void Ｐ＿縦スクロールバー＿全体量設定(int パーツ番号, int 全体量)
+{
+	PartsEngine.SetVScrollbarTotalSize(パーツ番号, 全体量);
+}
+
+void Ｐ＿縦スクロールバー＿表示量設定(int パーツ番号, int 表示量)
+{
+	PartsEngine.SetVScrollbarViewSize(パーツ番号, 表示量);
+}
+
+void Ｐ＿縦スクロールバー＿スクロール位置設定(int パーツ番号, int 表示位置)
+{
+	PartsEngine.SetVScrollbarScrollPos(パーツ番号, 表示位置);
+}
+
+void Ｐ＿縦スクロールバー＿スクロールレート設定(int パーツ番号, float レート)
+{
+	PartsEngine.SetVScrollbarScrollRate(パーツ番号, レート);
+}
+
+void Ｐ＿縦スクロールバー＿ボタンクリック移動量設定(int パーツ番号, int 移動量)
+{
+	PartsEngine.SetVScrollbarMoveSizeByButton(パーツ番号, 移動量);
+}
+
+int Ｐ＿縦スクロールバー＿全体量取得(int パーツ番号)
+{
+	return PartsEngine.GetVScrollbarTotalSize(パーツ番号);
+}
+
+int Ｐ＿縦スクロールバー＿表示量取得(int パーツ番号)
+{
+	return PartsEngine.GetVScrollbarViewSize(パーツ番号);
+}
+
+int Ｐ＿縦スクロールバー＿スクロール位置取得(int パーツ番号)
+{
+	return PartsEngine.GetVScrollbarScrollPos(パーツ番号);
+}
+
+float Ｐ＿縦スクロールバー＿スクロールレート取得(int パーツ番号)
+{
+	return PartsEngine.GetVScrollbarScrollRate(パーツ番号);
+}
+
+int Ｐ＿縦スクロールバー＿ボタンクリック移動量取得(int パーツ番号)
+{
+	return PartsEngine.GetVScrollbarMoveSizeByButton(パーツ番号);
+}
+
+void Ｐ＿縦スクロールバー＿ＣＧ名設定(int パーツ番号, string ＣＧ名)
+{
+	PartsEngine.SetVScrollbarCGName(パーツ番号, ＣＧ名);
+}
+
+string Ｐ＿縦スクロールバー＿ＣＧ名取得(int パーツ番号)
+{
+	string Name;
+	PartsEngine.GetVScrollbarCGName(パーツ番号, Name);
+	return Name;
+}
+
+void Ｐ＿縦スクロールバー＿フラット名設定(int パーツ番号, string ＣＧ名)
+{
+	PartsEngine.SetVScrollbarFlatName(パーツ番号, ＣＧ名);
+}
+
+string Ｐ＿縦スクロールバー＿フラット名取得(int パーツ番号)
+{
+	string Name;
+	PartsEngine.GetVScrollbarFlatName(パーツ番号, Name);
+	return Name;
+}
+

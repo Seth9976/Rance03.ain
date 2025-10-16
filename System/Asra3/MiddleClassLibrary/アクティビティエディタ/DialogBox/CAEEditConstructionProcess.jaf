@@ -1,0 +1,208 @@
+CAEEditConstructionProcess::CAEEditConstructionProcess()
+{
+	this.Release();
+}
+
+void CAEEditConstructionProcess::Create(int LayoutID, int ProcessNameAlphaClipper, int ProcessAlphaClipper, int NameWidth, ref CASConstructionProcess Process)
+{
+	this.Release();
+	this.m_RefProcess <- Process;
+	this.m_ProcessName = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿フォント色設定(this.m_ProcessName, 0, 0, 0, 1);
+	Ｐ＿テキスト設定(this.m_ProcessName, this.GetProcessName(Process), 1);
+	Ｐ＿座標設定(this.m_ProcessName, 0.0, 2.0);
+	Ｐ＿Ｚ座標設定(this.m_ProcessName, 1);
+	Ｐ＿オンカーソル透過設定(this.m_ProcessName, true);
+	this.m_ProcessNameWidth = NameWidth;
+	this.m_ProcessLayout = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿パディング設定(this.m_ProcessLayout, 0, 0, 6, 6);
+	Ｐ＿レイアウトボックス＿レイアウトタイプ設定(this.m_ProcessLayout, 2);
+	this.CreateProcessEdit(this.m_ProcessLayout, Process);
+	int Width = NameWidth;
+	int Height = 24;
+	this.m_BG = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿構築手順＿作成(this.m_BG, Width, Height, 1);
+	Ｐ＿構築手順＿色塗り(this.m_BG, 0, 0, Width, Height, 255, 255, 255, 255, 1);
+	Ｐ＿構築ビルド(this.m_BG, 1);
+	Ｐ＿親設定(this.m_ProcessName, this.m_BG);
+	Ｐ＿親設定(this.m_ProcessLayout, this.m_BG);
+	Ｐ＿クリック可能設定(this.m_BG, true);
+	Ｐ＿レイアウトボックス＿追加(LayoutID, this.m_BG);
+	Ｐ＿アルファクリッパー設定(this.m_BG, ProcessNameAlphaClipper);
+	Ｐ＿アルファクリッパー設定(this.m_ProcessLayout, ProcessAlphaClipper);
+	Ｐ＿アルファクリッパー設定(this.m_ProcessName, ProcessNameAlphaClipper);
+	AFL_Parts_AddMouseLClickEvent(this.m_BG, this.MouseClick);
+	AFL_Parts_AddMouseEnterEvent(this.m_BG, this.MouseEnter);
+	AFL_Parts_AddMouseLeaveEvent(this.m_BG, this.MouseLeave);
+	AFL_Parts_AddMouseWheelEvent(this.m_BG, this.MouseWheelEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_ProcessName, this.MouseWheelEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_ProcessLayout, this.MouseWheelEvent);
+}
+
+void CAEEditConstructionProcess::Release()
+{
+	this.m_RefProcess <- NULL;
+	PARTS_ReleaseWithInit(this.m_BG);
+	PARTS_ReleaseWithInit(this.m_ProcessLayout);
+	PARTS_ReleaseWithInit(this.m_ProcessName);
+	this.m_Focus = false;
+	this.ReleaseProcessEdit();
+	this.m_dgChangedEvent.Clear();
+	this.m_dgMouseWheelEvent.Clear();
+	this.m_dgMouseClickEvent.Clear();
+}
+
+string CAEEditConstructionProcess::GetProcessName(ref CASConstructionProcess Process)
+{
+	int Command = Process.GetCommand();
+	switch (Command)
+	{
+	case 0:
+		return "作成";
+	case 1:
+		return "ピクセル作成";
+	case 2:
+		return "ＣＧ設定";
+	case 3:
+		return "ＲＧＢ色塗り";
+	case 4:
+		return "ブレンド塗り";
+	case 5:
+		return "アルファ塗り";
+	case 6:
+		return "ＲＧＢＡ色塗り";
+	case 7:
+		return "テキストブレンド";
+	case 8:
+		return "テキストコピー";
+	case 9:
+		return "グラデーション";
+	case 10:
+		return "矩形";
+	case 11:
+		return "ＣＧ部分ブレンド";
+	case 13:
+		return "ＣＧ部分拡大縮小ブレンド";
+	case 12:
+		return "ＣＧ部分コピー";
+	case 14:
+		return "ＣＧ部分拡大縮小コピー";
+	case 19:
+		return "ＣＧ部分アルファブレンド";
+	case 20:
+		return "ＣＧ部分拡大縮小アルファブレンド";
+	case 21:
+		return "ＣＧ部分アルファ塗り";
+	case 22:
+		return "ＣＧ部分拡大縮小アルファ塗り";
+	case 15:
+		if (Process.IsFullSize())
+		{
+			return "白黒フィルタ全";
+		}
+		else
+		{
+			return "白黒フィルタ";
+		}
+	case 16:
+		if (Process.IsFullSize())
+		{
+			return "加算フィルタ全";
+		}
+		else
+		{
+			return "加算フィルタ";
+		}
+	case 17:
+		if (Process.IsFullSize())
+		{
+			return "乗算フィルタ全";
+		}
+		else
+		{
+			return "乗算フィルタ";
+		}
+	case 18:
+		return "線";
+	}
+	return "不明";
+}
+
+void CAEEditConstructionProcess::ReleaseProcessEdit()
+{
+	this.m_ProcessEdit.Release();
+}
+
+void CAEEditConstructionProcess::CreateProcessEdit(int LayoutID, ref CASConstructionProcess Process)
+{
+	this.m_ProcessEdit.Create(LayoutID, Process);
+	this.m_ProcessEdit.SetChangedEvent(this.ChangedEvent);
+	this.m_ProcessEdit.SetMouseWheelEvent(this.MouseWheelEvent);
+}
+
+int CAEEditConstructionProcess::GetProcessLabelWidth()
+{
+	return AFL_Parts_GetWidth(this.m_ProcessLayout, 1);
+}
+
+void CAEEditConstructionProcess::SetProcessLabelX(int PosX)
+{
+	Ｐ＿座標設定(this.m_ProcessLayout, this.m_ProcessNameWidth + PosX, 2.0);
+}
+
+void CAEEditConstructionProcess::MouseEnter(int ID, int MouseX, int MouseY)
+{
+	Ｐ＿乗算色設定(this.m_BG, 200, 200, 255);
+}
+
+void CAEEditConstructionProcess::MouseLeave(int ID, int MouseX, int MouseY)
+{
+	Ｐ＿乗算色設定(this.m_BG, 255, 255, this.m_Focus ? 200 : 255);
+}
+
+void CAEEditConstructionProcess::MouseClick(int ID, int MouseX, int MouseY)
+{
+	this.m_dgMouseClickEvent(this.m_BG, MouseX, MouseY);
+}
+
+void CAEEditConstructionProcess::MouseWheelEvent(int ID, int Forward, int Back)
+{
+	this.m_dgMouseWheelEvent(this.GetID(), Forward, Back);
+}
+
+void CAEEditConstructionProcess::ChangedEvent(int ID)
+{
+	this.m_dgChangedEvent(this.GetID());
+}
+
+void CAEEditConstructionProcess::SetActive(bool Active)
+{
+	this.m_Focus = Active;
+	Ｐ＿乗算色設定(this.m_BG, 255, 255, this.m_Focus ? 200 : 255);
+}
+
+bool CAEEditConstructionProcess::IsActive()
+{
+	return this.m_Focus;
+}
+
+int CAEEditConstructionProcess::GetID()
+{
+	return this.m_BG;
+}
+
+void CAEEditConstructionProcess::SetLButtonClick(DG_MouseClickHandler dgObject)
+{
+	this.m_dgMouseClickEvent = dgObject;
+}
+
+void CAEEditConstructionProcess::SetMouseWheelEvent(DG_MouseWheelHandler dgObject)
+{
+	this.m_dgMouseWheelEvent = dgObject;
+}
+
+void CAEEditConstructionProcess::SetChangedEvent(DG_ChangedHandler dgObject)
+{
+	this.m_dgChangedEvent = dgObject;
+}
+

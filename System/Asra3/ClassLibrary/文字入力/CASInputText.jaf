@@ -1,0 +1,253 @@
+CASInputText::CASInputText()
+{
+	this.m_End = false;
+}
+
+void CASInputText::Begin(int AreaNumber, string BeginText, bool OpenIME)
+{
+	SYS_ASSERTE_AREA_ID(AreaNumber);
+	ref 文字入力エリア_t a = _文字入力エリア[AreaNumber];
+	string cg = a.ＣＧ名;
+	this.m_BaseParts.Create();
+	if (!cg.Empty())
+	{
+		this.m_BaseParts.SetCG(cg, 1);
+	}
+	else
+	{
+		Ｐ＿構築手順＿初期化(this.m_BaseParts.GetPartsNumber(), 1);
+		Ｐ＿構築手順＿作成(this.m_BaseParts.GetPartsNumber(), a.幅, a.高, 1);
+		Ｐ＿構築手順＿色塗り(this.m_BaseParts.GetPartsNumber(), 0, 0, a.幅, a.高, a.塗Ｒ, a.塗Ｇ, a.塗Ｂ, a.塗率, 1);
+		Ｐ＿構築ビルド(this.m_BaseParts.GetPartsNumber(), 1);
+	}
+	this.m_BaseParts.SetPos(a.Ｘ, a.Ｙ);
+	this.m_BaseParts.SetZ(a.Ｚ);
+	this.m_BaseParts.SetShow(true);
+	string font_name;
+	switch (a.フォント)
+	{
+	case 0:
+		font_name = "ＭＳ ゴシック";
+		break;
+	case 1:
+		font_name = "ＭＳ 明朝";
+		break;
+	default:
+		font_name = "ＭＳ ゴシック";
+		break;
+	}
+	InputString.SetFont(a.文字サイズ, font_name, 0);
+	InputString.SetPos(a.Ｘ + a.文字Ｘ, a.Ｙ + a.文字Ｙ);
+	this.m_CharProperty.SetType(a.フォント);
+	this.m_CharProperty.SetSize(a.文字サイズ);
+	this.m_CharProperty.SetColor(CF_CASColor(a.文字Ｒ, a.文字Ｇ, a.文字Ｂ, 255));
+	this.m_CharProperty.SetBoldWeight(0.0);
+	this.m_CharProperty.SetEdgeWeight(Math.Max(0, Math.Max(Math.Max(a.文字飾左, a.文字飾右), Math.Max(a.文字飾上, a.文字飾下))));
+	this.m_CharProperty.SetEdgeColor(CF_CASColor(a.文字飾Ｒ, a.文字飾Ｇ, a.文字飾Ｂ, 255));
+	this.m_PrevTextParts.Create();
+	this.m_PrevTextParts.SetPos(a.Ｘ + a.文字Ｘ, a.Ｙ + a.文字Ｙ);
+	this.m_PrevTextParts.SetZ(a.Ｚ + 1);
+	this.m_NextTextParts.Create();
+	this.m_NextTextParts.SetPos(this.m_PrevTextParts.GetX() + this.m_PrevTextParts.GetWidth(1), this.m_PrevTextParts.GetY());
+	this.m_NextTextParts.SetZ(a.Ｚ + 1);
+	this.m_CursorParts.Create();
+	Ｐ＿構築手順＿初期化(this.m_CursorParts.GetPartsNumber(), 1);
+	Ｐ＿構築手順＿ピクセル作成(this.m_CursorParts.GetPartsNumber(), 3, a.文字サイズ, 1);
+	if (a.文字飾上 > 0 || a.文字飾右 > 0 || a.文字飾下 > 0 || a.文字飾左 > 0)
+	{
+		Ｐ＿構築手順＿色塗り(this.m_CursorParts.GetPartsNumber(), 0, 0, 3, a.文字サイズ, a.文字飾Ｒ, a.文字飾Ｇ, a.文字飾Ｂ, -1, 1);
+		Ｐ＿構築手順＿色塗り(this.m_CursorParts.GetPartsNumber(), 1, 1, 1, a.文字サイズ - 2, a.文字Ｒ, a.文字Ｇ, a.文字Ｂ, -1, 1);
+	}
+	else
+	{
+		Ｐ＿構築手順＿色塗り(this.m_CursorParts.GetPartsNumber(), 0, 0, 3, a.文字サイズ, a.文字Ｒ, a.文字Ｇ, a.文字Ｂ, -1, 1);
+	}
+	Ｐ＿構築ビルド(this.m_CursorParts.GetPartsNumber(), 1);
+	this.m_CursorParts.SetZ(a.Ｚ + 2);
+	this.UpdateCursorPos(a, a.文字Ｘ, a.文字Ｙ);
+	InputString.Begin();
+	if (OpenIME)
+	{
+		InputString.OpenIME();
+	}
+	string Dummy;
+	this.ClipText(a, BeginText, Dummy);
+	this.m_InputText = BeginText;
+	this.m_PrevText = BeginText;
+	this.m_NextText = "";
+	this.m_OldPrevText = "";
+	this.m_OldNextText = "";
+	this.m_LeftKeyClick.Init(37, true);
+	this.m_RightKeyClick.Init(39, true);
+	this.m_EnterKeyClick.Init(13, true);
+	this.m_EscapeKeyClick.Init(27, true);
+	this.m_RButtonClick.Init(2, true);
+	this.m_HomeKeyClick.Init(36, true);
+	this.m_EndKeyClick.Init(35, true);
+	this.m_BackSpaceKeyClick.Init(8, true);
+	this.m_DeleteKeyClick.Init(46, true);
+	this.m_Converts = false;
+	this.m_Inputs = false;
+	this.m_OpenIME = OpenIME;
+	this.m_AreaNumber = AreaNumber;
+	this.m_End = false;
+}
+
+void CASInputText::Update()
+{
+	if (this.m_End)
+	{
+		return;
+	}
+	this.m_InputText = this.m_PrevText + this.m_NextText;
+	if (this.m_EnterKeyClick.IsClick(-2147483648))
+	{
+		this.m_End = true;
+		return;
+	}
+	if (this.m_EscapeKeyClick.IsClick(-2147483648) || this.m_RButtonClick.IsClick(-2147483648))
+	{
+		this.m_End = true;
+		return;
+	}
+	bool MoveCursor = false;
+	if (!this.m_Inputs && !this.m_Converts)
+	{
+		if (this.m_LeftKeyClick.IsKeyPress(-2147483648))
+		{
+			MoveCursor = this.ShiftRight(this.m_PrevText, this.m_NextText);
+		}
+		else if (this.m_RightKeyClick.IsKeyPress(-2147483648))
+		{
+			MoveCursor = this.ShiftLeft(this.m_PrevText, this.m_NextText);
+		}
+		else if (this.m_HomeKeyClick.IsKeyDown())
+		{
+			this.m_NextText = this.m_PrevText + this.m_NextText;
+			this.m_PrevText = "";
+		}
+		else if (this.m_EndKeyClick.IsKeyDown())
+		{
+			this.m_PrevText = this.m_PrevText + this.m_NextText;
+			this.m_NextText = "";
+		}
+		if (this.m_LeftKeyClick.IsClick(-2147483648) || this.m_RightKeyClick.IsClick(-2147483648))
+		{
+			MoveCursor = false;
+		}
+		if (this.m_BackSpaceKeyClick.IsKeyPress(-2147483648))
+		{
+			this.m_PrevText.PopBack();
+		}
+		else if (this.m_DeleteKeyClick.IsKeyPress(-2147483648))
+		{
+			this.m_NextText.Erase(0);
+		}
+	}
+	else
+	{
+		this.m_BackSpaceKeyClick.Reset(true);
+		this.m_DeleteKeyClick.Reset(true);
+		this.m_EnterKeyClick.Reset(true);
+	}
+	this.m_PrevText += InputString.GetResultString();
+	InputString.ClearResultString();
+	if (this.m_OldPrevText != this.m_PrevText || this.m_OldNextText != this.m_NextText)
+	{
+		SYS_ASSERTE_AREA_ID(this.m_AreaNumber);
+		ref 文字入力エリア_t a = _文字入力エリア[this.m_AreaNumber];
+		this.ClipText(a, this.m_PrevText, this.m_NextText);
+		this.m_PrevTextParts.SetFontProperty(this.m_CharProperty, 1);
+		this.m_PrevTextParts.SetText(this.m_PrevText, 1);
+		this.m_NextTextParts.SetFontProperty(this.m_CharProperty, 1);
+		this.m_NextTextParts.SetText(this.m_NextText, 1);
+		this.m_NextTextParts.SetPos(this.m_PrevTextParts.GetX() + this.m_PrevTextParts.GetWidth(1), this.m_PrevTextParts.GetY());
+		this.UpdateCursorPos(a, a.文字Ｘ + this.m_PrevTextParts.GetWidth(1), a.文字Ｙ);
+		this.m_OldPrevText = this.m_PrevText;
+		this.m_OldNextText = this.m_NextText;
+	}
+	this.m_Converts = InputString.Converts();
+	this.m_Inputs = InputString.Inputs();
+	this.m_CursorParts.SetShow(MoveCursor | (system.GetTime() / 500) % 2);
+}
+
+void CASInputText::End()
+{
+	this.m_End = true;
+	this.m_CursorParts.Release();
+	this.m_NextTextParts.Release();
+	this.m_PrevTextParts.Release();
+	if (this.m_OpenIME)
+	{
+		InputString.CloseIME();
+	}
+	InputString.End();
+	this.m_BaseParts.Release();
+	AFL_MouseWheel_ClearCount();
+}
+
+bool CASInputText::IsEnd()
+{
+	return this.m_End;
+}
+
+string CASInputText::GetInputText()
+{
+	return this.m_InputText;
+}
+
+void CASInputText::UpdateCursorPos(ref 文字入力エリア_t a, int OffsetX, int OffsetY)
+{
+	int x = a.Ｘ + OffsetX;
+	int y = a.Ｙ + OffsetY;
+	InputString.SetPos(x, y);
+	this.m_CursorParts.SetPos(x + 1, y);
+}
+
+void CASInputText::ClipText(ref 文字入力エリア_t InputStringArea, ref string PrevText, ref string NextText)
+{
+	if (InputStringArea.m_nMaxTextLengthSJIS == -1)
+	{
+		return;
+	}
+	while (PrevText.LengthByte() + NextText.LengthByte() > InputStringArea.m_nMaxTextLengthSJIS * 2)
+	{
+		NextText.PopBack();
+		if (NextText.LengthByte() == 0)
+		{
+			break;
+		}
+	}
+	while (PrevText.LengthByte() > InputStringArea.m_nMaxTextLengthSJIS * 2)
+	{
+		PrevText.PopBack();
+	}
+}
+
+bool CASInputText::ShiftRight(ref string SrcText, ref string DestText)
+{
+	if (SrcText.Empty())
+	{
+		return false;
+	}
+	DestText = SrcText.GetPart(SrcText.Length() - 1, 1) + DestText;
+	SrcText.PopBack();
+	return true;
+}
+
+bool CASInputText::ShiftLeft(ref string SrcText, ref string DestText)
+{
+	if (DestText.Empty())
+	{
+		return false;
+	}
+	SrcText += DestText.GetPart(0, 1);
+	DestText.Erase(0);
+	return true;
+}
+
+bool CASInputText::IsConverting()
+{
+	return InputString.Converts() || InputString.Inputs();
+}
+

@@ -1,0 +1,272 @@
+AttackSkillIconView::AttackSkillIconView()
+{
+	this.gameObjectId_ = g_gameObjectManager.addFocusObject(this.update, this.isHover);
+	this.isEquip_ = false;
+	this.isInitialized_ = false;
+	this.isShow_ = false;
+}
+
+void AttackSkillIconView::init(string skillId, int mode, int availableLevel, int coolTime)
+{
+	this.coolTime_ = coolTime;
+	this.skillId_ = skillId;
+	this.mode_ = mode;
+	this.skill_ <- getPlayerSkillFromId(this.skillId_);
+	this.availableLevel_ = availableLevel;
+}
+
+void AttackSkillIconView::initParts()
+{
+	this.initCommonParts();
+	if (this.mode_ == 0)
+	{
+		this.initAvailable();
+	}
+	else if (this.mode_ == 1 || this.mode_ == 2)
+	{
+		this.initNotAvailable();
+	}
+	createPartsGroup(this.parent_, this.parts_, 6000);
+	if (this.parentPartsNumber_ != 0)
+	{
+		this.parent_.setParent(this.parentPartsNumber_);
+		this.parent_.setZ(0.0);
+	}
+	this.setPartsPos();
+	this.setState(0);
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].changeOrigin(5);
+	}
+	this.setPartsShow();
+}
+
+void AttackSkillIconView::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+	this.parts_[10].setShow(this.isEquip_);
+	this.setRankIconShow();
+}
+
+void AttackSkillIconView::setPartsPos()
+{
+	this.parts_[0].setPos(0.0, 0.0);
+	this.parts_[0].setOrigin(7);
+	this.parts_[1].setPos(58.0, 0.0);
+	this.parts_[1].setOrigin(8);
+	this.parts_[2].setPos(58.0, 47.0);
+	this.parts_[2].setOrigin(8);
+	this.parts_[5].setPos(13.0, 65.0);
+	this.parts_[5].setOrigin(7);
+	this.parts_[6].setPos(40.0, 83.0);
+	this.parts_[6].setOrigin(7);
+	this.parts_[10].setPos(58.0, 50.0);
+	this.parts_[10].setOrigin(5);
+	this.parts_[7].setPos(51.0, 67.0);
+	this.parts_[6].setOrigin(7);
+	this.parts_[3].setPos(25.0, 49.0);
+	this.parts_[4].setPos(69.0, 54.0);
+	this.parts_[4].setOrigin(5);
+	this.parts_[8].setPos(80.0, 5.0);
+	this.parts_[9].setPos(98.0, 22.0);
+	this.parts_[9].setOrigin(5);
+}
+
+void AttackSkillIconView::setRankIconShow()
+{
+}
+
+void AttackSkillIconView::update()
+{
+	this.updateHover();
+	if (this.cb_.Numof() != 0)
+	{
+		int n;
+		if (this.isHover())
+		{
+			n = 1;
+			if (g_mouse.isDown(0))
+			{
+				n = 2;
+			}
+		}
+		this.setState(n);
+		if (g_mouse.isClickWithFocus(this.gameObjectId_))
+		{
+			this.cb_(this.skillId_);
+		}
+	}
+	if (!this.lastHover_ && this.isHover_)
+	{
+		playCursor();
+	}
+	if (this.isHover_ && g_mouse.onDown(0))
+	{
+		playClick();
+	}
+	this.lastHover_ = this.isHover_;
+}
+
+void AttackSkillIconView::updateHover()
+{
+	this.isHover_ = this.parts_[0].isHit(g_mouse.getX(), g_mouse.getY()) && this.viewValue_ == 0.0 && this.mode_ == 0;
+}
+
+void AttackSkillIconView::setPos(int x, int y)
+{
+	this.x_ = x;
+	this.y_ = y;
+	this.parent_.setPos(this.x_, this.y_);
+	this.info_.setPos(100, 2);
+}
+
+void AttackSkillIconView::initAvailable()
+{
+	if (this.skill_ === NULL)
+	{
+		return;
+	}
+	this.parts_[1].init(this.skill_.getIconImageName(), 0);
+	this.parts_[6].init(this.getSkillTypeIcon(), 0);
+	this.parts_[5].init(this.getSkillAttrIcon(), 0);
+	this.parts_[2].initAsText(this.skill_.getName(), 20, true, 256, 255, 255, 255);
+	if (this.coolTime_ > 0)
+	{
+		this.parts_[8].init("システム／編成／クールタイム", 0);
+		this.parts_[9].initAsNumber("システム／数字／幅２３／白フチ", NULL);
+		this.parts_[9].setNumber(this.coolTime_);
+	}
+	this.parts_[7].init("システム／スキル／ランク／星%D" % this.skill_.getGroupRank(), 0);
+}
+
+void AttackSkillIconView::initCommonParts()
+{
+	this.parts_[0].init("システム／編成／スキル下地", 0);
+	this.parts_[10].init("システム／編成／スキル装備", 0);
+}
+
+string AttackSkillIconView::getSkillTypeIcon()
+{
+	return getPlayerAttackTargetTypeIconName(this.skill_);
+}
+
+string AttackSkillIconView::getSkillAttrIcon()
+{
+	PlayerSkillAttribute attr;
+	attr = getPlayerSkillAttributeFromId(this.skill_.getAttributeId());
+	return attr.getImageName();
+}
+
+void AttackSkillIconView::initNotAvailable()
+{
+	if (this.skill_ !== NULL)
+	{
+		this.parts_[1].init(this.skill_.getIconImageName(), 0);
+	}
+	if (this.mode_ != 2)
+	{
+		this.parts_[3].init("システム／編成／未修得レベル", 0);
+		NumberPartsInfomation n;
+		n.setSameWidth(23);
+		n.setSpan(-3);
+		this.parts_[4].initAsNumber("システム／数字／幅２３／白フチ", n);
+		this.parts_[4].setNumber(this.availableLevel_);
+	}
+}
+
+void AttackSkillIconView::setState(int n)
+{
+	if (this.mode_ == 0)
+	{
+		this.parts_[1].setCgRange((this.parts_[1].getWidth() / 5) * n, 0, this.parts_[1].getWidth() / 5, this.parts_[1].getHeight());
+	}
+	else if (this.mode_ == 1 || this.mode_ == 2)
+	{
+		this.parts_[1].setCgRange((this.parts_[1].getWidth() / 5) * 4, 0, this.parts_[1].getWidth() / 5, this.parts_[1].getHeight());
+		n = 3;
+	}
+	if (this.isEquip_)
+	{
+		n = 4;
+	}
+	this.parts_[0].setCgRange((this.parts_[0].getWidth() / 5) * n, 0, this.parts_[0].getWidth() / 5, this.parts_[0].getHeight());
+	this.parts_[10].setShow(this.isEquip_);
+}
+
+void AttackSkillIconView::setEquip(bool val)
+{
+	this.isEquip_ = val;
+}
+
+bool AttackSkillIconView::isHover()
+{
+	this.updateHover();
+	return this.isHover_;
+}
+
+void AttackSkillIconView::setZ(int z)
+{
+	this.parent_.setZ(z);
+}
+
+void AttackSkillIconView::setViewValue(float value)
+{
+	this.viewValue_ = value;
+	if (-1 <= this.viewValue_ && this.viewValue_ <= 1.0)
+	{
+		if (!this.isInitialized_)
+		{
+			this.isInitialized_ = true;
+			this.initParts();
+			this.info_.init(this.mode_ == 0 ? this.skillId_ : "");
+			this.info_.setParent(this.parent_.getPartsNumber());
+			this.setPos(this.x_, this.y_);
+			this.info_.setShow(this.isShow_);
+		}
+	}
+	float v = Math.MaxF(-1.0, Math.MinF(1.0, value));
+	this.parent_.setAlpha((1 - Math.AbsF(v)) * 255.0);
+	this.parent_.setScaling(100 - Math.AbsF(v) * 20.0);
+	this.parent_.setPos(this.x_ + v * 50.0, this.y_);
+	this.parent_.setXZRot(v * 60.0);
+	this.info_.setViewValue(value);
+}
+
+void AttackSkillIconView::setOnClickCallback(DG_OnClickAttackSkillCallback cb)
+{
+	this.cb_ = cb;
+}
+
+string AttackSkillIconView::getSkillId()
+{
+	return this.skillId_;
+}
+
+void AttackSkillIconView::setShowInformation(bool isShow)
+{
+	this.isShow_ = isShow;
+	this.info_.fadeIn(isShow, NULL);
+}
+
+void AttackSkillIconView::setParent(int parentPartsNumber)
+{
+	this.parentPartsNumber_ = parentPartsNumber;
+	if (this.parent_.isInitialized())
+	{
+		this.parent_.setParent(this.parentPartsNumber_);
+		this.parent_.setZ(0.0);
+	}
+}
+
+void AttackSkillIconView::fadeIn(bool val)
+{
+	this.setViewValue(0.0);
+	this.parent_.runMotion(getStandardMotion(val ? 0 : 1), NULL);
+}
+

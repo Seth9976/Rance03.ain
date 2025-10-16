@@ -1,0 +1,236 @@
+SceneWorldMap::SceneWorldMap()
+{
+	this.isExit_ = false;
+}
+
+void SceneWorldMap::setPlaceButtonClickable(bool val)
+{
+	this.worldMap_.setPlaceButtonClickable(val);
+}
+
+void SceneWorldMap::init(string placeId, bool isLoadAutoSave)
+{
+	this.currentPlaceId_ = placeId;
+	this.worldMap_.init(this.currentPlaceId_);
+	this.worldMap_.setOnClickPlaceCallback(this.onClickPlace);
+	if (!isLoadAutoSave)
+	{
+		this.partsDoneAutoSave_.initAsText("オートセーブしました", 24, true, 256, 255, 255, 255);
+		this.partsDoneAutoSave_.setZ(6200.0);
+		this.partsDoneAutoSave_.setShow(true);
+	}
+	this.runAutoSavePopup();
+	this.btnCamp_.init("システム／ボタン／幅１７０", "キャンプを開く", "", true);
+	this.btnCamp_.setPos(834, 688);
+	this.btnCamp_.setClickCallback(this.onClickCampButton, 0);
+	this.btnCamp_.setEnable(false);
+}
+
+void SceneWorldMap::runAutoSavePopup()
+{
+	array@PartsMotion p[3];
+	p[0].setTime(250);
+	p[0].setAlpha(0, 255, 0);
+	p[0].setMove(-this.partsDoneAutoSave_.getWidth(), 0, 0, 0, 1);
+	p[1].setTime(3000);
+	p[2].setTime(250);
+	p[2].setAlpha(255, 0, 0);
+	p[2].setMove(0, 0, -this.partsDoneAutoSave_.getWidth(), 0, 1);
+	this.partsDoneAutoSave_.runMotionArray(p, NULL);
+}
+
+void SceneWorldMap::run()
+{
+	g_music.play("音楽／システム／マップ", -2147483648, false);
+	this.fadeIn(true, 500, this.onFinishFadeIn);
+}
+
+void SceneWorldMap::onFinishFadeIn()
+{
+	this.worldMap_.showNewBranch(this.onFinishShowNewBranch);
+}
+
+void SceneWorldMap::fadeIn(bool val, int time, DG_GeneralCallback onFinishCallback)
+{
+	this.worldMap_.fadeIn(val, time, onFinishCallback);
+	this.btnCamp_.fadeIn(val);
+}
+
+void SceneWorldMap::onFinishMoveFadeOut()
+{
+	g_partsMotionManager.finalize(-1);
+	this.isExit_ = true;
+}
+
+string SceneWorldMap::getPlaceIdMoveTo()
+{
+	return this.placeIdMoveTo_;
+}
+
+void SceneWorldMap::onFinishShowNewBranch()
+{
+	ref MapPlace mp = getMapPlaceFromId(this.currentPlaceId_);
+	this.worldMap_.moveFocus(mp.getX(), mp.getY(), this.onFinishFocusToPlayer);
+	this.btnCamp_.setEnable(true);
+}
+
+void SceneWorldMap::onFinishFocusToPlayer()
+{
+	this.worldMap_.setPlaceButtonClickable(true);
+}
+
+void SceneWorldMap::onClickPlace(string placeId)
+{
+	array@string route;
+	if (g_mapChain.getRoute(route, this.currentPlaceId_, placeId))
+	{
+		this.worldMap_.setPlaceButtonClickable(false);
+		this.btnCamp_.setEnable(false);
+		this.placeIdMoveTo_ = placeId;
+		if (route.Numof() > 0)
+		{
+			this.worldMap_.setFollowPlayerIcon(true);
+			this.moveInfo_.init(route);
+			int c = getEncountCount(route.Numof() - 1);
+			int i;
+			for (i = 0; i < c; ++i)
+			{
+				this.moveInfo_.addEncountPoint();
+			}
+			int fx;
+			int fy;
+			int tx;
+			int ty;
+			if (this.moveInfo_.getNextNode(fx, fy, tx, ty, this.isEncount_))
+			{
+				this.worldMap_.movePlayerIcon(fx, fy, tx, ty, this.onFinishMovePlayerIcon);
+			}
+		}
+		else
+		{
+			g_music.fadeOut(2000);
+			g_sysSound.play(6, "効果音／ダンジョンイベント");
+			this.fadeIn(false, 500, this.onFinishMoveFadeOut);
+		}
+	}
+}
+
+void SceneWorldMap::onFinishMovePlayerIcon()
+{
+	if (this.isEncount_)
+	{
+		g_music.fadeOut(0);
+		this.flat_.init("システム／エンカウント", "効果音／エンカウント", false);
+		this.flat_.setOnFinishCallback(NULL);
+		this.flat_.run(1.0);
+		this.fadeIn(false, 350, this.onFinishEncountFadeOut);
+	}
+	else
+	{
+		this.moveNextNode();
+	}
+}
+
+void SceneWorldMap::onFinishEncountFadeOut()
+{
+	this.flat_.join(-2147483648);
+	this.flat_.release();
+	this.openMapEncount();
+	g_music.play("音楽／システム／マップ", 1000, true);
+	this.fadeIn(true, 500, this.onFinishEncountFadeIn);
+}
+
+void SceneWorldMap::openMapEncount()
+{
+	DG_GetMapEncountMonsterGroup fn;
+	fn = EX_String("マップエンカウントモンスターグループ取得関数", "");
+	string groupId = fn();
+	ref MapEncountMonsterGroup g = getMapEncountMonsterGroupFromId(groupId);
+	array@string m;
+	g.getMonsterList(m);
+	BattleInfomation info;
+	info.setMonsterArray(m);
+	info.setGold(g.getGold());
+	info.setExp(g.getExp());
+	info.setItem(g.getItemId(), g.getItemProbability());
+	info.setBattleBackGroundId("平野");
+	if (g.getMusicId() != "")
+	{
+		info.setMusicId(g.getMusicId());
+	}
+	openBattle2(info);
+}
+
+void SceneWorldMap::onFinishEncountFadeIn()
+{
+	this.moveNextNode();
+}
+
+void SceneWorldMap::moveNextNode()
+{
+	int fx;
+	int fy;
+	int tx;
+	int ty;
+	if (this.moveInfo_.getNextNode(fx, fy, tx, ty, this.isEncount_))
+	{
+		this.worldMap_.movePlayerIcon(fx, fy, tx, ty, this.onFinishMovePlayerIcon);
+	}
+	else
+	{
+		this.worldMap_.setFollowPlayerIcon(false);
+		g_music.fadeOut(2000);
+		g_sysSound.play(6, "効果音／ダンジョンイベント");
+		this.fadeIn(false, 1000, this.onFinishMoveFadeOut);
+	}
+}
+
+bool SceneWorldMap::update()
+{
+	if (this.isExit_)
+	{
+		return false;
+	}
+	return true;
+}
+
+void SceneWorldMap::onClickCampButton(int id)
+{
+	this.btnCamp_.setEnable(false);
+	this.fadeIn(false, 250, this.onClickCampButtonFadeOut);
+}
+
+void SceneWorldMap::onClickCampButtonFadeOut()
+{
+	g_partsMotionManager.finalize(-1);
+	bool last = g_playerCommonParam.isEnableExitDungeon();
+	g_playerCommonParam.setEnableExitDungeon(false);
+	g_gameObjectManager.pushScene();
+	openCamp(0);
+	g_gameObjectManager.popScene();
+	g_playerCommonParam.setEnableExitDungeon(last);
+	this.fadeIn(true, 250, this.onClickCampButtonFadeIn);
+}
+
+void SceneWorldMap::onClickCampButtonFadeIn()
+{
+	this.btnCamp_.setEnable(true);
+}
+
+int getEncountCount(int node)
+{
+	if (node == 0)
+	{
+		return 0;
+	}
+	int i;
+	for (i = 0; i < g_mapEncountProbability.Numof(); ++i)
+	{
+		if (g_mapEncountProbability[i].getNodeCount() == node)
+		{
+			return g_mapEncountProbability[i].getHitCount();
+		}
+	}
+	return g_mapEncountProbability[g_mapEncountProbability.Numof() - 1].getHitCount();
+}
+

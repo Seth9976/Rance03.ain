@@ -1,0 +1,546 @@
+CAEInstanceTreeForm::CAEInstanceTreeForm()
+{
+}
+
+CAEInstanceTreeForm::~CAEInstanceTreeForm()
+{
+	this.Release();
+}
+
+int CAEInstanceTreeForm::Create(ref CAEInstanceItemList InstanceList)
+{
+	this.Release();
+	if (InstanceList === NULL)
+	{
+		return 0;
+	}
+	this.m_RenameMenuID = this.m_Menu.AddItem("名前を変更", this.SelectContextMenuItemEvent);
+	this.m_Menu.AddSeparator();
+	this.m_CopyMenuID = this.m_Menu.AddItem("コピー", this.SelectContextMenuItemEvent);
+	this.m_SingleCopyMenuID = this.m_Menu.AddItem("単体コピー", this.SelectContextMenuItemEvent);
+	this.m_PasteMenuID = this.m_Menu.AddItem("ペースト", this.SelectContextMenuItemEvent);
+	this.m_Menu.AddSeparator();
+	this.m_EraseMenuID = this.m_Menu.AddItem("削除", this.SelectContextMenuItemEvent);
+	this.m_InstanceItemList <- InstanceList;
+	this.m_InstanceItemList.AddSelectEvent(this.SelectInstance);
+	this.m_MainLayoutBox = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿レイアウトタイプ設定(this.m_MainLayoutBox, 1);
+	this.m_ButtonLayoutBox = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿レイアウトタイプ設定(this.m_ButtonLayoutBox, 2);
+	Ｐ＿レイアウトボックス＿追加(this.m_MainLayoutBox, this.m_ButtonLayoutBox);
+	Ｐ＿レイアウトボックス＿折り返し設定(this.m_ButtonLayoutBox, true, 420.0);
+	this.m_EraseButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(this.m_EraseButton, "削除");
+	Ｐ＿ボタン＿サイズ設定(this.m_EraseButton, 120, 20);
+	Ｐ＿レイアウトボックス＿追加(this.m_ButtonLayoutBox, this.m_EraseButton);
+	this.m_RenameButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(this.m_RenameButton, "名前(F2)");
+	Ｐ＿ボタン＿サイズ設定(this.m_RenameButton, 120, 20);
+	Ｐ＿レイアウトボックス＿追加(this.m_ButtonLayoutBox, this.m_RenameButton);
+	this.m_CopyButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(this.m_CopyButton, "コピー");
+	Ｐ＿ボタン＿サイズ設定(this.m_CopyButton, 120, 20);
+	Ｐ＿レイアウトボックス＿追加(this.m_ButtonLayoutBox, this.m_CopyButton);
+	this.m_SingleCopyButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(this.m_SingleCopyButton, "単体コピー");
+	Ｐ＿ボタン＿サイズ設定(this.m_SingleCopyButton, 120, 20);
+	Ｐ＿レイアウトボックス＿追加(this.m_ButtonLayoutBox, this.m_SingleCopyButton);
+	this.m_PasteButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(this.m_PasteButton, "ペースト");
+	Ｐ＿ボタン＿サイズ設定(this.m_PasteButton, 120, 20);
+	Ｐ＿レイアウトボックス＿追加(this.m_ButtonLayoutBox, this.m_PasteButton);
+	Ｐ＿ボタン＿有効設定(this.m_PasteButton, false);
+	this.m_OpenTreeButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(this.m_OpenTreeButton, "開く");
+	Ｐ＿ボタン＿サイズ設定(this.m_OpenTreeButton, 120, 20);
+	Ｐ＿レイアウトボックス＿追加(this.m_ButtonLayoutBox, this.m_OpenTreeButton);
+	this.m_CloseTreeButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(this.m_CloseTreeButton, "閉じる");
+	Ｐ＿ボタン＿サイズ設定(this.m_CloseTreeButton, 120, 20);
+	Ｐ＿レイアウトボックス＿追加(this.m_ButtonLayoutBox, this.m_CloseTreeButton);
+	int TreeNumber = this.m_TreeView.Init();
+	Ｐ＿レイアウトボックス＿追加(this.m_MainLayoutBox, TreeNumber);
+	AFL_Parts_AddMouseLClickEvent(this.m_EraseButton, this.MouseClickEvent);
+	AFL_Parts_AddMouseLClickEvent(this.m_RenameButton, this.MouseClickEvent);
+	AFL_Parts_AddMouseLClickEvent(this.m_CopyButton, this.MouseCopyClickEvent);
+	AFL_Parts_AddMouseLClickEvent(this.m_SingleCopyButton, this.MouseSingleCopyClickEvent);
+	AFL_Parts_AddMouseLClickEvent(this.m_PasteButton, this.MousePasteClickEvent);
+	AFL_Parts_AddMouseLClickEvent(this.m_OpenTreeButton, this.MouseOpenTreeClickEvent);
+	AFL_Parts_AddMouseLClickEvent(this.m_CloseTreeButton, this.MouseCloseTreeClickEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_EraseButton, this.MouseWheelEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_RenameButton, this.MouseWheelEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_CopyButton, this.MouseWheelEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_SingleCopyButton, this.MouseWheelEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_PasteButton, this.MouseWheelEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_OpenTreeButton, this.MouseWheelEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_CloseTreeButton, this.MouseWheelEvent);
+	this.m_TreeView.AddMouseRClickEvent(this.MouseRClickEvent);
+	this.m_TreeView.AddUpdateTreeEvent(this.BookUpdateTree);
+	AFL_Parts_AddBeginUpdateEvent(this.UpdateTreeByUpdateFrame);
+	AFL_Parts_AddWholeKeyUpEvent(this.KeyUpEvent);
+	AFL_Parts_AddWholeKeyPressEvent(this.KeyPressEvent);
+	return this.m_MainLayoutBox;
+}
+
+void CAEInstanceTreeForm::Release()
+{
+	this.m_BookUpdate = false;
+	this.m_TreeView.Release();
+	PARTS_ReleaseWithInit(this.m_CloseTreeButton);
+	PARTS_ReleaseWithInit(this.m_OpenTreeButton);
+	PARTS_ReleaseWithInit(this.m_PasteButton);
+	PARTS_ReleaseWithInit(this.m_SingleCopyButton);
+	PARTS_ReleaseWithInit(this.m_CopyButton);
+	PARTS_ReleaseWithInit(this.m_RenameButton);
+	PARTS_ReleaseWithInit(this.m_EraseButton);
+	PARTS_ReleaseWithInit(this.m_ButtonLayoutBox);
+	PARTS_ReleaseWithInit(this.m_MainLayoutBox);
+	this.m_InstanceItemList <- NULL;
+}
+
+void CAEInstanceTreeForm::ReleaseAllInstance()
+{
+	this.m_InstanceItemList.ReleaseAllInstance();
+	this.UpdateTree();
+}
+
+void CAEInstanceTreeForm::MouseClickEvent(int ID, int MouseX, int MouseY)
+{
+	if (ID == this.m_EraseButton)
+	{
+		this.EraseActiveItem();
+	}
+	else if (ID == this.m_RenameButton)
+	{
+		this.RenameActiveItem();
+	}
+}
+
+void CAEInstanceTreeForm::MouseCopyClickEvent(int ID, int MouseX, int MouseY)
+{
+	this.CopyActiveItem();
+}
+
+void CAEInstanceTreeForm::MouseSingleCopyClickEvent(int ID, int MouseX, int MouseY)
+{
+	this.SingleCopyActiveItem();
+}
+
+void CAEInstanceTreeForm::MousePasteClickEvent(int ID, int MouseX, int MouseY)
+{
+	this.PasteActiveItem();
+}
+
+void CAEInstanceTreeForm::MouseOpenTreeClickEvent(int ID, int MouseX, int MouseY)
+{
+	this.m_InstanceItemList.SetOpen(true);
+	this.UpdateTree();
+}
+
+void CAEInstanceTreeForm::MouseCloseTreeClickEvent(int ID, int MouseX, int MouseY)
+{
+	this.m_InstanceItemList.SetOpen(false);
+	this.UpdateTree();
+}
+
+void CAEInstanceTreeForm::KeyUpEvent(int Number, int KeyCode)
+{
+	if (KeyCode == 113)
+	{
+		this.RenameActiveItem();
+	}
+}
+
+void CAEInstanceTreeForm::KeyPressEvent(int Number, int KeyCode)
+{
+	if (KeyCode == 38)
+	{
+		this.UpActive();
+	}
+	else if (KeyCode == 40)
+	{
+		this.DownActive();
+	}
+	else if (KeyCode == 37)
+	{
+		this.SetOpenActive(false);
+	}
+	else if (KeyCode == 39)
+	{
+		this.SetOpenActive(true);
+	}
+}
+
+void CAEInstanceTreeForm::MouseRClickEvent(int ID, int MouseX, int MouseY)
+{
+	this.m_Menu.SetItemEnable(this.m_PasteMenuID, this.m_InstanceItemList.IsExistCopyData());
+	this.m_Menu.Open(-2147483648, -2147483648);
+}
+
+void CAEInstanceTreeForm::SelectContextMenuItemEvent(int Index, string ItemText)
+{
+	if (Index == this.m_RenameMenuID)
+	{
+		this.RenameActiveItem();
+	}
+	else if (Index == this.m_CopyMenuID)
+	{
+		this.CopyActiveItem();
+	}
+	else if (Index == this.m_SingleCopyMenuID)
+	{
+		this.SingleCopyActiveItem();
+	}
+	else if (Index == this.m_PasteMenuID)
+	{
+		this.PasteActiveItem();
+	}
+	else if (Index == this.m_EraseMenuID)
+	{
+		this.EraseActiveItem();
+	}
+}
+
+void CAEInstanceTreeForm::CopyActiveItem()
+{
+	this.m_InstanceItemList.CopyActiveParts();
+	this.EnablePasteButton();
+}
+
+void CAEInstanceTreeForm::SingleCopyActiveItem()
+{
+	this.m_InstanceItemList.SingleCopyActiveParts();
+	this.EnablePasteButton();
+}
+
+void CAEInstanceTreeForm::PasteActiveItem()
+{
+	this.m_InstanceItemList.PasteActiveParts();
+	this.UpdateTree();
+}
+
+void CAEInstanceTreeForm::EnablePasteButton()
+{
+	Ｐ＿ボタン＿有効設定(this.m_PasteButton, this.m_InstanceItemList.IsExistCopyData());
+}
+
+void CAEInstanceTreeForm::EraseActiveItem()
+{
+	ref CAEInstanceItem Item = this.m_InstanceItemList.GetActive();
+	if (Item === NULL)
+	{
+		return;
+	}
+	int Number = Item.GetID();
+	if (!DIALOG_YESNO("【%s】削除しますか？" % Item.GetName()))
+	{
+		return;
+	}
+	ref CAEInstanceItem ActiveItem = this.m_InstanceItemList.GetActive();
+	if (Item === ActiveItem)
+	{
+		this.m_InstanceItemList.Passive();
+	}
+	int Parent = Ｐ＿親設定取得(Number);
+	int MyIndex = Ｐ＿子インデックス取得(Parent, Number);
+	int MyNumofChild = Ｐ＿子数取得(Number);
+	bool IsReleaseChild = false;
+	if (MyNumofChild != 0)
+	{
+		IsReleaseChild = DIALOG_YESNO("子も同時に削除しますか？");
+	}
+	Ｐ＿子解放(Parent, Number);
+	if (IsReleaseChild)
+	{
+		this.EraseItemWithChild(Item);
+	}
+	else
+	{
+		int Index;
+		for (Index = MyNumofChild - 1; 0 <= Index; --Index)
+		{
+			int ChildNumber = Ｐ＿子取得(Number, Index);
+			Ｐ＿子挿入(Parent, MyIndex, ChildNumber);
+		}
+		Item.Release();
+	}
+	int NumofChild = Ｐ＿子数取得(Parent);
+	int NextActiveNumber;
+	if (NumofChild == 0)
+	{
+		NextActiveNumber = Parent;
+	}
+	else if (MyIndex < NumofChild)
+	{
+		NextActiveNumber = Ｐ＿子取得(Parent, MyIndex);
+	}
+	else
+	{
+		NextActiveNumber = Ｐ＿子取得(Parent, NumofChild - 1);
+	}
+	ref CAEInstanceItem NextActiveItem = this.m_InstanceItemList.FindInstanceByNumber(NextActiveNumber);
+	if (NextActiveItem !== NULL)
+	{
+		NextActiveItem.Active(true);
+	}
+	this.UpdateTree();
+}
+
+void CAEInstanceTreeForm::EraseItemWithChild(ref CAEInstanceItem Item)
+{
+	if (Item === NULL)
+	{
+		return;
+	}
+	int MyNumofChild = Ｐ＿子数取得(Item.GetID());
+	int Index;
+	for (Index = MyNumofChild - 1; 0 <= Index; --Index)
+	{
+		int ChildNumber = Ｐ＿子取得(Item.GetID(), Index);
+		this.EraseItemWithChild(this.m_InstanceItemList.FindInstanceByNumber(ChildNumber));
+	}
+	Item.Release();
+}
+
+void CAEInstanceTreeForm::Add(int GUIType)
+{
+	ref CAEInstanceItem Item = this.m_InstanceItemList.AddInstance(GUIType);
+	int AddNumbr = Item.GetID();
+	ref CAEInstanceItem ActiveItem = this.m_InstanceItemList.GetActive();
+	if (ActiveItem === NULL)
+	{
+		Ｐ＿子追加(this.m_InstanceItemList.GetRootParts(), AddNumbr);
+	}
+	else
+	{
+		int MyParent = Ｐ＿親設定取得(ActiveItem.GetID());
+		int MyIndex = Ｐ＿子インデックス取得(MyParent, ActiveItem.GetID());
+		Ｐ＿子挿入(MyParent, MyIndex + 1, AddNumbr);
+	}
+	Item.Active(true);
+	this.UpdateTree();
+}
+
+void CAEInstanceTreeForm::RenameActiveItem()
+{
+	ref CAEInstanceItem ActiveItem = this.m_InstanceItemList.GetActive();
+	if (ActiveItem === NULL)
+	{
+		return;
+	}
+	string Name = ActiveItem.GetName();
+	if (DIALOG_GETTEXT("パーツ名を入力してください", Name))
+	{
+		if (this.RenameItem(ActiveItem, Name))
+		{
+			return;
+		}
+		this.RenameActiveItem();
+	}
+}
+
+bool CAEInstanceTreeForm::RenameItem(ref CAEInstanceItem Item, string Name)
+{
+	if (Item === NULL)
+	{
+		return true;
+	}
+	if (Name.Empty())
+	{
+		DIALOG_OK("最低でも１文字入力してください");
+		return false;
+	}
+	if (Item.GetName() == Name)
+	{
+		return true;
+	}
+	if (this.m_InstanceItemList.IsExist(Name))
+	{
+		DIALOG_OK("同名のパーツが存在します\n【%s】" % Name);
+		return false;
+	}
+	if ("ルートパーツ" == Name)
+	{
+		DIALOG_OK("%sはシステムで使用する名前です。別の名前を使用してください。" % "ルートパーツ");
+		return false;
+	}
+	Item.SetName(Name);
+	this.UpdateTree();
+	return true;
+}
+
+void CAEInstanceTreeForm::SelectInstance(ref CAEInstanceItem Item)
+{
+	this.BookUpdateTree();
+}
+
+void CAEInstanceTreeForm::UpdateButton()
+{
+	ref CAEInstanceItem ActiveItem = this.m_InstanceItemList.GetActive();
+	bool IsExistActive = ActiveItem !== NULL;
+	Ｐ＿ボタン＿有効設定(this.m_EraseButton, IsExistActive);
+	Ｐ＿ボタン＿有効設定(this.m_RenameButton, IsExistActive);
+	Ｐ＿ボタン＿有効設定(this.m_CopyButton, IsExistActive);
+	Ｐ＿ボタン＿有効設定(this.m_SingleCopyButton, IsExistActive);
+}
+
+void CAEInstanceTreeForm::GetPartsListByShowdItem(ref array@int List)
+{
+	int Root = this.m_InstanceItemList.GetRootParts();
+	int NumofChild = Ｐ＿子数取得(Root);
+	int i;
+	for (i = 0; i < NumofChild; ++i)
+	{
+		this.GetPartsListByShowdItemImp(Ｐ＿子取得(Root, i), List);
+	}
+}
+
+void CAEInstanceTreeForm::GetPartsListByShowdItemImp(int Parent, ref array@int List)
+{
+	if (Parent == 0)
+	{
+		return;
+	}
+	List.PushBack(Parent);
+	ref CAEInstanceItem Item = this.m_InstanceItemList.FindInstanceByNumber(Parent);
+	if (Item === NULL)
+	{
+		return;
+	}
+	if (!Item.IsOpen())
+	{
+		return;
+	}
+	int NumofChild = Ｐ＿子数取得(Parent);
+	int i;
+	for (i = 0; i < NumofChild; ++i)
+	{
+		this.GetPartsListByShowdItemImp(Ｐ＿子取得(Parent, i), List);
+	}
+}
+
+void CAEInstanceTreeForm::UpActive()
+{
+	ref CAEInstanceItem ActiveItem = this.m_InstanceItemList.GetActive();
+	if (ActiveItem === NULL)
+	{
+		return;
+	}
+	array@int List;
+	this.GetPartsListByShowdItem(List);
+	int Index = List.Find(0, List.Numof(), ActiveItem.GetID());
+	if (Index == -1)
+	{
+		return;
+	}
+	if (Index == 0)
+	{
+		return;
+	}
+	this.m_InstanceItemList.Active(List[Index - 1]);
+}
+
+void CAEInstanceTreeForm::DownActive()
+{
+	ref CAEInstanceItem ActiveItem = this.m_InstanceItemList.GetActive();
+	if (ActiveItem === NULL)
+	{
+		return;
+	}
+	array@int List;
+	this.GetPartsListByShowdItem(List);
+	int Index = List.Find(0, List.Numof(), ActiveItem.GetID());
+	if (Index == -1)
+	{
+		return;
+	}
+	if (Index == List.Numof() - 1)
+	{
+		return;
+	}
+	this.m_InstanceItemList.Active(List[Index + 1]);
+}
+
+void CAEInstanceTreeForm::SetOpenActive(bool Open)
+{
+	ref CAEInstanceItem ActiveItem = this.m_InstanceItemList.GetActive();
+	if (ActiveItem === NULL)
+	{
+		return;
+	}
+	ActiveItem.SetOpen(Open);
+	this.BookUpdateTree();
+}
+
+void CAEInstanceTreeForm::UpdateZPosAllParts()
+{
+	this.UpdateZPos(this.m_InstanceItemList.GetRootParts(), 1);
+}
+
+void CAEInstanceTreeForm::UpdateZPos(int Parts, int Count)
+{
+	ref CAEInstanceItem Item = this.m_InstanceItemList.FindInstanceByNumber(Parts);
+	if (Item === NULL)
+	{
+		Ｐ＿Ｚ座標設定(Parts, Count);
+	}
+	else
+	{
+		Item.SetZ(Count);
+	}
+	int NumofChild = Ｐ＿子数取得(Parts);
+	int Index;
+	int PosZ = 1;
+	for (Index = 0; Index < NumofChild; ++Index)
+	{
+		int Child = Ｐ＿子取得(Parts, Index);
+		this.UpdateZPos(Child, PosZ);
+		int ChildMaxPosZ = PARTS_GetAbsoluteMaxZ(Child) - PARTS_GetAbsoluteZ(Parts);
+		PosZ = ChildMaxPosZ + 1;
+	}
+}
+
+void CAEInstanceTreeForm::UpdateTree()
+{
+	this.UpdateButton();
+	this.m_TreeView.CreateTree(this.m_InstanceItemList);
+	this.UpdateZPosAllParts();
+}
+
+void CAEInstanceTreeForm::UpdateTreeByUpdateFrame(int PassedTime)
+{
+	if (!this.m_BookUpdate)
+	{
+		return;
+	}
+	this.m_BookUpdate = false;
+	this.UpdateTree();
+}
+
+void CAEInstanceTreeForm::BookUpdateTree()
+{
+	this.m_BookUpdate = true;
+}
+
+void CAEInstanceTreeForm::MouseWheelEvent(int ID, int Forward, int Back)
+{
+	this.m_TreeView.MouseWheelEvent(ID, Forward, Back);
+}
+
+bool CAEInstanceTreeForm::SaveActivity(ref CActivityData ActivityData)
+{
+	if (!this.m_InstanceItemList.SaveActivity(ActivityData))
+	{
+		return false;
+	}
+	return true;
+}
+
+bool CAEInstanceTreeForm::LoadActivity(ref CActivityData ActivityData)
+{
+	this.m_InstanceItemList.LoadActivity(ActivityData);
+	this.UpdateTree();
+	this.UpdateZPosAllParts();
+	return true;
+}
+

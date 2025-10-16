@@ -1,0 +1,108 @@
+CModeCGModel::CModeCGModel()
+{
+	this.Clear();
+}
+
+void CModeCGModel::Clear()
+{
+	this.m_CGName = "";
+	this.m_AutoModeFlatName = "";
+	this.m_nX = 0;
+	this.m_nY = 0;
+	this.m_nZ = 0;
+	this.m_bShow = false;
+	this.m_CGBeginNumber = 0;
+	this.m_CGCount = 0;
+	this.m_CGSwitchTime = 0;
+}
+
+string CModeCGModel::GetCG()
+{
+	return this.m_CGName;
+}
+
+string CModeCGModel::GetFlatName()
+{
+	return this.m_AutoModeFlatName;
+}
+
+int CModeCGModel::GetX()
+{
+	return this.m_nX;
+}
+
+int CModeCGModel::GetY()
+{
+	return this.m_nY;
+}
+
+int CModeCGModel::GetZ()
+{
+	return this.m_nZ;
+}
+
+bool CModeCGModel::GetShow()
+{
+	return this.m_bShow;
+}
+
+int CModeCGModel::GetCGBeginNumber()
+{
+	return this.m_CGBeginNumber;
+}
+
+int CModeCGModel::GetCGCount()
+{
+	return this.m_CGCount;
+}
+
+int CModeCGModel::GetCGSwitchTime()
+{
+	return this.m_CGSwitchTime;
+}
+
+void CModeCGModel::SetCG(string Name)
+{
+	this.m_CGName = Name;
+}
+
+void CModeCGModel::SetFlatName(string Name)
+{
+	this.m_AutoModeFlatName = Name;
+}
+
+void CModeCGModel::SetX(int _nX)
+{
+	this.m_nX = _nX;
+}
+
+void CModeCGModel::SetY(int _nY)
+{
+	this.m_nY = _nY;
+}
+
+void CModeCGModel::SetZ(int _nZ)
+{
+	this.m_nZ = _nZ;
+}
+
+void CModeCGModel::SetShow(bool _bShow)
+{
+	this.m_bShow = _bShow;
+}
+
+void CModeCGModel::SetCGBeginNumber(int Number)
+{
+	this.m_CGBeginNumber = Number;
+}
+
+void CModeCGModel::SetCGCount(int Count)
+{
+	this.m_CGCount = Count;
+}
+
+void CModeCGModel::SetCGSwitchTime(int Time)
+{
+	this.m_CGSwitchTime = Time;
+}
+

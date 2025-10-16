@@ -1,0 +1,150 @@
+CAEPropertyVScrollBar::CAEPropertyVScrollBar()
+{
+	this.Init(0, NULL);
+}
+
+CAEPropertyVScrollBar::~CAEPropertyVScrollBar()
+{
+	this.Release();
+}
+
+void CAEPropertyVScrollBar::Init(int LayoutID, ref CAEInstanceItem Item)
+{
+	this.Release();
+	if (Item === NULL)
+	{
+		return;
+	}
+	this.m_Item <- Item;
+	this.m_Panel.Init(LayoutID);
+	this.m_Panel.AddKeyDownEvent(this.KeyDownEvent);
+	this.m_Panel.AddMouseWheelEvent(this.MouseWheelEvent);
+	this.m_Panel.AddChangeTextEvent(this.ChangeTextEvent);
+	this.m_Panel.AddMouseClickEvent(this.MouseLClickEvent);
+	int ID = this.m_Item.GetID();
+	this.m_Panel.AddTextBoxItem("幅", string(AFL_Parts_GetWidth(ID, 1)), false);
+	this.m_Panel.AddTextBoxItem("高さ", string(AFL_Parts_GetHeight(ID, 1)), false);
+	this.m_Panel.AddTextBoxItem("上ボタンの高さ", string(Ｐ＿縦スクロールバー＿上ボタン高さ取得(ID)), false);
+	this.m_Panel.AddTextBoxItem("下ボタンの高さ", string(Ｐ＿縦スクロールバー＿下ボタン高さ取得(ID)), false);
+	this.m_Panel.AddTextBoxItem("全体量", string(Ｐ＿縦スクロールバー＿全体量取得(ID)), false);
+	this.m_Panel.AddTextBoxItem("表示量", string(Ｐ＿縦スクロールバー＿表示量取得(ID)), false);
+	this.m_Panel.AddTextBoxItem("スクロール位置", string(Ｐ＿縦スクロールバー＿スクロール位置取得(ID)), false);
+	ref CAEPropertyItem PanelItem = this.m_Panel.AddTextBoxItem("スクロールレート", Ｐ＿縦スクロールバー＿スクロールレート取得(ID).String(), false);
+	this.m_Panel.AddTextBoxItem("ボタンクリック移動量", string(Ｐ＿縦スクロールバー＿ボタンクリック移動量取得(ID)), false);
+	this.m_Panel.AddTextBoxItem("ＣＧ名", Ｐ＿縦スクロールバー＿ＣＧ名取得(ID), true);
+	this.m_Panel.AddTextBoxItem("フラット名", Ｐ＿縦スクロールバー＿フラット名取得(ID), true);
+	PanelItem.SetTextBoxReadOnly(true);
+}
+
+void CAEPropertyVScrollBar::Release()
+{
+	this.m_dgMouseWheelEvent.Clear();
+	this.m_dgKeyDownEvent.Clear();
+	this.m_Item <- NULL;
+	this.m_Panel.Release();
+}
+
+void CAEPropertyVScrollBar::KeyDownEvent(int ID, int KeyID)
+{
+	this.m_dgKeyDownEvent(ID, KeyID);
+}
+
+void CAEPropertyVScrollBar::MouseWheelEvent(int ID, int Forward, int Back)
+{
+	this.m_dgMouseWheelEvent(ID, Forward, Back);
+}
+
+void CAEPropertyVScrollBar::ChangeTextEvent(int ID)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	if (Item.GetLabel() == "幅")
+	{
+		Ｐ＿縦スクロールバー＿サイズ設定(PartsID, Item.GetTextBoxInt(), AFL_Parts_GetHeight(PartsID, 1));
+	}
+	else if (Item.GetLabel() == "高さ")
+	{
+		Ｐ＿縦スクロールバー＿サイズ設定(PartsID, AFL_Parts_GetWidth(PartsID, 1), Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "上ボタンの高さ")
+	{
+		Ｐ＿縦スクロールバー＿上ボタン高さ設定(PartsID, Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "下ボタンの高さ")
+	{
+		Ｐ＿縦スクロールバー＿下ボタン高さ設定(PartsID, Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "全体量")
+	{
+		Ｐ＿縦スクロールバー＿全体量設定(PartsID, Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "表示量")
+	{
+		Ｐ＿縦スクロールバー＿表示量設定(PartsID, Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "スクロール位置")
+	{
+		Ｐ＿縦スクロールバー＿スクロール位置設定(PartsID, Item.GetTextBoxInt());
+		this.m_Panel.GetItemByLabel("スクロールレート").SetTextBoxText(Ｐ＿縦スクロールバー＿スクロールレート取得(PartsID).String());
+	}
+	else if (Item.GetLabel() == "ボタンクリック移動量")
+	{
+		Ｐ＿縦スクロールバー＿ボタンクリック移動量設定(PartsID, Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "ＣＧ名")
+	{
+		Ｐ＿縦スクロールバー＿ＣＧ名設定(PartsID, Item.GetTextBoxText());
+	}
+	else if (Item.GetLabel() == "フラット名")
+	{
+		Ｐ＿縦スクロールバー＿フラット名設定(PartsID, Item.GetTextBoxText());
+	}
+	if (Item.GetLabel() == "全体量" || Item.GetLabel() == "表示量")
+	{
+		this.m_Panel.GetItemByLabel("スクロール位置").SetTextBoxText(string(Ｐ＿縦スクロールバー＿スクロール位置取得(PartsID)));
+		this.m_Panel.GetItemByLabel("スクロールレート").SetTextBoxText(Ｐ＿縦スクロールバー＿スクロールレート取得(PartsID).String());
+	}
+}
+
+void CAEPropertyVScrollBar::MouseLClickEvent(int ID, int MouseX, int MouseY)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+}
+
+void CAEPropertyVScrollBar::SelecteTextEvent(int ID, string Name)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+}
+
+void CAEPropertyVScrollBar::AddKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent += DelegateObject;
+}
+
+void CAEPropertyVScrollBar::EraseKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent -= DelegateObject;
+}
+
+void CAEPropertyVScrollBar::AddMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent += DelegateObject;
+}
+
+void CAEPropertyVScrollBar::EraseMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent -= DelegateObject;
+}
+

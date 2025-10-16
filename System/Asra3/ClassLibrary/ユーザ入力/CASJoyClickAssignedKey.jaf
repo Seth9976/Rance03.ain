@@ -1,0 +1,59 @@
+CASJoyClickAssignedKey::CASJoyClickAssignedKey()
+{
+	this.m_AssignedCode = -1;
+}
+
+CASJoyClickAssignedKey::~CASJoyClickAssignedKey()
+{
+}
+
+void CASJoyClickAssignedKey::UpdateAssignedKey()
+{
+	if (this.m_AssignedCode == -1)
+	{
+		return;
+	}
+	this.m_JoyClick.ChangeKey(AFL_Joystick_GetButtonAssignment(this.m_AssignedCode));
+}
+
+void CASJoyClickAssignedKey::Init(int AssignedCode, bool FirstKeyDownCancel)
+{
+	this.m_AssignedCode = AssignedCode;
+	this.m_JoyClick.Init(AFL_Joystick_GetButtonAssignment(this.m_AssignedCode), FirstKeyDownCancel);
+}
+
+void CASJoyClickAssignedKey::Reset(bool FirstKeyDownCancel)
+{
+	this.m_JoyClick.Reset(FirstKeyDownCancel);
+}
+
+bool CASJoyClickAssignedKey::IsFirstClick()
+{
+	this.UpdateAssignedKey();
+	return this.m_JoyClick.IsFirstClick();
+}
+
+bool CASJoyClickAssignedKey::IsClick(int nOnObject)
+{
+	this.UpdateAssignedKey();
+	return this.m_JoyClick.IsClick(nOnObject);
+}
+
+bool CASJoyClickAssignedKey::IsKeyDown()
+{
+	this.UpdateAssignedKey();
+	return this.m_JoyClick.IsKeyDown();
+}
+
+bool CASJoyClickAssignedKey::IsKeyTrigger()
+{
+	this.UpdateAssignedKey();
+	return this.m_JoyClick.IsKeyTrigger();
+}
+
+bool CASJoyClickAssignedKey::IsKeyPress()
+{
+	this.UpdateAssignedKey();
+	return this.m_JoyClick.IsKeyPress();
+}
+

@@ -1,0 +1,110 @@
+CDrawMovie::CDrawMovie()
+{
+	this.m_MovieParts = 0;
+	this.m_anKeyCode.PushBack(1);
+	this.m_anKeyCode.PushBack(2);
+	this.m_anKeyCode.PushBack(13);
+	this.m_anKeyCode.PushBack(32);
+	this.m_abKeyDown.Alloc(this.m_anKeyCode.Numof());
+	this.m_abKeyDown.Fill(0, this.m_abKeyDown.Numof(), false);
+	this.m_nBackColorY = 0;
+	this.m_nBackColorCb = 128;
+	this.m_nBackColorCr = 128;
+}
+
+CDrawMovie::~CDrawMovie()
+{
+	this.Release();
+}
+
+void CDrawMovie::Release()
+{
+	PARTS_Release(this.m_MovieParts);
+	this.m_abKeyDown.Fill(0, this.m_abKeyDown.Numof(), false);
+}
+
+bool CDrawMovie::CreateMovieParts(string FileName, int SoundGroup)
+{
+	PARTS_Release(this.m_MovieParts);
+	this.m_MovieParts = PARTS_GetFreeSystemPartsNumber();
+	PartsEngine.CreatePartsMovie(this.m_MovieParts, FileName, 1000, SoundGroup, this.m_nBackColorY, this.m_nBackColorCb, this.m_nBackColorCr, 1);
+	Ｐ＿Ｚ座標設定(this.m_MovieParts, 0);
+	return true;
+}
+
+bool CDrawMovie::IsClick()
+{
+	int n;
+	for (n = 0; n < this.m_anKeyCode.Numof(); n++)
+	{
+		if (AFL_IsKeyDown(this.m_anKeyCode[n]))
+		{
+			this.m_abKeyDown[n] = true;
+		}
+		else if (this.m_abKeyDown[n])
+		{
+			this.m_abKeyDown[n] = false;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool CDrawMovie::Play(string FileName, int SoundGroup, bool bKeyCancel)
+{
+	this.Release();
+	CASPartsLayer Layer;
+	if (!this.CreateMovieParts(FileName, SoundGroup))
+	{
+		return false;
+	}
+	IbisInputEngine.Mouse_HideCursorByGame(true);
+	this.m_EscapeKeyClick.Init(27, true);
+	CASJoyClickAssignedKey CancelOKButton;
+	CASJoyClickAssignedKey CancelJoyClick;
+	CancelOKButton.Init(4, true);
+	CancelJoyClick.Init(5, true);
+	int nStartTime = system.GetTime();
+	if (!PartsEngine.PlayPartsMovie(this.m_MovieParts, 1))
+	{
+		IbisInputEngine.Mouse_HideCursorByGame(false);
+		return false;
+	}
+	while (!PartsEngine.IsEndPartsMovie(this.m_MovieParts, 1))
+	{
+		if (bKeyCancel && system.GetTime() - nStartTime >= 1000)
+		{
+			if (this.IsClick())
+			{
+				break;
+			}
+			if (CancelOKButton.IsClick(-2147483648))
+			{
+				break;
+			}
+			if (CancelJoyClick.IsClick(-2147483648))
+			{
+				break;
+			}
+		}
+		if (this.m_EscapeKeyClick.IsClick(-2147483648))
+		{
+			IbisInputEngine.Mouse_HideCursorByGame(false);
+			Ｓ＿コンフィグ();
+			IbisInputEngine.Mouse_HideCursorByGame(true);
+		}
+		AFL_View_Update(true);
+		SYS_RestrainScreensaverWhileAutoMode();
+	}
+	this.Release();
+	IbisInputEngine.Mouse_HideCursorByGame(false);
+	return true;
+}
+
+void CDrawMovie::SetBackColor(int nR, int nG, int nB)
+{
+	this.m_nBackColorY = 0.29891 * nR + 0.58661 * nG + 0.11448 * nB;
+	this.m_nBackColorCb = (-0.16874 * nR - 0.33126 * nG) + 0.5 * nB + 128.0;
+	this.m_nBackColorCr = (0.5 * nR - 0.41869 * nG - 0.08131 * nB) + 128.0;
+}
+

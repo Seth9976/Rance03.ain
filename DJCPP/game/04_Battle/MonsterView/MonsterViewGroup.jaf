@@ -1,0 +1,277 @@
+MonsterViewGroup::MonsterViewGroup()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void MonsterViewGroup::init(ref BattleModel model, string battleBackGroundId)
+{
+	this.battleModel_ <- model;
+	this.battleBackGroundId_ = battleBackGroundId;
+}
+
+void MonsterViewGroup::update()
+{
+	int i;
+	while (i < this.deadMotionWaitList_.Numof())
+	{
+		if (this.deadMotionWaitList_[i].val.isDeadMotionFinish())
+		{
+			this.deadMotionWaitList_.Erase(i);
+		}
+		else
+		{
+			++i;
+		}
+	}
+}
+
+void MonsterViewGroup::setNewTurn(int turn)
+{
+	int i;
+	for (i = 0; i < this.view_.Numof(); ++i)
+	{
+		this.view_[i].val.setTurn(turn);
+	}
+}
+
+void MonsterViewGroup::showAttack(int index, DG_GeneralCallback onFinish, bool isUpdateBuff)
+{
+	if (isUpdateBuff)
+	{
+		this.updateBuffView();
+	}
+	this.view_[index].val.showAttack();
+	this.timer_.setTimer(350, onFinish);
+}
+
+void MonsterViewGroup::setFocusByTargetInfomation(ref array@TargetInfomation targets)
+{
+	int i;
+	for (i = 0; i < this.view_.Numof(); ++i)
+	{
+		bool isFocus = false;
+		int j;
+		for (j = 0; j < targets.Numof(); ++j)
+		{
+			if (targets[j].getTargetIndex() == i)
+			{
+				isFocus = true;
+				break;
+			}
+		}
+		this.view_[i].val.setFocus(isFocus);
+	}
+}
+
+void MonsterViewGroup::resetFocus()
+{
+	int i;
+	for (i = 0; i < this.view_.Numof(); ++i)
+	{
+		this.view_[i].val.setFocus(true);
+	}
+}
+
+void MonsterViewGroup::showBuffEffect(ref array@TargetInfomation targets, string effectName, DG_GeneralCallback onFinish)
+{
+	this.updateBuffView();
+	int i;
+	for (i = 0; i < targets.Numof(); ++i)
+	{
+		int index = targets[i].getTargetIndex();
+		this.view_[index].val.showEffect(effectName);
+	}
+	this.timer_.setTimer(1000, onFinish);
+}
+
+void MonsterViewGroup::updateBuffView()
+{
+	int i;
+	for (i = 0; i < this.view_.Numof(); ++i)
+	{
+		this.view_[i].val.updateBuffView();
+	}
+}
+
+void MonsterViewGroup::showName(DG_GeneralCallback onFinishShowName)
+{
+	if (this.isExistNotShowNameMonster())
+	{
+		this.onFinishShowNameCallback_ = onFinishShowName;
+		this.innerShowName();
+	}
+	else
+	{
+		onFinishShowName();
+	}
+}
+
+void MonsterViewGroup::innerShowName()
+{
+	int min = this.view_.Numof();
+	int max = -1;
+	int i;
+	for (i = 0; i < this.view_.Numof(); ++i)
+	{
+		ref MonsterInstance inst = this.battleModel_.getMonsterInstance(i);
+		if (!this.view_[i].val.isShownName() || inst.isChanged())
+		{
+			min = Math.Min(i, min);
+			max = Math.Max(i, max);
+		}
+	}
+	if (min > max)
+	{
+		this.resetFocus();
+		this.showNameTimer_.setTimer(300, this.onFinishShowNameCallback_);
+	}
+	else
+	{
+		int i;
+		for (i = 0; i < this.view_.Numof(); ++i)
+		{
+			this.view_[i].val.setFocus(i == min);
+			if (i == min)
+			{
+				ref MonsterInstance inst = this.battleModel_.getMonsterInstance(i);
+				if (inst.isChanged())
+				{
+					inst.setChanged(false);
+					this.view_[i].val <- NULL;
+					this.view_[i].val <- new MonsterView;
+					this.view_[i].val.initAsChange(inst, this.battleBackGroundId_, this.battleModel_.getTurn());
+					this.view_[i].val.getIn();
+				}
+				this.view_[i].val.showName(this.showMonsterNameNext);
+			}
+		}
+	}
+}
+
+bool MonsterViewGroup::isExistNotShowNameMonster()
+{
+	int i;
+	for (i = 0; i < this.view_.Numof(); ++i)
+	{
+		ref MonsterInstance inst = this.battleModel_.getMonsterInstance(i);
+		if (!this.view_[i].val.isShownName() || inst.isChanged())
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void MonsterViewGroup::showMonsterNameNext()
+{
+	this.innerShowName();
+}
+
+void MonsterViewGroup::showDamage(ref array@TargetInfomation targets, string effectName, DG_GeneralCallback onFinish)
+{
+	this.updateBuffView();
+	int i;
+	for (i = 0; i < targets.Numof(); ++i)
+	{
+		int index = targets[i].getTargetIndex();
+		int dmg = targets[i].getDamage();
+		int type = targets[i].getType();
+		int delay = i * 20;
+		if (i == 0)
+		{
+			this.view_[index].val.setDamage(dmg, effectName, true, type, delay, onFinish);
+		}
+		else
+		{
+			this.view_[index].val.setDamage(dmg, effectName, true, type, delay, NULL);
+		}
+	}
+}
+
+void MonsterViewGroup::showHeal(ref array@TargetInfomation targets, string effectName, DG_GeneralCallback onFinish)
+{
+	int i;
+	for (i = 0; i < targets.Numof(); ++i)
+	{
+		int index = targets[i].getTargetIndex();
+		int dmg = targets[i].getDamage();
+		int type = targets[i].getType();
+		if (i == 0)
+		{
+			this.view_[index].val.setDamage(dmg, effectName, false, type, 0, onFinish);
+		}
+		else
+		{
+			this.view_[index].val.setDamage(dmg, effectName, false, type, 0, NULL);
+		}
+	}
+}
+
+void MonsterViewGroup::add(ref MonsterInstance instance)
+{
+	int c = this.view_.Numof();
+	this.view_.Realloc(c + 1);
+	this.view_[c].val <- new MonsterView;
+	this.view_[c].val.init(instance, this.battleBackGroundId_, this.battleModel_.getTurn());
+}
+
+void MonsterViewGroup::erase(int index)
+{
+	if (this.view_[index].val.isFixedPosition())
+	{
+		this.deadStock_.PushBack(this.view_[index]);
+	}
+	else
+	{
+		this.deadMotionWaitList_.PushBack(this.view_[index]);
+	}
+	this.view_.Erase(index);
+}
+
+void MonsterViewGroup::setTarget(int targetType, bool val)
+{
+	int i;
+	for (i = 0; i < this.view_.Numof(); ++i)
+	{
+		this.view_[i].val.setTargetMark(false);
+	}
+	switch (targetType)
+	{
+	case 2:
+		int i;
+		for (i = 0; i < this.view_.Numof(); ++i)
+		{
+			this.view_[i].val.setTargetMark(val);
+		}
+		break;
+	case 0:
+		this.view_[0].val.setTargetMark(val);
+		break;
+	case 1:
+		this.view_[this.view_.Numof() - 1].val.setTargetMark(val);
+		break;
+	}
+}
+
+void MonsterViewGroup::resetPosition(DG_GeneralCallback cb)
+{
+	int i;
+	for (i = 0; i < this.view_.Numof(); ++i)
+	{
+		this.view_[i].val.resetPosition();
+	}
+	if (cb.Numof() != 0)
+	{
+		this.timer_.setTimer(1000, cb);
+	}
+}
+
+void MonsterViewGroup::fadeOut()
+{
+	int i;
+	for (i = 0; i < this.view_.Numof(); ++i)
+	{
+		this.view_[i].val.fadeOut();
+	}
+}
+

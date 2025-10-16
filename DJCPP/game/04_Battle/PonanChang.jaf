@@ -1,0 +1,202 @@
+Permutation::Permutation()
+{
+	this.evaluation = -1000;
+}
+
+void PonanChang::convertSkillIdsFromPermutation(ref array@string actions, ref array@string allIds, int permutation)
+{
+	actions.Free();
+	int i;
+	for (i = 0; i < 8; ++i)
+	{
+		int index = (permutation / int(Math.Pow(10.0, i))) % 10;
+		if (index != 0)
+		{
+			actions.PushBack(allIds[index - 1]);
+		}
+	}
+}
+
+int PonanChang::calcEvaluation(ref array@string pAction)
+{
+	g_battleCalcMode = true;
+	BattleModel model;
+	model = this.battleModel_;
+	model.setDummyMode(true);
+	int i;
+	for (i = 0; i < pAction.Numof(); ++i)
+	{
+		model.setPlayerAction(pAction[i]);
+		array@TargetInfomation t;
+		int kind;
+		model.processPlayerAction(t, kind);
+		model.updateMonsterList();
+		if (model.isNoMonster())
+		{
+			t.Free();
+			break;
+		}
+	}
+	model.loadMonsterAttackList(NULL);
+	while (true)
+	{
+		if (model.isEmptyMonsterAttack())
+		{
+			break;
+		}
+		array@TargetInfomation t;
+		int kind;
+		model.processMonsterAction(t, kind);
+		model.popMonsterAttack(NULL);
+	}
+	int val = model.getEvaluation();
+	model.setTurn(this.turn_ + 1);
+	g_battleCalcMode = false;
+	return val;
+}
+
+void PonanChang::call(BattleModel model, int turn, array@string ids, array@string allIds)
+{
+	this.currentEvaluation_ = model.getEvaluation();
+	this.turn_ = turn;
+	this.battleModel_ = model;
+	if (ids.Empty())
+	{
+		return;
+	}
+	array@int n;
+	int i;
+	for (i = 0; i < ids.Numof(); ++i)
+	{
+		n.PushBack(g_party.getIndexFromId(ids[i]) + 1);
+	}
+	int depth = n.Numof();
+	CASTimer rapTimer;
+	array@Permutation p;
+	rapTimer.Reset();
+	CASTimer timer;
+	int i;
+	for (i = 0; i < depth; ++i)
+	{
+		array@int m;
+		lookUpPermutation(timer, p, m, n, i + 1);
+	}
+	pass("rap:%d" % rapTimer.Get());
+	rapTimer.Reset();
+	CASTimer timer;
+	int i;
+	int thinkDepth = 100;
+	int c = Math.Min(thinkDepth, p.Numof());
+	for (i = 0; i < c; ++i)
+	{
+		int pIndex = i;
+		if (p.Numof() > thinkDepth)
+		{
+			pIndex = RAND(p.Numof()) - 1;
+		}
+		array@string actions;
+		this.convertSkillIdsFromPermutation(actions, allIds, p[pIndex].permutation);
+		p[pIndex].evaluation = this.calcEvaluation(actions);
+		if (timer.Get() > 12)
+		{
+			timer.Reset();
+			g_frameManager.updateFrame();
+			g_gameObjectManager.update();
+		}
+	}
+	pass("rap:%d" % rapTimer.Get());
+	rapTimer.Reset();
+	p.SortBy(&Permutation::evaluation);
+	p.Reverse();
+	for (i = 0; i < Math.Min(10, p.Numof()); ++i)
+	{
+		pass("[%08d]eval:%4d" % p[i].permutation % p[i].evaluation);
+	}
+	this.result_ = p[0].permutation;
+	this.maxEvaluation_ = p[0].evaluation;
+}
+
+void lookUpPermutation(ref CASTimer timer, ref array@Permutation result, array@int selected, array@int rest, int depth)
+{
+	if (selected.Numof() >= depth)
+	{
+		int val;
+		int i;
+		for (i = 0; i < selected.Numof(); ++i)
+		{
+			val += selected[i] * Math.Pow(10.0, i);
+		}
+		Permutation p;
+		p.permutation = val;
+		result.PushBack(p);
+		if (timer.Get() > 50)
+		{
+			timer.Reset();
+			g_frameManager.updateFrame();
+			g_gameObjectManager.update();
+		}
+	}
+	else
+	{
+		int i;
+		for (i = 0; i < rest.Numof(); ++i)
+		{
+			array@int newselected;
+			newselected.Alloc(selected.Numof());
+			newselected.Copy(0, selected, 0, selected.Numof());
+			newselected.PushBack(rest[i]);
+			array@int newrest;
+			newrest.Alloc(rest.Numof());
+			newrest.Copy(0, rest, 0, rest.Numof());
+			newrest.Erase(i);
+			lookUpPermutation(timer, result, newselected, newrest, depth);
+		}
+	}
+}
+
+void PonanChang::selectSkillSelector(ref SkillSelectorGroup selector)
+{
+	selector.clearOrder();
+	int i;
+	for (i = 0; i < 8; ++i)
+	{
+		int index = (this.result_ / int(Math.Pow(10.0, i))) % 10;
+		if (index != 0)
+		{
+			selector.select(index - 1);
+		}
+	}
+}
+
+void PonanChang::playVoice()
+{
+	int n;
+	if (this.currentEvaluation_ > this.maxEvaluation_)
+	{
+		array@int v;
+		v.PushBack(37006);
+		v.PushBack(37007);
+		v.PushBack(37009);
+		n = v[RAND(v.Numof()) - 1];
+	}
+	else if (this.maxEvaluation_ > 700)
+	{
+		array@int v;
+		v.PushBack(37002);
+		v.PushBack(37003);
+		v.PushBack(37004);
+		v.PushBack(37005);
+		n = v[RAND(v.Numof()) - 1];
+	}
+	else
+	{
+		array@int v;
+		v.PushBack(37001);
+		v.PushBack(37005);
+		v.PushBack(37007);
+		v.PushBack(37008);
+		n = v[RAND(v.Numof()) - 1];
+	}
+	g_sysSound.playVoice(n);
+}
+

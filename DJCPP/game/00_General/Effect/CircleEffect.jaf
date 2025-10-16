@@ -1,0 +1,61 @@
+CircleEffect::CircleEffect()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void CircleEffect::init(string imageName)
+{
+	this.parts_.init(imageName, 0);
+	this.parts_.setZ(30000.0);
+	this.parts_.setOrigin(5);
+}
+
+void CircleEffect::setPos(int x, int y)
+{
+	this.parts_.setPos(x, y);
+}
+
+void CircleEffect::setXYRot(int rot)
+{
+	this.parts_.setXYRot(rot);
+}
+
+void CircleEffect::setXZRot(int rot)
+{
+	this.parts_.setXZRot(rot);
+}
+
+void CircleEffect::setYZRot(int rot)
+{
+	this.parts_.setYZRot(rot);
+}
+
+void CircleEffect::run(int type)
+{
+	this.parts_.setShow(true);
+	array@PartsMotion m[3];
+	m[0].setTime(RAND(80));
+	m[0].setScaling(0, 0, 1);
+	m[1].setTime(125 + RAND(50));
+	m[1].setScaling(0, this.maxScaling_ * 0.8, 0);
+	m[1].setAlpha(255, 128, 0);
+	m[2].setTime(300 + RAND(100));
+	m[2].setScaling(this.maxScaling_ * 0.8, this.maxScaling_, 0);
+	m[2].setAlpha(128, 0, 0);
+	this.parts_.runMotionArray(m, NULL);
+}
+
+void CircleEffect::setMaxScaling(float maxScaling)
+{
+	this.maxScaling_ = maxScaling;
+}
+
+void CircleEffect::update()
+{
+}
+
+void CircleEffect::setZ(int z)
+{
+	this.parts_.setZ(z);
+}
+

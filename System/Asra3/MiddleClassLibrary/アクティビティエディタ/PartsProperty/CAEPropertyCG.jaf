@@ -1,0 +1,152 @@
+CAEPropertyCG::CAEPropertyCG()
+{
+	this.Release();
+}
+
+CAEPropertyCG::~CAEPropertyCG()
+{
+	this.Release();
+}
+
+void CAEPropertyCG::Init(int LayoutID, ref CAEInstanceItem Item, int State)
+{
+	this.Release();
+	if (Item === NULL)
+	{
+		return;
+	}
+	this.m_Item <- Item;
+	this.m_PartsState = State;
+	this.m_Panel.Init(LayoutID);
+	this.m_Panel.AddKeyDownEvent(this.KeyDownEvent);
+	this.m_Panel.AddMouseWheelEvent(this.MouseWheelEvent);
+	this.m_Panel.AddChangeTextEvent(this.ChangeTextEvent);
+	this.m_Panel.AddSelectedEvent(this.SelectedComboBoxEvent);
+	int ID = this.m_Item.GetID();
+	int X;
+	int Y;
+	int Width;
+	int Height;
+	Ｐ＿ＣＧ表示範囲取得(ID, X, Y, Width, Height, State);
+	array@string ReveseList;
+	ReveseList.PushBack("通常");
+	ReveseList.PushBack("左右反転");
+	ReveseList.PushBack("上下反転");
+	this.m_Panel.AddTextBoxItem("ＣＧ名", Ｐ＿ＣＧ名取得(ID, State), true);
+	this.m_Panel.AddComboBoxItem("反転", ReveseList, (Ｐ＿左右反転確認(ID, State) ? true : Ｐ＿上下反転確認(ID, State)) ? 2 : 0);
+	this.m_Panel.AddTextBoxItem("表示範囲／Ｘ", string(X), false);
+	this.m_Panel.AddTextBoxItem("表示範囲／Ｙ", string(Y), false);
+	this.m_Panel.AddTextBoxItem("表示範囲／幅", string(Width), false);
+	this.m_Panel.AddTextBoxItem("表示範囲／高さ", string(Height), false);
+}
+
+void CAEPropertyCG::Release()
+{
+	this.m_dgMouseWheelEvent.Clear();
+	this.m_dgKeyDownEvent.Clear();
+	this.m_Item <- NULL;
+	this.m_Panel.Release();
+}
+
+void CAEPropertyCG::KeyDownEvent(int ID, int KeyID)
+{
+	this.m_dgKeyDownEvent(ID, KeyID);
+}
+
+void CAEPropertyCG::MouseWheelEvent(int ID, int Forward, int Back)
+{
+	this.m_dgMouseWheelEvent(ID, Forward, Back);
+}
+
+void CAEPropertyCG::ChangeTextEvent(int ID)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	int X;
+	int Y;
+	int Width;
+	int Height;
+	Ｐ＿ＣＧ表示範囲取得(PartsID, X, Y, Width, Height, this.m_PartsState);
+	if (Item.GetLabel() == "ＣＧ名")
+	{
+		if (Ｐ＿左右反転確認(PartsID, this.m_PartsState))
+		{
+			Ｐ＿左右反転ＣＧ設定(PartsID, Item.GetTextBoxText(), this.m_PartsState);
+		}
+		else if (Ｐ＿上下反転確認(PartsID, this.m_PartsState))
+		{
+			Ｐ＿上下反転ＣＧ設定(PartsID, Item.GetTextBoxText(), this.m_PartsState);
+		}
+		else
+		{
+			Ｐ＿ＣＧ設定(PartsID, Item.GetTextBoxText(), this.m_PartsState);
+		}
+	}
+	else if (Item.GetLabel() == "表示範囲／Ｘ")
+	{
+		Ｐ＿ＣＧ表示範囲設定(PartsID, Item.GetTextBoxInt(), Y, Width, Height, this.m_PartsState);
+	}
+	else if (Item.GetLabel() == "表示範囲／Ｙ")
+	{
+		Ｐ＿ＣＧ表示範囲設定(PartsID, X, Item.GetTextBoxInt(), Width, Height, this.m_PartsState);
+	}
+	else if (Item.GetLabel() == "表示範囲／幅")
+	{
+		Ｐ＿ＣＧ表示範囲設定(PartsID, X, Y, Item.GetTextBoxInt(), Height, this.m_PartsState);
+	}
+	else if (Item.GetLabel() == "表示範囲／高さ")
+	{
+		Ｐ＿ＣＧ表示範囲設定(PartsID, X, Y, Width, Item.GetTextBoxInt(), this.m_PartsState);
+	}
+}
+
+void CAEPropertyCG::SelectedComboBoxEvent(int ID, int Index)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	if (Item.GetLabel() == "反転")
+	{
+		string CGName = Ｐ＿ＣＧ名取得(PartsID, this.m_PartsState);
+		switch (Index)
+		{
+		case 0:
+			Ｐ＿ＣＧ設定(PartsID, CGName, this.m_PartsState);
+			break;
+		case 1:
+			Ｐ＿左右反転ＣＧ設定(PartsID, CGName, this.m_PartsState);
+			break;
+		case 2:
+			Ｐ＿上下反転ＣＧ設定(PartsID, CGName, this.m_PartsState);
+			break;
+		}
+	}
+}
+
+void CAEPropertyCG::AddKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent += DelegateObject;
+}
+
+void CAEPropertyCG::EraseKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent -= DelegateObject;
+}
+
+void CAEPropertyCG::AddMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent += DelegateObject;
+}
+
+void CAEPropertyCG::EraseMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent -= DelegateObject;
+}
+

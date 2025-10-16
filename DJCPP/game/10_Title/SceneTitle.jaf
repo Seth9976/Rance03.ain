@@ -1,0 +1,91 @@
+void SceneTitle::init()
+{
+	this.selected_ = -1;
+	this.partsBg_.init("イベント／アリス／メインメニュー", 0);
+	this.initButton();
+	this.setButtonPos();
+}
+
+void SceneTitle::initButton()
+{
+	array@string n;
+	n.PushBack("ゲーム開始");
+	n.PushBack("ロード");
+	n.PushBack("オートセーブをロード");
+	n.PushBack("マニュアル");
+	n.PushBack("ＣＧ");
+	n.PushBack("回想");
+	n.PushBack("音楽");
+	n.PushBack("コンフィグ");
+	n.PushBack("アンケート");
+	n.PushBack("アリスの館");
+	n.PushBack("シーンエディタ");
+	n.PushBack("終了");
+	int i;
+	for (i = 0; i < this.btn_.Numof(); ++i)
+	{
+		this.btn_[i].init("システム／ボタン／幅２８２", n[i], "", true);
+		this.btn_[i].setClickCallback(this.onClick, i);
+	}
+	this.btn_[2].setEnable(g_common_latestAutoSaveIndex != -1);
+}
+
+void SceneTitle::setButtonPos()
+{
+	int i;
+	for (i = 0; i < this.btn_.Numof(); ++i)
+	{
+		this.btn_[i].setPos(81 + (i % 3) * 292, 500 + (i / 3) * 56);
+	}
+}
+
+void SceneTitle::fadeButton(bool val)
+{
+	int i;
+	for (i = 0; i < this.btn_.Numof(); ++i)
+	{
+		this.btn_[i].fadeIn(val);
+	}
+}
+
+void SceneTitle::fadeIn(bool val, DG_GeneralCallback cb)
+{
+	this.fadeButton(val);
+	this.partsBg_.setShow(true);
+	this.partsBg_.runMotion(getStandardMotion(val ? 0 : 1), cb);
+	if (val)
+	{
+		g_music.play("音楽／ＡＤＶ／アリスのテーマ", -2147483648, false);
+	}
+	else
+	{
+		g_music.play("", 500, false);
+	}
+}
+
+void SceneTitle::run()
+{
+	this.fadeIn(true, NULL);
+}
+
+bool SceneTitle::update()
+{
+	return !this.isFinish_;
+}
+
+void SceneTitle::onClick(int id)
+{
+	this.selected_ = id;
+	this.fadeIn(false, this.onFinishFadeOut);
+}
+
+void SceneTitle::onFinishFadeOut()
+{
+	this.isFinish_ = true;
+}
+
+int SceneTitle::getSelected()
+{
+	return this.selected_;
+}
+

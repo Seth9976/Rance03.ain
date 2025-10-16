@@ -1,0 +1,156 @@
+CBackLogUnit::CBackLogUnit()
+{
+}
+
+CBackLogUnit::~CBackLogUnit()
+{
+}
+
+void CBackLogUnit::AddPlayVoiceEvent(DG_NotifyPlayVoiceList dgObject)
+{
+	this.m_PlayVoiceEvent += dgObject;
+}
+
+void CBackLogUnit::Add(ref SBackLogUnitModel Model)
+{
+	SBackLogRefUnitModel UnitModel;
+	UnitModel.Model <- Model;
+	this.m_ModelList.PushBack(UnitModel);
+}
+
+string CBackLogUnit::CreateLog()
+{
+	string Log;
+	int i;
+	for (i = 0; i < this.m_ModelList.Numof(); ++i)
+	{
+		if (this.m_ModelList[i].Model.m_Separator)
+		{
+			Log = " ";
+			continue;
+		}
+		if (!Log.Empty())
+		{
+			Log += "\n";
+		}
+		Log += this.m_ModelList[i].Model.m_Text;
+	}
+	return Log;
+}
+
+bool CBackLogUnit::IsExistVoice()
+{
+	int i;
+	for (i = 0; i < this.m_ModelList.Numof(); ++i)
+	{
+		if (!this.m_ModelList[i].Model.m_VoiceNameList.Empty())
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool CBackLogUnit::IsPlayVoice()
+{
+	int i;
+	for (i = 0; i < this.m_ModelList.Numof(); ++i)
+	{
+		if (this.m_ModelList[i].Model.m_Playing)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void CBackLogUnit::Build(int LayoutParts, CASCharSpriteProperty Font, CASCharSpriteProperty VoiceFont, CASCharSpriteProperty VoiceOnFont, CASCharSpriteProperty PlayVoiceFont, int CharSpace, int LineSpace, int Width)
+{
+	this.m_Text.Create();
+	this.m_Text.SetZ(1);
+	int Number = this.m_Text.GetPartsNumber();
+	Ｐ＿レイアウトボックス＿追加(LayoutParts, Number);
+	int TextWidth;
+	int TextHeight;
+	PARTS_TextParts_CalcSize(Font, this.CreateLog(), TextWidth, TextHeight, CharSpace, LineSpace);
+	TextHeight += LineSpace;
+	if (!this.IsExistVoice())
+	{
+		this.CreateText(Font, CharSpace, LineSpace, Width, TextHeight, 1);
+		return;
+	}
+	this.m_Text.SetClickable(true);
+	AFL_Parts_AddMouseLClickEvent(Number, this.LClickEvent);
+	this.m_VoiceFont = VoiceFont;
+	this.m_VoiceOnFont = VoiceOnFont;
+	this.m_PlayVoiceFont = PlayVoiceFont;
+	this.m_CharSpace = CharSpace;
+	this.m_LineSpace = LineSpace;
+	this.m_Width = Width;
+	this.m_TextHeight = TextHeight;
+	if (this.IsPlayVoice())
+	{
+		this.PlayVoice();
+	}
+	else
+	{
+		this.StopVoice();
+	}
+}
+
+void CBackLogUnit::CreateText(CASCharSpriteProperty Font, int CharSpace, int LineSpace, int Width, int TextHeight, int State)
+{
+	if (!this.m_Text.IsExist())
+	{
+		return;
+	}
+	int Number = this.m_Text.GetPartsNumber();
+	Ｐ＿構築手順＿初期化(Number, State);
+	Ｐ＿構築手順＿作成(Number, Width, TextHeight, State);
+	Ｐ＿構築手順＿アルファ塗り(Number, 0, 0, Width, TextHeight, 0, State);
+	Ｐ＿構築手順＿テキストコピー(Number, 0, 0, this.CreateLog(), Font, CharSpace, LineSpace, State);
+	Ｐ＿構築ビルド(Number, State);
+}
+
+void CBackLogUnit::LClickEvent(int Number, int MouseX, int MouseY)
+{
+	if (!this.IsExistVoice())
+	{
+		return;
+	}
+	this.m_PlayVoiceEvent(this.m_ModelList[0].Model.m_VoiceNameList);
+	this.PlayVoice();
+}
+
+void CBackLogUnit::PlayVoice()
+{
+	if (!this.IsExistVoice())
+	{
+		return;
+	}
+	this.CreateText(this.m_PlayVoiceFont, this.m_CharSpace, this.m_LineSpace, this.m_Width, this.m_TextHeight, 1);
+	this.CreateText(this.m_PlayVoiceFont, this.m_CharSpace, this.m_LineSpace, this.m_Width, this.m_TextHeight, 2);
+	this.CreateText(this.m_PlayVoiceFont, this.m_CharSpace, this.m_LineSpace, this.m_Width, this.m_TextHeight, 3);
+	int i;
+	for (i = 0; i < this.m_ModelList.Numof(); ++i)
+	{
+		this.m_ModelList[i].Model.m_Playing = true;
+	}
+}
+
+void CBackLogUnit::StopVoice()
+{
+	if (!this.IsExistVoice())
+	{
+		return;
+	}
+	this.CreateText(this.m_VoiceFont, this.m_CharSpace, this.m_LineSpace, this.m_Width, this.m_TextHeight, 1);
+	this.CreateText(this.m_VoiceOnFont, this.m_CharSpace, this.m_LineSpace, this.m_Width, this.m_TextHeight, 2);
+	this.CreateText(this.m_PlayVoiceFont, this.m_CharSpace, this.m_LineSpace, this.m_Width, this.m_TextHeight, 3);
+	int i;
+	for (i = 0; i < this.m_ModelList.Numof(); ++i)
+	{
+		this.m_ModelList[i].Model.m_Playing = false;
+	}
+}
+

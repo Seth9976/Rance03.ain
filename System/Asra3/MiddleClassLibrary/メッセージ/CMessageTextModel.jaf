@@ -1,0 +1,295 @@
+CMessageTextModel::CMessageTextModel()
+{
+}
+
+void CMessageTextModel::Clear()
+{
+	int Index;
+	for (Index = 0; Index < this.m_MessageTextList.Numof(); ++Index)
+	{
+		this.m_ReadMessageTextManager.EraseMessageNumber(this.m_MessageTextList[Index].nMsgNum);
+	}
+	this.m_MessageTextList.Free();
+}
+
+void CMessageTextModel::ClearMessageText(int MessageWindowNumber)
+{
+	int Index;
+	for (Index = 0; Index < this.m_MessageTextList.Numof(); )
+	{
+		if (this.m_MessageTextList[Index].MessageWindowNumber == MessageWindowNumber)
+		{
+			this.m_ReadMessageTextManager.EraseMessageNumber(this.m_MessageTextList[Index].nMsgNum);
+			this.m_MessageTextList.Erase(Index);
+		}
+		else
+		{
+			Index++;
+		}
+	}
+}
+
+void CMessageTextModel::SetEventName(string Name)
+{
+	this.m_EventName = Name;
+}
+
+void CMessageTextModel::SetEventInfoByADV(string FilePath, string FuncName)
+{
+	if (FilePath.Empty() && FuncName.Empty())
+	{
+		this.m_EventInfoByADVEngine = "";
+		return;
+	}
+	this.m_EventInfoByADVEngine = "ファイル[%s] 関数名[%s]" % FilePath % FuncName;
+}
+
+void CMessageTextModel::AddMessageText(int Index, string Text, int MessageWindowNumber)
+{
+	CMessageText MessageText;
+	MessageText.nType = 0;
+	MessageText.MessageWindowNumber = MessageWindowNumber;
+	MessageText.nMsgNum = Index;
+	MessageText.MessageText = Text;
+	MessageText.Ｍフォント = _Ｍフォント;
+	MessageText.Ｍサイズ = _Ｍサイズ;
+	MessageText.Ｍ太さ = _g_Ｍ太さ;
+	MessageText.ＭＲ = _ＭＲ;
+	MessageText.ＭＧ = _ＭＧ;
+	MessageText.ＭＢ = _ＭＢ;
+	MessageText.Ｍ速度 = _Ｍ速度;
+	MessageText.Ｍ配置 = _Ｍ配置;
+	MessageText.Ｍ縁取り幅 = g_MessageTextEdgeWeight;
+	MessageText.Ｍ縁取りＲ = _Ｍ飾Ｒ;
+	MessageText.Ｍ縁取りＧ = _Ｍ飾Ｇ;
+	MessageText.Ｍ縁取りＢ = _Ｍ飾Ｂ;
+	this.m_MessageTextList.PushBack(MessageText);
+}
+
+void CMessageTextModel::AddNewLine(int MessageWindowNumber)
+{
+	CMessageText MessageText;
+	MessageText.nType = 1;
+	MessageText.MessageWindowNumber = MessageWindowNumber;
+	MessageText.Ｍフォント = _Ｍフォント;
+	MessageText.Ｍサイズ = _Ｍサイズ;
+	MessageText.Ｍ太さ = _g_Ｍ太さ;
+	MessageText.ＭＲ = _ＭＲ;
+	MessageText.ＭＧ = _ＭＧ;
+	MessageText.ＭＢ = _ＭＢ;
+	MessageText.Ｍ速度 = _Ｍ速度;
+	MessageText.Ｍ配置 = _Ｍ配置;
+	MessageText.Ｍ縁取り幅 = g_MessageTextEdgeWeight;
+	MessageText.Ｍ縁取りＲ = _Ｍ飾Ｒ;
+	MessageText.Ｍ縁取りＧ = _Ｍ飾Ｇ;
+	MessageText.Ｍ縁取りＢ = _Ｍ飾Ｂ;
+	this.m_MessageTextList.PushBack(MessageText);
+}
+
+void CMessageTextModel::AddVoice(string VoiceName, int MessageWindowNumber)
+{
+	CMessageText MessageText;
+	MessageText.nType = 2;
+	MessageText.MessageWindowNumber = MessageWindowNumber;
+	MessageText.Voice = VoiceName;
+	this.m_MessageTextList.PushBack(MessageText);
+}
+
+void CMessageTextModel::AddC(int MessageWindowNumber)
+{
+	CMessageText MessageText;
+	MessageText.nType = 3;
+	MessageText.MessageWindowNumber = MessageWindowNumber;
+	this.m_MessageTextList.PushBack(MessageText);
+}
+
+int CMessageTextModel::GetNumofMessage()
+{
+	return this.m_MessageTextList.Numof();
+}
+
+ref CMessageText CMessageTextModel::GetMessage(int Index)
+{
+	return this.m_MessageTextList[Index];
+}
+
+int CMessageTextModel::GetMessageTextLength()
+{
+	int Length;
+	int nIndex;
+	for (nIndex = 0; nIndex < this.m_MessageTextList.Numof(); nIndex++)
+	{
+		ref CMessageText Message = this.m_MessageTextList[nIndex];
+		if (Message.nType == 0)
+		{
+			int nChar;
+			for (nChar = 0; nChar < Message.MessageText.Length(); nChar++)
+			{
+				int nSJISCode = Message.MessageText[nChar];
+				int nSJISCode1Byte = nSJISCode & 255;
+				if (nSJISCode > 255 && nSJISCode1Byte >= 136)
+				{
+					Length += 2;
+				}
+				else
+				{
+					Length++;
+				}
+			}
+		}
+		else if (Message.nType == 3)
+		{
+			Length = 0;
+		}
+	}
+	return Length;
+}
+
+string CMessageTextModel::GetLastVoiceName()
+{
+	string VoiceName;
+	int nIndex;
+	for (nIndex = 0; nIndex < this.m_MessageTextList.Numof(); nIndex++)
+	{
+		ref CMessageText Message = this.m_MessageTextList[nIndex];
+		if (Message.nType != 2)
+		{
+			continue;
+		}
+		VoiceName = Message.Voice;
+	}
+	return VoiceName;
+}
+
+bool CMessageTextModel::IsExistVoice()
+{
+	int nIndex;
+	for (nIndex = 0; nIndex < this.m_MessageTextList.Numof(); nIndex++)
+	{
+		ref CMessageText Message = this.m_MessageTextList[nIndex];
+		if (Message.nType == 2)
+		{
+			bool bExistC = false;
+			int nNext;
+			for (nNext = nIndex + 1; nNext < this.m_MessageTextList.Numof() - 1; nNext++)
+			{
+				if (this.m_MessageTextList[nNext].nType == 3)
+				{
+					bExistC = true;
+					break;
+				}
+			}
+			if (bExistC)
+			{
+				continue;
+			}
+			if (SYS_IsMuteVoice(Message.Voice))
+			{
+				continue;
+			}
+			return true;
+		}
+	}
+	return false;
+}
+
+bool CMessageTextModel::IsReadMessage(ref CMessageText MessageText)
+{
+	if (MessageText.nMsgNum > 0)
+	{
+		return MsgSkip.GetFlag(MessageText.nMsgNum);
+	}
+	int n;
+	for (n = 0; n < this.m_MessageTextList.Numof(); n++)
+	{
+		ref CMessageText Data = this.m_MessageTextList[n];
+		if (Data.nType != 0)
+		{
+			continue;
+		}
+		if (Data.nMsgNum <= 0)
+		{
+			continue;
+		}
+		if (Data.MessageWindowNumber != MessageText.MessageWindowNumber)
+		{
+			continue;
+		}
+		if (MsgSkip.GetFlag(Data.nMsgNum))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void CMessageTextModel::SetMessageReadFlag()
+{
+	int n;
+	for (n = 0; n < this.m_MessageTextList.Numof(); n++)
+	{
+		ref CMessageText Data = this.m_MessageTextList[n];
+		if (Data.nType != 0)
+		{
+			continue;
+		}
+		if (Data.nMsgNum <= 0)
+		{
+			continue;
+		}
+		this.m_ReadMessageTextManager.SetReadMessage(Data.nMsgNum);
+	}
+}
+
+void CMessageTextModel::DebugOutputMessageText()
+{
+	if (!system.IsDebugMode())
+	{
+		return;
+	}
+	system.Output("--------MessageBegin--------\n");
+	system.Output("【 %s 】\n" % (this.m_EventInfoByADVEngine.Empty() ? this.m_EventName : this.m_EventInfoByADVEngine));
+	int Index;
+	for (Index = 0; Index < this.m_MessageTextList.Numof(); Index++)
+	{
+		ref CMessageText DrawMessage = this.m_MessageTextList[Index];
+		switch (DrawMessage.nType)
+		{
+		case 0:
+			system.Output(DrawMessage.MessageText);
+			break;
+		case 1:
+			system.Output("\n");
+			break;
+		}
+	}
+	system.Output("\n--------MessageEnd----------\n");
+}
+
+void CMessageTextModel::DebugMessageTextToClipboard()
+{
+	if (!system.IsDebugMode())
+	{
+		return;
+	}
+	string Text;
+	Text += "--------MessageBegin--------\n";
+	Text += "【 %s 】\r\n" % (this.m_EventInfoByADVEngine.Empty() ? this.m_EventName : this.m_EventInfoByADVEngine);
+	int Index;
+	for (Index = 0; Index < this.m_MessageTextList.Numof(); Index++)
+	{
+		ref CMessageText DrawMessage = this.m_MessageTextList[Index];
+		switch (DrawMessage.nType)
+		{
+		case 0:
+			Text += DrawMessage.MessageText;
+			break;
+		case 1:
+			Text += "\n";
+			break;
+		}
+	}
+	Text += "\n--------MessageEnd----------\n";
+	Clipboard.SetText(Text);
+}
+

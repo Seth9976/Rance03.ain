@@ -1,0 +1,26 @@
+void Ｐ＿ＣＧ判定設定(int パーツ番号, int Ｘ, int Ｙ, string ＣＧ名)
+{
+	PartsEngine.SetComponentPos(パーツ番号, Ｘ, Ｙ);
+	if (!PartsEngine.Parts_SetPartsCGDetectionSize(パーツ番号, ＣＧ名, 1))
+	{
+		PARTS_Warning("Ｐ＿ＣＧ判定設定(パーツ番号 = %d, Ｘ = %d, Ｙ = %d, ＣＧ名 = %s)\n" % パーツ番号 % Ｘ % Ｙ % ＣＧ名);
+	}
+}
+
+string Ｐ＿ＣＧ判定ＣＧ名取得(int パーツ番号)
+{
+	string Out;
+	PartsEngine.Parts_GetPartsCGDetectionCGName(Out, パーツ番号, 1);
+	return Out;
+}
+
+void Ｐ＿ＣＧ判定範囲設定(int パーツ番号, int Ｘ, int Ｙ, int 幅, int 高さ)
+{
+	PartsEngine.Parts_SetPartsCGDetectionSurfaceArea(パーツ番号, Ｘ, Ｙ, 幅, 高さ, 1);
+}
+
+void Ｐ＿ＣＧ判定範囲取得(int パーツ番号, ref int Ｘ, ref int Ｙ, ref int 幅, ref int 高さ)
+{
+	PartsEngine.GetCGDetectionSurfaceArea(パーツ番号, Ｘ, Ｙ, 幅, 高さ, 1);
+}
+

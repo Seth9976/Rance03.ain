@@ -1,0 +1,184 @@
+CAESelectOriginDialog::CAESelectOriginDialog()
+{
+}
+
+void CAESelectOriginDialog::Show(int ID, int PosX, int PosY, int Type, DG_ChangedOriginType dgChangedOrigin)
+{
+	AFL_Parts_AddLayer(-1);
+	this.m_dgChangedOrigin = dgChangedOrigin;
+	this.m_ParentID = ID;
+	int LayoutBox = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿パディング設定(LayoutBox, 6, 6, 6, 6);
+	Ｐ＿レイアウトボックス＿配置設定(LayoutBox, 3);
+	int OriginLayoutBox = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿レイアウトタイプ設定(OriginLayoutBox, 2);
+	Ｐ＿レイアウトボックス＿折り返し設定(OriginLayoutBox, true, 90.0);
+	Ｐ＿レイアウトボックス＿追加(LayoutBox, OriginLayoutBox);
+	this.m_OriginLT = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(this.m_OriginLT, "＼");
+	Ｐ＿ボタン＿サイズ設定(this.m_OriginLT, 22, 22);
+	Ｐ＿マージン設定(this.m_OriginLT, 4, 4, 4, 4);
+	Ｐ＿レイアウトボックス＿追加(OriginLayoutBox, this.m_OriginLT);
+	AFL_Parts_AddMouseLClickEvent(this.m_OriginLT, this.MouseLClickEvent);
+	this.m_OriginMT = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(this.m_OriginMT, "｜");
+	Ｐ＿ボタン＿サイズ設定(this.m_OriginMT, 22, 22);
+	Ｐ＿マージン設定(this.m_OriginMT, 4, 4, 4, 4);
+	Ｐ＿レイアウトボックス＿追加(OriginLayoutBox, this.m_OriginMT);
+	AFL_Parts_AddMouseLClickEvent(this.m_OriginMT, this.MouseLClickEvent);
+	this.m_OriginRT = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(this.m_OriginRT, "／");
+	Ｐ＿ボタン＿サイズ設定(this.m_OriginRT, 22, 22);
+	Ｐ＿マージン設定(this.m_OriginRT, 4, 4, 4, 4);
+	Ｐ＿レイアウトボックス＿追加(OriginLayoutBox, this.m_OriginRT);
+	AFL_Parts_AddMouseLClickEvent(this.m_OriginRT, this.MouseLClickEvent);
+	this.m_OriginLM = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(this.m_OriginLM, "―");
+	Ｐ＿ボタン＿サイズ設定(this.m_OriginLM, 22, 22);
+	Ｐ＿マージン設定(this.m_OriginLM, 4, 4, 4, 4);
+	Ｐ＿レイアウトボックス＿追加(OriginLayoutBox, this.m_OriginLM);
+	AFL_Parts_AddMouseLClickEvent(this.m_OriginLM, this.MouseLClickEvent);
+	this.m_OriginMM = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(this.m_OriginMM, "○");
+	Ｐ＿ボタン＿サイズ設定(this.m_OriginMM, 22, 22);
+	Ｐ＿マージン設定(this.m_OriginMM, 4, 4, 4, 4);
+	Ｐ＿レイアウトボックス＿追加(OriginLayoutBox, this.m_OriginMM);
+	AFL_Parts_AddMouseLClickEvent(this.m_OriginMM, this.MouseLClickEvent);
+	this.m_OriginRM = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(this.m_OriginRM, "―");
+	Ｐ＿ボタン＿サイズ設定(this.m_OriginRM, 22, 22);
+	Ｐ＿マージン設定(this.m_OriginRM, 4, 4, 4, 4);
+	Ｐ＿レイアウトボックス＿追加(OriginLayoutBox, this.m_OriginRM);
+	AFL_Parts_AddMouseLClickEvent(this.m_OriginRM, this.MouseLClickEvent);
+	this.m_OriginLB = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(this.m_OriginLB, "／");
+	Ｐ＿ボタン＿サイズ設定(this.m_OriginLB, 22, 22);
+	Ｐ＿マージン設定(this.m_OriginLB, 4, 4, 4, 4);
+	Ｐ＿レイアウトボックス＿追加(OriginLayoutBox, this.m_OriginLB);
+	AFL_Parts_AddMouseLClickEvent(this.m_OriginLB, this.MouseLClickEvent);
+	this.m_OriginMB = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(this.m_OriginMB, "｜");
+	Ｐ＿ボタン＿サイズ設定(this.m_OriginMB, 22, 22);
+	Ｐ＿マージン設定(this.m_OriginMB, 4, 4, 4, 4);
+	Ｐ＿レイアウトボックス＿追加(OriginLayoutBox, this.m_OriginMB);
+	AFL_Parts_AddMouseLClickEvent(this.m_OriginMB, this.MouseLClickEvent);
+	this.m_OriginRB = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(this.m_OriginRB, "＼");
+	Ｐ＿ボタン＿サイズ設定(this.m_OriginRB, 22, 22);
+	Ｐ＿マージン設定(this.m_OriginRB, 4, 4, 4, 4);
+	Ｐ＿レイアウトボックス＿追加(OriginLayoutBox, this.m_OriginRB);
+	AFL_Parts_AddMouseLClickEvent(this.m_OriginRB, this.MouseLClickEvent);
+	int ButtonLayout = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿レイアウトタイプ設定(ButtonLayout, 2);
+	Ｐ＿レイアウトボックス＿パディング設定(ButtonLayout, 3, 3, 3, 3);
+	Ｐ＿レイアウトボックス＿追加(LayoutBox, ButtonLayout);
+	int OKButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(OKButton, "決定");
+	Ｐ＿ボタン＿サイズ設定(OKButton, 65, 22);
+	Ｐ＿マージン設定(OKButton, 0, 0, 3, 0);
+	Ｐ＿レイアウトボックス＿追加(ButtonLayout, OKButton);
+	AFL_Parts_AddMouseLClickEvent(OKButton, this.ClickOKButtonEvent);
+	int CancelButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(CancelButton, "キャンセル");
+	Ｐ＿ボタン＿サイズ設定(CancelButton, 100, 22);
+	Ｐ＿マージン設定(CancelButton, 0, 0, 3, 0);
+	Ｐ＿レイアウトボックス＿追加(ButtonLayout, CancelButton);
+	AFL_Parts_AddMouseLClickEvent(CancelButton, this.ClickCancelButtonEvent);
+	int Width = AFL_Parts_GetWidth(LayoutBox, 1);
+	int Height = AFL_Parts_GetHeight(LayoutBox, 1);
+	int BG = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿構築手順＿ピクセル作成(BG, Width, Height, 1);
+	Ｐ＿構築手順＿色塗り(BG, 0, 0, Width, Height, 200, 200, 200, -1, 1);
+	Ｐ＿構築ビルド(BG, 1);
+	Ｐ＿ドラッグ可能設定(BG, true);
+	Ｐ＿親設定(LayoutBox, BG);
+	PosX = Math.Max(0, Math.Min(AFL_View_GetWidth() - Width, PosX));
+	PosY = Math.Max(0, Math.Min(AFL_View_GetHeight() - Height, PosY));
+	Ｐ＿座標設定(BG, PosX, PosY);
+	AFL_Parts_AddDragEndEvent(BG, this.DragEndEvent);
+	this.m_OK = false;
+	this.m_Cancel = false;
+	PARTS_BeginInput();
+	for (; ; )
+	{
+		AFL_View_Update(true);
+		if (this.m_OK)
+		{
+			break;
+		}
+		if (this.m_Cancel)
+		{
+			dgChangedOrigin(ID, Type);
+			break;
+		}
+	}
+	PARTS_EndInput();
+	PARTS_ReleaseWithInit(LayoutBox);
+	PARTS_ReleaseWithInit(CancelButton);
+	PARTS_ReleaseWithInit(OKButton);
+	PARTS_ReleaseWithInit(ButtonLayout);
+	PARTS_ReleaseWithInit(BG);
+	AFL_Parts_EraseLayer(-1);
+}
+
+void CAESelectOriginDialog::ClickOKButtonEvent(int ID, int MouseX, int MouseY)
+{
+	this.m_OK = true;
+}
+
+void CAESelectOriginDialog::ClickCancelButtonEvent(int ID, int MouseX, int MouseY)
+{
+	this.m_Cancel = true;
+}
+
+void CAESelectOriginDialog::MouseLClickEvent(int ID, int MouseX, int MouseY)
+{
+	if (ID == this.m_OriginLT)
+	{
+		this.m_dgChangedOrigin(this.m_ParentID, 1);
+	}
+	else if (ID == this.m_OriginMT)
+	{
+		this.m_dgChangedOrigin(this.m_ParentID, 2);
+	}
+	else if (ID == this.m_OriginRT)
+	{
+		this.m_dgChangedOrigin(this.m_ParentID, 3);
+	}
+	else if (ID == this.m_OriginLM)
+	{
+		this.m_dgChangedOrigin(this.m_ParentID, 4);
+	}
+	else if (ID == this.m_OriginMM)
+	{
+		this.m_dgChangedOrigin(this.m_ParentID, 5);
+	}
+	else if (ID == this.m_OriginRM)
+	{
+		this.m_dgChangedOrigin(this.m_ParentID, 6);
+	}
+	else if (ID == this.m_OriginLB)
+	{
+		this.m_dgChangedOrigin(this.m_ParentID, 7);
+	}
+	else if (ID == this.m_OriginMB)
+	{
+		this.m_dgChangedOrigin(this.m_ParentID, 8);
+	}
+	else if (ID == this.m_OriginRB)
+	{
+		this.m_dgChangedOrigin(this.m_ParentID, 9);
+	}
+}
+
+void CAESelectOriginDialog::DragEndEvent(int ID)
+{
+	int PosX = Ｐ＿Ｘ座標取得(ID);
+	int PosY = Ｐ＿Ｙ座標取得(ID);
+	int Width = AFL_Parts_GetWidth(ID, 1);
+	int Height = AFL_Parts_GetHeight(ID, 1);
+	PosX = Math.Max(0, Math.Min(AFL_View_GetWidth() - Width, PosX));
+	PosY = Math.Max(0, Math.Min(AFL_View_GetHeight() - Height, PosY));
+	Ｐ＿座標設定(ID, PosX, PosY);
+}
+

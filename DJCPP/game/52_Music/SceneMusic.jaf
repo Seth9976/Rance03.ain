@@ -1,0 +1,192 @@
+void SceneMusic::init()
+{
+	this.isFinish_ = false;
+	this.lastPlayMusicId_ = "";
+	this.isAllPlaying_ = false;
+	this.initSongButton();
+	this.initSysButton();
+	this.view_.init();
+	this.partsAllPlaying_.initAsCgPlaneImage("システム／音楽鑑賞／全曲再生", 255, 64, 0);
+	this.partsAllPlaying_.setAlpha(160.0);
+	int w = this.partsAllPlaying_.getWidth() / 4;
+	int h = this.partsAllPlaying_.getHeight();
+	this.partsAllPlaying_.setCgRange(0, 0, w, h);
+	this.partsAllPlaying_.setPos(866.0, 600.0);
+	this.partsAllPlaying_.setZ(6100.0);
+}
+
+void SceneMusic::initSongButton()
+{
+	this.list_.init();
+	this.list_.setOnClickCallback(this.onClick);
+}
+
+void SceneMusic::initSysButton()
+{
+	array@string n;
+	n.PushBack("システム／音楽鑑賞／前へ");
+	n.PushBack("システム／音楽鑑賞／再生");
+	n.PushBack("システム／音楽鑑賞／停止");
+	n.PushBack("システム／音楽鑑賞／次へ");
+	n.PushBack("システム／音楽鑑賞／全曲再生");
+	int i;
+	for (i = 0; i < this.btnSystem_.Numof(); ++i)
+	{
+		this.btnSystem_[i].init(n[i], "", "", false);
+		this.btnSystem_[i].setPos(578 + 72 * i, 600);
+		this.btnSystem_[i].setClickCallback(this.onClickSysButton, i);
+	}
+	this.btnExit_.init("システム／ボタン／幅１７０", "閉じる", "", true);
+	this.btnExit_.setPos(839, 691);
+	this.btnExit_.setClickCallback(this.onClickButtonExit, 0);
+}
+
+void SceneMusic::fadeButton(bool val)
+{
+}
+
+void SceneMusic::onClickButtonExit(int id)
+{
+	this.fadeIn(false, this.onFinishFadeOut);
+}
+
+void SceneMusic::run()
+{
+	this.fadeIn(true, NULL);
+}
+
+bool SceneMusic::update()
+{
+	if (this.isAllPlaying_)
+	{
+		if (g_music.getPlayingPosition() < this.lastPlayTime_)
+		{
+			string n = this.getNextMusicId(this.lastPlayMusicId_);
+			this.play(n, 1000);
+		}
+		this.lastPlayTime_ = g_music.getPlayingPosition();
+	}
+	if (!this.timerCb_.isRunning() && g_mouse.isClick(1))
+	{
+		playCancel();
+		this.fadeIn(false, this.onFinishFadeOut);
+	}
+	this.partsAllPlaying_.setShow(this.isAllPlaying_);
+	return !this.isFinish_;
+}
+
+void SceneMusic::fadeIn(bool val, DG_GeneralCallback onFinishCallback)
+{
+	this.list_.fadeIn(val, NULL);
+	this.btnExit_.fadeIn(val);
+	this.view_.fadeIn(val);
+	int i;
+	for (i = 0; i < this.btnSystem_.Numof(); ++i)
+	{
+		this.btnSystem_[i].fadeIn(val);
+	}
+	if (onFinishCallback.Numof() != 0)
+	{
+		this.timerCb_.setTimer(300, onFinishCallback);
+	}
+}
+
+void SceneMusic::onFinishFadeOut()
+{
+	this.isFinish_ = true;
+}
+
+string SceneMusic::getNextMusicId(string current)
+{
+	int index = this.getCurrentMusicIndex(current) + 1;
+	while (!g_musicInfo[this.getCycleValue(index)].isPlayed())
+	{
+		++index;
+	}
+	return g_musicInfo[this.getCycleValue(index)].getId();
+}
+
+string SceneMusic::getPrevMusicId(string current)
+{
+	int index = this.getCurrentMusicIndex(current) - 1;
+	while (!g_musicInfo[this.getCycleValue(index)].isPlayed())
+	{
+		--index;
+	}
+	return g_musicInfo[this.getCycleValue(index)].getId();
+}
+
+int SceneMusic::getCycleValue(int n)
+{
+	int c = g_musicInfo.Numof();
+	return (n + c) % c;
+}
+
+int SceneMusic::getCurrentMusicIndex(string current)
+{
+	int i;
+	for (i = 0; i < g_musicInfo.Numof(); ++i)
+	{
+		if (current == g_musicInfo[i].getId())
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+void SceneMusic::play(string id, int time)
+{
+	if (id != "")
+	{
+		this.lastPlayMusicId_ = id;
+		int index = getMusicInfoFromId(id).getIndex();
+		string key = "音楽%02d" % (index + 1);
+		g_globalGameFlag.setInt(key, g_globalGameFlag.getInt(key) + 1);
+	}
+	this.lastPlayTime_ = 0;
+	g_music.play(id, time, false);
+	this.list_.setPlaying(this.getCurrentMusicIndex(id));
+	this.view_.start();
+}
+
+void SceneMusic::onClick(int index)
+{
+	string n = g_musicInfo[index].getId();
+	this.play(n, 0);
+	this.view_.start();
+}
+
+void SceneMusic::onClickSysButton(int index)
+{
+	switch (index)
+	{
+	case 0:
+		this.play(this.getPrevMusicId(this.lastPlayMusicId_), 0);
+		break;
+	case 1:
+		this.play(this.lastPlayMusicId_, 0);
+		break;
+	case 2:
+		this.play("", 0);
+		break;
+	case 3:
+		this.play(this.getNextMusicId(this.lastPlayMusicId_), 0);
+		break;
+	case 4:
+		if (this.isAllPlaying_)
+		{
+			this.isAllPlaying_ = false;
+		}
+		else
+		{
+			this.isAllPlaying_ = true;
+			if (g_music.getPlayingMusicId() == "")
+			{
+				this.play(this.lastPlayMusicId_, 0);
+			}
+		}
+		break;
+	}
+}
+

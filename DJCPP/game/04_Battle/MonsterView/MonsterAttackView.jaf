@@ -1,0 +1,168 @@
+MonsterAttackView::MonsterAttackView()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+	this.isFirst_ = true;
+}
+
+void MonsterAttackView::init(int parentPartsNumber)
+{
+	this.parent_.initAsDummy();
+	this.parent_.setShow(true);
+	this.parent_.setParent(parentPartsNumber);
+}
+
+void MonsterAttackView::reset(MonsterAttack attack, int position)
+{
+	this.attack_ = attack;
+	this.attr_ = getMonsterAttackAttributeFromId(this.attack_.getAttributeId());
+	this.position_ = position;
+	if (this.isFirst_)
+	{
+		this.isFirst_ = false;
+		this.initIconParts();
+		this.fadeIcon(true, NULL);
+	}
+	else
+	{
+		this.fadeIcon(false, this.resetParts);
+	}
+}
+
+void MonsterAttackView::fadeIcon(bool val, DG_GeneralCallback cb)
+{
+	PartsMotion m;
+	if (val)
+	{
+		m.setScaling(0, 100, 1);
+	}
+	else
+	{
+		m.setScaling(100, 0, 1);
+	}
+	this.parts_[0].runMotion(m, cb);
+}
+
+void MonsterAttackView::resetParts()
+{
+	this.initIconParts();
+	this.fadeIcon(true, NULL);
+}
+
+void MonsterAttackView::initIconParts()
+{
+	this.parts_[0].setPos(0.0, 0.0);
+	this.parts_[0].init(this.getAttackTypeIcon(), 0);
+	this.parts_[0].changeOrigin(5);
+	this.parts_[0].setParent(this.parent_.getPartsNumber());
+	this.parts_[0].setShow(true);
+	this.parts_[0].setScaling(0.0);
+	this.setShowAttackDisable();
+}
+
+void MonsterAttackView::setShowAttackDisable()
+{
+	if (this.attr_.getType() == 0 && !isMonsterAttackAvailable(this.attack_, this.position_))
+	{
+		this.parts_[0].setMultiColorValue(128, 128, 128);
+	}
+	else
+	{
+		this.parts_[0].setMultiColorValue(255, 255, 255);
+	}
+}
+
+string MonsterAttackView::getAttackTypeIcon()
+{
+	int count = this.attack_.getTargetType() % 10;
+	switch (this.attr_.getId())
+	{
+	case "物理攻撃":
+	case "爆裂攻撃":
+	case "性的攻撃":
+	case "急所攻撃":
+		if (count == 1)
+		{
+			return "システム／スキル／モンスター／攻撃／物理";
+		}
+		else if (count == 8)
+		{
+			return "システム／スキル／モンスター／攻撃／物理全体";
+		}
+		else
+		{
+			return "システム／スキル／モンスター／攻撃／物理複数";
+		}
+	case "魔法攻撃":
+		if (count == 1)
+		{
+			return "システム／スキル／モンスター／攻撃／魔法";
+		}
+		else if (count == 8)
+		{
+			return "システム／スキル／モンスター／攻撃／魔法全体";
+		}
+		else
+		{
+			return "システム／スキル／モンスター／攻撃／魔法複数";
+		}
+	case "物理防御":
+	case "魔法防御":
+		return "システム／スキル／モンスター／攻撃／防御";
+	case "物理治療":
+	case "魔法治療":
+		if (count == 1 || count == 2)
+		{
+			return "システム／スキル／モンスター／攻撃／治療";
+		}
+		else
+		{
+			return "システム／スキル／モンスター／攻撃／治療複数";
+		}
+	case "物理攻撃上昇":
+	case "魔法攻撃上昇":
+	case "物理防御上昇":
+	case "魔法防御上昇":
+		if (count == 1 || count == 2)
+		{
+			return "システム／スキル／モンスター／攻撃／バフ";
+			break;
+		}
+		return "システム／スキル／モンスター／攻撃／バフ複数";
+	}
+	return "システム／スキル／モンスター／攻撃／待機";
+}
+
+bool MonsterAttackView::isSingleTarget()
+{
+	return this.attack_.getTargetType() % 10 == 1;
+}
+
+void MonsterAttackView::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void MonsterAttackView::setPartsPos()
+{
+}
+
+void MonsterAttackView::update()
+{
+}
+
+void MonsterAttackView::setPos(int x, int y)
+{
+	this.parent_.setPos(x, y);
+}
+
+void MonsterAttackView::updatePosition(int position)
+{
+	this.position_ = position;
+	this.setShowAttackDisable();
+}
+

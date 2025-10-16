@@ -1,0 +1,82 @@
+PartyBackground::PartyBackground()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void PartyBackground::init(bool isShowBg)
+{
+	this.isShowBg_ = isShowBg;
+	this.initParts();
+}
+
+void PartyBackground::initParts()
+{
+	this.parts_[0].init("システム／キャンプ／背景", 0);
+	this.parts_[1].init("システム／編成／スキル背景", 0);
+	this.parts_[2].initAsFlat("システム／戦闘／フレーム／開始");
+	this.parts_[0].setZ(4000.0);
+	this.parts_[1].setZ(4200.0);
+	this.parts_[2].setZ(4300.0);
+}
+
+void PartyBackground::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+	this.parts_[0].setShow(this.isShowBg_);
+}
+
+void PartyBackground::update()
+{
+}
+
+void PartyBackground::fadeIn(bool val)
+{
+	if (val)
+	{
+		this.parts_[2].startFlat(false, 1.0);
+	}
+	else
+	{
+		PartsMotion m;
+		m.setMove(0, 0, 0, 300, 1);
+		m.setAlpha(255, 0, 0);
+		this.parts_[2].runMotion(m, NULL);
+	}
+	PartsMotion mb;
+	mb = getStandardMotion(val ? 0 : 1);
+	mb.setTime(500);
+	this.setPartsShow();
+	PartsMotion m;
+	if (val)
+	{
+		m.setTime(400);
+		m.setCgRangeMove(0, 0, 1, 1, 0, 0, 665, 768, 1);
+	}
+	else
+	{
+		m.setTime(150);
+		m.setMove(0, 0, -300, 0, 1);
+		m.setAlpha(255, 0, 0);
+	}
+	this.parts_[1].runMotion(m, NULL);
+}
+
+void PartyBackground::changeCenter(bool isWithOutInfomation)
+{
+	PartsMotion m;
+	if (isWithOutInfomation)
+	{
+		m.setMove(-145, 0, 0, 0, 1);
+	}
+	else
+	{
+		m.setMove(0, 0, -145, 0, 1);
+	}
+	this.parts_[1].runMotion(m, NULL);
+}
+

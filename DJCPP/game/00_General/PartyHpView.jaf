@@ -1,0 +1,168 @@
+PartyHpView::PartyHpView()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void PartyHpView::reset()
+{
+	this.init(5200);
+}
+
+void PartyHpView::init(int z)
+{
+	this.z_ = z;
+	g_party.getPlayerIdList(this.playerIdList_);
+	this.icons_.init();
+	this.initHpBar();
+	this.initLevelUpEnableIcon();
+	this.initParts();
+}
+
+void PartyHpView::initParts()
+{
+	this.parts_[0].init("システム／ダンジョン／下地", 0);
+	this.parts_[0].setPos(0.0, 482.0);
+	this.parts_[0].setZ(5000.0);
+	this.parts_[1].initAsFlat("システム／ダンジョン／鎖");
+	this.parts_[1].setPos(0.0, -30.0);
+	this.parts_[1].setZ(5300.0);
+}
+
+void PartyHpView::initHpBar()
+{
+	int c = this.playerIdList_.Numof();
+	this.hpBar_.Alloc(c);
+	this.x_.Alloc(c);
+	this.y_.Alloc(c);
+	int i;
+	for (i = 0; i < this.hpBar_.Numof(); ++i)
+	{
+		int min;
+		int max;
+		g_party.getPlayerSkillIndexMinMax(min, max, this.playerIdList_[i]);
+		this.getHpBarPos(min, max, this.x_[i], this.y_[i]);
+		this.x_[i] += 80;
+		this.hpBar_[i].initAsPlayer(getPlayerFromId(this.playerIdList_[i]));
+		this.hpBar_[i].setZ(this.z_);
+	}
+	this.setHpBarPos();
+}
+
+void PartyHpView::initLevelUpEnableIcon()
+{
+	this.partsLvUp_.Alloc(this.playerIdList_.Numof());
+	int i;
+	for (i = 0; i < this.partsLvUp_.Numof(); ++i)
+	{
+		this.partsLvUp_[i].initAsFlat("システム／ダンジョン／レベルアップ");
+		this.partsLvUp_[i].setPos(this.x_[i], this.y_[i]);
+		this.partsLvUp_[i].setZ(5000.0);
+	}
+}
+
+void PartyHpView::fadeInLevelUpEnableIcon(bool val)
+{
+	int i;
+	for (i = 0; i < this.partsLvUp_.Numof(); ++i)
+	{
+		PartsMotion m;
+		m = getStandardMotion(val ? 0 : 1);
+		int min;
+		int max;
+		g_party.getPlayerSkillIndexMinMax(min, max, this.playerIdList_[i]);
+		int x;
+		int y;
+		this.getHpBarPos(min, max, x, y);
+		if (val)
+		{
+			m.setMove(this.x_[i] - 20, this.y_[i] + 250, this.x_[i], this.y_[i], 1);
+		}
+		else
+		{
+			m.setMove(this.x_[i], this.y_[i], this.x_[i] - 20, this.y_[i] + 250, 1);
+			m.setTime(150);
+		}
+		this.partsLvUp_[i].runMotion(m, NULL);
+		this.partsLvUp_[i].startFlat(false, 1.0);
+		this.partsLvUp_[i].setShow(getPlayerFromId(this.playerIdList_[i]).isLevelUpEnable());
+	}
+}
+
+void PartyHpView::setHpBarPos()
+{
+	int i;
+	for (i = 0; i < this.playerIdList_.Numof(); ++i)
+	{
+		int min;
+		int max;
+		g_party.getPlayerSkillIndexMinMax(min, max, this.playerIdList_[i]);
+		int x;
+		int y;
+		this.getHpBarPos(min, max, x, y);
+		this.hpBar_[i].setPos(x, y);
+	}
+}
+
+void PartyHpView::getHpBarPos(int min, int max, ref int x, ref int y)
+{
+	int left = 16 + min * 118;
+	int right = 16 + max * 118;
+	x = (left + right) / 2.0;
+	y = 504 + ((min + max) / 2.0) * 12.0;
+}
+
+void PartyHpView::setPartsShow(bool val)
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(val);
+	}
+}
+
+void PartyHpView::setPartsPos()
+{
+}
+
+void PartyHpView::update()
+{
+}
+
+void PartyHpView::fadeIn(bool val)
+{
+	this.setPartsShow(val);
+	if (val)
+	{
+		PartsMotion m;
+		m.setMove(0, 782, 0, 482, 2);
+		this.parts_[0].setZ(5000.0);
+		this.parts_[0].runMotion(m, NULL);
+		this.parts_[1].startFlat(false, 1.0);
+	}
+	this.icons_.fadeIn(val);
+	this.fadeInLevelUpEnableIcon(val);
+	int i;
+	for (i = 0; i < this.hpBar_.Numof(); ++i)
+	{
+		PartsMotion m;
+		int x = this.hpBar_[i].getX();
+		int y = this.hpBar_[i].getY();
+		if (val)
+		{
+			m.setMove(x, y + 250, x, y, 1);
+			m.setAlpha(0, 255, 0);
+		}
+		else
+		{
+			m.setMove(x, y, x, y + 250, 1);
+			m.setAlpha(255, 0, 0);
+		}
+		this.hpBar_[i].fadeIn(val, m);
+	}
+}
+
+void PartyHpView::updateCoolTime()
+{
+	this.icons_.updateCoolTime();
+}
+

@@ -1,0 +1,107 @@
+SceneAdvSelection2::SceneAdvSelection2()
+{
+	this.isFadeOutFinish_ = false;
+}
+
+void SceneAdvSelection2::init(array@string selection)
+{
+	this.partsModeMark_[0].init("システム／オートモード", 0);
+	this.partsModeMark_[0].setPos(601.0, 684.0);
+	this.partsModeMark_[0].setZ(3450.0);
+	this.partsModeMark_[1].init("システム／スキップモード", 0);
+	this.partsModeMark_[1].setPos(663.0, 684.0);
+	this.partsModeMark_[1].setZ(3450.0);
+	this.selection_.Alloc(selection.Numof());
+	this.selection_.Copy(0, selection, 0, selection.Numof());
+	int c = this.selection_.Numof();
+	this.btn_.Alloc(c);
+	int h = c * 50 + (c - 1) * 20;
+	int i;
+	for (i = 0; i < this.btn_.Numof(); ++i)
+	{
+		this.btn_[i].init("システム／ボタン／幅５５０", this.selection_[i], "", true);
+		this.btn_[i].setClickCallback(this.onClick, i);
+		this.btn_[i].setPos(50, (384 - h / 2) + i * 70);
+		if (i == this.btn_.Numof() - 1)
+		{
+			this.btn_[i].setOnFinishFadeOutCallback(this.onFinishFadeOut);
+		}
+	}
+	this.initParts();
+}
+
+void SceneAdvSelection2::initParts()
+{
+}
+
+void SceneAdvSelection2::run()
+{
+	this.fadeIn(true);
+}
+
+bool SceneAdvSelection2::update()
+{
+	if (this.isFadeOutFinish_)
+	{
+		return false;
+	}
+	if (g_mouse.getWheel() > 0)
+	{
+		openBackLog();
+	}
+	this.partsModeMark_[0].setShow(Ａ＿オートモード中確認());
+	this.partsModeMark_[1].setShow(SYS_スキップモード確認());
+	return true;
+}
+
+void SceneAdvSelection2::fadeIn(bool val)
+{
+	int i;
+	for (i = 0; i < this.btn_.Numof(); ++i)
+	{
+		int x;
+		int y;
+		this.getPos(x, y, i);
+		if (val)
+		{
+			array@PartsMotion m[2];
+			m[0].setTime(i * 50);
+			m[0].setMove(-600, y, -600, y, 1);
+			m[1].setTime(300);
+			m[1].setMove(-600, y, x, y, 1);
+			this.btn_[i].fadeInCustomized(true, m);
+		}
+		else
+		{
+			array@PartsMotion m[1];
+			m[0].setTime(100);
+			m[0].setMove(x, y, -600, y, 1);
+			this.btn_[i].fadeInCustomized(false, m);
+		}
+	}
+}
+
+void SceneAdvSelection2::onClick(int index)
+{
+	this.clickedId_ = this.selection_[index];
+	this.fadeIn(false);
+}
+
+string SceneAdvSelection2::getClickedId()
+{
+	return this.clickedId_;
+}
+
+void SceneAdvSelection2::getPos(ref int x, ref int y, int index)
+{
+	int c = this.selection_.Numof();
+	int h = c * 50 + (c - 1) * 20;
+	x = 50;
+	y = (384 - h / 2) + index * 70;
+}
+
+void SceneAdvSelection2::onFinishFadeOut()
+{
+	this.isFadeOutFinish_ = true;
+}
+

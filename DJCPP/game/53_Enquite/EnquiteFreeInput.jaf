@@ -1,0 +1,31 @@
+void EnquiteFreeInput::init(string activityFileName, string activityName)
+{
+	this.activityFileName_ = activityFileName;
+	this.activityName_ = activityName;
+	this.btnOk_.init(this.activityName_, "はい", 0);
+	this.btnCancel_.init(this.activityName_, "いいえ", 1);
+	this.btnOk_.setOnClickCallback(this.onClick);
+	this.btnCancel_.setOnClickCallback(this.onClick);
+	this.textBox_.init(this.activityName_, "マルチラインテキストボックス_000");
+	this.textBox_.setText(g_enquiteFreeText);
+	this.textBox_.addOnChangeTextCallback(this.onChangeText);
+	this.textBox_.setMax(800);
+	this.pnNow_ = AFL_Activity_GetPartsNumber(this.activityName_, "文字数_現在値");
+	this.pnMax_ = AFL_Activity_GetPartsNumber(this.activityName_, "文字数_最大値");
+	Ｐ＿数字設定(this.pnMax_, 800, 1);
+}
+
+void EnquiteFreeInput::onClick(int id)
+{
+	if (id == 0)
+	{
+		g_enquiteFreeText = this.textBox_.getText();
+	}
+	AFL_Activity_End();
+}
+
+void EnquiteFreeInput::onChangeText()
+{
+	Ｐ＿数字設定(this.pnNow_, this.textBox_.getText().Length(), 1);
+}
+

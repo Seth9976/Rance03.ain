@@ -1,0 +1,35 @@
+MotionKey::MotionKey()
+{
+	this.isEnable_ = false;
+	this.from_ = this.to_ = -2147483648;
+	this.motionType_ = 0;
+}
+
+void MotionKey::set(int from, int to, int motionType)
+{
+	this.from_ = from;
+	this.to_ = to;
+	this.motionType_ = motionType;
+	this.isEnable_ = true;
+}
+
+bool MotionKey::isEnable()
+{
+	return this.isEnable_;
+}
+
+int MotionKey::getFrom()
+{
+	return this.from_;
+}
+
+int MotionKey::getTo()
+{
+	return this.to_;
+}
+
+int MotionKey::getMotionType()
+{
+	return this.motionType_;
+}
+

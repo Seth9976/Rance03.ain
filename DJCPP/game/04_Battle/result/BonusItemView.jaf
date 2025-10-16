@@ -1,0 +1,88 @@
+BonusItemView::BonusItemView()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void BonusItemView::init(string itemId)
+{
+	this.itemId_ = itemId;
+	this.initParts();
+}
+
+void BonusItemView::initParts()
+{
+	this.parts_[0].init("システム／リザルト／ＩＴＥＭ下地", 0);
+	this.parts_[1].initAsCgPlaneImage("システム／リザルト／ＩＴＥＭ下地", 255, 255, 255);
+	this.parts_[5].init("システム／リザルト／ＩＴＥＭ斜め線", 0);
+	if (this.itemId_ != "")
+	{
+		this.parts_[2].initAsFlat("システム／後光");
+		this.parts_[3].init(getItemFromId(this.itemId_).getIconImageName(), 0);
+		this.parts_[4].initAsFlat("システム／キラキラ");
+	}
+	createPartsGroup(this.parent_, this.parts_, 3530);
+	this.setPartsPos();
+}
+
+void BonusItemView::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void BonusItemView::startFlat()
+{
+	this.parts_[2].startFlat(false, 1.0);
+	this.parts_[4].startFlat(false, 1.0);
+}
+
+void BonusItemView::setPartsPos()
+{
+	this.parts_[0].setPos(629.0, 713.0);
+	this.parts_[1].setPos(629.0, 713.0);
+	this.parts_[5].setPos(-13.0, 581.0);
+	this.parts_[2].setPos(461.0, 571.0);
+	this.parts_[3].setPos(461.0, 571.0);
+	this.parts_[4].setPos(461.0, 571.0);
+	this.parts_[0].setOrigin(3);
+	this.parts_[1].setOrigin(3);
+	this.parts_[5].setOrigin(7);
+	this.parts_[2].setOrigin(5);
+	this.parts_[3].setOrigin(5);
+	this.parts_[4].setOrigin(5);
+}
+
+void BonusItemView::update()
+{
+}
+
+void BonusItemView::fadeIn(bool val, DG_GeneralCallback cb)
+{
+	this.setPartsShow();
+	if (val)
+	{
+		this.startFlat();
+		PartsMotion m;
+		m.setTime(1000);
+		m.setAlpha(255, 0, 0);
+		this.parts_[1].runMotion(m, NULL);
+		PartsMotion m2;
+		int w = this.parts_[5].getWidth();
+		int h = this.parts_[5].getHeight();
+		m2.setCgRangeMove(0, 0, 0, h, 0, 0, w, h, 2);
+		m2.setTime(1000);
+		this.parts_[5].runMotion(m2, cb);
+	}
+	else
+	{
+		PartsMotion m;
+		m.setTime(100);
+		m.setMove(0, 0, -700, 0, 1);
+		this.parent_.runMotion(m, cb);
+	}
+}
+

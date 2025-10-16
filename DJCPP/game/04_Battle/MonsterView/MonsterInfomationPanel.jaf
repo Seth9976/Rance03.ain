@@ -1,0 +1,143 @@
+MonsterInfomationPanel::MonsterInfomationPanel()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+	this.isNotShow_ = true;
+}
+
+void MonsterInfomationPanel::resetAttackView(MonsterAttack monsterAttack)
+{
+	this.atkView_.reset(monsterAttack, this.instance_.getPosition());
+}
+
+void MonsterInfomationPanel::init(ref MonsterInstance instance)
+{
+	this.instance_ <- instance;
+	this.isFixedPosition_ = getMonsterFromId(this.instance_.getId()).isFixedPosition();
+	this.parent_.initAsDummy();
+	this.parent_.setZ(2700.0);
+	this.parent_.setShow(true);
+	this.hpBar_.init(this.instance_.getHp(), this.instance_.getMaxHp(), false, "システム／ＨＰ／下地／敵");
+	this.hpBar_.setParent(this.parent_.getPartsNumber());
+	this.hpBar_.setShow(true);
+	this.hpBar_.setPos(55, 3);
+	this.hpBar_.setZ(0);
+	this.buffView_.init(this.instance_);
+	this.buffView_.setParent(this.parent_.getPartsNumber());
+	this.buffView_.setPos(0, 0);
+	this.atkView_.init(this.parent_.getPartsNumber());
+	this.atkView_.setPos(0, 4);
+	this.atkView_.updatePosition(this.instance_.getPosition());
+	this.partsTarget_.initAsFlat("システム／戦闘／ターゲット");
+	this.partsTarget_.setShow(false);
+	this.partsTarget_.setParent(this.parent_.getPartsNumber());
+	this.partsTarget_.setZ(100.0);
+	ref MonsterAttribute ma = getMonsterAttributeFromId(getMonsterFromId(this.instance_.getId()).getMonsterAttributeId());
+	this.partsMonsterAttribute_.init(ma.getImageName(), 0);
+	this.partsMonsterAttribute_.setShow(true);
+	this.partsMonsterAttribute_.setParent(this.parent_.getPartsNumber());
+	this.partsMonsterAttribute_.setPos(159.0, 37.0);
+	this.partsMonsterAttribute_.setOrigin(9);
+	this.partsMonsterAttribute_.setZ(10.0);
+	this.setPosition();
+}
+
+void MonsterInfomationPanel::update()
+{
+}
+
+void MonsterInfomationPanel::changeValue()
+{
+	this.hpBar_.changeValue(this.instance_.getHp(), this.onFinishChangeValue);
+}
+
+void MonsterInfomationPanel::onFinishChangeValue()
+{
+	if (this.instance_.getHp() == 0)
+	{
+		this.fadeIn(false, NULL);
+	}
+}
+
+void MonsterInfomationPanel::fadeIn(bool val, DG_GeneralCallback onFinish)
+{
+	this.parent_.setShow(true);
+	this.hpBar_.fadeIn(true, NULL);
+	PartsMotion m;
+	int nx;
+	int ny;
+	if (this.isFixedPosition_)
+	{
+		getMonsterFromId(this.instance_.getId()).getInformationPosition(nx, ny);
+	}
+	else
+	{
+		getMonsterInfomationPosition(nx, ny, this.instance_.getPosition());
+	}
+	if (val)
+	{
+		m.setMove(1200, ny, nx, ny, 7);
+		m.setTime(450);
+		this.isNotShow_ = false;
+	}
+	else
+	{
+		m.setMove(nx, ny, 1200, ny, 1);
+		m.setAlpha(255, 0, 0);
+		m.setTime(250);
+	}
+	this.parent_.runMotion(m, onFinish);
+}
+
+void MonsterInfomationPanel::movePosition()
+{
+	if (this.isFixedPosition_)
+	{
+		return;
+	}
+	int cx = this.parent_.getX();
+	int cy = this.parent_.getY();
+	if (cx == 0 && cy == 0)
+	{
+		getMonsterInfomationPosition(cx, cy, -1);
+	}
+	int nx;
+	int ny;
+	getMonsterInfomationPosition(nx, ny, this.instance_.getPosition());
+	PartsMotion m;
+	m.setTime(450);
+	m.setMove(cx, cy, nx, ny, 7);
+	this.parent_.runMotion(m, NULL);
+	this.atkView_.updatePosition(this.instance_.getPosition());
+}
+
+void MonsterInfomationPanel::setPosition()
+{
+	int nx;
+	int ny;
+	getMonsterInfomationPosition(nx, ny, this.instance_.getPosition());
+	this.parent_.setPos(nx, ny);
+}
+
+void MonsterInfomationPanel::showTargetMark(bool val)
+{
+	if (val)
+	{
+		this.partsTarget_.setShow(true);
+		this.partsTarget_.startFlat(false, 1.0);
+	}
+	else
+	{
+		this.partsTarget_.setShow(false);
+	}
+}
+
+bool MonsterInfomationPanel::isNotShow()
+{
+	return this.isNotShow_;
+}
+
+void MonsterInfomationPanel::updateBuffView()
+{
+	this.buffView_.updateState();
+}
+

@@ -1,0 +1,91 @@
+CountingNormalButton::CountingNormalButton()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void CountingNormalButton::init(string caption, DG_CountButtonGetCount cbGet)
+{
+	this.state_ = 1;
+	this.cbGet_ = cbGet;
+	this.btn_.init("システム／ボタン／幅１２８", caption, "", true);
+	this.initParts();
+	this.updateCount();
+}
+
+void CountingNormalButton::setPos(int x, int y)
+{
+	this.btn_.setPos(x, y);
+	this.parent_.setPos(x, y);
+}
+
+void CountingNormalButton::setZ(int z)
+{
+	this.btn_.setZ(z);
+	this.parent_.setZ(z + 100);
+}
+
+void CountingNormalButton::update()
+{
+}
+
+void CountingNormalButton::fadeIn(bool val, DG_GeneralCallback onFinish)
+{
+	if (val)
+	{
+		if (this.state_ == 0)
+		{
+			return;
+		}
+		if (this.cbGet_() <= 0)
+		{
+			return;
+		}
+	}
+	if (!val && this.state_ == 1)
+	{
+		return;
+	}
+	this.setPartsShow();
+	this.parent_.runMotion(getStandardMotion(val ? 0 : 1), onFinish);
+	this.btn_.fadeIn(val);
+	this.state_ = val ? 0 : 1;
+}
+
+void CountingNormalButton::initParts()
+{
+	this.parts_[0].init("システム／オート／下地", 0);
+	this.parts_[1].initAsNumber("システム／数字／幅１０／白", NULL);
+	this.setPartsPos();
+	createPartsGroup(this.parent_, this.parts_, 6100);
+}
+
+void CountingNormalButton::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void CountingNormalButton::setPartsPos()
+{
+	this.parts_[0].setPos(64.0, 49.0);
+	this.parts_[1].setPos(64.0, 52.0);
+	this.parts_[0].setOrigin(8);
+	this.parts_[1].setOrigin(8);
+}
+
+void CountingNormalButton::updateCount()
+{
+	int count = this.cbGet_();
+	this.btn_.setEnable(count > 0);
+	this.parts_[1].setNumber(count);
+}
+
+void CountingNormalButton::setClickCallback(DG_ButtonClickCallback onClick, int id)
+{
+	this.btn_.setClickCallback(onClick, id);
+}
+

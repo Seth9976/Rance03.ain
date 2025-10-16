@@ -1,0 +1,53 @@
+float getMotionValue(int motionType, float from, float to, float t)
+{
+	if (from == to)
+	{
+		return from;
+	}
+	t = Math.MinF(1.0, t);
+	t = Math.MaxF(0.0, t);
+	switch (motionType)
+	{
+	case 0:
+		return (1 - t) * from + t * to;
+		break;
+	case 1:
+		float tt = -Math.AbsF(Math.Pow(t - 1.0, 3.0)) + 1.0;
+		return (1 - tt) * from + tt * to;
+		break;
+	case 2:
+		float tt = -Math.AbsF(Math.Pow(t - 1.0, 7.0)) + 1.0;
+		return (1 - tt) * from + tt * to;
+		break;
+	case 3:
+		float tt = bezierVal(0.0, 1.0, t, 1.2);
+		return (1 - tt) * from + tt * to;
+		break;
+	case 4:
+		if (t < 0.7)
+		{
+			float tt = t / 0.7;
+			return from + (to - from) * (tt * tt);
+		}
+		else
+		{
+			float tt = ((t - 0.7) / 0.3) * 2.0 - 1.0;
+			return from + (to - from) * ((tt * tt) / 8.0 + 0.875);
+		}
+		break;
+	case 5:
+		float tt = Math.AbsF(Math.Pow(t, 3.0));
+		return (1 - tt) * from + tt * to;
+		break;
+	case 6:
+		float tt = Math.AbsF(Math.Pow(t, 5.0));
+		return (1 - tt) * from + tt * to;
+		break;
+	case 7:
+		float r = (Math.Sin(90 + t * 180.0) + 1.0) / 2.0;
+		return r * from + (1 - r) * to;
+		break;
+	}
+	return from;
+}
+

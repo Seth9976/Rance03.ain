@@ -1,0 +1,76 @@
+MusicPanelView::MusicPanelView()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void MusicPanelView::init()
+{
+	this.initParts();
+	this.changeNameParts();
+	this.setPartsPos();
+}
+
+void MusicPanelView::initParts()
+{
+	NumberPartsInfomation n;
+	n.setSameWidth(21);
+	n.setDigit(2);
+	this.parts_[0].initAsNumber("システム／数字／幅２１／黒", n);
+	this.parts_[1].initAsNumber("システム／数字／幅２１／黒", n);
+	this.parts_[2].initAsNumber("システム／数字／幅２１／黒", n);
+	this.parts_[3].initAsNumber("システム／数字／幅２１／黒", n);
+	createPartsGroup(this.parent_, this.parts_, 6000);
+}
+
+void MusicPanelView::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void MusicPanelView::setPartsPos()
+{
+	this.parts_[0].setPos(330.0, 646.0);
+	this.parts_[1].setPos(386.0, 646.0);
+	this.parts_[0].setOrigin(3);
+	this.parts_[1].setOrigin(3);
+	this.parts_[2].setPos(464.0, 646.0);
+	this.parts_[3].setPos(520.0, 646.0);
+	this.parts_[2].setOrigin(3);
+	this.parts_[3].setOrigin(3);
+}
+
+void MusicPanelView::update()
+{
+	int sec = g_music.getPlayingPosition() / 1000;
+	this.parts_[0].setNumber(sec / 60);
+	this.parts_[1].setNumber(sec % 60);
+	sec = g_music.getLength() / 1000;
+	this.parts_[2].setNumber(sec / 60);
+	this.parts_[3].setNumber(sec % 60);
+}
+
+void MusicPanelView::start()
+{
+	this.changeNameParts();
+}
+
+void MusicPanelView::changeNameParts()
+{
+}
+
+void MusicPanelView::stop()
+{
+	this.changeNameParts();
+}
+
+void MusicPanelView::fadeIn(bool val)
+{
+	this.setPartsShow();
+	this.parent_.runMotion(getStandardMotion(val ? 0 : 1), NULL);
+}
+

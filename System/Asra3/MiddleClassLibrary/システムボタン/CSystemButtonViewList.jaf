@@ -1,0 +1,142 @@
+CSystemButtonViewList::CSystemButtonViewList()
+{
+	this.m_MessageWindowNumber = -2147483648;
+	this.m_SelectButtonID = -2147483648;
+	this.m_Show = true;
+}
+
+void CSystemButtonViewList::Clear()
+{
+	if (this.m_MessageWindowNumber == -2147483648)
+	{
+		return;
+	}
+	int Index;
+	for (Index = 0; Index < this.m_ViewList.Numof(); ++Index)
+	{
+		this.m_ViewList[Index].Delete();
+	}
+	this.m_ViewList.Free();
+	this.m_MessageWindowNumber = -2147483648;
+	this.m_SelectButtonID = -2147483648;
+}
+
+void CSystemButtonViewList::SetMessageWindowNumber(int MessageWindowNumber)
+{
+	if (MessageWindowNumber == this.m_MessageWindowNumber)
+	{
+		return;
+	}
+	this.Clear();
+	this.m_MessageWindowNumber = MessageWindowNumber;
+	this.Create();
+}
+
+void CSystemButtonViewList::Create()
+{
+	this.m_ViewList.Alloc(g_SystemButtonModelMap.GetButtonCount(this.m_MessageWindowNumber));
+	int Index;
+	for (Index = 0; Index < this.m_ViewList.Numof(); ++Index)
+	{
+		this.m_ViewList[Index].Create(Index);
+	}
+}
+
+void CSystemButtonViewList::Update()
+{
+	if (this.m_MessageWindowNumber == -2147483648)
+	{
+		return;
+	}
+	int Index;
+	for (Index = 0; Index < this.m_ViewList.Numof(); ++Index)
+	{
+		this.m_ViewList[Index].Update();
+	}
+	this.m_SelectButtonID = -2147483648;
+	for (Index = 0; Index < this.m_ViewList.Numof(); ++Index)
+	{
+		if (this.m_ViewList[Index].IsSelecting())
+		{
+			this.m_SelectButtonID = Index;
+			break;
+		}
+	}
+}
+
+int CSystemButtonViewList::GetMessageWindowNumber()
+{
+	return this.m_MessageWindowNumber;
+}
+
+sys_btn_fnc_t CSystemButtonViewList::GetSelectedFunc()
+{
+	if (this.m_SelectButtonID == -2147483648)
+	{
+		return NULL;
+	}
+	return g_SystemButtonModelMap.GetFunction(this.m_MessageWindowNumber, this.m_SelectButtonID);
+}
+
+void CSystemButtonViewList::Hide()
+{
+	this.SetShow(false);
+}
+
+void CSystemButtonViewList::Show()
+{
+	this.SetShow(true);
+}
+
+void CSystemButtonViewList::SetShow(bool ShowFlg)
+{
+	this.m_Show = ShowFlg;
+	int Index;
+	for (Index = 0; Index < this.m_ViewList.Numof(); ++Index)
+	{
+		this.m_ViewList[Index].SetShow(this.m_Show);
+	}
+}
+
+void CSystemButtonViewList::SetPartsLayer(int ID)
+{
+	int Index;
+	for (Index = 0; Index < this.m_ViewList.Numof(); Index++)
+	{
+		this.m_ViewList[Index].SetPartsLayer(ID);
+	}
+}
+
+bool CSystemButtonViewList::IsShow()
+{
+	return this.m_Show;
+}
+
+void CSystemButtonViewList::SetOnCursorSoundName(string OnCursorSoundName)
+{
+	this.m_OnCursorSoundName = OnCursorSoundName;
+}
+
+void CSystemButtonViewList::SetClickSoundName(string ClickSoundName)
+{
+	this.m_ClickSoundName = ClickSoundName;
+}
+
+void CSystemButtonViewList::PlayOnCursorSound()
+{
+	if (this.m_OnCursorSoundName.Empty())
+	{
+		return;
+	}
+	システム効果音(this.m_OnCursorSoundName);
+}
+
+void CSystemButtonViewList::PlayClickSound()
+{
+	if (this.m_ClickSoundName.Empty())
+	{
+		return;
+	}
+	システム効果音(this.m_ClickSoundName);
+}
+

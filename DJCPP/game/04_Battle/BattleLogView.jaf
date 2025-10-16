@@ -1,0 +1,147 @@
+PartsContainer::PartsContainer()
+{
+	this.isShow = false;
+}
+
+BattleLogView::BattleLogView()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+	this.isBufferingMode_ = false;
+}
+
+void BattleLogView::init()
+{
+	g_battleLog.setOnAddCallback(this.onAddLog);
+	this.initParts();
+}
+
+void BattleLogView::initParts()
+{
+	this.parent_.initAsDummy();
+	this.parent_.setZ(2900.0);
+	this.parent_.setPos(20.0, 300.0);
+}
+
+void BattleLogView::setPartsPos()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].p.setPos(0.0, -(this.parts_.Numof() - i - 1) * 20);
+	}
+}
+
+void BattleLogView::update()
+{
+	while (this.parts_.Numof() > 20)
+	{
+		this.parts_.PopBack();
+	}
+}
+
+void BattleLogView::onAddLog(string msg, int type)
+{
+	if (this.isBufferingMode_)
+	{
+		this.bufferMsg_.PushBack(msg);
+		this.bufferType_.PushBack(type);
+	}
+	else
+	{
+		this.addLog(msg, type);
+	}
+}
+
+void BattleLogView::flush()
+{
+	int i;
+	for (i = 0; i < this.bufferMsg_.Numof(); ++i)
+	{
+		this.addLog(this.bufferMsg_[i], this.bufferType_[i]);
+	}
+	this.bufferMsg_.Free();
+	this.bufferType_.Free();
+}
+
+void BattleLogView::addLog(string msg, int type)
+{
+	int r;
+	int g;
+	int b;
+	this.getColor(type, r, g, b);
+	PartsContainer c;
+	c.p <- new Parts;
+	c.p.initAsText(msg, 20, true, 256, r, g, b);
+	c.p.setShow(true);
+	c.p.setPos(-300.0, 0.0);
+	c.p.setParent(this.parent_.getPartsNumber());
+	if (this.parts_.Empty())
+	{
+		this.parts_.PushBack(c);
+	}
+	else
+	{
+		this.parts_.Insert(0, c);
+	}
+	this.moveParts();
+}
+
+void BattleLogView::moveParts()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		if (this.parts_[i].isShow)
+		{
+			PartsMotion m;
+			m.setMove(0, this.parts_[i].p.getY(), 0, -i * 20, 1);
+			m.setAlpha(this.getIndexAlpha(-this.parts_[i].p.getY() / 20.0), this.getIndexAlpha(i), 0);
+			this.parts_[i].p.runMotion(m, NULL);
+		}
+		else
+		{
+			this.parts_[i].isShow = true;
+			PartsMotion m;
+			m.setMove(-this.parts_[i].p.getWidth() - 100, -i * 20, 0, -i * 20, 1);
+			this.parts_[i].p.runMotion(m, NULL);
+		}
+	}
+}
+
+int BattleLogView::getIndexAlpha(int index)
+{
+	int n = index - 4;
+	int l = Math.Max(n, 0);
+	return Math.Max(0, 255 - l * 64);
+}
+
+void BattleLogView::getColor(int type, ref int r, ref int g, ref int b)
+{
+	r = EX_IA2Int("戦闘ログカラー情報", type, "r", 0);
+	g = EX_IA2Int("戦闘ログカラー情報", type, "g", 0);
+	b = EX_IA2Int("戦闘ログカラー情報", type, "b", 0);
+}
+
+void BattleLogView::setBufferingMode(bool val)
+{
+	this.flush();
+	this.isBufferingMode_ = val;
+}
+
+void BattleLogView::fadeIn(bool val)
+{
+	this.parent_.setShow(true);
+	PartsMotion m;
+	if (val)
+	{
+		m.setAlpha(0, 255, 0);
+		m.setMove(-300, 300, 20, 300, 1);
+	}
+	else
+	{
+		m.setAlpha(255, 0, 0);
+		m.setMove(20, 300, -300, 300, 1);
+	}
+	this.parent_.runMotion(m, NULL);
+}
+

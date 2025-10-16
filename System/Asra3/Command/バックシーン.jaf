@@ -1,0 +1,53 @@
+void Ｓ＿バックシーン()
+{
+	g_dgBackScenePreEvent();
+	CBackSceneView BackSceneView;
+	BackSceneView.SetActivityName(EX_String("Ｅ＿バックシーンファイル名", ""));
+	BackSceneView.Execute();
+	++g_NumofOpenBackScene;
+	SYS_情報集計データセーブ();
+	g_dgBackScenePostEvent();
+}
+
+int Ａ＿バックシーン表示回数取得()
+{
+	return g_NumofOpenBackScene;
+}
+
+void Ａ＿バックシーン背景ＣＧ設定(string Name)
+{
+	g_BackSceneBGName = Name;
+}
+
+bool バックシーン登録制御(bool bFlag)
+{
+	bool bPrevFlag = g_bバックシーン登録可能;
+	g_bバックシーン登録可能 = bFlag;
+	return bPrevFlag;
+}
+
+void Ａ＿バックシーン登録()
+{
+	SYS_バックシーン登録();
+}
+
+void Ａ＿バックシーン前イベント登録(DG_NotifyHandler dgObject)
+{
+	g_dgBackScenePreEvent += dgObject;
+}
+
+void Ａ＿バックシーン後イベント登録(DG_NotifyHandler dgObject)
+{
+	g_dgBackScenePostEvent += dgObject;
+}
+
+void Ａ＿バックシーン前イベント登録解除(DG_NotifyHandler dgObject)
+{
+	g_dgBackScenePreEvent -= dgObject;
+}
+
+void Ａ＿バックシーン後イベント登録解除(DG_NotifyHandler dgObject)
+{
+	g_dgBackScenePostEvent -= dgObject;
+}
+

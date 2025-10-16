@@ -1,0 +1,418 @@
+void 制御／ダイアログ／プロローグ／親衛隊()
+{
+	DialogInfomation info;
+	info.setCaption("レイラが参加！");
+	info.setMessage("キャンプのパーティ編成で、|レイラの別のバトルスキルも、|セットしてみましょう");
+	info.setPictureImageName("システム／ダイアログ／写真／レイラ");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／キースギルド／入る／聖武具()
+{
+	DialogInfomation info;
+	info.setCaption("マップの移動範囲が拡大！");
+	info.setMessage("アイスの東に位置する、|カンラに進めるようになった！");
+	info.setPictureImageName("システム／ダイアログ／写真／経路増加");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／キースギルド／請ける／初回()
+{
+	DialogInfomation info;
+	info.setCaption("マップの移動範囲が拡大！");
+	info.setMessage("リスの洞窟に進めるようになった！|街から外に出ると、|マップが開きます");
+	info.setPictureImageName("システム／ダイアログ／写真／経路増加");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／キースギルド／請ける／コー()
+{
+	DialogInfomation info;
+	info.setCaption("マップの移動範囲が拡大！");
+	info.setMessage("キャンスレー干樹海にある、|コーへ進めるようになった！");
+	info.setPictureImageName("システム／ダイアログ／写真／経路増加");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／酒場／カンラ／捜す／初回()
+{
+	DialogInfomation info;
+	info.setCaption("マップの移動範囲が拡大！");
+	info.setMessage("カンラの東に位置する、|ラジールへ進めるようになった！");
+	info.setPictureImageName("システム／ダイアログ／写真／経路増加");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／都市／カンラ／入る／コリン()
+{
+	DialogInfomation info;
+	info.setCaption("マップの移動範囲が拡大！");
+	info.setMessage("はにわ大神殿があるらしい、|ティティ湖へ進めるようになった！");
+	info.setPictureImageName("システム／ダイアログ／写真／経路増加");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／都市／カンラ／入る／ロゼ()
+{
+	DialogInfomation info;
+	info.setCaption("マップの移動範囲が拡大！");
+	info.setMessage("帆船高岳にある、|悪魔回廊へ進めるようになった！");
+	info.setPictureImageName("システム／ダイアログ／写真／経路増加");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／悪魔回廊／出る()
+{
+	DialogInfomation info;
+	info.setCaption("マップの移動範囲が拡大！");
+	info.setMessage("悪魔回廊を抜け、|カスタムへ進めるようになった！");
+	info.setPictureImageName("システム／ダイアログ／写真／経路増加");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／解放軍司令部／カスタム／初回()
+{
+	DialogInfomation info;
+	info.setCaption("マップの移動範囲が拡大！");
+	info.setMessage("カスタム方面から、|ラジールへ進めるようになった！");
+	info.setPictureImageName("システム／ダイアログ／写真／経路増加");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／ラジール屋敷／ミーキル／初回()
+{
+	DialogInfomation info;
+	info.setCaption("マップの移動範囲が拡大！");
+	info.setMessage("ラジールの郊外にある遺跡、|地上灯台へ進めるようになった！");
+	info.setPictureImageName("システム／ダイアログ／写真／経路増加");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／烈火鉱山／亀裂()
+{
+	DialogInfomation info;
+	info.setCaption("ランス以外が離脱！");
+	info.setMessage("戦闘に参加していた場合は、|そのぶんのバトルスキルが空きます");
+	info.setPictureImageName("システム／ダイアログ／写真／情報");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／烈火鉱山／シィル()
+{
+	DialogInfomation info;
+	info.setCaption("シィルたちが参加！");
+	info.setMessage("キャンプのパーティ編成で、|バトルスキルが確認できます");
+	info.setPictureImageName("システム／ダイアログ／写真／情報");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／解放軍司令部／ラジール／四回目()
+{
+	DialogInfomation info;
+	info.setCaption("マップの移動範囲が拡大！");
+	info.setMessage("ヘルマンが駐留する自由都市、|レッドへ進めるようになった！");
+	info.setPictureImageName("システム／ダイアログ／写真／経路増加");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／レッド／オレリイ大聖堂()
+{
+	DialogInfomation info;
+	info.setCaption("パーティが復帰！");
+	info.setMessage("一度だけキャンプが開き、|編成などの準備が行えます");
+	info.setPictureImageName("システム／ダイアログ／写真／情報");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／解放軍司令部／レッド／初回()
+{
+	DialogInfomation info;
+	info.setCaption("マップの移動範囲が拡大！");
+	info.setMessage("レッドの程近くにある、|迷子の森へ進めるようになった！");
+	info.setPictureImageName("システム／ダイアログ／写真／経路増加");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／迷子の森／集落／二回目()
+{
+	DialogInfomation info;
+	info.setCaption("セル以外が離脱！");
+	info.setMessage("戦闘に参加していた場合は、|そのぶんのバトルスキルが空きます");
+	info.setPictureImageName("システム／ダイアログ／写真／情報");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／迷子の森／ユニコーン／Ｂ()
+{
+	DialogInfomation info;
+	info.setCaption("ランスたちが参加！");
+	info.setMessage("キャンプのパーティ編成で、|バトルスキルが確認できます");
+	info.setPictureImageName("システム／ダイアログ／写真／情報");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／解放軍司令部／レッド／三回目()
+{
+	DialogInfomation info;
+	info.setCaption("ランス以外が離脱！");
+	info.setMessage("戦闘に参加していた場合は、|そのぶんのバトルスキルが空きます");
+	info.setPictureImageName("システム／ダイアログ／写真／情報");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／宿屋／入る／セル()
+{
+	DialogInfomation info;
+	info.setCaption("シィルとマリア以外が参加！");
+	info.setMessage("キャンプのパーティ編成で、|バトルスキルが確認できます");
+	info.setPictureImageName("システム／ダイアログ／写真／情報");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／宿屋／入る／セル／Ｂ()
+{
+	DialogInfomation info;
+	info.setCaption("マップの移動範囲が変更！");
+	info.setMessage("ハイパービルに進めるようになった|そしてシィルを救い出すまで、|他の場所に進む気がなくなった！");
+	info.setPictureImageName("システム／ダイアログ／写真／経路増加");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／ハイパービル／シーザー／二回目()
+{
+	DialogInfomation info;
+	info.setCaption("マリアが参加！");
+	info.setMessage("キャンプのパーティ編成で、|バトルスキルが確認できます");
+	info.setPictureImageName("システム／ダイアログ／写真／マリア");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／ハイパービル／シィル／二回目()
+{
+	DialogInfomation info;
+	info.setCaption("マップの移動範囲が変更！");
+	info.setMessage("ハイパービル以外にも、|進む気になった！");
+	info.setPictureImageName("システム／ダイアログ／写真／経路増加");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／都市／レッド／入る／かなみ()
+{
+	DialogInfomation info;
+	info.setCaption("かなみ以外が離脱！");
+	info.setMessage("戦闘に参加していた場合は、|そのぶんのバトルスキルが空きます");
+	info.setPictureImageName("システム／ダイアログ／写真／情報");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／都市／レッド／入る／かなみ／Ｂ()
+{
+	DialogInfomation info;
+	info.setCaption("マップの移動範囲が変更！");
+	info.setMessage("ジオに進めるようになった|そして任務が完了するまで、|他の場所に進めなくなった！");
+	info.setPictureImageName("システム／ダイアログ／写真／経路増加");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／都市／レッド／入る／五回目()
+{
+	DialogInfomation info;
+	info.setCaption("ランスたちが参加！");
+	info.setMessage("キャンプのパーティ編成で、|バトルスキルが確認できます");
+	info.setPictureImageName("システム／ダイアログ／写真／情報");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／都市／レッド／入る／五回目／Ｂ()
+{
+	DialogInfomation info;
+	info.setCaption("マップの移動範囲が変更！");
+	info.setMessage("作戦開始までジオに進めなくなった|他の場所には進める様になった！");
+	info.setPictureImageName("システム／ダイアログ／写真／経路増加");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／解放軍司令部／レッド／五回目()
+{
+	DialogInfomation info;
+	info.setCaption("マップの移動範囲が拡大！");
+	info.setMessage("決戦の舞台、|ホッホ峡へ進めるようになった！");
+	info.setPictureImageName("システム／ダイアログ／写真／経路増加");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／ホッホ峡／入口／初回()
+{
+	DialogInfomation info;
+	info.setCaption("ホッホ峡本路を進撃！");
+	info.setMessage("マリアと志津香で交戦します！");
+	info.setPictureImageName("システム／ダイアログ／写真／情報");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／ホッホ峡／▲ｊ００()
+{
+	DialogInfomation info;
+	info.setCaption("ホッホ峡A支路を進撃！");
+	info.setMessage("ミリとセルで交戦します！");
+	info.setPictureImageName("システム／ダイアログ／写真／情報");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／ホッホ峡／▲ｊ０１()
+{
+	DialogInfomation info;
+	info.setCaption("ホッホ峡B支路を進撃！");
+	info.setMessage("リックとレイラで交戦します！");
+	info.setPictureImageName("システム／ダイアログ／写真／情報");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／ホッホ峡／▲ｊ０２()
+{
+	DialogInfomation info;
+	info.setCaption("ホッホ峡C支路を進撃！");
+	info.setMessage("かなみとスーで交戦します！");
+	info.setPictureImageName("システム／ダイアログ／写真／情報");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／ホッホ峡／▲ｊ０３()
+{
+	DialogInfomation info;
+	info.setCaption("大将自らが進撃！");
+	info.setMessage("ランスと奴隷たちで交戦します！");
+	info.setPictureImageName("システム／ダイアログ／写真／情報");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／ホッホ峡／ランス／サファイア()
+{
+	DialogInfomation info;
+	info.setCaption("マップの移動範囲が拡大！");
+	info.setMessage("ホッホ峡を抜け、|ジオへ進めるようになった！");
+	info.setPictureImageName("システム／ダイアログ／写真／経路増加");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／解放軍司令部／ジオ／初回()
+{
+	DialogInfomation info;
+	info.setCaption("マップの移動範囲が拡大！");
+	info.setMessage("とうとうリーザス領、|オクへ進めるようになった！");
+	info.setPictureImageName("システム／ダイアログ／写真／経路増加");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／解放軍司令部／オク／初回()
+{
+	DialogInfomation info;
+	info.setCaption("マップの移動範囲が拡大！");
+	info.setMessage("パッキャマラード・デンに、|進めるようになった！");
+	info.setPictureImageName("システム／ダイアログ／写真／経路増加");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／解放軍司令部／オク／二回目()
+{
+	DialogInfomation info;
+	info.setCaption("マップの移動範囲が拡大！");
+	info.setMessage("L.C.M.山脈に程近い、|ノースへ進めるようになった！");
+	info.setPictureImageName("システム／ダイアログ／写真／経路増加");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／都市／オク／入る／三回目()
+{
+	DialogInfomation info;
+	info.setCaption("マップの移動範囲が拡大！");
+	info.setMessage("高地にある鉱山都市、|サウスへ進めるようになった！");
+	info.setPictureImageName("システム／ダイアログ／写真／経路増加");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／宿屋／入る／シィル／二回目()
+{
+	DialogInfomation info;
+	info.setCaption("マップの移動範囲が拡大！");
+	info.setMessage("ノースを経て、|リーザスへ進めるようになった！");
+	info.setPictureImageName("システム／ダイアログ／写真／経路増加");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／都市／ノース／入る／五回目()
+{
+	DialogInfomation info;
+	info.setCaption("マップの移動範囲が拡大！");
+	info.setMessage("サウスを経て、|リーザスへ進めるようになった！");
+	info.setPictureImageName("システム／ダイアログ／写真／経路増加");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／都市／サウス／入る／三回目()
+{
+	DialogInfomation info;
+	info.setCaption("マップの移動範囲が拡大！");
+	info.setMessage("リーザスへ進めるようになった！|進んで作戦が開始されると、|しばらく他の場所に進めません");
+	info.setPictureImageName("システム／ダイアログ／写真／経路増加");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／都市／城下町／入る／三回目()
+{
+	DialogInfomation info;
+	info.setCaption("パーティが一部離脱！");
+	info.setMessage("ランスと奴隷たちで地下を進む！|帰り木はしばらく使えません");
+	info.setPictureImageName("システム／ダイアログ／写真／情報");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／牢獄／▲ｎ００()
+{
+	DialogInfomation info;
+	info.setCaption("マップを移動した！");
+	info.setMessage("下水道や牢獄を抜け、|リーザス城へ進んだ！");
+	info.setPictureImageName("システム／ダイアログ／写真／経路増加");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／居館／一階／入口／初回()
+{
+	DialogInfomation info;
+	info.setCaption("マップの移動範囲が拡大！");
+	info.setMessage("リーザス城から、|城下町へ進めるようになった！");
+	info.setPictureImageName("システム／ダイアログ／写真／経路増加");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／西の塔／トパーズ／初回()
+{
+	DialogInfomation info;
+	info.setCaption("ランスが離脱！");
+	info.setMessage("戦闘に参加していた場合は、|そのぶんのバトルスキルが空きます|帰り木はしばらく使えません");
+	info.setPictureImageName("システム／ダイアログ／写真／情報");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／西の塔／トパーズ／三回目()
+{
+	DialogInfomation info;
+	info.setCaption("ランスが復帰！");
+	info.setMessage("キャンプのパーティ編成で、|バトルスキルが確認できます|帰り木が使えるようになった！");
+	info.setPictureImageName("システム／ダイアログ／写真／ランス");
+	openDialog(info);
+}
+
+void 制御／ダイアログ／コー／オブ(string name, int num, int gold)
+{
+	string caption;
+	string desc;
+	caption = name + "を手渡した！";
+	desc = "%d個を手渡して、|%dGOLDを受け取った！" % num % gold;
+	DialogInfomation info;
+	info.setCaption(caption);
+	info.setMessage(desc);
+	info.setPictureImageName("システム／ダイアログ／写真／情報");
+	openDialog(info);
+}
+

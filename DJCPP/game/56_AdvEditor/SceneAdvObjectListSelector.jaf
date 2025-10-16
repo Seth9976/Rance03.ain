@@ -1,0 +1,238 @@
+void SceneAdvObjectListSelector::init(int mode, string current)
+{
+	this.selected_ = -1;
+	this.mode_ = mode;
+	this.result_ = 0;
+	this.isFinish_ = false;
+	this.initTargetObjectList();
+	this.pageCount_ = (this.cgNameList_.Numof() + 19) / 20;
+	this.base_.init(this.pageCount_, "システム／シーンエディタ／下地", false);
+	this.initSelectButton();
+	this.initSysButton();
+	pass(current);
+	int i;
+	for (i = 0; i < this.cgNameList_.Numof(); ++i)
+	{
+		if (current == this.cgNameList_[i])
+		{
+			this.selected_ = i;
+			this.updateThumbnail(this.selected_);
+			break;
+		}
+	}
+	this.setDetailButtonState();
+}
+
+void SceneAdvObjectListSelector::initSysButton()
+{
+	this.btnSys_[0].init("システム／ボタン／幅１７０", "詳細", "", true);
+	this.btnSys_[0].setPos(739, 541);
+	this.btnSys_[0].setClickCallback(this.onClickSysButton, 0);
+	this.btnSys_[1].init("システム／ボタン／幅１７０", "選択", "", true);
+	this.btnSys_[1].setPos(654, 691);
+	this.btnSys_[1].setClickCallback(this.onClickSysButton, 1);
+	this.btnSys_[2].init("システム／ボタン／幅１７０", "キャンセル", "", true);
+	this.btnSys_[2].setPos(839, 691);
+	this.btnSys_[2].setClickCallback(this.onClickSysButton, 2);
+}
+
+void SceneAdvObjectListSelector::initSelectButton()
+{
+	this.btnSelect_.Alloc(this.cgNameList_.Numof());
+	int i;
+	for (i = 0; i < this.cgNameList_.Numof(); ++i)
+	{
+		this.btnSelect_[i].init("システム／ボタン／幅２８２", this.captionList_[i], "", true);
+		int g = i / 20;
+		int x = (i % 20) / 10;
+		int y = i % 20 % 10;
+		this.btnSelect_[i].setPos(81 + x * 300 + g * 1024, 128 + y * 56);
+		this.btnSelect_[i].setParent(this.base_.getPartsNumber());
+		this.btnSelect_[i].setZ(4500);
+		this.btnSelect_[i].setClickCallback(this.onClick, i);
+	}
+}
+
+void SceneAdvObjectListSelector::initTargetObjectList()
+{
+	switch (this.mode_)
+	{
+	case 2:
+		this.prefix_ = "背景／";
+		break;
+	case 0:
+		this.prefix_ = "trim_立ち絵／";
+		break;
+	case 1:
+		this.prefix_ = "trim_立ち絵背／";
+		break;
+	case 3:
+		this.prefix_ = "システム／名札／";
+		break;
+	}
+	this.getCgList(this.cgNameList_, this.captionList_, this.prefix_);
+}
+
+void SceneAdvObjectListSelector::onClickSysButton(int id)
+{
+	if (id == 0)
+	{
+		openStandViewer(this.prefix_ + this.cgNameList_[this.selected_]);
+	}
+	else if (id == 1)
+	{
+		this.result_ = 0;
+		this.fadeIn(false, this.onFinishFadeOut);
+	}
+	else
+	{
+		this.result_ = 1;
+		this.selected_ = -1;
+		this.fadeIn(false, this.onFinishFadeOut);
+	}
+}
+
+void SceneAdvObjectListSelector::onFinishFadeOut()
+{
+	this.isFinish_ = true;
+}
+
+void SceneAdvObjectListSelector::onClick(int index)
+{
+	this.selected_ = index;
+	if (this.selected_ == 0)
+	{
+		this.parts_.release();
+	}
+	else
+	{
+		this.updateThumbnail(index);
+	}
+	this.setDetailButtonState();
+}
+
+void SceneAdvObjectListSelector::updateThumbnail(int index)
+{
+	this.parts_.init(this.prefix_ + this.cgNameList_[index], 0);
+	this.parts_.setZ(4500.0);
+	this.parts_.setShow(true);
+	this.parts_.setPos(824.0, 384.0);
+	this.parts_.setOrigin(5);
+	if (this.mode_ == 3)
+	{
+		this.parts_.setScaling(100.0);
+	}
+	else if (this.mode_ == 2)
+	{
+		this.parts_.setScaling(30.0);
+	}
+	else
+	{
+		this.parts_.setScaling(40.0);
+	}
+}
+
+void SceneAdvObjectListSelector::setDetailButtonState()
+{
+	this.btnSys_[0].setEnable(this.selected_ > 0);
+}
+
+string SceneAdvObjectListSelector::getSelected()
+{
+	if (this.selected_ > 0)
+	{
+		return this.cgNameList_[this.selected_];
+	}
+	return "";
+}
+
+void SceneAdvObjectListSelector::getCgList(ref array@string cgName, ref array@string captions, string prefix)
+{
+	cgName.Free();
+	captions.Free();
+	cgName.PushBack("");
+	captions.PushBack("なし");
+	string key;
+	switch (this.mode_)
+	{
+	case 0:
+		key = "ＡＤＶエディタ立ち絵情報";
+		break;
+	case 1:
+		key = "ＡＤＶエディタ立ち絵背情報";
+		break;
+	case 2:
+		key = "ＡＤＶエディタ背景情報";
+		break;
+	case 3:
+		key = "ＡＤＶエディタ名札情報";
+		break;
+	}
+	int count = EX_Height(key);
+	int i;
+	for (i = 0; i < count; ++i)
+	{
+		string n = EX_RA2String(key, i, "cgName", "");
+		if (ＣＧモード確認(n))
+		{
+			cgName.PushBack(this.erasePrefix(n, prefix));
+			captions.PushBack(EX_RA2String(key, i, "name", ""));
+		}
+	}
+}
+
+string SceneAdvObjectListSelector::erasePrefix(string target, string prefix)
+{
+	return target.GetPart(prefix.Length(), target.Length() - prefix.Length());
+}
+
+void SceneAdvObjectListSelector::fadeButton(bool val)
+{
+}
+
+void SceneAdvObjectListSelector::run()
+{
+	this.fadeIn(true, NULL);
+}
+
+void SceneAdvObjectListSelector::fadeIn(bool val, DG_GeneralCallback cb)
+{
+	this.base_.fadeIn(val, NULL);
+	int i;
+	for (i = 0; i < this.btnSelect_.Numof(); ++i)
+	{
+		this.btnSelect_[i].fadeIn(val);
+	}
+	for (i = 0; i < this.btnSys_.Numof(); ++i)
+	{
+		if (i == 0)
+		{
+			if (this.mode_ == 0)
+			{
+				this.btnSys_[i].fadeIn(val);
+			}
+		}
+		else
+		{
+			this.btnSys_[i].fadeIn(val);
+		}
+	}
+	this.parts_.runMotion(getStandardMotion(val ? 0 : 1), NULL);
+	this.cbTimer_.setTimer(300, cb);
+}
+
+bool SceneAdvObjectListSelector::update()
+{
+	if (!this.cbTimer_.isRunning() && g_mouse.isClick(1))
+	{
+		playCancel();
+		this.fadeIn(false, this.onFinishFadeOut);
+	}
+	return !this.isFinish_;
+}
+
+int SceneAdvObjectListSelector::getResult()
+{
+	return this.result_;
+}
+

@@ -1,0 +1,51 @@
+void AFL_Activity_End()
+{
+	g_EndActivity = true;
+}
+
+int AFL_Activity_NumofParts(string Name)
+{
+	return SYS_Activity_NumofParts(Name);
+}
+
+bool AFL_Activity_GetParts(int Index, string Name, ref string PartsName, ref int Number)
+{
+	return SYS_Activity_GetParts(Index, Name, PartsName, Number);
+}
+
+bool AFL_Activity_IsExistPartsByName(string Name, string PartsName)
+{
+	return SYS_Activity_IsExistPartsByName(Name, PartsName);
+}
+
+bool AFL_Activity_IsExistPartsByNumber(string Name, int Number)
+{
+	return SYS_Activity_IsExistPartsByNumber(Name, Number);
+}
+
+int AFL_Activity_GetPartsNumber(string Name, string PartsName)
+{
+	return SYS_Activity_GetPartsNumber(Name, PartsName);
+}
+
+string AFL_Activity_GetPartsName(string Name, int Number)
+{
+	return SYS_Activity_GetPartsName(Name, Number);
+}
+
+string AFL_Activity_Load(string FileName)
+{
+	string ActivityName = SYS_Activity_GetFreeName("");
+	if (!SYS_Activity_ReadFile(ActivityName, FileName))
+	{
+		system.Output("アクティビティの読み込みに失敗しました。【%s】\n" % FileName);
+		return "";
+	}
+	return ActivityName;
+}
+
+bool AFL_Activity_Release(string ActivityName)
+{
+	return SYS_Activity_Release(ActivityName);
+}
+

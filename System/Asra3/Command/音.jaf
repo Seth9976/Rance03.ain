@@ -1,0 +1,281 @@
+void 音楽(string 音楽名, int 効果タイプ, int 効果時間)
+{
+	g_BGM.PlayBGM(音楽名, 0, 効果タイプ, 効果時間, 1.0);
+}
+
+void 音楽１回再生(string 音楽名, int 効果タイプ, int 効果時間)
+{
+	g_BGM.PlayBGM(音楽名, 1, 効果タイプ, 効果時間, 1.0);
+}
+
+bool 音楽再生中確認()
+{
+	return g_BGM.IsPlay();
+}
+
+string 再生中音楽名取得()
+{
+	if (!g_BGM.IsPlay())
+	{
+		return "";
+	}
+	return g_BGM.GetSoundName();
+}
+
+void Ａ＿音楽一時停止()
+{
+	g_BGM.Pause();
+}
+
+void Ａ＿音楽再開()
+{
+	g_BGM.Restart();
+}
+
+bool Ａ＿音楽一時停止中確認()
+{
+	return g_BGM.IsPausing();
+}
+
+bool Ａ＿音楽確認(string 音楽名)
+{
+	return PassRegister.ExistText(2, 音楽名);
+}
+
+void 効果音(string _効果音名, int 効果タイプ, int 効果時間)
+{
+	SYS_PlaySE(_効果音名, false, true, true, 効果タイプ, 効果時間);
+}
+
+void Ａ＿効果音停止()
+{
+	SYS_StopSE();
+}
+
+bool Ａ＿効果音再生中確認()
+{
+	return SYS_IsPlaySE();
+}
+
+void Ａ＿効果音非継続(string _効果音名, int 効果タイプ, int 効果時間)
+{
+	SYS_PlaySE(_効果音名, false, true, false, 効果タイプ, 効果時間);
+}
+
+void 効果音終了待ちあり(string _効果音名, int 効果タイプ, int 効果時間)
+{
+	SYS_PlaySE(_効果音名, true, true, false, 効果タイプ, 効果時間);
+}
+
+void 効果音強制終了待ちあり(string _効果音名, int 効果タイプ, int 効果時間)
+{
+	SYS_PlaySE(_効果音名, true, false, false, 効果タイプ, 効果時間);
+}
+
+void 効果音ボリューム(float 音量)
+{
+	SYS_ASSERTE_VOLUME(音量);
+	g_SE.SetVolume(音量);
+	g_SE.Fade(0, 音量, false, -1);
+}
+
+void システム効果音(string _snd)
+{
+	_g_SystemSound._Play(_snd);
+}
+
+void Ａ＿システム効果音停止()
+{
+	_g_SystemSound._ClearCache();
+}
+
+bool Ａ＿システム効果音再生中確認()
+{
+	return _g_SystemSound.IsPlay();
+}
+
+void Ａ＿ループ効果音１(string ループ効果音名, int 効果タイプ, int 効果時間)
+{
+	g_LoopSE[0].PlayBGM(ループ効果音名, 0, 効果タイプ, 効果時間, 1.0);
+}
+
+void Ａ＿ループ効果音２(string ループ効果音名, int 効果タイプ, int 効果時間)
+{
+	g_LoopSE[1].PlayBGM(ループ効果音名, 0, 効果タイプ, 効果時間, 1.0);
+}
+
+void Ａ＿ループ効果音３(string ループ効果音名, int 効果タイプ, int 効果時間)
+{
+	g_LoopSE[2].PlayBGM(ループ効果音名, 0, 効果タイプ, 効果時間, 1.0);
+}
+
+void Ａ＿ループ効果音停止(int 効果時間)
+{
+	Ａ＿ループ効果音１("", 3, 効果時間);
+	Ａ＿ループ効果音２("", 3, 効果時間);
+	Ａ＿ループ効果音３("", 3, 効果時間);
+}
+
+void VOICE(string VOICE名)
+{
+	SYS_VOICE(VOICE名);
+}
+
+void Ａ＿ボイス停止()
+{
+	SYS_StopVoice();
+}
+
+bool Ａ＿ボイスリプレイ可能確認()
+{
+	if (_g_最終音声名.Empty())
+	{
+		return false;
+	}
+	if (!KiwiSoundEngine.IsExistFile(_g_最終音声名))
+	{
+		return false;
+	}
+	return true;
+}
+
+void Ｓ＿ボイスリプレイ()
+{
+	if (Ａ＿ボイスリプレイ可能確認())
+	{
+		SYS_PlayVoice(_g_最終音声名);
+	}
+}
+
+void Ａ＿音声加工(string 加工名)
+{
+}
+
+void Ａ＿音声加工開始(string 加工名)
+{
+}
+
+void Ａ＿音声加工終了()
+{
+}
+
+void Ａ＿擬音開始(string 効果音名1, string 効果音名2, string 効果音名3, string 効果音名4, string 効果音名5, string 効果音名6, string 効果音名7, string 効果音名8, string 効果音名9, string 効果音名10)
+{
+	array@string SoundList;
+	SoundList.PushBack(効果音名1);
+	if (!効果音名2.Empty())
+	{
+		SoundList.PushBack(効果音名2);
+	}
+	if (!効果音名3.Empty())
+	{
+		SoundList.PushBack(効果音名3);
+	}
+	if (!効果音名4.Empty())
+	{
+		SoundList.PushBack(効果音名4);
+	}
+	if (!効果音名5.Empty())
+	{
+		SoundList.PushBack(効果音名5);
+	}
+	if (!効果音名6.Empty())
+	{
+		SoundList.PushBack(効果音名6);
+	}
+	if (!効果音名7.Empty())
+	{
+		SoundList.PushBack(効果音名7);
+	}
+	if (!効果音名8.Empty())
+	{
+		SoundList.PushBack(効果音名8);
+	}
+	if (!効果音名9.Empty())
+	{
+		SoundList.PushBack(効果音名9);
+	}
+	if (!効果音名10.Empty())
+	{
+		SoundList.PushBack(効果音名10);
+	}
+	SYS_PlayBackSE(SYS_SOUNDGROUP_SE(), SoundList);
+}
+
+void Ａ＿擬音終了()
+{
+	array@string SoundList;
+	SoundList.PushBack("");
+	SYS_PlayBackSE(SYS_SOUNDGROUP_SE(), SoundList);
+}
+
+void Ａ＿背景音声開始(int サウンドグループ番号, string 音声名1, string 音声名2, string 音声名3, string 音声名4, string 音声名5, string 音声名6, string 音声名7, string 音声名8, string 音声名9, string 音声名10)
+{
+	if (サウンドグループ番号 <= SYS_SOUNDGROUP_BACKVOICE())
+	{
+		SYS_ERROR("サウンドグループ[%d]無効" % サウンドグループ番号, 0);
+		return;
+	}
+	array@string SoundList;
+	SoundList.PushBack(音声名1);
+	if (!音声名2.Empty())
+	{
+		SoundList.PushBack(音声名2);
+	}
+	if (!音声名3.Empty())
+	{
+		SoundList.PushBack(音声名3);
+	}
+	if (!音声名4.Empty())
+	{
+		SoundList.PushBack(音声名4);
+	}
+	if (!音声名5.Empty())
+	{
+		SoundList.PushBack(音声名5);
+	}
+	if (!音声名6.Empty())
+	{
+		SoundList.PushBack(音声名6);
+	}
+	if (!音声名7.Empty())
+	{
+		SoundList.PushBack(音声名7);
+	}
+	if (!音声名8.Empty())
+	{
+		SoundList.PushBack(音声名8);
+	}
+	if (!音声名9.Empty())
+	{
+		SoundList.PushBack(音声名9);
+	}
+	if (!音声名10.Empty())
+	{
+		SoundList.PushBack(音声名10);
+	}
+	SYS_PlayBackSE(サウンドグループ番号, SoundList);
+}
+
+void Ａ＿背景音声終了(int サウンドグループ番号)
+{
+	if (サウンドグループ番号 <= SYS_SOUNDGROUP_BACKVOICE())
+	{
+		SYS_ERROR("サウンドグループ[%d]無効" % サウンドグループ番号, 0);
+		return;
+	}
+	array@string SoundList;
+	SoundList.PushBack("");
+	SYS_PlayBackSE(サウンドグループ番号, SoundList);
+}
+
+void Ａ＿サウンド状態保存(bool 音楽停止)
+{
+	SYS_Sound_Suspend(音楽停止);
+}
+
+void Ａ＿サウンド状態復帰()
+{
+	SYS_Sound_Resume();
+}
+

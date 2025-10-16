@@ -1,0 +1,80 @@
+void SceneStandViewer::init(string standCgName)
+{
+	this.partsBg_.initAsPlaneImage(1024, 768, 0, 0, 0, 255);
+	this.partsBg_.setZ(8500.0);
+	this.partsStand_.init(standCgName, 0);
+	string n = standCgName.GetPart(5, standCgName.Length() - 5);
+	int x = EX_SA2Int("立ち絵オフセット", n, "x", 0);
+	int offset = 425;
+	this.partsStand_.setPos(x - offset, 50.0);
+	this.partsStand_.setOrigin(7);
+	this.partsStand_.setZ(8550.0);
+	int vHeight = this.partsStand_.getHeight() + -718;
+	if (vHeight < 0)
+	{
+		this.partsStand_.setPos(x - offset, 384.0);
+		this.partsStand_.setOrigin(4);
+		vHeight = 0;
+	}
+	int snap = 300;
+	if (vHeight > 0)
+	{
+		int index = 1;
+		int val = 300;
+		int i;
+		for (i = 1; i < 10; ++i)
+		{
+			float v = float(vHeight) / float(i);
+			int n = Math.Abs(300 - v);
+			if (n < val)
+			{
+				val = n;
+				index = i;
+			}
+		}
+		snap = vHeight / index;
+	}
+	this.scroller_.init(0, 0, 1024, 768, vHeight, snap, true);
+	this.partsStand_.setShow(true);
+	this.partsBg_.setShow(true);
+	this.partsStand_.setParent(this.scroller_.getPartsNumber());
+	this.isFinish_ = false;
+	this.btnExit_.init("システム／ボタン／幅１７０", "閉じる", "", true);
+	this.btnExit_.setPos(839, 691);
+	this.btnExit_.setClickCallback(this.onClickButtonExit, 0);
+	this.btnExit_.setZ(8550);
+}
+
+void SceneStandViewer::onClickButtonExit(int id)
+{
+	this.fadeIn(false, this.onFinishFadeOut);
+}
+
+void SceneStandViewer::onFinishFadeOut()
+{
+	this.isFinish_ = true;
+}
+
+void SceneStandViewer::run()
+{
+	this.fadeIn(true, NULL);
+	this.btnExit_.fadeIn(true);
+}
+
+bool SceneStandViewer::update()
+{
+	if (!this.cbTimer_.isRunning() && g_mouse.isClick(1))
+	{
+		playCancel();
+		this.fadeIn(false, this.onFinishFadeOut);
+	}
+	return !this.isFinish_;
+}
+
+void SceneStandViewer::fadeIn(bool val, DG_GeneralCallback onFinish)
+{
+	this.partsStand_.runMotion(getStandardMotion(val ? 0 : 1), NULL);
+	this.btnExit_.fadeIn(val);
+	this.cbTimer_.setTimer(150, onFinish);
+}
+

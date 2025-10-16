@@ -1,0 +1,43 @@
+ButtonState::ButtonState()
+{
+	this.isLastDown_ = this.isDown_ = this.isForcePress_ = this.onUpIgnore_ = false;
+}
+
+bool ButtonState::isDown()
+{
+	return this.isDown_;
+}
+
+bool ButtonState::isPress()
+{
+	return this.isPress_;
+}
+
+void ButtonState::update(bool newState)
+{
+	this.isLastDown_ = this.isDown_;
+	this.isDown_ = newState;
+	this.isForcePress_ = false;
+	this.isPress_ = !this.isDown_ && this.isLastDown_ || this.isForcePress_;
+	if (this.isPress_ && this.onUpIgnore_)
+	{
+		this.onUpIgnore_ = false;
+		this.isPress_ = false;
+	}
+}
+
+void ButtonState::forceClick()
+{
+	this.isForcePress_ = true;
+}
+
+void ButtonState::setNextMouseUpIgnore()
+{
+	this.onUpIgnore_ = true;
+}
+
+bool ButtonState::onDown()
+{
+	return !this.isLastDown_ && this.isDown_;
+}
+

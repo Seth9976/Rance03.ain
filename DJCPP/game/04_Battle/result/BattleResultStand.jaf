@@ -1,0 +1,32 @@
+BattleResultStand::BattleResultStand()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void BattleResultStand::init()
+{
+	this.initParts();
+}
+
+void BattleResultStand::initParts()
+{
+}
+
+void BattleResultStand::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void BattleResultStand::setPartsPos()
+{
+}
+
+void BattleResultStand::update()
+{
+}
+

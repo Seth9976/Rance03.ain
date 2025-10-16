@@ -1,0 +1,23 @@
+void SYS_Movie_Play(string ファイル名, bool キーキャンセル, int nBackColorR, int nBackColorG, int nBackColorB, int nSoundGroupNum)
+{
+	if (AFL_IsKeyDown(27))
+	{
+		return;
+	}
+	bool bPrevInvalidateFrameSkip = AFL_GetInvalidateFrameSkipWhileMessageSkip();
+	AFL_SetInvalidateFrameSkipWhileMessageSkip(true);
+	bool bPrev既読スキップモードマーク表示許可 = SYS_スキップモードマーク表示許可フラグ取得();
+	bool bPrevオートモードマーク表示許可 = SYS_オートモードマーク表示許可フラグ取得();
+	既読スキップモードマーク表示許可設定(false);
+	オートモードマーク表示許可設定(false);
+	CDrawMovie MovieObject;
+	MovieObject.SetBackColor(nBackColorR, nBackColorG, nBackColorB);
+	if (!MovieObject.Play(ファイル名, nSoundGroupNum, キーキャンセル))
+	{
+		system.Error("【 %s 】\nムービー再生に失敗しました" % ファイル名);
+	}
+	既読スキップモードマーク表示許可設定(bPrev既読スキップモードマーク表示許可);
+	オートモードマーク表示許可設定(bPrevオートモードマーク表示許可);
+	AFL_SetInvalidateFrameSkipWhileMessageSkip(bPrevInvalidateFrameSkip);
+}
+

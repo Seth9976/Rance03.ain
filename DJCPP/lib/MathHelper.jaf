@@ -1,0 +1,140 @@
+float getDeflectionRandomValue(int level)
+{
+	level = Math.Max(1, level);
+	float total;
+	int i;
+	for (i = 0; i < level; ++i)
+	{
+		total += Math.RandF();
+	}
+	return total / level;
+}
+
+int range(int min, int max, int val)
+{
+	val = Math.Min(max, val);
+	val = Math.Max(min, val);
+	return val;
+}
+
+float rangeF(float min, float max, float val)
+{
+	val = Math.MinF(max, val);
+	val = Math.MaxF(min, val);
+	return val;
+}
+
+int roundOff(float val)
+{
+	if (val < 0.0)
+	{
+		return val - 0.5;
+	}
+	return val + 0.5;
+}
+
+float getDest(int x1, int y1, int x2, int y2)
+{
+	int dx = x1 - x2;
+	int dy = y1 - y2;
+	return Math.Sqrt(dx * dx + dy * dy);
+}
+
+bool isCollideAABB(int x, int y, int left, int top, int right, int bottom)
+{
+	if (left < x && x < right && top < y && y < bottom)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool isCollideAABBWH(int mx, int my, int x, int y, int w, int h)
+{
+	return isCollideAABB(mx, my, x, y, x + w, y + h);
+}
+
+bool isCollideWithMouseWH(int x, int y, int w, int h)
+{
+	return isCollideAABBWH(g_mouse.getX(), g_mouse.getY(), x, y, w, h);
+}
+
+bool isCollideEllipse(int mx, int my, int cx, int cy, int a, int b)
+{
+	if (a < b)
+	{
+		return false;
+	}
+	int px = mx - cx;
+	int py = my - cy;
+	int f = Math.Sqrt(a * a - b * b);
+	int dst1 = getDest(-f, 0, px, py);
+	int dst2 = getDest(f, 0, px, py);
+	return dst1 + dst2 < 2 * a;
+}
+
+float calcAngle(float x, float y)
+{
+	float radian = Math.Atan2(y, x);
+	if (radian < 0.0)
+	{
+		radian += 6.283;
+	}
+	return (radian * 180.0) / 3.1415;
+}
+
+void rotate(float x, float y, float rot, float cx, float cy, ref float rx, ref float ry)
+{
+	float px = x - cx;
+	float py = y - cy;
+	rx = (px * Math.Cos(rot) - py * Math.Sin(rot)) + cx;
+	ry = (px * Math.Sin(rot) - py * Math.Cos(rot)) + cy;
+}
+
+float bezierVal(float s, float e, float t, float c)
+{
+	if (s == e)
+	{
+		return s;
+	}
+	t = rangeF(0.0, 1.0, t);
+	c = rangeF(0.0, 2.0, c);
+	float v = 2 * t * (1 - t) * c + t * t;
+	return s + (e - s) * v;
+}
+
+void projection(Pos3D pos, Pos3D offset, ref Pos3D res, float horizon, float vertical, float nearClip, float farClip)
+{
+	pos.x += offset.x;
+	pos.y += offset.y;
+	pos.z += offset.z;
+	float w = (2 * nearClip) / 1.0;
+	float h = (2 * nearClip) / 0.75;
+	float Q = farClip / (farClip - nearClip);
+	res.x = pos.x * w;
+	res.y = pos.y * h;
+	res.z = Q * pos.z + 1.0;
+	res.w = -Q * nearClip * pos.z;
+	res.x /= res.w;
+	res.y /= res.w;
+	res.z /= res.w;
+	res.x = 400 - (res.x / 2.0) * 400.0;
+	res.y = 300 - (res.y / 2.0) * 300.0;
+}
+
+void splitToken(ref array@string result, string target, string token)
+{
+	result.Free();
+	while (true)
+	{
+		int n = target.Find(token);
+		if (n == -1)
+		{
+			result.PushBack(target);
+			break;
+		}
+		result.PushBack(target.GetPart(0, n));
+		target = target.GetPart(n + 1, target.Length());
+	}
+}
+

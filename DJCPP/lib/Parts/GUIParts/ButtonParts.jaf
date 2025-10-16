@@ -1,0 +1,40 @@
+bool ButtonParts::init(string activityName, string partsName, int id)
+{
+	this.release();
+	this.activityName_ = activityName;
+	this.partsName_ = partsName;
+	this.id_ = id;
+	this.partsNumber_ = AFL_Activity_GetPartsNumber(this.activityName_, partsName);
+	if (this.partsNumber_ != 0)
+	{
+		AFL_Parts_AddMouseLClickEvent(this.partsNumber_, this.onClick);
+		return true;
+	}
+	return false;
+}
+
+void ButtonParts::setOnClickCallback(DG_OnClickButtonParts cb)
+{
+	this.cb_ = cb;
+}
+
+void ButtonParts::onClick(int partsNumber, int mouseX, int mouseY)
+{
+	this.cb_(this.id_);
+}
+
+void ButtonParts::release()
+{
+	if (this.partsNumber_ != 0)
+	{
+		AFL_Parts_EraseMouseLClickEvent(this.partsNumber_, this.onClick);
+	}
+	this.partsNumber_ = 0;
+	this.cb_.Clear();
+}
+
+void ButtonParts::setEnable(bool val)
+{
+	Ｐ＿ボタン＿有効設定(this.partsNumber_, val);
+}
+

@@ -1,0 +1,278 @@
+CAEEditTextListListDialog::CAEEditTextListListDialog()
+{
+}
+
+void CAEEditTextListListDialog::SetSelectList(ref array@string List)
+{
+	this.m_SelectList <- List;
+}
+
+void CAEEditTextListListDialog::Show(int ID, int PosX, int PosY, array@string List, DG_ChangedItemList dgChangedItemList)
+{
+	AFL_Parts_AddLayer(-1);
+	this.m_dgChangedItemList = dgChangedItemList;
+	this.m_List.Realloc(List.Numof());
+	this.m_List.Copy(0, List, 0, List.Numof());
+	this.m_ParentID = ID;
+	int LayoutBox = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿パディング設定(LayoutBox, 6, 6, 6, 6);
+	Ｐ＿レイアウトボックス＿配置設定(LayoutBox, 3);
+	int ItemLayout = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿パディング設定(ItemLayout, 3, 3, 3, 3);
+	Ｐ＿レイアウトボックス＿折り返し設定(ItemLayout, true, 378.0);
+	Ｐ＿レイアウトボックス＿追加(LayoutBox, ItemLayout);
+	this.m_ListBox = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿リストボックス＿サイズ設定(this.m_ListBox, 256, 378);
+	int Index;
+	for (Index = 0; Index < List.Numof(); ++Index)
+	{
+		Ｐ＿リストボックス＿アイテム追加(this.m_ListBox, List[Index]);
+	}
+	Ｐ＿レイアウトボックス＿追加(ItemLayout, this.m_ListBox);
+	this.m_AddButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿サイズ設定(this.m_AddButton, 60, 24);
+	Ｐ＿ボタン＿テキスト設定(this.m_AddButton, "追加");
+	Ｐ＿マージン設定(this.m_AddButton, 1, 1, 3, 0);
+	Ｐ＿レイアウトボックス＿追加(ItemLayout, this.m_AddButton);
+	AFL_Parts_AddMouseLClickEvent(this.m_AddButton, this.MouseLClickEvent);
+	if (this.m_SelectList === NULL)
+	{
+		this.m_EditButton = PARTS_GetFreeSystemPartsNumber();
+		Ｐ＿ボタン＿サイズ設定(this.m_EditButton, 60, 24);
+		Ｐ＿ボタン＿テキスト設定(this.m_EditButton, "編集");
+		Ｐ＿マージン設定(this.m_EditButton, 1, 1, 3, 0);
+		Ｐ＿レイアウトボックス＿追加(ItemLayout, this.m_EditButton);
+		AFL_Parts_AddMouseLClickEvent(this.m_EditButton, this.MouseLClickEvent);
+	}
+	this.m_RemoveButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿サイズ設定(this.m_RemoveButton, 60, 24);
+	Ｐ＿ボタン＿テキスト設定(this.m_RemoveButton, "削除");
+	Ｐ＿マージン設定(this.m_RemoveButton, 1, 1, 3, 0);
+	Ｐ＿レイアウトボックス＿追加(ItemLayout, this.m_RemoveButton);
+	AFL_Parts_AddMouseLClickEvent(this.m_RemoveButton, this.MouseLClickEvent);
+	this.m_UpButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿サイズ設定(this.m_UpButton, 60, 24);
+	Ｐ＿ボタン＿テキスト設定(this.m_UpButton, "↑");
+	Ｐ＿マージン設定(this.m_UpButton, 1, 1, 3, 0);
+	Ｐ＿レイアウトボックス＿追加(ItemLayout, this.m_UpButton);
+	AFL_Parts_AddMouseLClickEvent(this.m_UpButton, this.MouseLClickEvent);
+	this.m_DownButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿サイズ設定(this.m_DownButton, 60, 24);
+	Ｐ＿ボタン＿テキスト設定(this.m_DownButton, "↓");
+	Ｐ＿マージン設定(this.m_DownButton, 1, 1, 3, 0);
+	Ｐ＿レイアウトボックス＿追加(ItemLayout, this.m_DownButton);
+	AFL_Parts_AddMouseLClickEvent(this.m_DownButton, this.MouseLClickEvent);
+	int ButtonLayout = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿レイアウトタイプ設定(ButtonLayout, 2);
+	Ｐ＿レイアウトボックス＿パディング設定(ButtonLayout, 3, 3, 3, 3);
+	Ｐ＿レイアウトボックス＿追加(LayoutBox, ButtonLayout);
+	int OKButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(OKButton, "決定");
+	Ｐ＿ボタン＿サイズ設定(OKButton, 65, 22);
+	Ｐ＿マージン設定(OKButton, 0, 0, 3, 0);
+	Ｐ＿レイアウトボックス＿追加(ButtonLayout, OKButton);
+	AFL_Parts_AddMouseLClickEvent(OKButton, this.ClickOKButtonEvent);
+	int CancelButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(CancelButton, "キャンセル");
+	Ｐ＿ボタン＿サイズ設定(CancelButton, 100, 22);
+	Ｐ＿マージン設定(CancelButton, 0, 0, 3, 0);
+	Ｐ＿レイアウトボックス＿追加(ButtonLayout, CancelButton);
+	AFL_Parts_AddMouseLClickEvent(CancelButton, this.ClickCancelButtonEvent);
+	int Width = AFL_Parts_GetWidth(LayoutBox, 1);
+	int Height = AFL_Parts_GetHeight(LayoutBox, 1);
+	int BG = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿構築手順＿ピクセル作成(BG, Width, Height, 1);
+	Ｐ＿構築手順＿色塗り(BG, 0, 0, Width, Height, 200, 200, 200, -1, 1);
+	Ｐ＿構築ビルド(BG, 1);
+	Ｐ＿ドラッグ可能設定(BG, true);
+	Ｐ＿親設定(LayoutBox, BG);
+	PosX = Math.Max(0, Math.Min(AFL_View_GetWidth() - Width, PosX));
+	PosY = Math.Max(0, Math.Min(AFL_View_GetHeight() - Height, PosY));
+	Ｐ＿座標設定(BG, PosX, PosY);
+	AFL_Parts_AddDragEndEvent(BG, this.DragEndEvent);
+	this.m_OK = false;
+	this.m_Cancel = false;
+	PARTS_BeginInput();
+	for (; ; )
+	{
+		AFL_View_Update(true);
+		if (this.m_OK)
+		{
+			break;
+		}
+		if (this.m_Cancel)
+		{
+			dgChangedItemList(ID, List);
+			break;
+		}
+	}
+	PARTS_EndInput();
+	PARTS_ReleaseWithInit(LayoutBox);
+	PARTS_ReleaseWithInit(CancelButton);
+	PARTS_ReleaseWithInit(OKButton);
+	PARTS_ReleaseWithInit(ButtonLayout);
+	PARTS_ReleaseWithInit(BG);
+	AFL_Parts_EraseLayer(-1);
+}
+
+void CAEEditTextListListDialog::ChangeTextEvent(int ID, bool Check)
+{
+}
+
+void CAEEditTextListListDialog::ClickOKButtonEvent(int ID, int MouseX, int MouseY)
+{
+	this.m_OK = true;
+}
+
+void CAEEditTextListListDialog::ClickCancelButtonEvent(int ID, int MouseX, int MouseY)
+{
+	this.m_Cancel = true;
+}
+
+void CAEEditTextListListDialog::MouseLClickEvent(int ID, int MouseX, int MouseY)
+{
+	if (ID == this.m_AddButton)
+	{
+		this.AddItem(MouseX, MouseY);
+	}
+	else if (ID == this.m_EditButton)
+	{
+		this.EditItem();
+	}
+	else if (ID == this.m_RemoveButton)
+	{
+		this.RemoveItem();
+	}
+	else if (ID == this.m_UpButton)
+	{
+		this.UpItem();
+	}
+	else if (ID == this.m_DownButton)
+	{
+		this.DownItem();
+	}
+	this.SendItemList();
+}
+
+void CAEEditTextListListDialog::AddItem(int MouseX, int MouseY)
+{
+	string Text;
+	if (this.m_SelectList === NULL)
+	{
+		if (!DIALOG_GETTEXT("項目を入力して下さい", Text))
+		{
+			return;
+		}
+	}
+	else
+	{
+		this.m_SelectText = "";
+		CAESelectTextDialog Form;
+		Form.Show(0, "", MouseX, MouseY, this.m_SelectList, "", this.SelectePartsNameEvent);
+		if (this.m_SelectText == "")
+		{
+			return;
+		}
+		array@string List;
+		int Index;
+		int Numof = Ｐ＿リストボックス＿アイテム数取得(this.m_ListBox);
+		for (Index = 0; Index < Numof; ++Index)
+		{
+			List.PushBack(Ｐ＿リストボックス＿アイテム取得(this.m_ListBox, Index));
+		}
+		int Find = List.Find(0, List.Numof(), this.m_SelectText);
+		if (Find != -1)
+		{
+			DIALOG_OK("既に選択されています");
+			return;
+		}
+		Text = this.m_SelectText;
+	}
+	int ActiveIndex = Ｐ＿リストボックス＿選択位置取得(this.m_ListBox);
+	if (ActiveIndex == -1)
+	{
+		ActiveIndex = Ｐ＿リストボックス＿アイテム数取得(this.m_ListBox);
+	}
+	Ｐ＿リストボックス＿アイテム挿入(this.m_ListBox, ActiveIndex + 1, Text);
+	Ｐ＿リストボックス＿選択位置設定(this.m_ListBox, ActiveIndex + 1);
+}
+
+void CAEEditTextListListDialog::SelectePartsNameEvent(int ID, string Name)
+{
+	this.m_SelectText = Name;
+}
+
+void CAEEditTextListListDialog::EditItem()
+{
+	int ActiveIndex = Ｐ＿リストボックス＿選択位置取得(this.m_ListBox);
+	if (ActiveIndex == -1)
+	{
+		return;
+	}
+	string Item = Ｐ＿リストボックス＿アイテム取得(this.m_ListBox, ActiveIndex);
+	if (!DIALOG_GETTEXT("項目を入力して下さい", Item))
+	{
+		return;
+	}
+	Ｐ＿リストボックス＿アイテム設定(this.m_ListBox, ActiveIndex, Item);
+}
+
+void CAEEditTextListListDialog::RemoveItem()
+{
+	int ActiveIndex = Ｐ＿リストボックス＿選択位置取得(this.m_ListBox);
+	if (ActiveIndex == -1)
+	{
+		return;
+	}
+	Ｐ＿リストボックス＿アイテム削除(this.m_ListBox, ActiveIndex);
+}
+
+void CAEEditTextListListDialog::UpItem()
+{
+	int ActiveIndex = Ｐ＿リストボックス＿選択位置取得(this.m_ListBox);
+	if (ActiveIndex <= 0)
+	{
+		return;
+	}
+	string Item = Ｐ＿リストボックス＿アイテム取得(this.m_ListBox, ActiveIndex);
+	Ｐ＿リストボックス＿アイテム削除(this.m_ListBox, ActiveIndex);
+	Ｐ＿リストボックス＿アイテム挿入(this.m_ListBox, ActiveIndex - 1, Item);
+	Ｐ＿リストボックス＿選択位置設定(this.m_ListBox, ActiveIndex - 1);
+}
+
+void CAEEditTextListListDialog::DownItem()
+{
+	int ActiveIndex = Ｐ＿リストボックス＿選択位置取得(this.m_ListBox);
+	if (ActiveIndex == -1 || ActiveIndex + 1 == Ｐ＿リストボックス＿アイテム数取得(this.m_ListBox))
+	{
+		return;
+	}
+	string Item = Ｐ＿リストボックス＿アイテム取得(this.m_ListBox, ActiveIndex);
+	Ｐ＿リストボックス＿アイテム削除(this.m_ListBox, ActiveIndex);
+	Ｐ＿リストボックス＿アイテム挿入(this.m_ListBox, ActiveIndex + 1, Item);
+	Ｐ＿リストボックス＿選択位置設定(this.m_ListBox, ActiveIndex + 1);
+}
+
+void CAEEditTextListListDialog::SendItemList()
+{
+	array@string List;
+	int Index;
+	int Numof = Ｐ＿リストボックス＿アイテム数取得(this.m_ListBox);
+	for (Index = 0; Index < Numof; ++Index)
+	{
+		List.PushBack(Ｐ＿リストボックス＿アイテム取得(this.m_ListBox, Index));
+	}
+	this.m_dgChangedItemList(this.m_ParentID, List);
+}
+
+void CAEEditTextListListDialog::DragEndEvent(int ID)
+{
+	int PosX = Ｐ＿Ｘ座標取得(ID);
+	int PosY = Ｐ＿Ｙ座標取得(ID);
+	int Width = AFL_Parts_GetWidth(ID, 1);
+	int Height = AFL_Parts_GetHeight(ID, 1);
+	PosX = Math.Max(0, Math.Min(AFL_View_GetWidth() - Width, PosX));
+	PosY = Math.Max(0, Math.Min(AFL_View_GetHeight() - Height, PosY));
+	Ｐ＿座標設定(ID, PosX, PosY);
+}
+

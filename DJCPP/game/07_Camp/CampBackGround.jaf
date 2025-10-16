@@ -1,0 +1,49 @@
+CampBackGround::CampBackGround()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void CampBackGround::init()
+{
+	this.isShow_ = false;
+	this.partsBg_.init("システム／キャンプ／背景", 0);
+	this.partsBg_.setZ(4000.0);
+}
+
+void CampBackGround::update()
+{
+}
+
+void CampBackGround::fadeIn(bool val, DG_GeneralCallback onFinish)
+{
+	if (this.isShow_ && val)
+	{
+		return;
+	}
+	this.isShow_ = val;
+	this.partsBg_.setShow(true);
+	PartsMotion m;
+	if (val)
+	{
+		m.setMove(0, 384, 0, 0, 1);
+		m.setCgRangeMove(0, 384, 1024, 384, 0, 0, 1024, 768, 1);
+		m.setTime(400);
+	}
+	else
+	{
+		m.setMove(0, 0, 0, 384, 2);
+		m.setCgRangeMove(0, 0, 1024, 768, 0, 384, 1024, 384, 2);
+		m.setTime(200);
+	}
+	this.partsBg_.runMotion(m, onFinish);
+}
+
+void CampBackGround::joinFade()
+{
+	while (this.partsBg_.isMotion())
+	{
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+}
+

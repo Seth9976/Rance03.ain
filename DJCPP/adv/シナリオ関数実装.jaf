@@ -1,0 +1,37 @@
+void initAdv()
+{
+	initAdvObject();
+	initReadSkipMark();
+	initAutoModeMark();
+	initSystemButton();
+	キー待ちマーク(1, "システム／ウェイトカーソル／%02d", 1, 16, 80);
+}
+
+void initReadSkipMark()
+{
+	既読スキップモードマーク＿ＣＧ設定(1, "システム／スキップモード");
+	既読スキップモードマーク表示位置(1, 663, 684, 3450);
+}
+
+void initAutoModeMark()
+{
+	オートモードマーク＿ＣＧ設定(1, "システム／オートモード");
+	オートモードマーク表示位置(1, 601, 684, 3450);
+}
+
+void initSystemButton()
+{
+	Ａ＿システムボタンＣＧ設定(1, 950, 692, 3450, "システム／メニュー／非選択", "システム／メニュー／オン", "システム／メニュー／キーダウン", &onClickSystemButton, true);
+	システムボタン効果音("効果音／クリック", "効果音／カーソル");
+}
+
+bool isMessageSkipping()
+{
+	return 既読スキップ中確認() || 全文スキップ中確認();
+}
+
+void onClickSystemButton()
+{
+	openSystemMenu(true);
+}
+

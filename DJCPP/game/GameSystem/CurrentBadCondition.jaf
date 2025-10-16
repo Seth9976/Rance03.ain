@@ -1,0 +1,26 @@
+void CurrentBadCondition::init(string id, int turn)
+{
+	this.id_ = id;
+	this.turn_ = turn;
+}
+
+string CurrentBadCondition::getId()
+{
+	return this.id_;
+}
+
+int CurrentBadCondition::getTurn()
+{
+	return this.turn_;
+}
+
+void CurrentBadCondition::decTurn()
+{
+	this.turn_ = Math.Max(0, this.turn_ - 1);
+}
+
+void CurrentBadCondition::setTurn(int value)
+{
+	this.turn_ = value;
+}
+

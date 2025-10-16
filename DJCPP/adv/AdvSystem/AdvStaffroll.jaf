@@ -1,0 +1,18 @@
+void AdvStaffroll::show(string flatBaseName)
+{
+	this.flatBaseName_ = flatBaseName;
+	this.partsShow_.initAsFlat("スタッフロール/エンディング／%s／開始" % this.flatBaseName_);
+	this.partsShow_.setShow(true);
+	this.partsShow_.setZ(3400.0);
+	this.partsShow_.startFlat(false, 1.0);
+}
+
+void AdvStaffroll::hide()
+{
+	this.partsShow_.release();
+	this.partsHide_.initAsFlat("スタッフロール/エンディング／%s／終了" % this.flatBaseName_);
+	this.partsHide_.setShow(true);
+	this.partsHide_.setZ(3400.0);
+	this.partsHide_.startFlat(false, 1.0);
+}
+

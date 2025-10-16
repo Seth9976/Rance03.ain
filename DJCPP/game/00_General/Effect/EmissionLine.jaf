@@ -1,0 +1,97 @@
+EmissionLine::EmissionLine()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+	this.z_ = 30000;
+}
+
+void EmissionLine::init(int type)
+{
+	this.type_ = type;
+	if (type == 0)
+	{
+		float w = RAND(500) + 300;
+		float h = RAND(6) + 2;
+		this.parts_.init("システム／効果線／仮", 0);
+		this.parts_.setXScaling((w / 1024.0) * 100.0);
+		this.parts_.setYScaling((h / 8.0) * 100.0);
+	}
+	else if (type == 1)
+	{
+		this.parts_.init("システム／エフェクト／ダメージ", 0);
+		this.parts_.setXScaling(RAND(300) + 50);
+		this.parts_.setYScaling(RAND(100) + 20);
+	}
+	else if (type == 2)
+	{
+		this.parts_.init("システム／エフェクト／ダメージ", 0);
+		this.parts_.setXScaling(RAND(150) + 450);
+		this.parts_.setYScaling(RAND(50) + 50);
+	}
+	this.parts_.setAlpha(RAND(55) + 200);
+	this.parts_.setOrigin(4);
+	this.parts_.setZ(this.z_);
+}
+
+void EmissionLine::run()
+{
+	this.resetMotion();
+}
+
+void EmissionLine::resetMotion()
+{
+	array@PartsMotion m[2];
+	this.rot_ = RAND(360);
+	m[0].setTime(RAND(100));
+	m[0].setAlpha(0, 0, 0);
+	this.parts_.setShow(true);
+	if (this.type_ == 0)
+	{
+		m[1].setMove(this.x_, this.y_, this.x_ + Math.Cos(this.rot_) * 1024.0, this.y_ + Math.Sin(this.rot_) * 1024.0, 0);
+		m[1].setTime(500 + RAND(250));
+	}
+	else if (this.type_ == 1)
+	{
+		m[1].setMove(this.x_ - Math.Cos(this.rot_) * 120.0, this.y_ - Math.Sin(this.rot_) * 120.0, this.x_ + Math.Cos(this.rot_) * 300.0, this.y_ + Math.Sin(this.rot_) * 300.0, 0);
+		m[1].setAlpha(255, 0, 0);
+		m[1].setTime(200 + RAND(150));
+	}
+	else if (this.type_ == 2)
+	{
+		m[1].setMove(this.x_ + Math.Cos(this.rot_) * 600.0, this.y_ + Math.Sin(this.rot_) * 600.0, this.x_ + Math.Cos(this.rot_) * 200.0, this.y_ + Math.Sin(this.rot_) * 200.0, 0);
+		m[1].setAlpha(255, 0, 0);
+		m[1].setTime(100 + RAND(100));
+	}
+	this.parts_.setZ(this.z_);
+	this.parts_.setXYRot(this.rot_);
+	this.parts_.runMotionArray(m, this.onFinish);
+}
+
+void EmissionLine::onFinish()
+{
+	this.parts_.setShow(false);
+	if (this.isLoop_)
+	{
+		this.resetMotion();
+	}
+}
+
+void EmissionLine::update()
+{
+}
+
+void EmissionLine::setCenter(int x, int y)
+{
+	this.x_ = x;
+	this.y_ = y;
+}
+
+void EmissionLine::setLoopMode(bool isLoop)
+{
+	this.isLoop_ = isLoop;
+}
+
+void EmissionLine::setZ(int z)
+{
+	this.z_ = z;
+}
+

@@ -1,0 +1,471 @@
+void initGameSystem()
+{
+	loadEx();
+	g_globalGameFlag.setGlobalMode(true);
+	initPlayerAttackSkill();
+	g_playerCommonParam.setBadConditionBeginEndHandler("onBeginEndBadCondition");
+	g_music.addHandlerFunc("onPlayMusic");
+}
+
+void onBeginEndBadCondition(string id, bool isIn)
+{
+	if (id == "幻聴")
+	{
+		if (isIn)
+		{
+			g_music.forcePlay("音楽／システム／糞曲２");
+		}
+		else
+		{
+			g_music.forcePlay("");
+		}
+	}
+}
+
+void onPlayMusic(string id)
+{
+	if (g_playedMusic.Find(0, g_playedMusic.Numof(), id) == -1)
+	{
+		g_playedMusic.PushBack(id);
+		共有セーブ();
+	}
+}
+
+void loadEx()
+{
+	loadMapPlaceInfo();
+	loadCardInfo();
+	loadDungeon();
+	loadPlayerBuff();
+	loadPlayerAttackAttribute();
+	loadZeroThreeSkill();
+	loadBadCondition();
+	loadPlayer();
+	loadAttackSkill();
+	loadPlayerSkillOpenLevel();
+	loadPlayerVoiceFinder();
+	制御／プロローグ／初期設定／レベル();
+	loadMonsterBuff();
+	loadMonsterAttackAttribute();
+	loadMonsterAttribute();
+	loadMonster();
+	loadMonsterMultipleAttack();
+	setMonsterEffectOffset();
+	loadMapEncountProbability();
+	loadMapEncountMonsterGroup();
+	loadStandBackgroundFillInfomation();
+	loadItem();
+	loadShop();
+	loadCgList();
+	loadReplayList();
+	loadMusicInfo();
+	loadAdvSelectionButtonInfomation();
+	loadBattleBackGround();
+	loadEnquiteSelection();
+	loadMirrorPiece();
+}
+
+void loadMapPlaceInfo()
+{
+	string key = "マップ場所";
+	g_mapPlace.Alloc(EX_Height(key));
+	int i;
+	for (i = 0; i < g_mapPlace.Numof(); ++i)
+	{
+		g_mapPlace[i].init(EX_A2String(key, 0, i, ""));
+	}
+}
+
+void loadCardInfo()
+{
+	string key = "カード情報";
+	g_cardInfomation.Alloc(EX_Height(key));
+	int i;
+	for (i = 0; i < g_cardInfomation.Numof(); ++i)
+	{
+		g_cardInfomation[i].init(EX_A2String(key, 0, i, ""));
+	}
+	g_cardInfomation.SortBy(&CardInfomation::id_);
+}
+
+void loadDungeon()
+{
+	string key = "ダンジョン情報";
+	g_dungeon.Alloc(EX_Height(key));
+	int i;
+	for (i = 0; i < g_dungeon.Numof(); ++i)
+	{
+		string id = EX_A2String(key, 0, i, "");
+		g_dungeon[i].init(id);
+	}
+}
+
+void loadPlayer()
+{
+	string key = "プレイヤー情報";
+	g_player.Alloc(EX_Height(key));
+	int i;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		string id = EX_A2String(key, 0, i, "");
+		g_player[i].init(id);
+	}
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		if (getZeroThreeSkillFromId(g_player[i].getZeroThreeSkillId()) === NULL)
+		{
+			system.MsgBox("loadPlayer [%s] ゼロスリースキル[%s]ありません" % g_player[i].getName() % g_player[i].getZeroThreeSkillId());
+		}
+	}
+}
+
+void initPlayerAttackSkill()
+{
+	int i;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		g_player[i].initSkill();
+	}
+}
+
+void loadAttackSkill()
+{
+	string key = "プレイヤー攻撃スキル情報";
+	g_attackSkill.Alloc(EX_Height(key));
+	int i;
+	for (i = 0; i < g_attackSkill.Numof(); ++i)
+	{
+		string id = EX_A2String(key, 0, i, "");
+		g_attackSkill[i].init(EX_A2String(key, 0, i, ""));
+		string s = EX_SA2String(key, id, "characterId", "");
+		if (getPlayerFromId(s) === NULL)
+		{
+			system.MsgBox("loadAttackSkill [%s] プレイヤーID[%s]ありません" % id % s);
+		}
+		s = EX_SA2String(key, id, "attributeId", "");
+		if (getPlayerSkillAttributeFromId(s) === NULL)
+		{
+			system.MsgBox("loadAttackSkill [%s] プレイヤー攻撃属性[%s]はありません" % id % s);
+		}
+		s = EX_SA2String(key, id, "buffId", "");
+		if (s != "" && getPlayerBuffFromId(s) === NULL)
+		{
+			system.MsgBox("loadAttackSkill [%s] プレイヤーbuff[%s]はありません" % id % s);
+		}
+	}
+	g_attackSkill.SortBy(&PlayerSkill::id_);
+}
+
+void loadPlayerBuff()
+{
+	string key = "プレイヤーバフ情報";
+	g_playerBuff.Alloc(EX_Height(key));
+	int i;
+	for (i = 0; i < g_playerBuff.Numof(); ++i)
+	{
+		g_playerBuff[i].init(EX_A2String(key, 0, i, ""));
+	}
+}
+
+void loadMonsterBuff()
+{
+	string key = "モンスターバフ情報";
+	g_monsterBuff.Alloc(EX_Height(key));
+	int i;
+	for (i = 0; i < g_monsterBuff.Numof(); ++i)
+	{
+		g_monsterBuff[i].init(EX_A2String(key, 0, i, ""));
+	}
+}
+
+void loadMonster()
+{
+	string key = "モンスター情報";
+	g_monster.Alloc(EX_Height(key));
+	int i;
+	for (i = 0; i < g_monster.Numof(); ++i)
+	{
+		string id = EX_A2String(key, 0, i, "");
+		g_monster[i].init(id);
+		g_monster[i].setAttack();
+		int j;
+		for (j = 0; j < 3; ++j)
+		{
+			string attrId = "attr%d" % (j + 1);
+			string buffId = "buffId%d" % (j + 1);
+			string s = EX_SA2String(key, id, attrId, "");
+			if (getMonsterAttackAttributeFromId(s) === NULL)
+			{
+				system.MsgBox("loadMonster [%s] モンスター攻撃属性[%s]はありません" % id % s);
+			}
+			s = EX_SA2String(key, id, buffId, "");
+			if (s != "" && getMonsterBuffFromId(s) === NULL)
+			{
+				system.MsgBox("loadMonster [%s] モンスターbuff[%s]はありません" % id % s);
+			}
+		}
+	}
+}
+
+void loadMonsterMultipleAttack()
+{
+	string key = "モンスターマルチ攻撃情報";
+	int count = EX_Height(key);
+	int i;
+	for (i = 0; i < count; ++i)
+	{
+		string id = EX_RA2String(key, i, "id", "");
+		ref Monster m = getMonsterFromId(id);
+		m.addMultipleAttack(i);
+	}
+}
+
+void loadMonsterAttackAttribute()
+{
+	string key = "モンスター攻撃属性情報";
+	g_monsterAttackAttribute.Alloc(EX_Height(key));
+	int i;
+	for (i = 0; i < g_monsterAttackAttribute.Numof(); ++i)
+	{
+		string id = EX_A2String(key, 0, i, "");
+		g_monsterAttackAttribute[i].init(id);
+	}
+}
+
+void loadPlayerAttackAttribute()
+{
+	string key = "プレイヤー攻撃属性情報";
+	g_playerAttackAttribute.Alloc(EX_Height(key));
+	int i;
+	for (i = 0; i < g_playerAttackAttribute.Numof(); ++i)
+	{
+		string id = EX_A2String(key, 0, i, "");
+		g_playerAttackAttribute[i].init(EX_SA2String(key, id, "id", ""));
+	}
+}
+
+void loadItem()
+{
+	string key = "アイテム情報";
+	g_item.Alloc(EX_Height(key));
+	int i;
+	for (i = 0; i < g_item.Numof(); ++i)
+	{
+		string id = EX_A2String(key, 0, i, "");
+		g_item[i].init(i);
+		string s = EX_SA2String(key, id, "skillId", "");
+		if (s != "" && getPlayerSkillFromId(s) === NULL)
+		{
+			system.MsgBox("loadItem [%s] プレイヤースキル[%s]ありません" % id % s);
+		}
+	}
+}
+
+void loadShop()
+{
+	string key = "ショップ情報";
+	g_shop.Alloc(EX_Height(key));
+	int i;
+	for (i = 0; i < g_shop.Numof(); ++i)
+	{
+		string id = EX_A2String(key, 0, i, "");
+		g_shop[i].init(EX_SA2String(key, id, "id", ""), EX_SA2String(key, id, "name", ""), EX_SA2String(key, id, "imageName", ""));
+	}
+}
+
+void loadBadCondition()
+{
+	string key = "状態異常情報";
+	g_badCondition.Alloc(EX_Height(key));
+	int i;
+	for (i = 0; i < g_badCondition.Numof(); ++i)
+	{
+		string id = EX_A2String(key, 0, i, "");
+		g_badCondition[i].init(EX_SA2String(key, id, "id", ""), EX_SA2String(key, id, "name", ""), EX_SA2String(key, id, "imageName", ""), EX_SA2String(key, id, "desc", ""));
+	}
+}
+
+void loadMonsterAttribute()
+{
+	string key = "モンスター属性情報";
+	g_monsterAttribute.Alloc(EX_Height(key));
+	int i;
+	for (i = 0; i < g_monsterAttribute.Numof(); ++i)
+	{
+		string id = EX_A2String(key, 0, i, "");
+		g_monsterAttribute[i].init(EX_SA2String(key, id, "id", ""), EX_SA2String(key, id, "name", ""), EX_SA2String(key, id, "imageName", ""));
+	}
+}
+
+void loadCgList()
+{
+	string key = "ＣＧモード情報";
+	int height = EX_Height(key);
+	int width = EX_Width(key);
+	g_cgList.Alloc(height);
+	int i;
+	for (i = 0; i < height; ++i)
+	{
+		string thumbnail = EX_A2String(key, 0, i, "");
+		string baseName = EX_A2String(key, 1, i, "");
+		array@string cg;
+		int j;
+		for (j = 2; j < width; ++j)
+		{
+			string name = EX_A2String(key, j, i, "");
+			if (name != "")
+			{
+				cg.PushBack(name);
+			}
+		}
+		g_cgList[i].init(thumbnail, baseName, cg);
+	}
+}
+
+void loadReplayList()
+{
+	string key = "回想モード情報";
+	int height = EX_Height(key);
+	g_replay.Alloc(height);
+	int i;
+	for (i = 0; i < g_replay.Numof(); ++i)
+	{
+		g_replay[i].init(i);
+	}
+}
+
+void loadMusicInfo()
+{
+	string key = "音楽情報";
+	int height = EX_Height(key);
+	g_musicInfo.Alloc(height);
+	int i;
+	for (i = 0; i < g_musicInfo.Numof(); ++i)
+	{
+		g_musicInfo[i].init(i);
+	}
+}
+
+void loadZeroThreeSkill()
+{
+	string key = "ゼロスリースキル情報";
+	g_zeroThreeSkill.Alloc(EX_Height(key));
+	int i;
+	for (i = 0; i < g_zeroThreeSkill.Numof(); ++i)
+	{
+		string id = EX_A2String(key, 0, i, "");
+		g_zeroThreeSkill[i].init(id, EX_SA2String(key, id, "name", ""), EX_SA2String(key, id, "desc", ""));
+	}
+}
+
+void loadPlayerSkillOpenLevel()
+{
+	string key = "プレイヤー攻撃スキルオープンレベル情報";
+	g_playerSkillOpenLevel.Alloc(EX_Height(key));
+	int i;
+	for (i = 0; i < g_playerSkillOpenLevel.Numof(); ++i)
+	{
+		string id = EX_A2String(key, 0, i, "");
+		g_playerSkillOpenLevel[i].init(id, EX_SA2String(key, id, "playerId", ""), EX_SA2Int(key, id, "index", 0), EX_SA2Int(key, id, "openLevel", 0));
+		string s = EX_SA2String(key, id, "playerId", "");
+		if (getPlayerFromId(s) === NULL)
+		{
+			system.MsgBox("loadPlayerSkillOpenLevel [%s] プレイヤーID[%s]ありません" % id % s);
+		}
+	}
+}
+
+void loadMapEncountProbability()
+{
+	string key = "マップエンカウント率情報";
+	g_mapEncountProbability.Alloc(EX_Height(key));
+	int i;
+	for (i = 0; i < g_mapEncountProbability.Numof(); ++i)
+	{
+		int id = EX_A2Int(key, 0, i, 0);
+		g_mapEncountProbability[i].init(id, EX_IA2Int(key, id, "noHit", 0), EX_IA2Int(key, id, "hit1", 0), EX_IA2Int(key, id, "hit2", 0), EX_IA2Int(key, id, "hit3", 0));
+	}
+}
+
+void loadMapEncountMonsterGroup()
+{
+	string key = "マップエンカウントモンスターグループ情報";
+	g_mapEncountMonsterGroup.Alloc(EX_Height(key));
+	int i;
+	for (i = 0; i < g_mapEncountMonsterGroup.Numof(); ++i)
+	{
+		string id = EX_A2String(key, 0, i, "");
+		g_mapEncountMonsterGroup[i].init(id);
+	}
+}
+
+void loadBattleBackGround()
+{
+	string key = "戦闘背景情報";
+	g_battleBackgroundInfomation.Alloc(EX_Height(key));
+	int i;
+	for (i = 0; i < g_battleBackgroundInfomation.Numof(); ++i)
+	{
+		string id = EX_A2String(key, 0, i, "");
+		g_battleBackgroundInfomation[i].init(id);
+	}
+}
+
+void loadStandBackgroundFillInfomation()
+{
+	string key = "立ち絵乗算フィル情報";
+	g_standBackgroundFillInfomation.Alloc(EX_Height(key));
+	int i;
+	for (i = 0; i < g_standBackgroundFillInfomation.Numof(); ++i)
+	{
+		g_standBackgroundFillInfomation[i].init(EX_A2String(key, 0, i, ""), EX_A2Int(key, 1, i, 0), EX_A2Int(key, 2, i, 0), EX_A2Int(key, 3, i, 0));
+	}
+}
+
+void loadAdvSelectionButtonInfomation()
+{
+	string key = "ADV選択肢ボタン情報";
+	g_advSelectionButtonInfomation.Alloc(EX_Height(key));
+	int i;
+	for (i = 0; i < g_advSelectionButtonInfomation.Numof(); ++i)
+	{
+		string id = EX_A2String(key, 0, i, "");
+		g_advSelectionButtonInfomation[i].init(id, EX_SA2String(key, id, "caption", ""), EX_SA2String(key, id, "imageName", ""));
+	}
+}
+
+void loadMirrorPiece()
+{
+	string key = "鏡の破片情報";
+	g_mirrorPiece.Alloc(EX_Height(key));
+	int i;
+	for (i = 0; i < g_mirrorPiece.Numof(); ++i)
+	{
+		string id = EX_A2String(key, 0, i, "");
+		g_mirrorPiece[i].init(id);
+	}
+}
+
+void loadPlayerVoiceFinder()
+{
+	g_voiceFinder.Alloc(g_player.Numof());
+	int i;
+	for (i = 0; i < g_voiceFinder.Numof(); ++i)
+	{
+		g_voiceFinder[i].init(g_player[i].getId());
+	}
+}
+
+void setMonsterEffectOffset()
+{
+	getMonsterFromId("デカントf").setEffectOffset(235, 0);
+	getMonsterFromId("デカントj").setEffectOffset(235, 0);
+	getMonsterFromId("デカントマムル").setEffectOffset(235, 0);
+	getMonsterFromId("レイラ").setEffectOffset(52, 0);
+	getMonsterFromId("ジル").setEffectOffset(84, -133);
+	getMonsterFromId("シーザーh1").setEffectOffset(214, 0);
+	getMonsterFromId("シーザーh2").setEffectOffset(214, 0);
+	getMonsterFromId("シーザーh3").setEffectOffset(214, 0);
+	getMonsterFromId("サイクロナイト").setEffectOffset(192, 0);
+}
+

@@ -1,0 +1,38 @@
+PartyHpViewSkillIconList::PartyHpViewSkillIconList()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void PartyHpViewSkillIconList::init()
+{
+	pass("");
+	this.skillIcons_.Alloc(g_party.getCount());
+	int i;
+	for (i = 0; i < this.skillIcons_.Numof(); ++i)
+	{
+		this.skillIcons_[i].init(i);
+	}
+}
+
+void PartyHpViewSkillIconList::update()
+{
+}
+
+void PartyHpViewSkillIconList::fadeIn(bool val)
+{
+	int i;
+	for (i = 0; i < this.skillIcons_.Numof(); ++i)
+	{
+		this.skillIcons_[i].fadeIn(val, NULL);
+	}
+}
+
+void PartyHpViewSkillIconList::updateCoolTime()
+{
+	int i;
+	for (i = 0; i < this.skillIcons_.Numof(); ++i)
+	{
+		this.skillIcons_[i].updateCoolTime();
+	}
+}
+

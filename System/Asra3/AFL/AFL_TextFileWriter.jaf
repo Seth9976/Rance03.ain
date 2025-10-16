@@ -1,0 +1,15 @@
+bool AFL_TextFileWriter_Create(string FileName)
+{
+	return TextFile.Create(FileName);
+}
+
+bool AFL_TextFileWriter_Close()
+{
+	return TextFile.Close();
+}
+
+bool AFL_TextFileWriter_Write(string Text)
+{
+	return TextFile.Write(Text);
+}
+

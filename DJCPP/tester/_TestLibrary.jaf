@@ -1,0 +1,210 @@
+void test_Timer()
+{
+	Parts num;
+	NumberPartsInfomation n;
+	n.setSameWidth(18);
+	num.initAsNumber("システム／数字／幅１８／白", n);
+	num.setShow(true);
+	'グローバルタイマーのテスト' A;
+	while (!g_mouse.isClick(0))
+	{
+		g_frameManager.updateFrame();
+		num.setNumber(g_globalTimer.getTime());
+	}
+	g_frameManager.updateFrame();
+	'ローカルタイマーのテスト' A;
+	LocalTimer lt;
+	lt.reset();
+	while (!g_mouse.isClick(0))
+	{
+		g_frameManager.updateFrame();
+		num.setNumber(lt.getTime());
+	}
+	g_frameManager.updateFrame();
+	'ローカルタイマーのリセット' A;
+	lt.reset();
+	while (!g_mouse.isClick(0))
+	{
+		g_frameManager.updateFrame();
+		num.setNumber(lt.getTime());
+	}
+	g_frameManager.updateFrame();
+	'スケーリングx3' A;
+	g_globalTimer.setScaling(3.0);
+	lt.reset();
+	while (!g_mouse.isClick(0))
+	{
+		g_frameManager.updateFrame();
+		num.setNumber(lt.getTime());
+	}
+	g_frameManager.updateFrame();
+	'スケーリング .1' A;
+	g_globalTimer.setScaling(0.1);
+	lt.reset();
+	while (!g_mouse.isClick(0))
+	{
+		g_frameManager.updateFrame();
+		num.setNumber(lt.getTime());
+	}
+	g_frameManager.updateFrame();
+	'スキップFunction' A;
+	g_globalTimer.setScaling(1.0);
+	testCASTimer.Reset();
+	8156.setSkipFunction("testSkipFunc");
+	lt.reset();
+	while (!g_mouse.isClick(0))
+	{
+		g_frameManager.updateFrame();
+		num.setNumber(lt.getTime());
+	}
+	g_frameManager.updateFrame();
+}
+
+bool testSkipFunc()
+{
+	return g_keyboard.isDown(17);
+}
+
+void test_kasokudo()
+{
+	float nowSpeed;
+	float nowTime;
+	float dt = 10.0;
+	float pos;
+	float pps = 300.0;
+	int i;
+	for (i = 0; i < 100; ++i)
+	{
+		float dtSpeed = nowSpeed + pps * (dt / 1000.0);
+		float henni = getHenni(nowSpeed, dtSpeed, dt / 1000.0);
+		pos += henni;
+		pass("%f %f %f %f" % dtSpeed % nowSpeed % henni % pos);
+		nowSpeed = dtSpeed;
+	}
+}
+
+float getHenni(float v0, float v, float t)
+{
+	float a = (v - v0) / t;
+	return v0 * t + 0.5 * a * (t * t);
+}
+
+void test_Allocation()
+{
+	array@TestAllocationObject a[5];
+	pass("alloc");
+	a.Alloc(2);
+	pass("alloc_edn");
+	int i;
+	for (i = 0; i < a.Numof(); ++i)
+	{
+	}
+}
+
+TestAllocationObject::TestAllocationObject()
+{
+	pass("constructed %d" % debugTestAllocationObjectCount);
+	++debugTestAllocationObjectCount;
+}
+
+TestAllocationObject::~TestAllocationObject()
+{
+	pass("destructed%d" % debugTestAllocationObjectCount);
+	--debugTestAllocationObjectCount;
+}
+
+void test_Permitation()
+{
+	array@int n;
+	array@int m;
+	m.PushBack(0);
+	m.PushBack(1);
+	m.PushBack(2);
+	m.PushBack(3);
+	m.PushBack(4);
+	m.PushBack(5);
+	m.PushBack(6);
+	m.PushBack(7);
+	array@Permutation result;
+	pass("%d" % result.Numof());
+}
+
+void test_IsDungeonCardId()
+{
+	int i;
+	for (i = 0; i < g_cardInfomation.Numof(); ++i)
+	{
+		string id = g_cardInfomation[i].getId();
+		pass("%s %d" % id % isDungeonCardId(id));
+	}
+	pass("%d" % isDungeonCardId("bs_"));
+	pass("%d" % isDungeonCardId("baaa"));
+	pass("%d" % isDungeonCardId("__"));
+	pass("%d" % isDungeonCardId("asss"));
+}
+
+void test_LotterySystem()
+{
+	LotterySystem l;
+	l.addIntKey(1, 1000);
+	l.addIntKey(2, 30);
+	l.addIntKey(3, 40);
+	l.addIntKey(4, 10);
+	array@int n[4];
+	int i;
+	for (i = 0; i < 100000; ++i)
+	{
+		int r = l.drawInt(false);
+		++n[r - 1];
+	}
+	for (i = 0; i < n.Numof(); ++i)
+	{
+		pass("%d:%d" % (i + 1) % n[i]);
+	}
+}
+
+void test_IndexRoundRobin()
+{
+	IndexRoundRobin r;
+	r.init(6);
+	int i;
+	for (i = 0; i < 100; ++i)
+	{
+		pass("%d" % r.get());
+	}
+}
+
+void test_FindUsedCgResources()
+{
+	int count = AFL_AFA_CG_Numof();
+	AFL_LogViewer_OpenViewer();
+	int i;
+	for (i = 0; i < count; ++i)
+	{
+		string cg = AFL_AFA_CG_GetTitle(i);
+		if (ＣＧモード確認(cg))
+		{
+			AFL_LogViewer_AddText("%s\n" % cg);
+		}
+	}
+}
+
+void test_FindUsedMusicResources()
+{
+	int count = AFL_AFA_Sound_Numof();
+	AFL_LogViewer_OpenViewer();
+	int i;
+	for (i = 0; i < count; ++i)
+	{
+		string title = AFL_AFA_Sound_GetTitle(i);
+		if (g_playedMusic.Find(0, g_playedMusic.Numof(), title) >= 0)
+		{
+			AFL_LogViewer_AddText("%s\n" % title);
+		}
+	}
+}
+
+void test_OutputPermutation()
+{
+}
+

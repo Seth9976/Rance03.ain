@@ -1,0 +1,62 @@
+void SaveObject::init(int saveIndex)
+{
+	this.saveIndex_ = saveIndex;
+}
+
+void SaveObject::setOnSaveCallback(DG_OnSaveCallback onSaveCallback)
+{
+	this.onSave_ += onSaveCallback;
+}
+
+bool SaveObject::save(string comment)
+{
+	AFL_GameSave_CopyThumbnail(this.saveIndex_, 255);
+	bool r = AFL_GameSave_Save(this.saveIndex_, comment);
+	if (r)
+	{
+		this.updateInfomation();
+		if (this.onSave_.Numof() != 0)
+		{
+			this.onSave_();
+		}
+	}
+	return r;
+}
+
+void SaveObject::updateInfomation()
+{
+	AFL_GameSave_GetFileInfo(this.saveIndex_, this.year_, this.month_, this.day_, this.week_, this.hour_, this.min_, this.sec_, this.timeInGame_, this.userComment_, this.playTimeMinute_);
+}
+
+void SaveObject::load()
+{
+	if (!this.isSaved())
+	{
+		return;
+	}
+	AFL_GameSave_Load(this.saveIndex_);
+}
+
+bool SaveObject::isSaved()
+{
+	return AFL_GameSave_IsExistFile(this.saveIndex_);
+}
+
+string SaveObject::getComment()
+{
+	this.updateInfomation();
+	return this.userComment_;
+}
+
+string SaveObject::getSaveTime()
+{
+	this.updateInfomation();
+	return "%04d/%02d/%02d %02d:%02d:%02d" % this.year_ % this.month_ % this.day_ % this.hour_ % this.min_ % this.sec_;
+}
+
+int SaveObject::getPlayTimeMinute()
+{
+	this.updateInfomation();
+	return this.playTimeMinute_;
+}
+

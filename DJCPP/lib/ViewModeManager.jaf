@@ -1,0 +1,25 @@
+void ViewModeManager::set(bool val)
+{
+	this.stack_.PushBack(val);
+	this.innerSet(val);
+}
+
+void ViewModeManager::restore()
+{
+	this.stack_.PopBack();
+	if (this.stack_.Empty())
+	{
+		this.innerSet(true);
+	}
+	else
+	{
+		bool val = this.stack_[this.stack_.Numof() - 1];
+		this.innerSet(val);
+	}
+}
+
+void ViewModeManager::innerSet(bool val)
+{
+	AFL_KeepPreviousView_SetMode(val);
+}
+

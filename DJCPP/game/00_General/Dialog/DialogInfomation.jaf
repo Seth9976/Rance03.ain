@@ -1,0 +1,68 @@
+void DialogInfomation::setCaption(string val)
+{
+	this.caption_ = val;
+}
+
+void DialogInfomation::setMessage(string val)
+{
+	this.msg_ = val;
+}
+
+string DialogInfomation::getCaption()
+{
+	return this.caption_;
+}
+
+void DialogInfomation::getMessage(ref array@string msg)
+{
+	splitToken(msg, this.msg_, "|");
+}
+
+void DialogInfomation::setPictureImageType(int pictureImageType)
+{
+	this.pictureImageType_ = pictureImageType;
+}
+
+void DialogInfomation::setItemId(string itemId)
+{
+	this.itemId_ = itemId;
+	this.setPictureImageType(3);
+}
+
+void DialogInfomation::setAnswerTypeYesNo(bool val)
+{
+	this.isYesNo_ = val;
+}
+
+string DialogInfomation::getPictureImageName()
+{
+	if (this.imageName_.Empty())
+	{
+		switch (this.pictureImageType_)
+		{
+		case 1:
+			return "システム／ダイアログ／写真／情報";
+		case 2:
+			return "システム／ダイアログ／写真／罠";
+		case 3:
+			return "システム／ダイアログ／写真／宝箱";
+		}
+	}
+	return this.imageName_;
+}
+
+string DialogInfomation::getItemId()
+{
+	return this.itemId_;
+}
+
+bool DialogInfomation::isYesNo()
+{
+	return this.isYesNo_;
+}
+
+void DialogInfomation::setPictureImageName(string imageName)
+{
+	this.imageName_ = imageName;
+}
+

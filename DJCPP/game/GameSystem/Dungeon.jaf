@@ -1,0 +1,182 @@
+void Dungeon::init(string id)
+{
+	this.isLineLoaded_ = false;
+	this.isShowTitle_ = false;
+	this.id_ = id;
+	this.loadDungeonInfomationFromEx();
+}
+
+void Dungeon::loadDungeonLine()
+{
+	this.createDungeonLine(this.exDefinition_, this.dungeonWidth_);
+	this.setDungeonLineInfo();
+}
+
+void Dungeon::loadDungeonInfomationFromEx()
+{
+	this.exDefinition_ = "ダンジョン" + this.id_;
+	this.dungeonWidth_ = this.getDungeonWidth(this.exDefinition_);
+	if (!EX_IsExist(this.exDefinition_))
+	{
+		pass("情報がありません:%s" % this.exDefinition_);
+	}
+	string key = "ダンジョン情報";
+	this.caption_ = EX_SA2String(key, this.id_, "caption", "取得できませんでした");
+	this.defaultCardId_ = EX_SA2String(key, this.id_, "defaultCardId", "取得できませんでした");
+	this.backGroundImage_ = EX_SA2String(key, this.id_, "backGroundImage", "システム／ダンジョン／背景／仮");
+	this.musicId_ = EX_SA2String(key, this.id_, "musicId", "");
+	this.shadowR_ = EX_SA2Int(key, this.id_, "shadowR", 0);
+	this.shadowG_ = EX_SA2Int(key, this.id_, "shadowG", 0);
+	this.shadowB_ = EX_SA2Int(key, this.id_, "shadowB", 0);
+	this.bgFlatName_[0] = EX_SA2String(key, this.id_, "flatLeft", "");
+	this.bgFlatName_[1] = EX_SA2String(key, this.id_, "flatRight", "");
+	this.bgFlatName_[2] = EX_SA2String(key, this.id_, "flatTop", "");
+	this.titleFlatName_ = EX_SA2String(key, this.id_, "flatTitle", "");
+}
+
+void Dungeon::setDungeonLineInfo()
+{
+	int i;
+	for (i = 0; i < this.dungeonLine_.Numof(); ++i)
+	{
+		int j;
+		for (j = 0; j < this.dungeonWidth_; ++j)
+		{
+			string typeId = EX_A2String(this.exDefinition_, j * 2 + 0, i, "");
+			int openType = EX_A2Int(this.exDefinition_, j * 2 + 1, i, 0);
+			this.dungeonLine_[i].setDungeonCard(j, typeId, openType);
+		}
+	}
+	this.dungeonLine_.Reverse();
+}
+
+void Dungeon::createDungeonLine(string def, int width)
+{
+	int height = EX_Height(def);
+	this.dungeonLine_.Alloc(height);
+	int i;
+	for (i = 0; i < this.dungeonLine_.Numof(); ++i)
+	{
+		int depth = this.dungeonLine_.Numof() - i - 1;
+		this.dungeonLine_[i].init(width, depth);
+	}
+}
+
+int Dungeon::getDungeonWidth(string def)
+{
+	int lineCount;
+	int j;
+	for (j = 0; j < 9; ++j)
+	{
+		if (EX_A2String(def, j * 2, 0, "") == "")
+		{
+			break;
+		}
+		lineCount = j + 1;
+	}
+	return lineCount;
+}
+
+ref DungeonLine Dungeon::getDungeonLine(int line)
+{
+	return this.dungeonLine_[line % this.dungeonLine_.Numof()];
+}
+
+int Dungeon::getDepth()
+{
+	return this.dungeonLine_.Numof();
+}
+
+string Dungeon::getId()
+{
+	return this.id_;
+}
+
+string Dungeon::getCaption()
+{
+	return this.caption_;
+}
+
+int Dungeon::getWidth()
+{
+	return this.dungeonWidth_;
+}
+
+void Dungeon::reset()
+{
+	if (!this.isLineLoaded_)
+	{
+		this.isLineLoaded_ = true;
+		this.loadDungeonLine();
+	}
+	int i;
+	for (i = 0; i < this.dungeonLine_.Numof(); ++i)
+	{
+		this.dungeonLine_[i].reset();
+	}
+}
+
+string Dungeon::getDefaultCardId()
+{
+	return this.defaultCardId_;
+}
+
+string Dungeon::getBackGroundImageName()
+{
+	return this.backGroundImage_;
+}
+
+string Dungeon::getMusicId()
+{
+	return this.musicId_;
+}
+
+void Dungeon::setShowMinimap(bool isShow)
+{
+	this.isShowMinimap_ = isShow;
+}
+
+bool Dungeon::isShowMinimap()
+{
+	return this.isShowMinimap_;
+}
+
+int Dungeon::getShadowR()
+{
+	return this.shadowR_;
+}
+
+int Dungeon::getShadowG()
+{
+	return this.shadowG_;
+}
+
+int Dungeon::getShadowB()
+{
+	return this.shadowB_;
+}
+
+string Dungeon::getFlatName(int type)
+{
+	if (0 <= type && type < this.bgFlatName_.Numof())
+	{
+		return this.bgFlatName_[type];
+	}
+	return "";
+}
+
+void Dungeon::setShowTitle(bool isShow)
+{
+	this.isShowTitle_ = isShow;
+}
+
+bool Dungeon::isShowTitle()
+{
+	return this.isShowTitle_;
+}
+
+string Dungeon::getTitleFlatName()
+{
+	return this.titleFlatName_;
+}
+

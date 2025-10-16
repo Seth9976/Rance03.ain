@@ -1,0 +1,595 @@
+void openDungeon(string id, int x, int y)
+{
+	SceneDungeon scene;
+	scene.init(id, x, y);
+	scene.run();
+	runScene(scene.update);
+	array@string n;
+	getAlivePlayerList(n);
+	if (n.Empty())
+	{
+		openGameOver();
+	}
+}
+
+void openBackLog()
+{
+	if (AFL_Config_GetWheelForward() == 0)
+	{
+		Ｓ＿バックログ();
+	}
+	else
+	{
+		Ｓ＿バックシーン();
+	}
+}
+
+void openSystemMenu(bool isShowAutoSkip)
+{
+	g_gameObjectManager.pushScene();
+	int result;
+	SceneSystemMenu scene;
+	scene.init(isShowAutoSkip);
+	scene.run();
+	runScene(scene.update);
+	result = scene.getSelected();
+	switch (result)
+	{
+	case 0:
+		メッセージウィンドウ非表示();
+		break;
+	case 1:
+		Ｓ＿オート();
+		break;
+	case 2:
+		Ｓ＿既読スキップ();
+		break;
+	case 3:
+		Ｓ＿バックログ();
+		break;
+	case 4:
+		Ｓ＿バックシーン();
+		break;
+	case 5:
+		Ｓ＿コンフィグ();
+		break;
+	case 6:
+		Ａ＿プレイングマニュアル表示();
+		break;
+	}
+	g_gameObjectManager.popScene();
+}
+
+int openDialog(DialogInfomation info)
+{
+	setGameMode(true);
+	g_gameObjectManager.pushScene();
+	int result;
+	SceneDialog scene;
+	scene.init(info);
+	scene.run();
+	runScene(scene.update);
+	result = scene.getResult();
+	g_gameObjectManager.popScene();
+	restoreGameMode();
+	return result;
+}
+
+void openParty(bool isShowBg)
+{
+	setGameMode(true);
+	g_gameObjectManager.pushScene();
+	SceneParty scene;
+	scene.init(isShowBg);
+	scene.run();
+	runScene(scene.update);
+	g_gameObjectManager.popScene();
+	restoreGameMode();
+	gameClearConsecutiveBattleCount();
+}
+
+bool openBattle2(ref BattleInfomation info)
+{
+	if (info.getGold() == -1)
+	{
+		info.setGoldFromMonster();
+	}
+	if (info.getExp() == -1)
+	{
+		info.setExpFromMonster();
+	}
+	g_battleResult.reset();
+	g_battleResult.setInfo(info);
+	setGameMode(true);
+	g_gameObjectManager.pushScene();
+	bool result = false;
+	SceneBattle scene;
+	array@string mons;
+	info.getMonsterId(mons);
+	scene.init(info);
+	scene.run();
+	if (!g_battleMusicNotChangeMode)
+	{
+		g_music.play(info.getMusicId(), -2147483648, false);
+	}
+	runScene(scene.update);
+	result = scene.getBattleResult();
+	mons.Free();
+	g_gameObjectManager.popScene();
+	if (result)
+	{
+		if (!g_battleMusicNotChangeMode)
+		{
+			g_music.fadeOut(1000);
+		}
+		openBattleResult();
+		gameCheckItemMax();
+	}
+	else
+	{
+		W(1000);
+		openGameOver();
+	}
+	restoreGameMode();
+	if (g_battleResult.getBattleEndEvent() != "")
+	{
+		DG_GeneralCallback fn;
+		fn = g_battleResult.getBattleEndEvent();
+		setGameMode(false);
+		fn();
+		restoreGameMode();
+		fn.Clear();
+	}
+	return result;
+}
+
+bool openBattle(ref array@string monsterIdList, int gold, int exp, string itemId, int itemProbability, string battleBackGroundId)
+{
+	if (battleBackGroundId == "")
+	{
+		battleBackGroundId = "平野";
+	}
+	BattleInfomation info;
+	info.setMonsterArray(monsterIdList);
+	info.setGold(gold);
+	info.setExp(exp);
+	info.setItem(itemId, itemProbability);
+	info.setBattleBackGroundId(battleBackGroundId);
+	return openBattle2(info);
+}
+
+void openShop(string id, string shopName)
+{
+	setGameMode(true);
+	g_gameObjectManager.pushScene();
+	SceneShop scene;
+	scene.init(id, shopName);
+	scene.run();
+	runScene(scene.update);
+	g_gameObjectManager.popScene();
+	restoreGameMode();
+}
+
+void openCgSwipeView(ref array@string imageName)
+{
+	g_gameObjectManager.pushScene();
+	SceneCgSwipeView scene;
+	scene.init(imageName);
+	scene.run();
+	runScene(scene.update);
+	g_gameObjectManager.popScene();
+}
+
+void openItem()
+{
+	setGameMode(true);
+	g_gameObjectManager.pushScene();
+	SceneItem scene;
+	scene.init();
+	scene.run();
+	runScene(scene.update);
+	g_gameObjectManager.popScene();
+	restoreGameMode();
+}
+
+string openTargetPlayerSelect(int targetMode)
+{
+	g_gameObjectManager.pushScene();
+	string r;
+	SceneTargetPlayerSelect scene;
+	scene.init(targetMode);
+	scene.run();
+	runScene(scene.update);
+	r = scene.getTargetPlayerId();
+	g_gameObjectManager.popScene();
+	return r;
+}
+
+void openMirrorPieceView()
+{
+	setGameMode(true);
+	g_gameObjectManager.pushScene();
+	SceneMirrorPieceView scene;
+	scene.init();
+	scene.run();
+	runScene(scene.update);
+	g_gameObjectManager.popScene();
+	restoreGameMode();
+}
+
+bool openCamp(int imageType)
+{
+	CampBackGround bg;
+	bg.init();
+	while (true)
+	{
+		setGameMode(true);
+		g_gameObjectManager.pushScene();
+		int r;
+		SceneCamp scene;
+		scene.init(bg, imageType);
+		scene.run();
+		runScene(scene.update);
+		r = scene.getNextScene();
+		restoreGameMode();
+		g_gameObjectManager.popScene();
+		if (r == -1)
+		{
+			break;
+		}
+		switch (r)
+		{
+		case 2:
+			bg.fadeIn(false, NULL);
+			bg.joinFade();
+			string current = g_music.getPlayingMusicId();
+			g_music.fadeOut(1000);
+			openLevelGod();
+			g_music.play(current, -2147483648, false);
+			bg.fadeIn(true, NULL);
+			break;
+		case 1:
+			openItem();
+			break;
+		case 0:
+			openParty(false);
+			break;
+		case 3:
+			return false;
+		case 4:
+			bg.fadeIn(false, NULL);
+			openSave();
+			bg.fadeIn(true, NULL);
+			break;
+		case 5:
+			bg.fadeIn(false, NULL);
+			openMirrorPieceView();
+			bg.fadeIn(true, NULL);
+			break;
+		}
+	}
+	return true;
+}
+
+void openTitle()
+{
+	while (true)
+	{
+		int r = openTitleScene();
+		switch (r)
+		{
+		case 0:
+			return;
+		case 1:
+			openLoad();
+			break;
+		case 2:
+			g_saveDataManager.loadAutoSave();
+			break;
+		case 3:
+			Ａ＿プレイングマニュアル表示();
+			break;
+		case 4:
+			openCg();
+			break;
+		case 5:
+			openReplay();
+			break;
+		case 6:
+			openMusic();
+			break;
+		case 7:
+			Ｓ＿コンフィグ();
+			break;
+		case 8:
+			openEnquite();
+			break;
+		case 9:
+			制御／アリスの館();
+			break;
+		case 10:
+			openAdvEditor();
+			break;
+		case 11:
+			ゲーム終了();
+			break;
+		}
+	}
+}
+
+int openTitleScene()
+{
+	SceneTitle scene;
+	scene.init();
+	scene.run();
+	runScene(scene.update);
+	return scene.getSelected();
+}
+
+void openCg()
+{
+	SceneCg scene;
+	scene.init();
+	scene.run();
+	runScene(scene.update);
+}
+
+void openReplay()
+{
+	SceneReplay scene;
+	scene.init();
+	scene.run();
+	runScene(scene.update);
+}
+
+int openReplayDialog(array@string n)
+{
+	g_gameObjectManager.pushScene();
+	int r;
+	SceneReplaySelection scene;
+	scene.init(n);
+	scene.run();
+	runScene(scene.update);
+	r = scene.getClickedIndex();
+	g_gameObjectManager.popScene();
+	return r;
+}
+
+void openMusic()
+{
+	SceneMusic scene;
+	scene.init();
+	scene.run();
+	runScene(scene.update);
+}
+
+void openSave()
+{
+	setGameMode(true);
+	g_gameObjectManager.pushScene();
+	SceneSave scene;
+	scene.init();
+	scene.run();
+	runScene(scene.update);
+	g_gameObjectManager.popScene();
+	g_enquiteSender.innerGameSend();
+	restoreGameMode();
+}
+
+void openLoad()
+{
+	setGameMode(true);
+	g_gameObjectManager.pushScene();
+	SceneLoad scene;
+	scene.init();
+	scene.run();
+	runScene(scene.update);
+	g_gameObjectManager.popScene();
+	restoreGameMode();
+}
+
+void openGameOver()
+{
+	g_gameObjectManager.pushScene();
+	SceneGameOver scene;
+	scene.init();
+	scene.run();
+	runScene(scene.update);
+	g_gameObjectManager.popScene();
+}
+
+void runScene(DG_SceneUpdateMethod updateMethod)
+{
+	g_frameManager.updateFrame();
+	while (updateMethod())
+	{
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+	g_frameManager.updateFrame();
+}
+
+void openLevelGod()
+{
+	setGameMode(true);
+	g_gameObjectManager.pushScene();
+	SceneLevelGod scene;
+	scene.init();
+	scene.run();
+	runScene(scene.update);
+	g_gameObjectManager.popScene();
+	restoreGameMode();
+}
+
+void openBattleResult()
+{
+	g_gameObjectManager.pushScene();
+	SceneBattleResult scene;
+	scene.init();
+	scene.run();
+	runScene(scene.update);
+	g_gameObjectManager.popScene();
+}
+
+string openAdvSelection(array@string selection)
+{
+	string result;
+	setGameMode(true);
+	while (true)
+	{
+		g_gameObjectManager.pushScene();
+		SceneAdvSelection scene;
+		scene.init(selection);
+		scene.run();
+		runScene(scene.update);
+		result = scene.getClickedId();
+		g_gameObjectManager.popScene();
+		if (result == "キャンプを開く")
+		{
+			string s1 = g_advStand[0].getStandName();
+			string s2 = g_advStand[1].getStandName();
+			string bg = g_advBackGround.getCgName();
+			■立ち絵背景アウト();
+			bool last = g_playerCommonParam.isEnableExitDungeon();
+			g_playerCommonParam.setEnableExitDungeon(false);
+			openCamp(0);
+			g_playerCommonParam.setEnableExitDungeon(last);
+			■背景(bg, 2, 500);
+			■全体イン(s2, s1);
+		}
+		else
+		{
+			break;
+		}
+	}
+	restoreGameMode();
+	return result;
+}
+
+string openAdvSelection2(array@string selection)
+{
+	string result;
+	setGameMode(true);
+	while (true)
+	{
+		g_gameObjectManager.pushScene();
+		SceneAdvSelection2 scene;
+		scene.init(selection);
+		scene.run();
+		runScene(scene.update);
+		result = scene.getClickedId();
+		g_gameObjectManager.popScene();
+		if (result == "キャンプを開く")
+		{
+			openCamp(0);
+		}
+		else
+		{
+			break;
+		}
+	}
+	restoreGameMode();
+	return result;
+}
+
+void openMirrorPiece()
+{
+	g_gameObjectManager.pushScene();
+	SceneMirrorPiece scene;
+	scene.init();
+	scene.run();
+	runScene(scene.update);
+	g_gameObjectManager.popScene();
+}
+
+void openLogo()
+{
+	if (!g_enquiteSender.isExistId())
+	{
+		g_enquiteSender.createId();
+	}
+	g_enquiteSender.sendAsync();
+	g_gameObjectManager.pushScene();
+	SceneAliceLogo scene;
+	scene.init();
+	scene.run();
+	runScene(scene.update);
+	g_gameObjectManager.popScene();
+	g_enquiteSender.joinSendCommand();
+}
+
+void setOpenFlatCallback(DG_OpenFlatCallback cb)
+{
+	g_openFlatCallback = cb;
+}
+
+void openFlat(string flatName)
+{
+	g_openFlatCallback(flatName);
+}
+
+int openAdvObjectList(ref string selected, int mode, string current)
+{
+	int r;
+	g_gameObjectManager.pushScene();
+	SceneAdvObjectListSelector scene;
+	scene.init(mode, current);
+	scene.run();
+	runScene(scene.update);
+	r = scene.getResult();
+	selected = scene.getSelected();
+	pass(selected);
+	g_gameObjectManager.popScene();
+	return r;
+}
+
+void openAdvEditor()
+{
+	SceneAdvEditor scene;
+	scene.init();
+	scene.run();
+	runScene(scene.update);
+}
+
+void openStandViewer(string standCg)
+{
+	g_gameObjectManager.pushScene();
+	SceneStandViewer scene;
+	scene.init(standCg);
+	scene.run();
+	runScene(scene.update);
+	g_gameObjectManager.popScene();
+}
+
+void openOpMovie()
+{
+	g_playedMusic.PushBack("音楽／オープニング");
+	ムービー("Movie/OP.apeg", true, 0, 0, 0);
+}
+
+void openEdMovie()
+{
+	ムービー("Movie/ED.apeg", true, 0, 0, 0);
+}
+
+void openNetworkConnection()
+{
+	int result;
+	g_gameObjectManager.pushScene();
+	SceneNetworkConnection scene;
+	scene.init();
+	scene.run();
+	runScene(scene.update);
+	result = scene.getSelected();
+	if (result == 0)
+	{
+		AFL_Config_Network_SetEnableConnection(true);
+		g_enquiteSender.createId();
+	}
+	else
+	{
+		AFL_Config_Network_SetEnableConnection(false);
+	}
+	g_gameObjectManager.popScene();
+}
+

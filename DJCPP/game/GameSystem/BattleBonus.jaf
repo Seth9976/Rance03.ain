@@ -1,0 +1,16 @@
+void BattleBonus::init(string name, int value)
+{
+	this.name_ = name;
+	this.value_ = value;
+}
+
+string BattleBonus::getName()
+{
+	return this.name_;
+}
+
+int BattleBonus::getValue()
+{
+	return this.value_;
+}
+

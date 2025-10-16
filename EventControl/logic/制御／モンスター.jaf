@@ -1,0 +1,4909 @@
+void 制御／モンスター／イベント(string group)
+{
+	BattleInfomation info;
+	switch (group)
+	{
+	case "プロローグ／親衛隊1":
+		info.addMonster("リーザス親衛隊");
+		info.setItem("換金2", 制御／戦闘／アイテム確率設定(3));
+		info.setBattleBackGroundId("居館／地下一階");
+		break;
+	case "プロローグ／親衛隊2":
+		info.addMonster("リーザス親衛隊");
+		info.addMonster("リーザス親衛隊");
+		info.addMonster("リーザス親衛隊");
+		info.setItem("換金2", 制御／戦闘／アイテム確率設定(9));
+		info.setBattleBackGroundId("居館／地下一階");
+		break;
+	case "リスの洞窟／みつめとかげ":
+		info.addMonster("みつめとかげ");
+		info.setBattleBackGroundId("リスの洞窟");
+		break;
+	case "リスの洞窟／リスのウーくん":
+		info.addMonster("リスのウーくん");
+		info.setBattleBackGroundId("リスの洞窟／家");
+		info.setMusicId("音楽／戦闘／大ボス");
+		break;
+	case "悪魔回廊／ゴールデンハニー脚部":
+		info.addMonster("ゴールデンハニー脚部");
+		info.setBattleBackGroundId("悪魔回廊");
+		info.setMusicId("音楽／戦闘／大ボス");
+		break;
+	case "地上灯台／サファイア":
+		info.addMonster("サファイアd");
+		info.setBattleBackGroundId("地上灯台");
+		info.setMusicId("音楽／戦闘／大ボス");
+		break;
+	case "烈火鉱山／ルイス":
+		info.addMonster("ルイス");
+		info.setBattleBackGroundId("烈火鉱山");
+		info.setItem("世色癌1", 制御／戦闘／アイテム確率設定(99));
+		break;
+	case "烈火鉱山／カナリアン1":
+		info.addMonster("カナリアンe1");
+		info.setBattleBackGroundId("烈火鉱山");
+		info.setMusicId("音楽／戦闘／大ボス");
+		break;
+	case "烈火鉱山／カナリアン2":
+		info.addMonster("カナリアンe2");
+		info.setBattleBackGroundId("烈火鉱山");
+		info.setMusicId("音楽／戦闘／大ボス");
+		break;
+	case "烈火鉱山／カナリアン3":
+		info.addMonster("カナリアンe3");
+		info.setBattleBackGroundId("烈火鉱山");
+		info.setMusicId("音楽／戦闘／大ボス");
+		break;
+	case "都市／レッド／ヘルマン歩兵1":
+		info.addMonster("ヘルマン歩兵群f");
+		info.addMonster("ヘルマン歩兵群f");
+		info.addMonster("ヘルマン騎士f");
+		info.addMonster("ヘルマン工兵f");
+		info.addMonster("ヘルマン歩兵群f");
+		info.addMonster("ヘルマン弩兵群f");
+		info.addMonster("ヘルマン士官f");
+		info.setBattleBackGroundId("平野");
+		break;
+	case "都市／レッド／ヘルマン歩兵2":
+		info.addMonster("ヘルマン歩兵f");
+		info.addMonster("ヘルマン歩兵f");
+		info.addMonster("ヘルマン弩兵群f");
+		info.addMonster("ヘルマン操兵f");
+		info.addMonster("デカントf");
+		info.setBattleBackGroundId("平野");
+		break;
+	case "都市／レッド／ヘルマン歩兵3":
+		info.addMonster("ヘルマン騎士f");
+		info.addMonster("ヘルマン工兵f");
+		info.addMonster("ヘルマン工兵f");
+		info.addMonster("ヘルマン歩兵群f");
+		info.addMonster("ヘルマン士官f");
+		info.addMonster("ヘルマン弩兵群f");
+		info.setBattleBackGroundId("平野");
+		info.setMusicId("音楽／戦闘／大ボス");
+		break;
+	case "レッド／ヘルマン歩兵1":
+		info.addMonster("ヘルマン歩兵f");
+		info.addMonster("ヘルマン工兵f");
+		info.addMonster("ヘルマン騎士f");
+		info.setItem("バラバラ時計", 制御／戦闘／アイテム確率設定(99));
+		info.setExp(0);
+		info.setBattleBackGroundId("都市／レッド");
+		break;
+	case "レッド／ヘルマン歩兵2":
+		info.addMonster("ヘルマン弩兵群f");
+		info.addMonster("ヘルマン操兵f");
+		info.addMonster("デカントf");
+		info.setItem("珍味2", 制御／戦闘／アイテム確率設定(99));
+		info.setExp(0);
+		info.setBattleBackGroundId("都市／レッド");
+		break;
+	case "レッド／ヘルマン歩兵3":
+		info.addMonster("ヘルマン操兵f");
+		info.addMonster("デカントf");
+		info.addMonster("ヘルマン歩兵群f");
+		info.setItem("珍味2", 制御／戦闘／アイテム確率設定(99));
+		info.setExp(0);
+		info.setBattleBackGroundId("都市／レッド");
+		break;
+	case "レッド／ヘルマン歩兵4":
+		info.addMonster("ヘルマン騎士f");
+		info.addMonster("ヘルマン歩兵群f");
+		info.addMonster("ヘルマン歩兵群f");
+		info.setItem("珍味2", 制御／戦闘／アイテム確率設定(99));
+		info.setExp(0);
+		info.setBattleBackGroundId("都市／レッド");
+		break;
+	case "レッド／ヘルマン歩兵5":
+		info.addMonster("ヘルマン弩兵群f");
+		info.addMonster("ヘルマン弩兵群f");
+		info.addMonster("ヘルマン弩兵群f");
+		info.setItem("珍味2", 制御／戦闘／アイテム確率設定(99));
+		info.setExp(0);
+		info.setBattleBackGroundId("都市／レッド");
+		break;
+	case "レッド／ヘルマン歩兵6":
+		info.addMonster("ヘルマン工兵f");
+		info.addMonster("ヘルマン工兵f");
+		info.addMonster("ヘルマン工兵f");
+		info.addMonster("ヘルマン工兵f");
+		info.addMonster("ヘルマン工兵f");
+		info.addMonster("ヘルマン工兵f");
+		info.setItem("珍味2", 制御／戦闘／アイテム確率設定(99));
+		info.setExp(0);
+		info.setBattleBackGroundId("都市／レッド");
+		break;
+	case "レッド／フレッチャー":
+		info.addMonster("フレッチャー");
+		info.setItem("珍味3", 制御／戦闘／アイテム確率設定(99));
+		info.setBattleBackGroundId("オレリイ大聖堂");
+		info.setMusicId("音楽／戦闘／大ボス");
+		break;
+	case "レッド／レイラ":
+		info.addMonster("レイラ");
+		info.setBattleBackGroundId("オレリイ大聖堂");
+		info.setMusicId("音楽／戦闘／大ボス");
+		break;
+	case "迷子の森／ユニコーン":
+		info.addMonster("ユニコーン");
+		info.setItem("セーブライオン", 制御／戦闘／アイテム確率設定(99));
+		info.setBattleBackGroundId("迷子の森");
+		info.setMusicId("音楽／戦闘／女の子モンスター");
+		break;
+	case "迷子の森／スー1":
+		info.addMonster("スー");
+		info.addMonster("ラプ群");
+		info.setBattleBackGroundId("迷子の森");
+		info.setMusicId("音楽／戦闘／大ボス");
+		break;
+	case "迷子の森／スー2":
+		info.addMonster("ラプ群");
+		info.addMonster("スー");
+		info.addMonster("ラプ群");
+		info.setBattleBackGroundId("迷子の森");
+		info.setMusicId("音楽／戦闘／大ボス");
+		break;
+	case "迷子の森／イシス":
+		info.addMonster("イシス");
+		info.setBattleBackGroundId("迷子の森／家");
+		info.setMusicId("音楽／戦闘／大ボス");
+		break;
+	case "ハイパービル／シーザー1":
+		info.addMonster("シーザーh1");
+		info.setBattleBackGroundId("ハイパービル");
+		info.setMusicId("音楽／戦闘／大ボス");
+		break;
+	case "ハイパービル／シーザー2":
+		info.addMonster("シーザーh2");
+		info.setBattleBackGroundId("ハイパービル");
+		info.setMusicId("音楽／戦闘／大ボス");
+		break;
+	case "ハイパービル／シーザー3":
+		info.addMonster("シーザーh3");
+		info.setBattleBackGroundId("ハイパービル");
+		info.setMusicId("音楽／戦闘／大ボス");
+		break;
+	case "ハイパービル／バグ1":
+		info.addMonster("バグ");
+		info.addMonster("バグ");
+		info.addMonster("バグ群");
+		info.addMonster("バグ");
+		info.addMonster("バグ群");
+		info.addMonster("バグ");
+		info.setBattleBackGroundId("ハイパービル");
+		break;
+	case "ハイパービル／バグ2":
+		info.addMonster("バグ群");
+		info.addMonster("バグ");
+		info.addMonster("バグ群");
+		info.setBattleBackGroundId("ハイパービル");
+		break;
+	case "ハイパービル／バグ3":
+		info.addMonster("バグ群");
+		info.addMonster("バグ");
+		info.addMonster("バグ");
+		info.addMonster("バグ");
+		info.addMonster("バグ群");
+		info.addMonster("バグ");
+		info.addMonster("バグ");
+		info.addMonster("バグ群");
+		info.addMonster("バグ");
+		info.addMonster("バグ群");
+		info.addMonster("バグ群");
+		info.addMonster("バグ群");
+		info.setBattleBackGroundId("ハイパービル");
+		break;
+	case "ホッホ峡／巨兵小隊":
+		info.addMonster("ヘルマン弩兵j");
+		info.addMonster("ヘルマン操兵j");
+		info.addMonster("デカントj");
+		info.addMonster("ヘルマン操兵j");
+		info.setBattleBackGroundId("ホッホ峡／暗");
+		break;
+	case "ホッホ峡／射撃拠点":
+		info.addMonster("防衛陣地j");
+		info.addMonster("ヘルマン弩兵群j");
+		info.addMonster("ヘルマン工兵j");
+		info.setBattleBackGroundId("ホッホ峡／暗");
+		break;
+	case "ホッホ峡／ランドスター隊1":
+		info.addMonster("ヘルマン歩兵群j");
+		info.addMonster("ヘルマン歩兵群j");
+		info.addMonster("ヘルマン弩兵群j");
+		info.addMonster("ヘルマン歩兵群j");
+		info.addMonster("ヘルマン術兵j");
+		info.addMonster("ヘルマン工兵j");
+		info.addMonster("ヘルマン工兵j");
+		info.setBattleBackGroundId("ホッホ峡／暗");
+		break;
+	case "ホッホ峡／ランドスター隊2":
+		info.addMonster("ヘルマン弩兵群j");
+		info.addMonster("ヘルマン工兵j");
+		info.setBattleBackGroundId("ホッホ峡／暗");
+		break;
+	case "ホッホ峡／サファイア1":
+		info.addMonster("サファイアj1");
+		info.setBattleBackGroundId("ホッホ峡／暗");
+		info.setMusicId("音楽／戦闘／大ボス");
+		break;
+	case "ホッホ峡／サファイア2":
+		getMonsterFromId("ガーネットj").setFixedPosition(true, 0);
+		getMonsterFromId("サファイアj2").setFixedPosition(true, 0);
+		getMonsterFromId("トパーズj").setFixedPosition(true, 0);
+		getMonsterFromId("ガーネットj").setPosition(175, 52, 430, 320, 384, 256);
+		getMonsterFromId("サファイアj2").setPosition(574, -7, 767, 288, 845, 196);
+		getMonsterFromId("トパーズj").setPosition(364, -50, 576, 237, 608, 157);
+		info.addMonster("ガーネットj");
+		info.addMonster("サファイアj2");
+		info.addMonster("トパーズj");
+		info.setBattleBackGroundId("ホッホ峡／高台");
+		info.setMusicId("音楽／戦闘／大ボス");
+		break;
+	case "ホッホ峡／ヘルマン歩兵1":
+		info.addMonster("デカントj");
+		info.addMonster("ヘルマン操兵j");
+		info.setBattleBackGroundId("ホッホ峡／暗");
+		break;
+	case "ホッホ峡／ヘルマン歩兵2":
+		info.addMonster("ヘルマン工兵j");
+		info.addMonster("ヘルマン弩兵群j");
+		info.addMonster("ヘルマン歩兵j");
+		info.addMonster("ヘルマン弩兵j");
+		info.addMonster("ヘルマン弩兵j");
+		info.addMonster("ヘルマン歩兵群j");
+		info.addMonster("ヘルマン工兵j");
+		info.addMonster("ヘルマン歩兵j");
+		info.setBattleBackGroundId("ホッホ峡／暗");
+		break;
+	case "パッキャマラード・デン／触手":
+		info.addMonster("触手j1");
+		info.setBattleBackGroundId("リスの洞窟");
+		break;
+	case "パッキャマラード・デン／カースA1":
+		info.addMonster("カースA");
+		info.setBattleBackGroundId("リスの洞窟");
+		info.setMusicId("音楽／戦闘／大ボス");
+		break;
+	case "パッキャマラード・デン／カースA2":
+		info.addMonster("触手j2");
+		info.addMonster("カースA");
+		info.setBattleBackGroundId("リスの洞窟");
+		info.setMusicId("音楽／戦闘／大ボス");
+		break;
+	case "パッキャマラード・デン／カースA3":
+		info.addMonster("触手j2");
+		info.addMonster("カースA");
+		info.addMonster("触手j2");
+		info.setBattleBackGroundId("リスの洞窟");
+		info.setMusicId("音楽／戦闘／大ボス");
+		break;
+	case "パッキャマラード・デン／カースA4":
+		info.addMonster("触手j2");
+		info.addMonster("カースA");
+		info.addMonster("触手j2");
+		info.addMonster("触手j2");
+		info.setBattleBackGroundId("リスの洞窟");
+		info.setMusicId("音楽／戦闘／大ボス");
+		break;
+	case "パッキャマラード・デン／カースA5":
+		info.addMonster("触手j2");
+		info.addMonster("カースA");
+		info.addMonster("触手j2");
+		info.addMonster("触手j2");
+		info.addMonster("触手j2");
+		info.setBattleBackGroundId("リスの洞窟");
+		info.setMusicId("音楽／戦闘／大ボス");
+		break;
+	case "都市／ノース／ヘルマン歩兵1":
+		info.addMonster("ヘルマン騎士j");
+		info.addMonster("ヘルマン騎士j");
+		info.addMonster("ヘルマン歩兵群j");
+		info.addMonster("ヘルマン歩兵j");
+		info.addMonster("ヘルマン弩兵j");
+		info.addMonster("ヘルマン騎士j");
+		info.setBattleBackGroundId("平野");
+		break;
+	case "都市／ノース／ヘルマン歩兵2":
+		info.addMonster("ヘルマン騎士群l");
+		info.addMonster("ヘルマン歩兵j");
+		info.addMonster("ヘルマン弩兵j");
+		info.addMonster("ヘルマン弩兵群j");
+		info.addMonster("ヘルマン騎士j");
+		info.addMonster("ヘルマン士官j");
+		info.setBattleBackGroundId("平野");
+		break;
+	case "都市／ノース／トーマ":
+		info.addMonster("ヘルマン騎士j");
+		info.addMonster("トーマ");
+		info.addMonster("ヘルマン工兵j");
+		info.addMonster("ヘルマン弩兵j");
+		info.addMonster("ヘルマン工兵j");
+		info.setBattleBackGroundId("平野");
+		info.setMusicId("音楽／戦闘／大ボス");
+		break;
+	case "都市／サウス／ミネバ":
+		info.addMonster("ミネバl1");
+		info.addMonster("ヘルマン術兵j");
+		info.addMonster("ヘルマン術兵j");
+		info.addMonster("ヘルマン工兵j");
+		info.addMonster("ヘルマン弩兵j");
+		info.addMonster("ミネバl3");
+		info.addMonster("ヘルマン弩兵j");
+		info.addMonster("ヘルマン弩兵j");
+		info.addMonster("ヘルマン弩兵群j");
+		info.setBattleBackGroundId("都市／サウス");
+		info.setMusicId("音楽／戦闘／大ボス");
+		break;
+	case "下水道／ヘルマン歩兵":
+		info.addMonster("ヘルマン弩兵q");
+		info.addMonster("ヘルマン歩兵q");
+		info.addMonster("ヘルマン歩兵q");
+		info.setBattleBackGroundId("居館／地下一階");
+		break;
+	case "東の塔／ヘルマン歩兵":
+		info.addMonster("ヘルマン歩兵q");
+		info.addMonster("ヘルマン工兵q");
+		info.setBattleBackGroundId("塔／東");
+		break;
+	case "東の塔／NATO":
+		info.addMonster("ヘルマン工兵q");
+		info.addMonster("NATO");
+		info.setBattleBackGroundId("塔／東");
+		info.setMusicId("音楽／戦闘／大ボス");
+		break;
+	case "西の塔／リーザス歩兵1":
+		info.addMonster("リーザス歩兵群");
+		info.addMonster("リーザス歩兵群");
+		info.setBattleBackGroundId("塔／西");
+		break;
+	case "西の塔／リーザス歩兵2":
+		info.addMonster("リーザス歩兵");
+		info.addMonster("リーザス歩兵");
+		info.addMonster("ヘルマン歩兵群q");
+		info.addMonster("ヘルマン工兵q");
+		info.addMonster("リーザス歩兵群");
+		info.addMonster("ヘルマン弩兵q");
+		info.setBattleBackGroundId("塔／西");
+		break;
+	case "西の塔／リーザス歩兵3":
+		info.addMonster("リーザス歩兵群");
+		info.addMonster("リーザス歩兵群");
+		info.addMonster("ヘルマン弩兵群q");
+		info.addMonster("ヘルマン術兵q");
+		info.addMonster("リーザス歩兵");
+		info.addMonster("フルパワーゴリラZII");
+		info.setBattleBackGroundId("塔／西");
+		break;
+	case "西の塔／ランス":
+		info.addMonster("ランス");
+		info.setBattleBackGroundId("塔／西");
+		info.setMusicId("音楽／戦闘／大ボス");
+		break;
+	case "西の塔／サファイア":
+		info.addMonster("サファイアr");
+		info.addMonster("リーザス歩兵");
+		info.addMonster("ヘルマン術兵q");
+		info.addMonster("トパーズr");
+		info.addMonster("リーザス歩兵");
+		info.setBattleBackGroundId("塔／西");
+		info.setMusicId("音楽／戦闘／大ボス");
+		break;
+	case "中庭／ガーネット":
+		info.addMonster("ヘルマン騎士q");
+		info.addMonster("ガーネットs");
+		info.addMonster("ヘルマン弩兵q");
+		info.addMonster("ヘルマン工兵q");
+		info.setBattleBackGroundId("中庭");
+		info.setMusicId("音楽／戦闘／大ボス");
+		break;
+	case "中庭／アイゼル":
+		info.addMonster("アイゼル");
+		info.setBattleBackGroundId("中庭");
+		info.setMusicId("音楽／戦闘／アイゼル");
+		break;
+	case "居館／二階／ライカンスロープ":
+		info.addMonster("ライカンスロープZt1");
+		info.setItem("世色癌4", 制御／戦闘／アイテム確率設定(1));
+		info.setBattleBackGroundId("居館／二階");
+		info.setMusicId("音楽／戦闘／女の子モンスター");
+		break;
+	case "居館／二階／ワーシィル":
+		info.addMonster("ワーシィル");
+		info.setItem("世色癌4", 制御／戦闘／アイテム確率設定(1));
+		info.setBattleBackGroundId("居館／二階");
+		info.setMusicId("音楽／戦闘／女の子モンスター");
+		break;
+	case "居館／二階／ノス1":
+		info.addMonster("ノスt1");
+		info.setBattleBackGroundId("居館／二階");
+		info.setMusicId("音楽／戦闘／大ボス");
+		break;
+	case "居館／二階／ノス3":
+		getMonsterFromId("ノスt3左腕").setFixedPosition(true, 1);
+		getMonsterFromId("ノスt3右腕").setFixedPosition(true, 1);
+		getMonsterFromId("ノスt3").setFixedPosition(true, 2);
+		getMonsterFromId("ノスt3左腕").setPosition(758, -96, 751, 333, 908, 291);
+		getMonsterFromId("ノスt3右腕").setPosition(-80, 7, 201, 306, 191, 264);
+		getMonsterFromId("ノスt3").setPosition(-50, -50, 550, 260, 658, 222);
+		info.setEffectFlat("システム／戦闘／ノス戦");
+		info.addMonster("ノスt3左腕");
+		info.addMonster("ノスt3右腕");
+		info.addMonster("ノスt3");
+		info.setBattleBackGroundId("居館／二階");
+		info.setMusicId("音楽／戦闘／ノス２");
+		break;
+	case "デ・ラ・アドミラル空間／ジル":
+		getMonsterFromId("ジル").setFixedPosition(true, 2);
+		getMonsterFromId("ジル").setPosition(-50, -50, 664, 342, 585, 272);
+		info.setEffectFlat("システム／戦闘／ジル戦");
+		info.addMonster("ジル");
+		info.setBattleBackGroundId("居館／二階");
+		info.setMusicId("音楽／戦闘／ジル");
+		break;
+	case "コー／腐った死体":
+		info.addMonster("ゾンビ");
+		info.addMonster("腐った死体群");
+		info.addMonster("腐った死体群");
+		info.addMonster("ゾンビ");
+		info.addMonster("腐った死体群");
+		info.addMonster("腐った死体群");
+		info.addMonster("腐った死体群");
+		info.addMonster("腐った死体群");
+		info.addMonster("腐った死体群");
+		info.addMonster("ゾンビ");
+		info.addMonster("腐った死体群");
+		info.addMonster("腐った死体群");
+		info.setItem("換金3", 制御／戦闘／アイテム確率設定(90));
+		info.setBattleBackGroundId("都市／コー");
+		break;
+	case "地平線／シィル":
+		info.addMonster("ロンメル");
+		info.addMonster("ロンメル");
+		info.setBattleBackGroundId("平野");
+		break;
+	case "地平線／リア":
+		info.addMonster("みつめとかげ");
+		info.addMonster("みつめとかげ");
+		info.addMonster("みつめとかげ");
+		info.addMonster("みつめとかげ");
+		info.addMonster("みつめとかげ");
+		info.addMonster("みつめとかげ");
+		info.addMonster("みつめとかげ");
+		info.setBattleBackGroundId("平野");
+		break;
+	case "地平線／マリス":
+		info.addMonster("食通");
+		info.addMonster("食通");
+		info.addMonster("食通");
+		info.setBattleBackGroundId("平野");
+		break;
+	case "地平線／かなみ":
+		info.addMonster("イカマン");
+		info.addMonster("ニンタートル");
+		info.addMonster("ニンタートル");
+		info.addMonster("人形遣い");
+		info.addMonster("人形遣い");
+		info.setBattleBackGroundId("平野");
+		break;
+	case "地平線／フェリス":
+		info.addMonster("こんばんわ");
+		info.addMonster("こんばんわ");
+		info.addMonster("こんばんわ");
+		info.setBattleBackGroundId("平野");
+		break;
+	case "地平線／マリア":
+		info.addMonster("ザコ群");
+		info.addMonster("無課金戦士群");
+		info.addMonster("無課金戦士群");
+		info.addMonster("無課金戦士群");
+		info.setBattleBackGroundId("平野");
+		break;
+	case "地平線／志津香":
+		info.addMonster("ゲーリング");
+		info.addMonster("ゲーリング");
+		info.addMonster("ゲーリング");
+		info.addMonster("ゲーリング");
+		info.setBattleBackGroundId("平野");
+		break;
+	case "地平線／ミリ":
+		info.addMonster("イカマン");
+		info.addMonster("パワーゴリラ");
+		info.addMonster("パワーゴリラ");
+		info.setBattleBackGroundId("平野");
+		break;
+	case "地平線／ミル":
+		info.addMonster("デカントf");
+		info.addMonster("グリーンハニー");
+		info.setBattleBackGroundId("平野");
+		break;
+	case "地平線／セル":
+		info.addMonster("くずの悪魔群");
+		info.addMonster("NEOぬぼぼ");
+		info.addMonster("みつめとかげ");
+		info.addMonster("みつめとかげ");
+		info.addMonster("ロンメル");
+		info.setBattleBackGroundId("平野");
+		break;
+	case "地平線／バレス":
+		info.addMonster("人食いTOWNS");
+		info.setBattleBackGroundId("平野");
+		break;
+	case "地平線／スー":
+		info.addMonster("凶悪ハニー");
+		info.addMonster("レッドハニー");
+		info.addMonster("レッドハニー");
+		info.setBattleBackGroundId("平野");
+		break;
+	case "地平線／リック":
+		info.addMonster("ミミミック");
+		info.setBattleBackGroundId("平野");
+		break;
+	case "地平線／メナド":
+		info.addMonster("イカマン");
+		info.addMonster("大王イカマン");
+		info.addMonster("スーパーハニー");
+		info.addMonster("人食いX68");
+		info.addMonster("ミミミック");
+		info.addMonster("ミミミック");
+		info.addMonster("オッズ群");
+		info.setBattleBackGroundId("平野");
+		break;
+	case "地平線／ユラン":
+		info.addMonster("アカナリアンt2");
+		info.setBattleBackGroundId("平野");
+		break;
+	case "地平線／レイラ":
+		info.addMonster("うっぴー");
+		info.addMonster("うっぴー");
+		info.addMonster("うっぴー");
+		info.addMonster("うっぴー");
+		info.addMonster("うっぴー");
+		info.addMonster("うっぴー");
+		info.addMonster("うっぴー");
+		info.addMonster("うっぴー");
+		info.addMonster("うっぴー");
+		info.addMonster("うっぴー");
+		info.addMonster("うっぴー");
+		info.addMonster("うっぴー");
+		info.addMonster("うっぴー");
+		info.addMonster("うっぴー");
+		info.addMonster("うっぴー");
+		info.addMonster("うっぴー");
+		info.addMonster("うっぴー");
+		info.addMonster("うっぴー");
+		info.addMonster("うっぴー");
+		info.addMonster("うっぴー");
+		info.addMonster("うっぴー");
+		info.addMonster("うっぴー");
+		info.addMonster("うっぴー");
+		info.addMonster("うっぴー");
+		info.setBattleBackGroundId("平野");
+		break;
+	case "地平線／アテン":
+		info.addMonster("サイクロナイト");
+		info.addMonster("ニンタートル");
+		info.addMonster("ニンタートル");
+		info.setBattleBackGroundId("平野");
+		break;
+	case "地平線／ネカイ":
+		info.addMonster("金魚群");
+		info.addMonster("人形遣い");
+		info.addMonster("ちゃいむ");
+		info.addMonster("人形遣い");
+		info.addMonster("金魚群");
+		info.setBattleBackGroundId("平野");
+		break;
+	case "地平線／バーニング":
+		info.addMonster("ヒトラー");
+		info.setBattleBackGroundId("平野");
+		break;
+	case "地平線／イェリコ":
+		info.addMonster("ニンタートル");
+		info.addMonster("ニンタートル");
+		info.addMonster("ニンタートル");
+		info.addMonster("わんわん");
+		info.setBattleBackGroundId("平野");
+		break;
+	default:
+		info.addMonster("ルイス");
+		info.setBattleBackGroundId("平野");
+		break;
+	}
+	info.setExtraBattleFlag(1);
+	openBattle2(info);
+}
+
+void 制御／モンスター／プロローグ／ヘルマン歩兵()
+{
+	BattleInfomation info;
+	info.addMonster("ヘルマン歩兵a");
+	info.setBattleBackGroundId("居館／地下一階");
+	openBattle2(info);
+}
+
+void 制御／モンスター／プロローグ／ヘルマン歩兵／Ｂ()
+{
+	BattleInfomation info;
+	info.addMonster("ヘルマン歩兵群a");
+	info.setBattleBackGroundId("居館／地下一階");
+	openBattle2(info);
+}
+
+void 制御／モンスター／プロローグ／リーザス親衛隊()
+{
+	BattleInfomation info;
+	info.addMonster("リーザス親衛隊");
+	info.addMonster("リーザス親衛隊");
+	info.setItem("換金2", 制御／戦闘／アイテム確率設定(6));
+	info.setBattleBackGroundId("居館／地下一階");
+	openBattle2(info);
+}
+
+void 制御／モンスター／リスの洞窟／イカマン()
+{
+	BattleInfomation info;
+	if (RAND(6) != 1)
+	{
+		info.addMonster("イカマン");
+		info.addMonster("イカマン");
+		info.addMonster("イカマン");
+	}
+	else
+	{
+		info.addMonster("イカマン");
+		info.addMonster("イカマン");
+		info.addMonster("イカマン");
+		info.addMonster("イカマン");
+	}
+	info.setBattleBackGroundId("リスの洞窟");
+	openBattle2(info);
+}
+
+void 制御／モンスター／リスの洞窟／イカマン／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("イカマン群");
+		info.addMonster("イカマン群");
+	}
+	else
+	{
+		info.addMonster("イカマン群");
+		info.addMonster("グリーンハニー");
+	}
+	info.setBattleBackGroundId("リスの洞窟");
+	openBattle2(info);
+}
+
+void 制御／モンスター／リスの洞窟／ニンタートル()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ニンタートル");
+		info.addMonster("グリーンハニー");
+	}
+	else
+	{
+		info.addMonster("イカマン");
+		info.addMonster("ニンタートル");
+		info.addMonster("グリーンハニー");
+	}
+	info.setItem("守り神様ストラップ", 制御／戦闘／アイテム確率設定(3));
+	info.setBattleBackGroundId("リスの洞窟");
+	openBattle2(info);
+}
+
+void 制御／モンスター／リスの洞窟／げこげこ()
+{
+	BattleInfomation info;
+	info.addMonster("げこげこ");
+	info.setItem("世色癌1", 制御／戦闘／アイテム確率設定(3));
+	info.setBattleBackGroundId("リスの洞窟");
+	openBattle2(info);
+}
+
+void 制御／モンスター／リスの洞窟／げこげこ／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("げこげこ");
+		info.addMonster("げこげこ");
+		info.setItem("世色癌1", 制御／戦闘／アイテム確率設定(6));
+	}
+	else
+	{
+		info.addMonster("げこげこ");
+		info.addMonster("グリーンハニー");
+		info.setItem("世色癌1", 制御／戦闘／アイテム確率設定(3));
+	}
+	info.setBattleBackGroundId("リスの洞窟");
+	openBattle2(info);
+}
+
+void 制御／モンスター／リスの洞窟／ロンメル()
+{
+	BattleInfomation info;
+	info.addMonster("ロンメル");
+	info.setItem("徳用魔池", 制御／戦闘／アイテム確率設定(9));
+	info.setBattleBackGroundId("リスの洞窟");
+	openBattle2(info);
+}
+
+void 制御／モンスター／リスの洞窟／グリーンハニー()
+{
+	BattleInfomation info;
+	info.addMonster("グリーンハニー");
+	info.addMonster("グリーンハニー");
+	info.setBattleBackGroundId("リスの洞窟");
+	openBattle2(info);
+}
+
+void 制御／モンスター／リスの洞窟／グリーンハニー／Ｂ()
+{
+	BattleInfomation info;
+	info.addMonster("イカマン群");
+	info.addMonster("グリーンハニー");
+	info.addMonster("グリーンハニー");
+	info.setBattleBackGroundId("リスの洞窟");
+	openBattle2(info);
+}
+
+void 制御／モンスター／リスの洞窟／ちゃいむ()
+{
+	BattleInfomation info;
+	info.addMonster("ちゃいむ");
+	info.setItem("換金2", 3);
+	info.setBattleBackGroundId("リスの洞窟");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／悪魔回廊／イカマン()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("イカマン群");
+		info.addMonster("イカマン群");
+	}
+	else
+	{
+		info.addMonster("イカマン群");
+		info.addMonster("げこげこ");
+		info.addMonster("イカマン群");
+		info.setItem("世色癌1", 制御／戦闘／アイテム確率設定(3));
+	}
+	info.setBattleBackGroundId("悪魔回廊");
+	openBattle2(info);
+}
+
+void 制御／モンスター／悪魔回廊／げこげこ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("げこげこ");
+		info.addMonster("げこげこ");
+		info.addMonster("くずの悪魔");
+		info.setItem("世色癌1", 制御／戦闘／アイテム確率設定(6));
+	}
+	else
+	{
+		info.addMonster("グリーンハニー");
+		info.addMonster("げこげこ");
+		info.addMonster("げこげこ");
+		info.setItem("世色癌1", 制御／戦闘／アイテム確率設定(6));
+	}
+	info.setBattleBackGroundId("悪魔回廊");
+	openBattle2(info);
+}
+
+void 制御／モンスター／悪魔回廊／人形遣い()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("人形遣い");
+		info.addMonster("人形遣い");
+		info.addMonster("イカマン群");
+		info.setItem("マヨネーズ", 制御／戦闘／アイテム確率設定(6));
+	}
+	else
+	{
+		info.addMonster("人形遣い");
+		info.addMonster("ニンタートル");
+		info.addMonster("人形遣い");
+		info.setItem("マヨネーズ", 制御／戦闘／アイテム確率設定(6));
+	}
+	info.setBattleBackGroundId("悪魔回廊");
+	openBattle2(info);
+}
+
+void 制御／モンスター／悪魔回廊／人形遣い／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("イカマン群");
+		info.addMonster("くずの悪魔");
+		info.addMonster("人形遣い");
+		info.setItem("マヨネーズ", 制御／戦闘／アイテム確率設定(3));
+	}
+	else
+	{
+		info.addMonster("こんにちわc1");
+		info.addMonster("人形遣い");
+		info.addMonster("人形遣い");
+		info.setItem("毎度ありストラップ", 制御／戦闘／アイテム確率設定(3));
+	}
+	info.setBattleBackGroundId("悪魔回廊");
+	openBattle2(info);
+}
+
+void 制御／モンスター／悪魔回廊／くずの悪魔()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("くずの悪魔");
+		info.addMonster("くずの悪魔");
+		info.addMonster("くずの悪魔");
+	}
+	else
+	{
+		info.addMonster("くずの悪魔");
+		info.addMonster("くずの悪魔");
+		info.addMonster("くずの悪魔");
+		info.addMonster("くずの悪魔");
+	}
+	info.setBattleBackGroundId("悪魔回廊");
+	openBattle2(info);
+}
+
+void 制御／モンスター／悪魔回廊／くずの悪魔／Ｂ()
+{
+	BattleInfomation info;
+	info.addMonster("くずの悪魔群");
+	info.addMonster("くずの悪魔群");
+	info.addMonster("くずの悪魔群");
+	info.addMonster("人形遣い");
+	info.addMonster("人形遣い");
+	info.setItem("マヨネーズ", 制御／戦闘／アイテム確率設定(6));
+	info.setBattleBackGroundId("悪魔回廊");
+	openBattle2(info);
+}
+
+void 制御／モンスター／悪魔回廊／こんにちわ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("こんにちわc1");
+		info.setItem("毎度ありストラップ", 制御／戦闘／アイテム確率設定(3));
+	}
+	else
+	{
+		info.addMonster("こんにちわc1");
+		info.addMonster("くずの悪魔");
+		info.setItem("毎度ありストラップ", 制御／戦闘／アイテム確率設定(3));
+	}
+	info.setBattleBackGroundId("悪魔回廊");
+	openBattle2(info);
+}
+
+void 制御／モンスター／悪魔回廊／ちょーちん()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("こんにちわc1");
+		info.addMonster("ちょーちん");
+		info.setItem("換金2", 制御／戦闘／アイテム確率設定(3));
+	}
+	else
+	{
+		info.addMonster("グリーンハニー");
+		info.addMonster("グリーンハニー");
+		info.addMonster("グリーンハニー");
+		info.addMonster("グリーンハニー");
+		info.addMonster("ちょーちん");
+		info.setItem("換金2", 制御／戦闘／アイテム確率設定(3));
+	}
+	info.setBattleBackGroundId("悪魔回廊");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／地上灯台／ロンメル()
+{
+	BattleInfomation info;
+	info.addMonster("ロンメル");
+	info.setBattleBackGroundId("地上灯台");
+	info.setItem("珍味1", 制御／戦闘／アイテム確率設定(15));
+	openBattle2(info);
+}
+
+void 制御／モンスター／地上灯台／ロンメル／Ｂ()
+{
+	BattleInfomation info;
+	info.addMonster("ロンメル");
+	info.addMonster("ロンメル");
+	info.setBattleBackGroundId("地上灯台");
+	info.setItem("珍味1", 制御／戦闘／アイテム確率設定(30));
+	openBattle2(info);
+}
+
+void 制御／モンスター／地上灯台／人形遣い()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("人形遣い");
+		info.addMonster("人形遣い");
+		info.addMonster("グリーンハニー");
+		info.addMonster("人形遣い");
+		info.setItem("マヨネーズ", 制御／戦闘／アイテム確率設定(9));
+	}
+	else
+	{
+		info.addMonster("人形遣い群");
+		info.addMonster("人形遣い群");
+		info.setItem("マヨネーズ", 制御／戦闘／アイテム確率設定(12));
+	}
+	info.setBattleBackGroundId("地上灯台");
+	openBattle2(info);
+}
+
+void 制御／モンスター／地上灯台／人形遣い／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ミートボール");
+		info.addMonster("人形遣い群");
+		info.setItem("マヨネーズ", 制御／戦闘／アイテム確率設定(6));
+	}
+	else
+	{
+		info.addMonster("ミートボール");
+		info.addMonster("人形遣い");
+		info.addMonster("ミートボール");
+		info.setItem("マヨネーズ", 制御／戦闘／アイテム確率設定(3));
+	}
+	info.setBattleBackGroundId("地上灯台");
+	openBattle2(info);
+}
+
+void 制御／モンスター／地上灯台／ミートボール()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ミートボール");
+		info.addMonster("ミートボール");
+	}
+	else
+	{
+		info.addMonster("ミートボール");
+		info.addMonster("人形遣い");
+		info.setItem("マヨネーズ", 制御／戦闘／アイテム確率設定(3));
+	}
+	info.setBattleBackGroundId("地上灯台");
+	openBattle2(info);
+}
+
+void 制御／モンスター／地上灯台／ミートボール／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ミートボール群");
+		info.addMonster("グリーンハニー");
+		info.addMonster("ミートボール群");
+	}
+	else
+	{
+		info.addMonster("ミートボール群");
+		info.addMonster("ミートボール群");
+		info.addMonster("グリーンハニー");
+	}
+	info.setBattleBackGroundId("地上灯台");
+	openBattle2(info);
+}
+
+void 制御／モンスター／地上灯台／ブルーハニー()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ミートボール");
+		info.addMonster("ブルーハニー");
+	}
+	else
+	{
+		info.addMonster("ブルーハニー");
+		info.addMonster("ブルーハニー");
+	}
+	info.setBattleBackGroundId("地上灯台");
+	openBattle2(info);
+}
+
+void 制御／モンスター／地上灯台／ブルーハニー／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ブルーハニー");
+		info.addMonster("人形遣い群");
+	}
+	else
+	{
+		info.addMonster("ミートボール");
+		info.addMonster("ブルーハニー");
+		info.addMonster("ブルーハニー");
+	}
+	info.setBattleBackGroundId("地上灯台");
+	openBattle2(info);
+}
+
+void 制御／モンスター／地上灯台／ラーメン()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("グリーンハニー");
+		info.addMonster("ミートボール");
+		info.addMonster("ラーメン");
+		info.setItem("珍味1", 制御／戦闘／アイテム確率設定(3));
+	}
+	else
+	{
+		info.addMonster("ラーメン");
+		info.addMonster("ラーメン");
+		info.setItem("珍味1", 制御／戦闘／アイテム確率設定(6));
+	}
+	info.setBattleBackGroundId("地上灯台");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／地上灯台／ミミック()
+{
+	BattleInfomation info;
+	info.addMonster("ミミック");
+	info.setItem("スカウトキー", 制御／戦闘／アイテム確率設定(15));
+	info.setBattleBackGroundId("地上灯台");
+	openBattle2(info);
+}
+
+void 制御／モンスター／烈火鉱山／みつめとかげ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("みつめとかげ");
+		info.setItem("アサクヒロク1", 制御／戦闘／アイテム確率設定(9));
+	}
+	else
+	{
+		info.addMonster("みつめとかげ");
+		info.addMonster("みつめとかげ");
+		info.setItem("アサクヒロク1", 制御／戦闘／アイテム確率設定(18));
+	}
+	info.setBattleBackGroundId("烈火鉱山");
+	openBattle2(info);
+}
+
+void 制御／モンスター／烈火鉱山／ライカンスロープ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ライカンスロープe2");
+	}
+	else
+	{
+		info.addMonster("ライカンスロープd1");
+	}
+	info.setItem("世色癌1", 制御／戦闘／アイテム確率設定(3));
+	info.setBattleBackGroundId("烈火鉱山");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／烈火鉱山／ブルーハニー()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ブルーハニー");
+		info.addMonster("ブルーハニー");
+	}
+	else
+	{
+		info.addMonster("げこげこ");
+		info.addMonster("ブルーハニー");
+		info.setItem("世色癌1", 制御／戦闘／アイテム確率設定(3));
+	}
+	info.setBattleBackGroundId("烈火鉱山");
+	openBattle2(info);
+}
+
+void 制御／モンスター／烈火鉱山／ミミック()
+{
+	BattleInfomation info;
+	info.addMonster("ミミック");
+	info.setItem("スカウトキー", 制御／戦闘／アイテム確率設定(15));
+	info.setBattleBackGroundId("烈火鉱山");
+	openBattle2(info);
+}
+
+void 制御／モンスター／烈火鉱山／金魚()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("金魚");
+		info.addMonster("金魚");
+	}
+	else
+	{
+		info.addMonster("金魚");
+	}
+	info.setBattleBackGroundId("烈火鉱山");
+	openBattle2(info);
+}
+
+void 制御／モンスター／烈火鉱山／金魚／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("金魚群");
+	}
+	else
+	{
+		info.addMonster("金魚群");
+		info.addMonster("げこげこ");
+		info.addMonster("げこげこ");
+		info.setItem("世色癌1", 制御／戦闘／アイテム確率設定(6));
+	}
+	info.setBattleBackGroundId("烈火鉱山");
+	openBattle2(info);
+}
+
+void 制御／モンスター／烈火鉱山／ＮＥＯぬぼぼ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("NEOぬぼぼ");
+		info.addMonster("NEOぬぼぼ");
+		info.addMonster("NEOぬぼぼ");
+	}
+	else
+	{
+		info.addMonster("NEOぬぼぼ");
+		info.addMonster("NEOぬぼぼ");
+		info.addMonster("NEOぬぼぼ");
+		info.addMonster("ブルーハニー");
+	}
+	info.setBattleBackGroundId("烈火鉱山");
+	openBattle2(info);
+}
+
+void 制御／モンスター／烈火鉱山／マーダー()
+{
+	BattleInfomation info;
+	info.addMonster("マーダー");
+	info.setItem("徳用魔池", 制御／戦闘／アイテム確率設定(9));
+	info.setBattleBackGroundId("烈火鉱山");
+	openBattle2(info);
+}
+
+void 制御／モンスター／烈火鉱山／金魚使い()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("金魚");
+		info.addMonster("金魚");
+		info.addMonster("金魚");
+		info.addMonster("金魚");
+		info.addMonster("金魚使い");
+	}
+	else
+	{
+		info.addMonster("金魚群");
+		info.addMonster("金魚群");
+		info.addMonster("金魚使い");
+		info.addMonster("金魚群");
+	}
+	info.setBattleBackGroundId("烈火鉱山");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／迷子の森／マーダー()
+{
+	BattleInfomation info;
+	info.addMonster("マーダー");
+	info.setItem("珍味2", 制御／戦闘／アイテム確率設定(15));
+	info.setBattleBackGroundId("迷子の森");
+	openBattle2(info);
+}
+
+void 制御／モンスター／迷子の森／いもむしＤＸマークＩＩ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("いもむしDXマークII");
+		info.addMonster("レッドハニー");
+		info.addMonster("いもむしDXマークII");
+	}
+	else
+	{
+		info.addMonster("いもむしDXマークII");
+		info.addMonster("いもむしDXマークII");
+		info.addMonster("うっぴー");
+		info.setItem("毎度ありストラップ", 制御／戦闘／アイテム確率設定(3));
+	}
+	info.setBattleBackGroundId("迷子の森");
+	openBattle2(info);
+}
+
+void 制御／モンスター／迷子の森／いもむしＤＸマークＩＩ／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("いもむしDXマークII群");
+		info.addMonster("いもむしDXマークII群");
+		info.addMonster("わんわん群");
+	}
+	else
+	{
+		info.addMonster("いもむしDXマークII群");
+		info.addMonster("レッドハニー");
+		info.addMonster("いもむしDXマークII群");
+	}
+	info.setBattleBackGroundId("迷子の森");
+	openBattle2(info);
+}
+
+void 制御／モンスター／迷子の森／いもむしＤＸマークＩＩ／Ｃ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("いもむしDXマークII");
+	}
+	else
+	{
+		info.addMonster("いもむしDXマークII");
+		info.addMonster("いもむしDXマークII");
+	}
+	info.setBattleBackGroundId("迷子の森");
+	openBattle2(info);
+}
+
+void 制御／モンスター／迷子の森／うっぴー()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("うっぴー");
+		info.addMonster("うっぴー");
+		info.setItem("毎度ありストラップ", 制御／戦闘／アイテム確率設定(6));
+	}
+	else
+	{
+		info.addMonster("うっぴー");
+		info.addMonster("レッドハニー");
+		info.addMonster("わんわん群");
+		info.setItem("毎度ありストラップ", 制御／戦闘／アイテム確率設定(3));
+	}
+	info.setBattleBackGroundId("迷子の森");
+	openBattle2(info);
+}
+
+void 制御／モンスター／迷子の森／パワーゴリラ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("パワーゴリラ");
+		info.setItem("丹下犬ストラップ", 制御／戦闘／アイテム確率設定(3));
+	}
+	else
+	{
+		info.addMonster("パワーゴリラ");
+		info.addMonster("パワーゴリラ");
+		info.setItem("丹下犬ストラップ", 制御／戦闘／アイテム確率設定(6));
+	}
+	info.setBattleBackGroundId("迷子の森");
+	openBattle2(info);
+}
+
+void 制御／モンスター／迷子の森／パワーゴリラ／Ｂ()
+{
+	BattleInfomation info;
+	info.addMonster("いもむしDXマークII");
+	info.addMonster("パワーゴリラ");
+	info.addMonster("レッドハニー");
+	info.addMonster("わんわん群");
+	info.setItem("丹下犬ストラップ", 制御／戦闘／アイテム確率設定(3));
+	info.setBattleBackGroundId("迷子の森");
+	openBattle2(info);
+}
+
+void 制御／モンスター／迷子の森／ミスコーン()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ミスコーン");
+		info.setItem("カッパーマトック", 制御／戦闘／アイテム確率設定(3));
+	}
+	else
+	{
+		info.addMonster("ミスコーン");
+		info.addMonster("わんわん群");
+		info.setItem("カッパーマトック", 制御／戦闘／アイテム確率設定(3));
+	}
+	info.setBattleBackGroundId("迷子の森");
+	openBattle2(info);
+}
+
+void 制御／モンスター／迷子の森／レッドハニー()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("レッドハニー");
+		info.addMonster("レッドハニー");
+	}
+	else
+	{
+		info.addMonster("レッドハニー");
+		info.addMonster("ブルーハニー");
+		info.addMonster("グリーンハニー");
+	}
+	info.setBattleBackGroundId("迷子の森");
+	openBattle2(info);
+}
+
+void 制御／モンスター／迷子の森／ハチ女()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ハチ女");
+		info.addMonster("レッドハニー");
+		info.addMonster("レッドハニー");
+		info.setItem("アサクヒロク2", 制御／戦闘／アイテム確率設定(6));
+	}
+	else
+	{
+		info.addMonster("ミスコーン");
+		info.addMonster("いもむしDXマークII");
+		info.addMonster("ハチ女");
+		info.addMonster("ハチ女");
+		info.setItem("アサクヒロク2", 制御／戦闘／アイテム確率設定(12));
+	}
+	info.setBattleBackGroundId("迷子の森");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／迷子の森／ミミック()
+{
+	BattleInfomation info;
+	info.addMonster("ミミック");
+	info.setItem("スカウトキー", 制御／戦闘／アイテム確率設定(15));
+	info.setBattleBackGroundId("迷子の森");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ハイパービル／ライカンスロープ()
+{
+	BattleInfomation info;
+	switch (RAND(6))
+	{
+	case 1:
+	case 2:
+	case 3:
+		info.addMonster("ライカンスロープh2");
+		break;
+	case 4:
+	case 5:
+		info.addMonster("ライカンスロープe2");
+		break;
+	default:
+		info.addMonster("ライカンスロープd1");
+		break;
+	}
+	info.setItem("世色癌1", 制御／戦闘／アイテム確率設定(3));
+	info.setBattleBackGroundId("ハイパービル");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ハイパービル／ライカンスロープ／Ｂ()
+{
+	BattleInfomation info;
+	switch (RAND(6))
+	{
+	case 1:
+	case 2:
+	case 3:
+	case 4:
+		info.addMonster("リヤカー");
+		info.addMonster("リヤカー");
+		info.addMonster("ライカンスロープh2");
+		break;
+	case 5:
+		info.addMonster("リヤカー");
+		info.addMonster("リヤカー");
+		info.addMonster("ライカンスロープe2");
+		break;
+	default:
+		info.addMonster("リヤカー");
+		info.addMonster("リヤカー");
+		info.addMonster("ライカンスロープd1");
+		break;
+	}
+	info.setItem("世色癌1", 制御／戦闘／アイテム確率設定(3));
+	info.setBattleBackGroundId("ハイパービル");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ハイパービル／レッドハニー()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("レッドハニー");
+		info.addMonster("レッドハニー");
+		info.addMonster("レッドハニー");
+	}
+	else
+	{
+		info.addMonster("グリーンハニー");
+		info.addMonster("グリーンハニー");
+		info.addMonster("グリーンハニー");
+		info.addMonster("レッドハニー");
+		info.addMonster("レッドハニー");
+	}
+	info.setBattleBackGroundId("ハイパービル");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ハイパービル／ザコ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("リヤカー");
+		info.addMonster("ザコ群");
+		info.setItem("換金1", 制御／戦闘／アイテム確率設定(3));
+	}
+	else
+	{
+		info.addMonster("ザコ");
+		info.addMonster("ザコ");
+		info.addMonster("リヤカー");
+		info.addMonster("ザコ");
+		info.setItem("換金1", 制御／戦闘／アイテム確率設定(3));
+	}
+	info.setBattleBackGroundId("ハイパービル");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ハイパービル／ザコ／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ザコ");
+		info.addMonster("ザコ");
+		info.addMonster("ザコ群");
+	}
+	else
+	{
+		info.addMonster("ザコ群");
+		info.addMonster("ザコ群");
+		info.addMonster("ザコ");
+	}
+	info.setBattleBackGroundId("ハイパービル");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ハイパービル／リヤカー()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("リヤカー");
+		info.addMonster("リヤカー");
+		info.addMonster("ザコ");
+		info.setItem("換金1", 制御／戦闘／アイテム確率設定(6));
+	}
+	else
+	{
+		info.addMonster("リヤカー");
+		info.addMonster("ザコ");
+		info.addMonster("リヤカー");
+		info.addMonster("ザコ");
+		info.setItem("換金1", 制御／戦闘／アイテム確率設定(6));
+	}
+	info.setBattleBackGroundId("ハイパービル");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ハイパービル／リヤカー／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("リヤカー群");
+		info.addMonster("リヤカー群");
+		info.setItem("換金1", 制御／戦闘／アイテム確率設定(12));
+	}
+	else
+	{
+		info.addMonster("リヤカー");
+		info.addMonster("リヤカー群");
+		info.addMonster("ザコ群");
+		info.setItem("換金1", 制御／戦闘／アイテム確率設定(6));
+	}
+	info.setBattleBackGroundId("ハイパービル");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ハイパービル／ＰＫタートル()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("PKタートル");
+		info.addMonster("リヤカー");
+		info.addMonster("レッドハニー");
+		info.setItem("守り神様ストラップ", 制御／戦闘／アイテム確率設定(3));
+	}
+	else
+	{
+		info.addMonster("PKタートル");
+		info.addMonster("PKタートル");
+		info.addMonster("ザコ");
+		info.setItem("守り神様ストラップ", 制御／戦闘／アイテム確率設定(6));
+	}
+	info.setBattleBackGroundId("ハイパービル");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ハイパービル／ＰＫタートル／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("PKタートル");
+		info.addMonster("PKタートル");
+		info.addMonster("PKタートル");
+		info.addMonster("ザコ群");
+		info.setItem("守り神様ストラップ", 制御／戦闘／アイテム確率設定(9));
+	}
+	else
+	{
+		info.addMonster("リヤカー");
+		info.addMonster("ザコ");
+		info.addMonster("PKタートル");
+		info.addMonster("リヤカー");
+		info.addMonster("レッドハニー");
+		info.setItem("守り神様ストラップ", 制御／戦闘／アイテム確率設定(3));
+	}
+	info.setBattleBackGroundId("ハイパービル");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ハイパービル／ゲーリング()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("リヤカー");
+		info.addMonster("ゲーリング");
+		info.addMonster("リヤカー");
+		info.setItem("徳用魔池", 制御／戦闘／アイテム確率設定(9));
+	}
+	else
+	{
+		info.addMonster("ゲーリング");
+		info.addMonster("リヤカー群");
+		info.setItem("徳用魔池", 制御／戦闘／アイテム確率設定(9));
+	}
+	info.setBattleBackGroundId("ハイパービル");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ハイパービル／ゲーリング／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("リヤカー群");
+		info.addMonster("ゲーリング");
+		info.addMonster("リヤカー群");
+		info.setItem("徳用魔池", 制御／戦闘／アイテム確率設定(9));
+	}
+	else
+	{
+		info.addMonster("リヤカー");
+		info.addMonster("リヤカー");
+		info.addMonster("ゲーリング");
+		info.addMonster("リヤカー群");
+		info.setItem("徳用魔池", 制御／戦闘／アイテム確率設定(9));
+	}
+	info.setBattleBackGroundId("ハイパービル");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ハイパービル／パワーゴリラＺ()
+{
+	BattleInfomation info;
+	info.addMonster("パワーゴリラZ");
+	info.setBattleBackGroundId("ハイパービル");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ハイパービル／パワーゴリラＺ／Ｂ()
+{
+	BattleInfomation info;
+	info.addMonster("パワーゴリラZ");
+	info.addMonster("パワーゴリラZ");
+	info.setBattleBackGroundId("ハイパービル");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ハイパービル／うしドバーン()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("うしドバーン");
+		info.setItem("珍味3", 制御／戦闘／アイテム確率設定(3));
+	}
+	else
+	{
+		info.addMonster("うしドバーン");
+		info.addMonster("グリーンハニー");
+		info.addMonster("グリーンハニー");
+		info.setItem("珍味3", 制御／戦闘／アイテム確率設定(3));
+	}
+	info.setBattleBackGroundId("ハイパービル");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ハイパービル／うしドバーン／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("うしドバーン");
+		info.addMonster("PKタートル");
+		info.addMonster("レッドハニー");
+		info.addMonster("うしドバーン");
+		info.setItem("珍味3", 制御／戦闘／アイテム確率設定(6));
+	}
+	else
+	{
+		info.addMonster("うしドバーン");
+		info.addMonster("グリーンハニー");
+		info.addMonster("グリーンハニー");
+		info.addMonster("グリーンハニー");
+		info.addMonster("グリーンハニー");
+		info.addMonster("グリーンハニー");
+		info.addMonster("グリーンハニー");
+		info.setItem("珍味3", 制御／戦闘／アイテム確率設定(3));
+	}
+	info.setBattleBackGroundId("ハイパービル");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ハイパービル／ミミミック()
+{
+	BattleInfomation info;
+	info.addMonster("ミミミック");
+	info.setItem("スカウトキー", 制御／戦闘／アイテム確率設定(30));
+	info.setBattleBackGroundId("ハイパービル");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ジオ／ヘルマン歩兵()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン歩兵f");
+	}
+	else
+	{
+		info.addMonster("ヘルマン歩兵f");
+		info.addMonster("ヘルマン歩兵f");
+	}
+	info.setBattleBackGroundId("都市／ジオ");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ジオ／ヘルマン弩兵()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン弩兵f");
+	}
+	else
+	{
+		info.addMonster("ヘルマン弩兵f");
+		info.addMonster("ヘルマン弩兵f");
+	}
+	info.setBattleBackGroundId("都市／ジオ");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ジオ／ヘルマン工兵()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン工兵f");
+	}
+	else
+	{
+		info.addMonster("ヘルマン工兵f");
+		info.addMonster("ヘルマン工兵f");
+	}
+	info.setBattleBackGroundId("都市／ジオ");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ホッホ峡／ヘルマン歩兵()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン歩兵j");
+		info.addMonster("ヘルマン歩兵j");
+		info.addMonster("ヘルマン歩兵群j");
+	}
+	else
+	{
+		info.addMonster("ヘルマン歩兵群j");
+		info.addMonster("ヘルマン歩兵j");
+		info.addMonster("ヘルマン工兵j");
+		info.addMonster("ヘルマン歩兵群j");
+	}
+	info.setBattleBackGroundId("ホッホ峡／暗");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ホッホ峡／ヘルマン歩兵／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン歩兵群j");
+		info.addMonster("ヘルマン歩兵群j");
+		info.addMonster("ヘルマン弩兵j");
+	}
+	else
+	{
+		info.addMonster("ヘルマン歩兵j");
+		info.addMonster("ヘルマン歩兵群f");
+		info.addMonster("ヘルマン弩兵群j");
+		info.addMonster("ヘルマン歩兵群f");
+	}
+	info.setBattleBackGroundId("ホッホ峡／暗");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ホッホ峡／ヘルマン弩兵()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン歩兵j");
+		info.addMonster("ヘルマン弩兵群j");
+	}
+	else
+	{
+		info.addMonster("ヘルマン弩兵j");
+		info.addMonster("ヘルマン弩兵j");
+		info.addMonster("ヘルマン歩兵j");
+		info.addMonster("ヘルマン弩兵j");
+	}
+	info.setBattleBackGroundId("ホッホ峡／暗");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ホッホ峡／ヘルマン弩兵／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン弩兵群j");
+		info.addMonster("ヘルマン工兵j");
+		info.addMonster("ヘルマン弩兵群j");
+	}
+	else
+	{
+		info.addMonster("ヘルマン歩兵群f");
+		info.addMonster("ヘルマン弩兵f");
+		info.addMonster("ヘルマン弩兵群j");
+		info.addMonster("ヘルマン弩兵群j");
+	}
+	info.setBattleBackGroundId("ホッホ峡／暗");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ホッホ峡／ヘルマン工兵()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン工兵j");
+		info.addMonster("ヘルマン工兵j");
+		info.addMonster("ヘルマン弩兵j");
+	}
+	else
+	{
+		info.addMonster("ヘルマン歩兵j");
+		info.addMonster("ヘルマン工兵j");
+		info.addMonster("ヘルマン工兵j");
+		info.addMonster("ヘルマン歩兵j");
+	}
+	info.setBattleBackGroundId("ホッホ峡／暗");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ホッホ峡／ヘルマン工兵／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン弩兵群j");
+		info.addMonster("ヘルマン工兵j");
+		info.addMonster("ヘルマン歩兵群j");
+		info.addMonster("ヘルマン工兵j");
+	}
+	else
+	{
+		info.addMonster("ヘルマン歩兵f");
+		info.addMonster("ヘルマン工兵f");
+		info.addMonster("ヘルマン工兵j");
+		info.addMonster("ヘルマン弩兵群j");
+		info.addMonster("ヘルマン工兵f");
+		info.addMonster("ヘルマン工兵j");
+		info.addMonster("ヘルマン弩兵群j");
+	}
+	info.setBattleBackGroundId("ホッホ峡／暗");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ホッホ峡／ヘルマン術兵()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン歩兵j");
+		info.addMonster("ヘルマン歩兵j");
+		info.addMonster("ヘルマン歩兵j");
+		info.addMonster("ヘルマン術兵j");
+	}
+	else
+	{
+		info.addMonster("ヘルマン歩兵群j");
+		info.addMonster("ヘルマン術兵j");
+		info.addMonster("ヘルマン工兵j");
+	}
+	info.setBattleBackGroundId("ホッホ峡／暗");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ホッホ峡／ヘルマン術兵／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン歩兵群j");
+		info.addMonster("ヘルマン弩兵j");
+		info.addMonster("ヘルマン術兵j");
+		info.addMonster("ヘルマン術兵j");
+	}
+	else
+	{
+		info.addMonster("ヘルマン弩兵群j");
+		info.addMonster("ヘルマン工兵j");
+		info.addMonster("ヘルマン歩兵j");
+		info.addMonster("ヘルマン術兵j");
+		info.addMonster("ヘルマン術兵j");
+		info.addMonster("ヘルマン術兵j");
+	}
+	info.setBattleBackGroundId("ホッホ峡／暗");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ホッホ峡／ヘルマン騎士()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン歩兵群j");
+		info.addMonster("ヘルマン騎士j");
+	}
+	else
+	{
+		info.addMonster("ヘルマン騎士j");
+		info.addMonster("ヘルマン工兵j");
+		info.addMonster("ヘルマン弩兵j");
+	}
+	info.setBattleBackGroundId("ホッホ峡／暗");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ホッホ峡／ヘルマン騎士／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン騎士j");
+		info.addMonster("ヘルマン歩兵j");
+		info.addMonster("ヘルマン工兵j");
+		info.addMonster("ヘルマン弩兵群j");
+	}
+	else
+	{
+		info.addMonster("ヘルマン騎士j");
+		info.addMonster("ヘルマン弩兵群j");
+		info.addMonster("ヘルマン騎士j");
+	}
+	info.setBattleBackGroundId("ホッホ峡／暗");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ホッホ峡Ｂ／腐った死体()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("腐った死体");
+		info.addMonster("腐った死体");
+		info.setItem("珍味1", 制御／戦闘／アイテム確率設定(30));
+	}
+	else
+	{
+		info.addMonster("ミスコーン");
+		info.addMonster("腐った死体");
+		info.addMonster("腐った死体");
+		info.setItem("カッパーマトック", 制御／戦闘／アイテム確率設定(3));
+	}
+	info.setBattleBackGroundId("ホッホ峡／明");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ホッホ峡Ｂ／腐った死体／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("腐った死体群");
+		info.addMonster("腐った死体群");
+		info.setItem("珍味1", 制御／戦闘／アイテム確率設定(60));
+	}
+	else
+	{
+		info.addMonster("腐った死体群");
+		info.addMonster("腐った死体群");
+		info.addMonster("腐った死体群");
+		info.addMonster("ゲーリング");
+		info.setItem("珍味1", 制御／戦闘／アイテム確率設定(90));
+	}
+	info.setBattleBackGroundId("ホッホ峡／明");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ホッホ峡Ｂ／ライカンスロープ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ライカンスロープd1");
+		info.addMonster("ライカンスロープh2");
+		info.addMonster("ライカンスロープe2");
+		info.setItem("世色癌1", 制御／戦闘／アイテム確率設定(9));
+	}
+	else
+	{
+		info.addMonster("ライカンスロープe2");
+		info.addMonster("ライカンスロープh2");
+		info.addMonster("ライカンスロープh2");
+		info.setItem("世色癌1", 制御／戦闘／アイテム確率設定(9));
+	}
+	info.setBattleBackGroundId("ホッホ峡／明");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ホッホ峡Ｂ／サメラ～イ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("サメラ～イ");
+		info.addMonster("サメラ～イ");
+		info.addMonster("サメラ～イ");
+		info.setItem("アサクヒロク2", 制御／戦闘／アイテム確率設定(9));
+	}
+	else
+	{
+		info.addMonster("ライカンスロープe2");
+		info.addMonster("サメラ～イ");
+		info.addMonster("サメラ～イ");
+		info.setItem("アサクヒロク2", 制御／戦闘／アイテム確率設定(6));
+	}
+	info.setBattleBackGroundId("ホッホ峡／明");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ホッホ峡Ｂ／おかゆフィーバー()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("おかゆフィーバー");
+		info.addMonster("ちょーちん");
+		info.setItem("換金4", 制御／戦闘／アイテム確率設定(15));
+	}
+	else
+	{
+		info.addMonster("ちゃいむ");
+		info.addMonster("おかゆフィーバー");
+		info.setItem("換金4", 制御／戦闘／アイテム確率設定(15));
+	}
+	info.setBattleBackGroundId("ホッホ峡／明");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／パッキャマラード・デン／ライカンスロープ()
+{
+	BattleInfomation info;
+	switch (RAND(6))
+	{
+	case 1:
+	case 2:
+	case 3:
+	case 4:
+		info.addMonster("凶悪ハニー");
+		info.addMonster("ライカンスロープh2");
+		info.addMonster("凶悪ハニー");
+		info.setItem("守り神様ストラップ", 制御／戦闘／アイテム確率設定(6));
+		break;
+	case 5:
+		info.addMonster("凶悪ハニー");
+		info.addMonster("ライカンスロープe2");
+		info.addMonster("凶悪ハニー");
+		info.setItem("守り神様ストラップ", 制御／戦闘／アイテム確率設定(6));
+		break;
+	default:
+		info.addMonster("凶悪ハニー");
+		info.addMonster("ライカンスロープd1");
+		info.addMonster("凶悪ハニー");
+		info.setItem("守り神様ストラップ", 制御／戦闘／アイテム確率設定(6));
+		break;
+	}
+	info.setBattleBackGroundId("リスの洞窟");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／パッキャマラード・デン／住民()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("住民");
+		info.addMonster("住民");
+		info.setItem("換金1", 制御／戦闘／アイテム確率設定(30));
+	}
+	else
+	{
+		info.addMonster("住民");
+		info.setItem("換金1", 制御／戦闘／アイテム確率設定(15));
+	}
+	info.setBattleBackGroundId("リスの洞窟");
+	openBattle2(info);
+}
+
+void 制御／モンスター／パッキャマラード・デン／凶悪ハニー()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("凶悪ハニー");
+		info.addMonster("住民");
+		info.setItem("守り神様ストラップ", 制御／戦闘／アイテム確率設定(3));
+	}
+	else
+	{
+		info.addMonster("凶悪ハニー");
+		info.addMonster("凶悪ハニー");
+		info.addMonster("住民");
+		info.setItem("守り神様ストラップ", 制御／戦闘／アイテム確率設定(6));
+	}
+	info.setBattleBackGroundId("リスの洞窟");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ハニービル／背景チーム()
+{
+	BattleInfomation info;
+	info.addMonster("なかじー");
+	info.addMonster("古介");
+	info.addMonster("れんれん");
+	info.setItem("ピッキングドリル", 制御／戦闘／アイテム確率設定(3));
+	info.setBattleBackGroundId("ハニービル");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ハニービル／背景チーム／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("なかじー");
+		info.addMonster("なかじー");
+		info.addMonster("古介B");
+		info.addMonster("れんれん");
+		info.setItem("ピッキングドリル", 制御／戦闘／アイテム確率設定(6));
+	}
+	else
+	{
+		info.addMonster("なかじー");
+		info.addMonster("れんれん");
+		info.addMonster("古介B");
+		info.addMonster("なかじー");
+		info.setItem("ピッキングドリル", 制御／戦闘／アイテム確率設定(6));
+	}
+	info.setBattleBackGroundId("ハニービル");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ハニービル／背景チーム／Ｃ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("なかじーB");
+		info.addMonster("れんれん");
+		info.addMonster("れんれん");
+		info.addMonster("古介C");
+		info.setItem("ピッキングドリル", 制御／戦闘／アイテム確率設定(3));
+	}
+	else
+	{
+		info.addMonster("なかじー");
+		info.addMonster("なかじーB");
+		info.addMonster("古介");
+		info.addMonster("古介");
+		info.addMonster("古介");
+		info.addMonster("れんれん");
+		info.setItem("ピッキングドリル", 制御／戦闘／アイテム確率設定(6));
+	}
+	info.setBattleBackGroundId("ハニービル");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ハニービル／背景チーム／Ｄ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("古介");
+		info.addMonster("古介");
+		info.addMonster("なかじーC");
+		info.addMonster("れんれん");
+		info.setItem("ピッキングドリル", 制御／戦闘／アイテム確率設定(3));
+	}
+	else
+	{
+		info.addMonster("れんれん");
+		info.addMonster("古介");
+		info.addMonster("れんれん");
+		info.addMonster("なかじーC");
+		info.addMonster("なかじーC");
+		info.setItem("ピッキングドリル", 制御／戦闘／アイテム確率設定(6));
+	}
+	info.setBattleBackGroundId("ハニービル");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ハニービル／背景チーム／Ｅ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("古介");
+		info.addMonster("古介");
+		info.addMonster("古介");
+		info.addMonster("古介");
+		info.addMonster("古介");
+		info.addMonster("なかじー");
+		info.addMonster("れんれんB");
+		info.setItem("珍味2", 制御／戦闘／アイテム確率設定(15));
+	}
+	else
+	{
+		info.addMonster("古介");
+		info.addMonster("古介");
+		info.addMonster("古介");
+		info.addMonster("れんれん");
+		info.addMonster("れんれん");
+		info.addMonster("なかじー");
+		info.setItem("珍味2", 制御／戦闘／アイテム確率設定(9));
+	}
+	info.setBattleBackGroundId("ハニービル");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ハニービル／背景チーム／Ｆ()
+{
+	BattleInfomation info;
+	switch (RAND(6))
+	{
+	case 1:
+	case 2:
+	case 3:
+		info.addMonster("なかじー");
+		info.addMonster("古介B");
+		info.addMonster("古介B");
+		info.addMonster("れんれん");
+		info.addMonster("古介B");
+		info.setItem("珍味2", 制御／戦闘／アイテム確率設定(15));
+		break;
+	case 4:
+	case 5:
+		info.addMonster("古介B");
+		info.addMonster("れんれんB");
+		info.addMonster("古介B");
+		info.addMonster("なかじー");
+		info.setItem("珍味2", 制御／戦闘／アイテム確率設定(9));
+		break;
+	case 6:
+		info.addMonster("なかじーB");
+		info.addMonster("れんれんB");
+		info.addMonster("古介D");
+		info.setItem("丹下犬ストラップ", 制御／戦闘／アイテム確率設定(3));
+		break;
+	}
+	info.setBattleBackGroundId("ハニービル");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ハニービル／背景チーム／Ｇ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("なかじーB");
+		info.addMonster("古介C");
+		info.addMonster("れんれん");
+		info.addMonster("れんれん");
+		info.setItem("珍味2", 制御／戦闘／アイテム確率設定(3));
+	}
+	else
+	{
+		info.addMonster("れんれんB");
+		info.addMonster("古介C");
+		info.addMonster("古介C");
+		info.addMonster("なかじー");
+		info.addMonster("古介C");
+		info.setItem("珍味2", 制御／戦闘／アイテム確率設定(9));
+	}
+	info.setBattleBackGroundId("ハニービル");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ハニービル／背景チーム／Ｈ()
+{
+	BattleInfomation info;
+	switch (RAND(6))
+	{
+	case 1:
+	case 2:
+	case 3:
+		info.addMonster("なかじー");
+		info.addMonster("なかじー");
+		info.addMonster("れんれんB");
+		info.addMonster("古介C");
+		info.setItem("換金2", 制御／戦闘／アイテム確率設定(3));
+		break;
+	case 4:
+	case 5:
+		info.addMonster("なかじー");
+		info.addMonster("なかじー");
+		info.addMonster("れんれんB");
+		info.addMonster("古介C");
+		info.setItem("換金2", 制御／戦闘／アイテム確率設定(3));
+		break;
+	case 6:
+		info.addMonster("れんれんC");
+		info.setItem("毎度ありストラップ", 制御／戦闘／アイテム確率設定(3));
+		break;
+	}
+	info.setBattleBackGroundId("ハニービル");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ハニービル／背景チーム／Ｉ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("なかじーB");
+		info.addMonster("れんれんB");
+		info.addMonster("古介C");
+		info.addMonster("古介B");
+		info.addMonster("なかじー");
+		info.addMonster("れんれん");
+		info.setItem("ピッキングドリル", 制御／戦闘／アイテム確率設定(6));
+	}
+	else
+	{
+		info.addMonster("古介C");
+		info.addMonster("古介C");
+		info.addMonster("古介C");
+		info.addMonster("なかじーB");
+		info.addMonster("なかじーC");
+		info.addMonster("古介C");
+		info.addMonster("れんれん");
+		info.setItem("ピッキングドリル", 制御／戦闘／アイテム確率設定(6));
+	}
+	info.setBattleBackGroundId("ハニービル");
+	openBattle2(info);
+}
+
+void 制御／モンスター／下水道／ライカンスロープ()
+{
+	BattleInfomation info;
+	switch (RAND(6))
+	{
+	case 1:
+	case 2:
+	case 3:
+	case 4:
+		info.addMonster("ライカンスロープm2");
+		break;
+	case 5:
+		info.addMonster("ライカンスロープh2");
+		break;
+	default:
+		info.addMonster("ライカンスロープd1");
+		break;
+	}
+	info.setItem("世色癌1", 制御／戦闘／アイテム確率設定(3));
+	info.setBattleBackGroundId("下水道");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／下水道／ライカンスロープ／Ｂ()
+{
+	BattleInfomation info;
+	switch (RAND(6))
+	{
+	case 1:
+	case 2:
+	case 3:
+	case 4:
+		info.addMonster("つみれマン");
+		info.addMonster("ライカンスロープm2");
+		info.addMonster("大王イカマン群");
+		break;
+	case 5:
+		info.addMonster("つみれマン");
+		info.addMonster("ライカンスロープh2");
+		info.addMonster("大王イカマン群");
+		break;
+	default:
+		info.addMonster("つみれマン");
+		info.addMonster("ライカンスロープd1");
+		info.addMonster("大王イカマン群");
+		break;
+	}
+	info.setItem("丹下犬ストラップ", 制御／戦闘／アイテム確率設定(3));
+	info.setBattleBackGroundId("下水道");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／下水道／さかなモンスター()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("さかなモンスター");
+		info.addMonster("さかなモンスター");
+		info.addMonster("さかなモンスター");
+		info.setItem("換金1", 制御／戦闘／アイテム確率設定(9));
+	}
+	else
+	{
+		info.addMonster("さかなモンスター");
+		info.addMonster("さかなモンスター");
+		info.addMonster("さかなモンスター");
+		info.addMonster("さかなモンスター");
+		info.addMonster("さかなモンスター");
+		info.setItem("換金1", 制御／戦闘／アイテム確率設定(12));
+	}
+	info.setBattleBackGroundId("下水道");
+	openBattle2(info);
+}
+
+void 制御／モンスター／下水道／さかなモンスター／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("さかなモンスター群");
+		info.addMonster("さかなモンスター群");
+		info.addMonster("さかなモンスター群");
+		info.setItem("換金1", 制御／戦闘／アイテム確率設定(18));
+	}
+	else
+	{
+		info.addMonster("大王イカマン");
+		info.addMonster("さかなモンスター群");
+		info.addMonster("さかなモンスター群");
+		info.setItem("換金1", 制御／戦闘／アイテム確率設定(12));
+	}
+	info.setBattleBackGroundId("下水道");
+	openBattle2(info);
+}
+
+void 制御／モンスター／下水道／大王イカマン()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("大王イカマン");
+		info.addMonster("大王イカマン");
+	}
+	else
+	{
+		info.addMonster("さかなモンスター");
+		info.addMonster("大王イカマン");
+		info.addMonster("さかなモンスター");
+		info.setItem("換金1", 制御／戦闘／アイテム確率設定(6));
+	}
+	info.setBattleBackGroundId("下水道");
+	openBattle2(info);
+}
+
+void 制御／モンスター／下水道／つみれマン()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("つみれマン");
+		info.addMonster("つみれマン");
+		info.addMonster("ダブルハニー");
+		info.setItem("丹下犬ストラップ", 制御／戦闘／アイテム確率設定(6));
+	}
+	else
+	{
+		info.addMonster("つみれマン");
+		info.addMonster("さかなモンスター");
+		info.addMonster("さかなモンスター");
+		info.addMonster("つみれマン");
+		info.addMonster("ダブルハニー");
+		info.setItem("丹下犬ストラップ", 制御／戦闘／アイテム確率設定(6));
+	}
+	info.setBattleBackGroundId("下水道");
+	openBattle2(info);
+}
+
+void 制御／モンスター／下水道／ダブルハニー()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ダブルハニー");
+	}
+	else
+	{
+		info.addMonster("さかなモンスター群");
+		info.addMonster("ダブルハニー");
+		info.setItem("換金1", 制御／戦闘／アイテム確率設定(6));
+	}
+	info.setBattleBackGroundId("下水道");
+	openBattle2(info);
+}
+
+void 制御／モンスター／下水道／ダブルハニー／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ダブルハニー");
+		info.addMonster("ダブルハニー");
+	}
+	else
+	{
+		info.addMonster("さかなモンスター群");
+		info.addMonster("大王イカマン");
+		info.addMonster("ダブルハニー");
+		info.addMonster("ダブルハニー");
+		info.setItem("換金1", 制御／戦闘／アイテム確率設定(6));
+	}
+	info.setBattleBackGroundId("下水道");
+	openBattle2(info);
+}
+
+void 制御／モンスター／下水道／コンテ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("コンテ");
+		info.addMonster("大王イカマン群");
+	}
+	else
+	{
+		info.addMonster("つみれマン");
+		info.addMonster("コンテ");
+	}
+	info.setBattleBackGroundId("下水道");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／下水道／コンテ／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("つみれマン");
+		info.addMonster("大王イカマン群");
+		info.addMonster("コンテ");
+		info.addMonster("大王イカマン群");
+	}
+	else
+	{
+		info.addMonster("大王イカマン");
+		info.addMonster("大王イカマン");
+		info.addMonster("コンテ");
+		info.addMonster("大王イカマン");
+		info.addMonster("大王イカマン");
+	}
+	info.setBattleBackGroundId("下水道");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／下水道／Ζくらげ()
+{
+	BattleInfomation info;
+	info.addMonster("Ζくらげ");
+	info.addMonster("さかなモンスター群");
+	info.addMonster("さかなモンスター群");
+	info.addMonster("大王イカマン群");
+	info.addMonster("大王イカマン群");
+	info.setItem("換金1", 制御／戦闘／アイテム確率設定(12));
+	info.setBattleBackGroundId("下水道");
+	openBattle2(info);
+}
+
+void 制御／モンスター／下水道／ミミミック()
+{
+	BattleInfomation info;
+	info.addMonster("ミミミック");
+	info.setItem("スカウトキー", 制御／戦闘／アイテム確率設定(30));
+	info.setBattleBackGroundId("下水道");
+	openBattle2(info);
+}
+
+void 制御／モンスター／牢獄／ライカンスロープ()
+{
+	BattleInfomation info;
+	switch (RAND(6))
+	{
+	case 1:
+	case 2:
+	case 3:
+	case 4:
+		info.addMonster("ライカンスロープn2");
+		break;
+	case 5:
+		info.addMonster("ライカンスロープm2");
+		break;
+	default:
+		info.addMonster("ライカンスロープd1");
+		break;
+	}
+	info.setItem("世色癌1", 制御／戦闘／アイテム確率設定(3));
+	info.setBattleBackGroundId("牢獄");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／牢獄／ヘルマン歩兵()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン歩兵q");
+		info.addMonster("ヘルマン歩兵q");
+	}
+	else
+	{
+		info.addMonster("ヘルマン歩兵q");
+		info.addMonster("ヘルマン弩兵q");
+	}
+	info.setBattleBackGroundId("牢獄");
+	openBattle2(info);
+}
+
+void 制御／モンスター／牢獄／コンテ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("コンテ");
+		info.addMonster("コンテ");
+	}
+	else
+	{
+		info.addMonster("こんばんわ");
+		info.addMonster("コンテ");
+		info.addMonster("こんばんわ");
+		info.setItem("毎度ありストラップ", 制御／戦闘／アイテム確率設定(6));
+	}
+	info.setBattleBackGroundId("牢獄");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／牢獄／フルパワーゴリラＺＩＩ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("フルパワーゴリラZII");
+		info.setItem("換金5", 制御／戦闘／アイテム確率設定(3));
+	}
+	else
+	{
+		info.addMonster("フルパワーゴリラZII");
+		info.addMonster("コンテ");
+		info.setItem("換金5", 制御／戦闘／アイテム確率設定(3));
+		info.setMusicId("音楽／戦闘／女の子モンスター");
+	}
+	info.setBattleBackGroundId("牢獄");
+	openBattle2(info);
+}
+
+void 制御／モンスター／居館／地下一階／ラーカイム()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ラーカイム");
+		info.addMonster("ラーカイム");
+		info.addMonster("ラーカイム");
+		info.addMonster("ラーカイム");
+		info.addMonster("ラーカイム");
+		switch (RAND(3))
+		{
+		case 1:
+			info.setItem("徳用魔池", 制御／戦闘／アイテム確率設定(75));
+			break;
+		case 2:
+			info.setItem("バラバラ時計", 制御／戦闘／アイテム確率設定(75));
+			break;
+		case 3:
+			info.setItem("換金3", 制御／戦闘／アイテム確率設定(75));
+		}
+	}
+	else
+	{
+		info.addMonster("ラーカイム");
+		info.addMonster("ラーカイム");
+		info.addMonster("ラーカイム");
+		info.addMonster("ラーカイム");
+		info.addMonster("ラーカイム");
+		info.addMonster("ラーカイム");
+		info.addMonster("ラーカイム");
+		info.addMonster("ラーカイム");
+		info.addMonster("ラーカイム");
+		switch (RAND(3))
+		{
+		case 1:
+			info.setItem("徳用魔池", 制御／戦闘／アイテム確率設定(99));
+			break;
+		case 2:
+			info.setItem("バラバラ時計", 制御／戦闘／アイテム確率設定(99));
+			break;
+		case 3:
+			info.setItem("換金3", 制御／戦闘／アイテム確率設定(99));
+		}
+	}
+	info.setBattleBackGroundId("居館／地下一階");
+	openBattle2(info);
+}
+
+void 制御／モンスター／東の塔／ライカンスロープ()
+{
+	BattleInfomation info;
+	switch (RAND(6))
+	{
+	case 1:
+	case 2:
+	case 3:
+	case 4:
+		info.addMonster("ライカンスロープn2");
+		info.addMonster("わんわん群");
+		info.addMonster("わんわん群");
+		info.addMonster("わんわん群");
+		break;
+	case 5:
+		info.addMonster("ライカンスロープh2");
+		info.addMonster("わんわん群");
+		info.addMonster("わんわん群");
+		info.addMonster("わんわん群");
+		break;
+	default:
+		info.addMonster("ライカンスロープe2");
+		info.addMonster("わんわん群");
+		info.addMonster("わんわん群");
+		info.addMonster("わんわん群");
+		break;
+	}
+	info.setItem("世色癌1", 制御／戦闘／アイテム確率設定(3));
+	info.setBattleBackGroundId("塔／東");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／東の塔／ヘルマン歩兵()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン歩兵q");
+		info.addMonster("ヘルマン歩兵q");
+	}
+	else
+	{
+		info.addMonster("ヘルマン歩兵群q");
+		info.addMonster("ヘルマン弩兵q");
+	}
+	info.setBattleBackGroundId("塔／東");
+	openBattle2(info);
+}
+
+void 制御／モンスター／東の塔／ヘルマン弩兵()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン歩兵q");
+		info.addMonster("ヘルマン弩兵q");
+		info.addMonster("ヘルマン弩兵q");
+	}
+	else
+	{
+		info.addMonster("ヘルマン歩兵q");
+		info.addMonster("ヘルマン弩兵群q");
+		info.addMonster("ヘルマン弩兵群q");
+	}
+	info.setBattleBackGroundId("塔／東");
+	openBattle2(info);
+}
+
+void 制御／モンスター／東の塔／ヘルマン工兵()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン歩兵q");
+		info.addMonster("ヘルマン工兵q");
+		info.addMonster("ヘルマン弩兵q");
+		info.addMonster("ヘルマン工兵q");
+	}
+	else
+	{
+		info.addMonster("ヘルマン歩兵群q");
+		info.addMonster("ヘルマン工兵q");
+		info.addMonster("ヘルマン弩兵q");
+	}
+	info.setBattleBackGroundId("塔／東");
+	openBattle2(info);
+}
+
+void 制御／モンスター／東の塔／ヘルマン術兵()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン歩兵q");
+		info.addMonster("ヘルマン工兵q");
+		info.addMonster("ヘルマン術兵q");
+	}
+	else
+	{
+		info.addMonster("ヘルマン弩兵群q");
+		info.addMonster("ヘルマン術兵q");
+		info.addMonster("ヘルマン術兵q");
+	}
+	info.setBattleBackGroundId("塔／東");
+	openBattle2(info);
+}
+
+void 制御／モンスター／東の塔／ヘルマン騎士()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン騎士q");
+		info.addMonster("ヘルマン工兵q");
+	}
+	else
+	{
+		info.addMonster("ヘルマン騎士q");
+		info.addMonster("ヘルマン弩兵群q");
+	}
+	info.setBattleBackGroundId("塔／東");
+	openBattle2(info);
+}
+
+void 制御／モンスター／東の塔／ヘルマン士官()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン歩兵群q");
+		info.addMonster("ヘルマン歩兵群q");
+		info.addMonster("ヘルマン士官q");
+	}
+	else
+	{
+		info.addMonster("ヘルマン士官q");
+		info.addMonster("ヘルマン弩兵群q");
+		info.addMonster("ヘルマン工兵q");
+	}
+	info.setBattleBackGroundId("塔／東");
+	openBattle2(info);
+}
+
+void 制御／モンスター／東の塔／ヘルマン操兵()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("オッズ");
+		info.addMonster("オッズ");
+		info.addMonster("ヘルマン操兵q");
+	}
+	else
+	{
+		info.addMonster("オッズ");
+		info.addMonster("ヘルマン操兵q");
+		info.addMonster("ヘルマン工兵q");
+	}
+	info.setBattleBackGroundId("塔／東");
+	openBattle2(info);
+}
+
+void 制御／モンスター／東の塔／ヘルマン操兵／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("オッズ群");
+		info.addMonster("オッズ群");
+		info.addMonster("ヘルマン操兵q");
+	}
+	else
+	{
+		info.addMonster("オッズ群");
+		info.addMonster("ヘルマン操兵q");
+		info.addMonster("ヘルマン術兵q");
+	}
+	info.setBattleBackGroundId("塔／東");
+	openBattle2(info);
+}
+
+void 制御／モンスター／東の塔／防衛陣地()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("防衛陣地q");
+		info.addMonster("ヘルマン工兵q");
+		info.addMonster("ヘルマン弩兵群q");
+		info.setItem("珍味3", 制御／戦闘／アイテム確率設定(15));
+	}
+	else
+	{
+		info.addMonster("防衛陣地q");
+		info.addMonster("ヘルマン弩兵q");
+		info.addMonster("ヘルマン弩兵q");
+		info.setItem("珍味3", 制御／戦闘／アイテム確率設定(15));
+	}
+	info.setBattleBackGroundId("塔／東");
+	openBattle2(info);
+}
+
+void 制御／モンスター／東の塔／スーパーハニー()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("スーパーハニー");
+		info.setItem("アサクヒロク2", 制御／戦闘／アイテム確率設定(3));
+	}
+	else
+	{
+		info.addMonster("スーパーハニー");
+		info.addMonster("スーパーハニー");
+		info.setItem("アサクヒロク2", 制御／戦闘／アイテム確率設定(6));
+	}
+	info.setBattleBackGroundId("塔／東");
+	openBattle2(info);
+}
+
+void 制御／モンスター／東の塔／デュラピー()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ミスコーン");
+		info.addMonster("デュラピー");
+		info.setItem("換金5", 制御／戦闘／アイテム確率設定(3));
+	}
+	else
+	{
+		info.addMonster("デュラピー");
+		info.addMonster("ミスコーン");
+		info.setItem("換金5", 制御／戦闘／アイテム確率設定(3));
+	}
+	info.setBattleBackGroundId("塔／東");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／東の塔／デュラピー／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ダブルハニー");
+		info.addMonster("デュラピー");
+		info.setItem("換金5", 制御／戦闘／アイテム確率設定(3));
+	}
+	else
+	{
+		info.addMonster("デュラピー");
+		info.addMonster("ダブルハニー");
+		info.setItem("換金5", 制御／戦闘／アイテム確率設定(3));
+	}
+	info.setBattleBackGroundId("塔／東");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／東の塔／ゆみみみっく()
+{
+	BattleInfomation info;
+	info.addMonster("ゆみみみっく");
+	info.setItem("スカウトキー", 制御／戦闘／アイテム確率設定(60));
+	info.setBattleBackGroundId("塔／東");
+	openBattle2(info);
+}
+
+void 制御／モンスター／西の塔／ライカンスロープ()
+{
+	BattleInfomation info;
+	switch (RAND(6))
+	{
+	case 1:
+	case 2:
+	case 3:
+		info.addMonster("ライカンスロープn2");
+		info.addMonster("ライカンスロープn2");
+		info.addMonster("わんわん群");
+		break;
+	case 4:
+	case 5:
+		info.addMonster("ライカンスロープe2");
+		info.addMonster("ライカンスロープn2");
+		info.addMonster("わんわん群");
+		break;
+	default:
+		info.addMonster("ライカンスロープn2");
+		info.addMonster("ライカンスロープm2");
+		info.addMonster("わんわん群");
+		break;
+	}
+	info.setItem("世色癌2", 制御／戦闘／アイテム確率設定(6));
+	info.setBattleBackGroundId("塔／西");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／西の塔／フルパワーゴリラＺＩＩ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("フルパワーゴリラZII");
+		info.setItem("換金5", 制御／戦闘／アイテム確率設定(3));
+	}
+	else
+	{
+		info.addMonster("フルパワーゴリラZII");
+		info.addMonster("フルパワーゴリラZII");
+		info.setItem("換金5", 制御／戦闘／アイテム確率設定(6));
+	}
+	info.setBattleBackGroundId("塔／西");
+	openBattle2(info);
+}
+
+void 制御／モンスター／西の塔／ヘルマン歩兵()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン歩兵群q");
+		info.addMonster("ヘルマン歩兵群q");
+		info.addMonster("ヘルマン歩兵群q");
+	}
+	else
+	{
+		info.addMonster("ヘルマン歩兵群q");
+		info.addMonster("ヘルマン弩兵q");
+	}
+	info.setBattleBackGroundId("塔／西");
+	openBattle2(info);
+}
+
+void 制御／モンスター／西の塔／ヘルマン弩兵()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン弩兵群q");
+		info.addMonster("ヘルマン弩兵群q");
+		info.addMonster("ヘルマン工兵q");
+	}
+	else
+	{
+		info.addMonster("ヘルマン歩兵q");
+		info.addMonster("ヘルマン弩兵q");
+		info.addMonster("ヘルマン弩兵q");
+	}
+	info.setBattleBackGroundId("塔／西");
+	openBattle2(info);
+}
+
+void 制御／モンスター／西の塔／ヘルマン工兵()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン工兵q");
+		info.addMonster("ヘルマン工兵q");
+		info.addMonster("ヘルマン弩兵q");
+		info.setItem("換金4", 制御／戦闘／アイテム確率設定(6));
+	}
+	else
+	{
+		info.addMonster("ヘルマン歩兵群q");
+		info.addMonster("ヘルマン工兵q");
+		info.addMonster("ヘルマン弩兵q");
+		info.setItem("換金4", 制御／戦闘／アイテム確率設定(3));
+	}
+	info.setBattleBackGroundId("塔／西");
+	openBattle2(info);
+}
+
+void 制御／モンスター／西の塔／ヘルマン術兵()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン歩兵群q");
+		info.addMonster("ヘルマン工兵q");
+		info.addMonster("ヘルマン術兵q");
+		info.addMonster("ヘルマン術兵q");
+	}
+	else
+	{
+		info.addMonster("ヘルマン術兵q");
+		info.addMonster("ヘルマン術兵q");
+		info.addMonster("ヘルマン術兵q");
+	}
+	info.setBattleBackGroundId("塔／西");
+	openBattle2(info);
+}
+
+void 制御／モンスター／西の塔／ヘルマン操兵()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("サイクロナイト");
+		info.addMonster("ヘルマン操兵q");
+	}
+	else
+	{
+		info.addMonster("サイクロナイト");
+		info.addMonster("ヘルマン操兵q");
+		info.addMonster("ヘルマン術兵q");
+	}
+	info.setBattleBackGroundId("塔／西");
+	openBattle2(info);
+}
+
+void 制御／モンスター／西の塔／ヘルマン操兵／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("サイクロナイト");
+		info.addMonster("ヘルマン操兵q");
+		info.addMonster("ヘルマン工兵q");
+		info.addMonster("サイクロナイト");
+	}
+	else
+	{
+		info.addMonster("オッズ群");
+		info.addMonster("サイクロナイト");
+		info.addMonster("ヘルマン操兵q");
+	}
+	info.setBattleBackGroundId("塔／西");
+	openBattle2(info);
+}
+
+void 制御／モンスター／西の塔／スーパーハニー()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("スーパーハニー");
+		info.addMonster("スーパーハニー");
+		info.setItem("アサクヒロク2", 制御／戦闘／アイテム確率設定(6));
+	}
+	else
+	{
+		info.addMonster("スーパーハニー");
+		info.addMonster("スーパーハニー");
+		info.addMonster("スーパーハニー");
+		info.setItem("アサクヒロク2", 制御／戦闘／アイテム確率設定(9));
+	}
+	info.setBattleBackGroundId("塔／西");
+	openBattle2(info);
+}
+
+void 制御／モンスター／西の塔／ヒトラー()
+{
+	BattleInfomation info;
+	info.addMonster("ヒトラー");
+	info.setItem("徳用魔池", 制御／戦闘／アイテム確率設定(9));
+	info.setBattleBackGroundId("塔／西");
+	openBattle2(info);
+}
+
+void 制御／モンスター／西の塔／フローズン()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("スーパーハニー");
+		info.addMonster("フローズン");
+		info.setItem("珍味4", 制御／戦闘／アイテム確率設定(15));
+	}
+	else
+	{
+		info.addMonster("大王イカマン群");
+		info.addMonster("フローズン");
+		info.addMonster("大王イカマン群");
+		info.setItem("珍味4", 制御／戦闘／アイテム確率設定(15));
+	}
+	info.setBattleBackGroundId("塔／西");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／西の塔／フローズン／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("フローズン");
+		info.addMonster("フローズン");
+		info.setItem("珍味4", 制御／戦闘／アイテム確率設定(30));
+	}
+	else
+	{
+		info.addMonster("フローズン");
+		info.addMonster("大王イカマン群");
+		info.addMonster("大王イカマン群");
+		info.addMonster("フローズン");
+		info.setItem("珍味4", 制御／戦闘／アイテム確率設定(60));
+	}
+	info.setBattleBackGroundId("塔／西");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／西の塔／ゆみみみっく()
+{
+	BattleInfomation info;
+	info.addMonster("ゆみみみっく");
+	info.setItem("スカウトキー", 制御／戦闘／アイテム確率設定(60));
+	info.setBattleBackGroundId("塔／西");
+	openBattle2(info);
+}
+
+void 制御／モンスター／中庭／ヘルマン歩兵()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン歩兵q");
+		info.addMonster("ヘルマン歩兵q");
+		info.addMonster("ヘルマン弩兵q");
+	}
+	else
+	{
+		info.addMonster("ヘルマン歩兵q");
+		info.addMonster("ヘルマン歩兵q");
+		info.addMonster("ヘルマン歩兵q");
+		info.addMonster("ヘルマン弩兵q");
+		info.addMonster("ヘルマン弩兵q");
+		info.addMonster("ヘルマン弩兵q");
+	}
+	info.setBattleBackGroundId("中庭");
+	openBattle2(info);
+}
+
+void 制御／モンスター／中庭／ヘルマン歩兵／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン歩兵群q");
+		info.addMonster("ヘルマン歩兵群q");
+		info.addMonster("ヘルマン弩兵群q");
+	}
+	else
+	{
+		info.addMonster("ヘルマン歩兵群q");
+		info.addMonster("ヘルマン工兵q");
+		info.addMonster("ヘルマン歩兵群q");
+		info.addMonster("ヘルマン工兵q");
+	}
+	info.setBattleBackGroundId("中庭");
+	openBattle2(info);
+}
+
+void 制御／モンスター／中庭／ヘルマン弩兵()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン弩兵群q");
+		info.addMonster("ヘルマン弩兵群q");
+		info.addMonster("ヘルマン工兵q");
+		info.addMonster("ヘルマン弩兵q");
+	}
+	else
+	{
+		info.addMonster("ヘルマン歩兵群q");
+		info.addMonster("ヘルマン弩兵q");
+		info.addMonster("ヘルマン弩兵q");
+		info.addMonster("ヘルマン弩兵q");
+		info.addMonster("ヘルマン弩兵q");
+		info.addMonster("ヘルマン弩兵q");
+	}
+	info.setBattleBackGroundId("中庭");
+	openBattle2(info);
+}
+
+void 制御／モンスター／中庭／ヘルマン工兵()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン歩兵群q");
+		info.addMonster("ヘルマン工兵q");
+		info.addMonster("ヘルマン歩兵q");
+		info.addMonster("ヘルマン工兵q");
+		info.setItem("換金4", 制御／戦闘／アイテム確率設定(6));
+	}
+	else
+	{
+		info.addMonster("ヘルマン工兵q");
+		info.addMonster("ヘルマン工兵q");
+		info.addMonster("ヘルマン弩兵群q");
+		info.addMonster("ヘルマン工兵q");
+		info.addMonster("ヘルマン術兵q");
+		info.addMonster("ヘルマン工兵q");
+		info.setItem("換金4", 制御／戦闘／アイテム確率設定(12));
+	}
+	info.setBattleBackGroundId("中庭");
+	openBattle2(info);
+}
+
+void 制御／モンスター／中庭／ヘルマン術兵()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン弩兵群q");
+		info.addMonster("ヘルマン術兵q");
+		info.addMonster("ヘルマン歩兵群q");
+	}
+	else
+	{
+		info.addMonster("ヘルマン工兵q");
+		info.addMonster("ヘルマン工兵q");
+		info.addMonster("ヘルマン工兵q");
+		info.addMonster("ヘルマン術兵q");
+		info.addMonster("ヘルマン術兵q");
+		info.addMonster("ヘルマン術兵q");
+	}
+	info.setBattleBackGroundId("中庭");
+	openBattle2(info);
+}
+
+void 制御／モンスター／中庭／ヘルマン騎士()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン歩兵群q");
+		info.addMonster("ヘルマン弩兵q");
+		info.addMonster("ヘルマン騎士q");
+		info.addMonster("ヘルマン弩兵群q");
+	}
+	else
+	{
+		info.addMonster("ヘルマン騎士q");
+		info.addMonster("ヘルマン弩兵q");
+		info.addMonster("ヘルマン工兵q");
+		info.addMonster("ヘルマン騎士q");
+	}
+	info.setBattleBackGroundId("中庭");
+	openBattle2(info);
+}
+
+void 制御／モンスター／中庭／ヘルマン騎士／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン騎士群q");
+		info.addMonster("ヘルマン工兵q");
+		info.addMonster("ヘルマン弩兵群q");
+		info.addMonster("ヘルマン術兵q");
+	}
+	else
+	{
+		info.addMonster("ヘルマン歩兵群q");
+		info.addMonster("ヘルマン騎士群q");
+		info.addMonster("ヘルマン弩兵群q");
+	}
+	info.setBattleBackGroundId("中庭");
+	openBattle2(info);
+}
+
+void 制御／モンスター／中庭／ヘルマン士官()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン士官q");
+		info.addMonster("ヘルマン弩兵群q");
+		info.addMonster("ヘルマン弩兵群q");
+		info.setItem("珍味3", 制御／戦闘／アイテム確率設定(3));
+	}
+	else
+	{
+		info.addMonster("ヘルマン騎士群q");
+		info.addMonster("ヘルマン工兵q");
+		info.addMonster("ヘルマン弩兵群q");
+		info.addMonster("ヘルマン士官q");
+		info.setItem("珍味3", 制御／戦闘／アイテム確率設定(3));
+	}
+	info.setBattleBackGroundId("中庭");
+	openBattle2(info);
+}
+
+void 制御／モンスター／中庭／ヘルマン操兵()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("オッズ");
+		info.addMonster("オッズ");
+		info.addMonster("コンタートル");
+		info.addMonster("ヘルマン操兵q");
+	}
+	else
+	{
+		info.addMonster("オッズ");
+		info.addMonster("オッズ");
+		info.addMonster("ヘルマン操兵q");
+		info.addMonster("デカントマムル");
+		info.addMonster("ヘルマン操兵q");
+	}
+	info.setBattleBackGroundId("中庭");
+	openBattle2(info);
+}
+
+void 制御／モンスター／中庭／ヘルマン操兵／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("サイクロナイト");
+		info.addMonster("オッズ");
+		info.addMonster("ヘルマン操兵q");
+		info.addMonster("デカントマムル");
+		info.addMonster("ヘルマン操兵q");
+	}
+	else
+	{
+		info.addMonster("オッズ群");
+		info.addMonster("サイクロナイト");
+		info.addMonster("ヘルマン操兵q");
+		info.addMonster("コンタートル");
+	}
+	info.setBattleBackGroundId("中庭");
+	openBattle2(info);
+}
+
+void 制御／モンスター／中庭／防衛陣地()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ヘルマン工兵q");
+		info.addMonster("防衛陣地q");
+		info.addMonster("ヘルマン弩兵群q");
+		info.addMonster("ヘルマン弩兵q");
+		info.setItem("珍味3", 制御／戦闘／アイテム確率設定(30));
+	}
+	else
+	{
+		info.addMonster("防衛陣地q");
+		info.addMonster("ヘルマン弩兵群q");
+		info.addMonster("ヘルマン士官q");
+		info.setItem("珍味3", 制御／戦闘／アイテム確率設定(30));
+	}
+	info.setBattleBackGroundId("中庭");
+	openBattle2(info);
+}
+
+void 制御／モンスター／中庭／オッズ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("オッズ群");
+		info.addMonster("オッズ群");
+		info.addMonster("オッズ群");
+		info.setItem("換金1", 制御／戦闘／アイテム確率設定(18));
+	}
+	else
+	{
+		info.addMonster("オッズ");
+		info.addMonster("コンタートル");
+		info.addMonster("オッズ群");
+		info.setItem("守り神様ストラップ", 制御／戦闘／アイテム確率設定(3));
+	}
+	info.setBattleBackGroundId("中庭");
+	openBattle2(info);
+}
+
+void 制御／モンスター／中庭／サイクロナイト()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("オッズ");
+		info.addMonster("サイクロナイト");
+		info.addMonster("スーパーハニー");
+		info.setItem("アサクヒロク2", 制御／戦闘／アイテム確率設定(3));
+	}
+	else
+	{
+		info.addMonster("サイクロナイト");
+		info.addMonster("スーパーハニー");
+		info.addMonster("サイクロナイト");
+		info.setItem("アサクヒロク2", 制御／戦闘／アイテム確率設定(3));
+	}
+	info.setBattleBackGroundId("中庭");
+	openBattle2(info);
+}
+
+void 制御／モンスター／中庭／コンタートル()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("オッズ");
+		info.addMonster("オッズ");
+		info.addMonster("コンタートル");
+		info.addMonster("コンタートル");
+		info.setItem("守り神様ストラップ", 制御／戦闘／アイテム確率設定(6));
+	}
+	else
+	{
+		info.addMonster("コンタートル");
+		info.addMonster("スーパーハニー");
+		info.addMonster("オッズ");
+		info.addMonster("コンタートル");
+		info.setItem("守り神様ストラップ", 制御／戦闘／アイテム確率設定(6));
+	}
+	info.setBattleBackGroundId("中庭");
+	openBattle2(info);
+}
+
+void 制御／モンスター／中庭／デカントマムル()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("デカントマムル");
+		info.addMonster("オッズ群");
+		info.setItem("換金1", 制御／戦闘／アイテム確率設定(6));
+	}
+	else
+	{
+		info.addMonster("デカントマムル");
+		info.addMonster("デカントマムル");
+		info.addMonster("オッズ");
+		info.addMonster("スーパーハニー");
+		info.setItem("換金1", 制御／戦闘／アイテム確率設定(3));
+	}
+	info.setBattleBackGroundId("中庭");
+	openBattle2(info);
+}
+
+void 制御／モンスター／中庭／神風()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("神風");
+		info.addMonster("スーパーハニー");
+		info.setItem("コンビーフの鍵", 制御／戦闘／アイテム確率設定(1));
+	}
+	else
+	{
+		info.addMonster("神風");
+		info.addMonster("神風");
+		info.setItem("コンビーフの鍵", 制御／戦闘／アイテム確率設定(2));
+	}
+	info.setBattleBackGroundId("中庭");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／居館／二階／ヒトラー()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ナースホルン");
+		info.addMonster("ヒトラー");
+		info.setItem("徳用魔池", 制御／戦闘／アイテム確率設定(18));
+	}
+	else
+	{
+		info.addMonster("ヒトラー");
+		info.addMonster("ナースホルン");
+		info.setItem("徳用魔池", 制御／戦闘／アイテム確率設定(18));
+	}
+	info.setBattleBackGroundId("居館／二階");
+	openBattle2(info);
+}
+
+void 制御／モンスター／居館／二階／ヒトラー／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ナースホルン");
+		info.addMonster("ナースホルン");
+		info.addMonster("ヒトラー");
+		info.setItem("徳用魔池", 制御／戦闘／アイテム確率設定(27));
+	}
+	else
+	{
+		info.addMonster("ナースホルン");
+		info.addMonster("ヒトラー");
+		info.addMonster("ナースホルン");
+		info.setItem("徳用魔池", 制御／戦闘／アイテム確率設定(27));
+	}
+	info.setBattleBackGroundId("居館／二階");
+	openBattle2(info);
+}
+
+void 制御／モンスター／居館／二階／シルバ～サメラ～イ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("シルバ～サメラ～イ");
+		info.addMonster("トリプルハニー");
+		info.setItem("珍味5", 制御／戦闘／アイテム確率設定(1));
+	}
+	else
+	{
+		info.addMonster("トリプルハニー");
+		info.addMonster("シルバ～サメラ～イ");
+		info.setItem("珍味5", 制御／戦闘／アイテム確率設定(1));
+	}
+	info.setBattleBackGroundId("居館／二階");
+	openBattle2(info);
+}
+
+void 制御／モンスター／居館／二階／シルバ～サメラ～イ／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("シルバ～サメラ～イ");
+		info.addMonster("ナースホルン");
+		info.addMonster("ヒトラー");
+		info.setItem("珍味5", 制御／戦闘／アイテム確率設定(1));
+	}
+	else
+	{
+		info.addMonster("シルバ～サメラ～イ");
+		info.addMonster("シルバ～サメラ～イ");
+		info.addMonster("ヒトラー");
+		info.addMonster("ナースホルン");
+		info.setItem("珍味5", 制御／戦闘／アイテム確率設定(2));
+	}
+	info.setBattleBackGroundId("居館／二階");
+	openBattle2(info);
+}
+
+void 制御／モンスター／居館／二階／トリプルハニー()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("トリプルハニー");
+		info.addMonster("トリプルハニー");
+		info.setItem("換金5", 制御／戦闘／アイテム確率設定(2));
+	}
+	else
+	{
+		info.addMonster("トリプルハニー");
+		info.addMonster("トリプルハニー");
+		info.addMonster("トリプルハニー");
+		info.setItem("換金5", 制御／戦闘／アイテム確率設定(3));
+	}
+	info.setBattleBackGroundId("居館／二階");
+	openBattle2(info);
+}
+
+void 制御／モンスター／居館／二階／ライカンスロープＺ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ライカンスロープZt1");
+		info.setItem("世色癌4", 制御／戦闘／アイテム確率設定(1));
+	}
+	else
+	{
+		info.addMonster("ライカンスロープZt1");
+		info.addMonster("ライカンスロープZt1");
+		info.setItem("世色癌4", 制御／戦闘／アイテム確率設定(2));
+	}
+	info.setBattleBackGroundId("居館／二階");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／居館／二階／ライカンスロープＺ／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ライカンスロープZt2");
+		info.addMonster("ライカンスロープZt3");
+		info.setItem("世色癌4", 制御／戦闘／アイテム確率設定(2));
+	}
+	else
+	{
+		info.addMonster("ライカンスロープZt3");
+		info.addMonster("ライカンスロープZt4");
+		info.setItem("世色癌4", 制御／戦闘／アイテム確率設定(2));
+	}
+	info.setBattleBackGroundId("居館／二階");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／居館／二階／ライカンスロープＺ／Ｃ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ライカンスロープZt4");
+		info.addMonster("ライカンスロープZt2");
+		info.setItem("世色癌4", 制御／戦闘／アイテム確率設定(2));
+	}
+	else
+	{
+		info.addMonster("ライカンスロープZt4");
+		info.addMonster("ライカンスロープZt4");
+		info.setItem("世色癌4", 制御／戦闘／アイテム確率設定(2));
+	}
+	info.setBattleBackGroundId("居館／二階");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／居館／二階／ライカンスロープＺ／Ｄ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ライカンスロープZt3");
+		info.addMonster("ライカンスロープZt2");
+		info.addMonster("ライカンスロープZt4");
+		info.setItem("世色癌4", 制御／戦闘／アイテム確率設定(2));
+	}
+	else
+	{
+		info.addMonster("ライカンスロープZt3");
+		info.addMonster("ライカンスロープZt4");
+		info.addMonster("ライカンスロープZt4");
+		info.setItem("世色癌4", 制御／戦闘／アイテム確率設定(2));
+	}
+	info.setBattleBackGroundId("居館／二階");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／居館／二階／ライカンスロープＺ／Ｅ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ライカンスロープZt3");
+		info.addMonster("ライカンスロープZt3");
+		info.addMonster("ライカンスロープZt2");
+		info.addMonster("ライカンスロープZt4");
+		info.setItem("世色癌4", 制御／戦闘／アイテム確率設定(4));
+	}
+	else
+	{
+		info.addMonster("ライカンスロープZt2");
+		info.addMonster("ライカンスロープZt4");
+		info.addMonster("ライカンスロープZt3");
+		info.addMonster("ライカンスロープZt2");
+		info.setItem("世色癌4", 制御／戦闘／アイテム確率設定(4));
+	}
+	info.setBattleBackGroundId("居館／二階");
+	info.setMusicId("音楽／戦闘／女の子モンスター");
+	openBattle2(info);
+}
+
+void 制御／モンスター／コー／こんにちわ()
+{
+	BattleInfomation info;
+	info.addMonster("こんにちわv2");
+	info.setItem("毎度ありストラップ", 制御／戦闘／アイテム確率設定(3));
+	info.setBattleBackGroundId("都市／コー");
+	openBattle2(info);
+}
+
+void 制御／モンスター／コー／腐った死体()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("腐った死体");
+		info.addMonster("腐った死体");
+		info.addMonster("ゾンビ");
+		info.addMonster("腐った死体");
+		info.addMonster("腐った死体");
+		info.setItem("換金3", 制御／戦闘／アイテム確率設定(30));
+	}
+	else
+	{
+		info.addMonster("腐った死体");
+		info.addMonster("ゾンビ");
+		info.addMonster("腐った死体");
+		info.addMonster("腐った死体");
+		info.addMonster("腐った死体");
+		info.addMonster("ゾンビ");
+		info.addMonster("腐った死体");
+		info.setItem("換金3", 制御／戦闘／アイテム確率設定(60));
+	}
+	info.setBattleBackGroundId("都市／コー");
+	openBattle2(info);
+}
+
+void 制御／モンスター／コー／腐った死体／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("腐った死体群");
+		info.addMonster("腐った死体群");
+		info.addMonster("腐った死体群");
+		info.addMonster("腐った死体群");
+	}
+	else
+	{
+		info.addMonster("腐った死体群");
+		info.addMonster("腐った死体群");
+		info.addMonster("腐った死体群");
+		info.addMonster("腐った死体群");
+		info.addMonster("腐った死体群");
+		info.addMonster("腐った死体群");
+	}
+	info.setBattleBackGroundId("都市／コー");
+	openBattle2(info);
+}
+
+void 制御／モンスター／コー／ピンキー()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ピンキー");
+		info.addMonster("ピンキー");
+		info.addMonster("腐った死体群");
+	}
+	else
+	{
+		info.addMonster("ピンキー");
+		info.addMonster("腐った死体");
+		info.addMonster("ゾンビ");
+		info.addMonster("ピンキー");
+		info.addMonster("ピンキー");
+		info.setItem("換金3", 制御／戦闘／アイテム確率設定(30));
+	}
+	info.setBattleBackGroundId("都市／コー");
+	openBattle2(info);
+}
+
+void 制御／モンスター／はにわ大神殿／グリーンハニー()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("グリーンハニー");
+		info.addMonster("グリーンハニー");
+	}
+	else
+	{
+		info.addMonster("グリーンハニー");
+		info.addMonster("グリーンハニー");
+		info.addMonster("グリーンハニー");
+	}
+	info.setBattleBackGroundId("はにわ大神殿／グリーン");
+	openBattle2(info);
+}
+
+void 制御／モンスター／はにわ大神殿／グリーンハニー／Ｂ()
+{
+	BattleInfomation info;
+	info.addMonster("グリーンハニー");
+	info.addMonster("グリーンハニー");
+	info.addMonster("グリーンハニー");
+	info.addMonster("グリーンハニー");
+	info.addMonster("グリーンハニー");
+	info.addMonster("グリーンハニー");
+	info.addMonster("グリーンハニー");
+	info.addMonster("グリーンハニー");
+	info.setBattleBackGroundId("はにわ大神殿／グリーン");
+	openBattle2(info);
+}
+
+void 制御／モンスター／はにわ大神殿／ブルーハニー()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("ブルーハニー");
+		info.addMonster("ブルーハニー");
+	}
+	else
+	{
+		info.addMonster("ブルーハニー");
+	}
+	info.setBattleBackGroundId("はにわ大神殿／ブルー");
+	openBattle2(info);
+}
+
+void 制御／モンスター／はにわ大神殿／ブルーハニー／Ｂ()
+{
+	BattleInfomation info;
+	info.addMonster("ブルーハニー");
+	info.addMonster("ブルーハニー");
+	info.addMonster("ブルーハニー");
+	info.addMonster("ブルーハニー");
+	info.addMonster("ブルーハニー");
+	info.addMonster("ブルーハニー");
+	info.addMonster("ブルーハニー");
+	info.addMonster("ブルーハニー");
+	info.setBattleBackGroundId("はにわ大神殿／ブルー");
+	openBattle2(info);
+}
+
+void 制御／モンスター／はにわ大神殿／レッドハニー()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("レッドハニー");
+		info.addMonster("レッドハニー");
+		info.addMonster("レッドハニー");
+	}
+	else
+	{
+		info.addMonster("レッドハニー");
+		info.addMonster("レッドハニー");
+		info.addMonster("レッドハニー");
+		info.addMonster("レッドハニー");
+	}
+	info.setBattleBackGroundId("はにわ大神殿／レッド");
+	openBattle2(info);
+}
+
+void 制御／モンスター／はにわ大神殿／レッドハニー／Ｂ()
+{
+	BattleInfomation info;
+	info.addMonster("レッドハニー");
+	info.addMonster("レッドハニー");
+	info.addMonster("レッドハニー");
+	info.addMonster("レッドハニー");
+	info.addMonster("レッドハニー");
+	info.addMonster("レッドハニー");
+	info.addMonster("レッドハニー");
+	info.addMonster("レッドハニー");
+	info.setBattleBackGroundId("はにわ大神殿／レッド");
+	openBattle2(info);
+}
+
+void 制御／モンスター／はにわ大神殿／スーパーハニー()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("スーパーハニー");
+		info.addMonster("スーパーハニー");
+		info.addMonster("スーパーハニー");
+	}
+	else
+	{
+		info.addMonster("スーパーハニー");
+		info.addMonster("スーパーハニー");
+		info.addMonster("スーパーハニー");
+		info.addMonster("スーパーハニー");
+	}
+	info.setBattleBackGroundId("はにわ大神殿／スーパー");
+	openBattle2(info);
+}
+
+void 制御／モンスター／はにわ大神殿／スーパーハニー／Ｂ()
+{
+	BattleInfomation info;
+	if (RAND(3) != 1)
+	{
+		info.addMonster("スーパーハニー");
+		info.addMonster("スーパーハニー");
+		info.addMonster("スーパーハニー");
+		info.addMonster("スーパーハニー");
+		info.addMonster("スーパーハニー");
+		info.addMonster("スーパーハニー");
+		info.addMonster("スーパーハニー");
+		info.addMonster("スーパーハニー");
+	}
+	else
+	{
+		info.addMonster("スーパーハニー");
+		info.addMonster("スーパーハニー");
+		info.addMonster("スーパーハニー");
+		info.addMonster("スーパーハニー");
+		info.addMonster("スーパーハニー");
+		info.addMonster("スーパーハニー");
+		info.addMonster("凶悪ハニー");
+		info.addMonster("スーパーハニー");
+	}
+	info.setBattleBackGroundId("はにわ大神殿／スーパー");
+	openBattle2(info);
+}
+
+void 制御／モンスター／はにわ大神殿／ハニーナイト()
+{
+	BattleInfomation info;
+	info.addMonster("ハニーナイト");
+	info.addMonster("グリーンハニー");
+	info.addMonster("スーパーハニー");
+	info.addMonster("ハニーナイト");
+	info.setBattleBackGroundId("はにわ大神殿／スーパー");
+	openBattle2(info);
+}
+
+void 制御／モンスター／はにわ大神殿／ハニーキング()
+{
+	BattleInfomation info;
+	info.addMonster("グリーンハニー");
+	info.addMonster("ブルーハニー");
+	info.addMonster("レッドハニー");
+	info.addMonster("グリーンハニー");
+	info.addMonster("ブルーハニー");
+	info.addMonster("レッドハニー");
+	info.addMonster("ハニーキング");
+	info.addMonster("グリーンハニー");
+	info.addMonster("ブルーハニー");
+	info.addMonster("レッドハニー");
+	info.addMonster("グリーンハニー");
+	info.addMonster("ブルーハニー");
+	info.addMonster("レッドハニー");
+	info.addMonster("グリーンハニー");
+	info.addMonster("ブルーハニー");
+	info.addMonster("レッドハニー");
+	info.addMonster("グリーンハニー");
+	info.addMonster("ブルーハニー");
+	info.addMonster("レッドハニー");
+	info.addMonster("グリーンハニー");
+	info.addMonster("ブルーハニー");
+	info.addMonster("レッドハニー");
+	info.addMonster("グリーンハニー");
+	info.addMonster("ブルーハニー");
+	info.addMonster("レッドハニー");
+	info.addMonster("グリーンハニー");
+	info.addMonster("ブルーハニー");
+	info.addMonster("レッドハニー");
+	info.addMonster("グリーンハニー");
+	info.addMonster("ブルーハニー");
+	info.addMonster("レッドハニー");
+	info.setBattleBackGroundId("はにわ大神殿／スーパー");
+	info.setMusicId("音楽／戦闘／大ボス");
+	info.setExtraBattleFlag(1);
+	openBattle2(info);
+}
+
+void 制御／モンスター／ＴＯＷＥＲ／一層Ａ()
+{
+	BattleInfomation info;
+	int num;
+	switch (RAND(12))
+	{
+	case 1:
+		num = 1;
+		break;
+	case 2:
+	case 3:
+		num = 2;
+		break;
+	case 4:
+	case 5:
+	case 6:
+	case 7:
+	case 8:
+		num = 3;
+		break;
+	case 9:
+	case 10:
+		num = RAND(3) + 3;
+		break;
+	case 11:
+		num = RAND(6) + 3;
+		break;
+	default:
+		num = RAND(9) + 3;
+		break;
+	}
+	int i;
+	for (i = 0; i < num; ++i)
+	{
+		switch (RAND(12))
+		{
+		case 1:
+			info.addMonster("イカマン群");
+			break;
+		case 2:
+			info.addMonster("げこげこ");
+			break;
+		case 3:
+			info.addMonster("ニンタートル");
+			break;
+		case 4:
+			info.addMonster("ロンメル");
+			break;
+		case 5:
+		case 6:
+			info.addMonster("グリーンハニー");
+			break;
+		case 7:
+		case 8:
+			info.addMonster("無課金戦士群");
+			break;
+		case 9:
+		case 10:
+			info.addMonster("人形遣い");
+			break;
+		default:
+			info.addMonster("くずの悪魔");
+			break;
+		}
+	}
+	info.setItem("世色癌1", 制御／戦闘／アイテム確率設定(3));
+	info.setBattleBackGroundId("地上灯台");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ＴＯＷＥＲ／一層Ｂ()
+{
+	BattleInfomation info;
+	int num;
+	switch (RAND(12))
+	{
+	case 1:
+		num = 1;
+		break;
+	case 2:
+	case 3:
+		num = 2;
+		break;
+	case 4:
+	case 5:
+	case 6:
+	case 7:
+	case 8:
+		num = 3;
+		break;
+	case 9:
+	case 10:
+		num = RAND(3) + 3;
+		break;
+	case 11:
+		num = RAND(6) + 3;
+		break;
+	default:
+		num = RAND(9) + 3;
+		break;
+	}
+	int i;
+	for (i = 0; i < num; ++i)
+	{
+		switch (RAND(12))
+		{
+		case 1:
+			info.addMonster("ロンメル");
+			break;
+		case 2:
+			info.addMonster("グリーンハニー");
+			break;
+		case 3:
+			info.addMonster("こんにちわc1");
+			break;
+		case 4:
+			info.addMonster("ブルーハニー");
+			break;
+		case 5:
+		case 6:
+			info.addMonster("ロンメル");
+			break;
+		case 7:
+		case 8:
+			info.addMonster("無課金戦士群");
+			break;
+		case 9:
+		case 10:
+			info.addMonster("人形遣い群");
+			break;
+		default:
+			info.addMonster("くずの悪魔群");
+			break;
+		}
+	}
+	info.setItem("アサクヒロク1", 制御／戦闘／アイテム確率設定(3));
+	info.setBattleBackGroundId("地上灯台");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ＴＯＷＥＲ／一層Ｃ()
+{
+	BattleInfomation info;
+	info.addMonster("ウルンセル");
+	info.addMonster("ウルンセル");
+	info.addMonster("ウルンセル");
+	info.addMonster("ウルンセル緑");
+	info.addMonster("ウルンセル");
+	info.setBattleBackGroundId("地上灯台");
+	info.setMusicId("音楽／戦闘／大ボス");
+	info.setExtraBattleFlag(1);
+	openBattle2(info);
+}
+
+void 制御／モンスター／ＴＯＷＥＲ／二層Ａ()
+{
+	BattleInfomation info;
+	int num;
+	switch (RAND(12))
+	{
+	case 1:
+		num = 1;
+		break;
+	case 2:
+	case 3:
+		num = 2;
+		break;
+	case 4:
+	case 5:
+	case 6:
+	case 7:
+	case 8:
+		num = 3;
+		break;
+	case 9:
+	case 10:
+		num = RAND(3) + 3;
+		break;
+	case 11:
+		num = RAND(6) + 3;
+		break;
+	default:
+		num = RAND(9) + 3;
+		break;
+	}
+	int i;
+	for (i = 0; i < num; ++i)
+	{
+		switch (RAND(12))
+		{
+		case 1:
+			info.addMonster("ロンメル");
+			break;
+		case 2:
+			info.addMonster("人形遣い群");
+			break;
+		case 3:
+			info.addMonster("くずの悪魔");
+			break;
+		case 4:
+			info.addMonster("こんにちわc1");
+			break;
+		case 5:
+		case 6:
+			info.addMonster("ミートボール群");
+			break;
+		case 7:
+		case 8:
+			info.addMonster("ブルーハニー");
+			break;
+		case 9:
+		case 10:
+			info.addMonster("金魚");
+			break;
+		default:
+			info.addMonster("NEOぬぼぼ");
+			break;
+		}
+	}
+	info.setItem("世色癌1", 制御／戦闘／アイテム確率設定(3));
+	info.setBattleBackGroundId("地上灯台");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ＴＯＷＥＲ／二層Ｂ()
+{
+	BattleInfomation info;
+	int num;
+	switch (RAND(12))
+	{
+	case 1:
+		num = 1;
+		break;
+	case 2:
+	case 3:
+		num = 2;
+		break;
+	case 4:
+	case 5:
+	case 6:
+	case 7:
+	case 8:
+		num = 3;
+		break;
+	case 9:
+	case 10:
+		num = RAND(3) + 3;
+		break;
+	case 11:
+		num = RAND(6) + 3;
+		break;
+	default:
+		num = RAND(9) + 3;
+		break;
+	}
+	int i;
+	for (i = 0; i < num; ++i)
+	{
+		switch (RAND(12))
+		{
+		case 1:
+			info.addMonster("ロンメル");
+			break;
+		case 2:
+			info.addMonster("人形遣い群");
+			break;
+		case 3:
+			info.addMonster("くずの悪魔群");
+			break;
+		case 4:
+			info.addMonster("マーダー");
+			break;
+		case 5:
+		case 6:
+			info.addMonster("みつめとかげ");
+			break;
+		case 7:
+		case 8:
+			info.addMonster("こんにちわc1");
+			break;
+		case 9:
+		case 10:
+			info.addMonster("ブルーハニー");
+			break;
+		default:
+			info.addMonster("NEOぬぼぼ");
+			break;
+		}
+	}
+	info.setItem("アサクヒロク1", 制御／戦闘／アイテム確率設定(3));
+	info.setBattleBackGroundId("地上灯台");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ＴＯＷＥＲ／二層Ｃ()
+{
+	BattleInfomation info;
+	info.addMonster("ウルンセル");
+	info.addMonster("ウルンセル緑");
+	info.addMonster("ウルンセル青");
+	info.addMonster("ウルンセル");
+	info.addMonster("ウルンセル");
+	info.addMonster("ウルンセル青");
+	info.addMonster("ウルンセル");
+	info.setBattleBackGroundId("地上灯台");
+	info.setMusicId("音楽／戦闘／大ボス");
+	info.setExtraBattleFlag(1);
+	openBattle2(info);
+}
+
+void 制御／モンスター／ＴＯＷＥＲ／三層Ａ()
+{
+	BattleInfomation info;
+	int num;
+	switch (RAND(12))
+	{
+	case 1:
+		num = 1;
+		break;
+	case 2:
+	case 3:
+		num = 2;
+		break;
+	case 4:
+	case 5:
+	case 6:
+	case 7:
+	case 8:
+		num = 3;
+		break;
+	case 9:
+	case 10:
+		num = RAND(3) + 3;
+		break;
+	case 11:
+		num = RAND(6) + 3;
+		break;
+	default:
+		num = RAND(9) + 3;
+		break;
+	}
+	int i;
+	for (i = 0; i < num; ++i)
+	{
+		switch (RAND(12))
+		{
+		case 1:
+			info.addMonster("くずの悪魔群");
+			break;
+		case 2:
+			info.addMonster("こんにちわc1");
+			break;
+		case 3:
+			info.addMonster("ミートボール群");
+			break;
+		case 4:
+			info.addMonster("ブルーハニー");
+			break;
+		case 5:
+		case 6:
+			info.addMonster("金魚群");
+			break;
+		case 7:
+		case 8:
+			info.addMonster("わんわん群");
+			break;
+		case 9:
+		case 10:
+			info.addMonster("さかなモンスター");
+			break;
+		default:
+			info.addMonster("ザコ");
+			break;
+		}
+	}
+	info.setItem("世色癌1", 制御／戦闘／アイテム確率設定(3));
+	info.setBattleBackGroundId("地上灯台");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ＴＯＷＥＲ／三層Ｂ()
+{
+	BattleInfomation info;
+	int num;
+	switch (RAND(12))
+	{
+	case 1:
+		num = 1;
+		break;
+	case 2:
+	case 3:
+		num = 2;
+		break;
+	case 4:
+	case 5:
+	case 6:
+	case 7:
+	case 8:
+		num = 3;
+		break;
+	case 9:
+	case 10:
+		num = RAND(3) + 3;
+		break;
+	case 11:
+		num = RAND(6) + 3;
+		break;
+	default:
+		num = RAND(9) + 3;
+		break;
+	}
+	int i;
+	for (i = 0; i < num; ++i)
+	{
+		switch (RAND(12))
+		{
+		case 1:
+			info.addMonster("こんにちわc1");
+			break;
+		case 2:
+			info.addMonster("マーダー");
+			break;
+		case 3:
+			info.addMonster("カナリアンe1");
+			break;
+		case 4:
+			info.addMonster("レッドハニー");
+			break;
+		case 5:
+		case 6:
+			info.addMonster("金魚群");
+			break;
+		case 7:
+		case 8:
+			info.addMonster("わんわん群");
+			break;
+		case 9:
+		case 10:
+			info.addMonster("ザコ");
+			break;
+		default:
+			info.addMonster("PKタートル");
+			break;
+		}
+	}
+	info.setItem("アサクヒロク1", 制御／戦闘／アイテム確率設定(3));
+	info.setBattleBackGroundId("地上灯台");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ＴＯＷＥＲ／三層Ｃ()
+{
+	BattleInfomation info;
+	info.addMonster("ウルンセル");
+	info.addMonster("ウルンセル赤");
+	info.addMonster("ウルンセル緑");
+	info.addMonster("ウルンセル青");
+	info.addMonster("ウルンセル");
+	info.addMonster("ウルンセル");
+	info.addMonster("ウルンセル緑");
+	info.addMonster("ウルンセル赤");
+	info.addMonster("ウルンセル赤");
+	info.setBattleBackGroundId("地上灯台");
+	info.setMusicId("音楽／戦闘／大ボス");
+	info.setExtraBattleFlag(1);
+	openBattle2(info);
+}
+
+void 制御／モンスター／ＴＯＷＥＲ／四層Ａ()
+{
+	BattleInfomation info;
+	int num;
+	switch (RAND(12))
+	{
+	case 1:
+		num = 1;
+		break;
+	case 2:
+	case 3:
+		num = 2;
+		break;
+	case 4:
+	case 5:
+	case 6:
+	case 7:
+	case 8:
+		num = 3;
+		break;
+	case 9:
+	case 10:
+		num = RAND(3) + 3;
+		break;
+	case 11:
+		num = RAND(6) + 3;
+		break;
+	default:
+		num = RAND(9) + 3;
+		break;
+	}
+	int i;
+	for (i = 0; i < num; ++i)
+	{
+		switch (RAND(12))
+		{
+		case 1:
+			info.addMonster("わんわん群");
+			break;
+		case 2:
+			info.addMonster("うっぴー");
+			break;
+		case 3:
+			info.addMonster("レッドハニー");
+			break;
+		case 4:
+			info.addMonster("パワーゴリラ");
+			break;
+		case 5:
+		case 6:
+			info.addMonster("いもむしDXマークII");
+			break;
+		case 7:
+		case 8:
+			info.addMonster("ザコ群");
+			break;
+		case 9:
+		case 10:
+			info.addMonster("バグ");
+			break;
+		default:
+			info.addMonster("PKタートル");
+			break;
+		}
+	}
+	info.setItem("世色癌1", 制御／戦闘／アイテム確率設定(3));
+	info.setBattleBackGroundId("地上灯台");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ＴＯＷＥＲ／四層Ｂ()
+{
+	BattleInfomation info;
+	int num;
+	switch (RAND(12))
+	{
+	case 1:
+		num = 1;
+		break;
+	case 2:
+	case 3:
+		num = 2;
+		break;
+	case 4:
+	case 5:
+	case 6:
+	case 7:
+	case 8:
+		num = 3;
+		break;
+	case 9:
+	case 10:
+		num = RAND(3) + 3;
+		break;
+	case 11:
+		num = RAND(6) + 3;
+		break;
+	default:
+		num = RAND(9) + 3;
+		break;
+	}
+	int i;
+	for (i = 0; i < num; ++i)
+	{
+		switch (RAND(12))
+		{
+		case 1:
+			info.addMonster("カナリアンe1");
+			break;
+		case 2:
+			info.addMonster("デカントf");
+			break;
+		case 3:
+			info.addMonster("ミスコーン");
+			break;
+		case 4:
+			info.addMonster("ゲーリング");
+			break;
+		case 5:
+		case 6:
+			info.addMonster("レッドハニー");
+			break;
+		case 7:
+		case 8:
+			info.addMonster("ザコ群");
+			break;
+		case 9:
+		case 10:
+			info.addMonster("ピンキー");
+			break;
+		default:
+			info.addMonster("サメラ～イ");
+			break;
+		}
+	}
+	info.setItem("アサクヒロク1", 制御／戦闘／アイテム確率設定(3));
+	info.setBattleBackGroundId("地上灯台");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ＴＯＷＥＲ／四層Ｃ()
+{
+	BattleInfomation info;
+	info.addMonster("ウルンセル");
+	info.addMonster("ウルンセル赤");
+	info.addMonster("ウルンセル緑");
+	info.addMonster("ウルンセル青");
+	info.addMonster("ウルンセル");
+	info.addMonster("ウルンセル");
+	info.addMonster("ウルンセル緑");
+	info.addMonster("ウルンセル赤");
+	info.addMonster("ウルンセル赤");
+	info.addMonster("ウルンセル");
+	info.addMonster("ウルンセル緑");
+	info.addMonster("ウルンセル緑");
+	info.setBattleBackGroundId("地上灯台");
+	info.setMusicId("音楽／戦闘／大ボス");
+	info.setExtraBattleFlag(1);
+	openBattle2(info);
+}
+
+void 制御／モンスター／ＴＯＷＥＲ／五層Ａ()
+{
+	BattleInfomation info;
+	int num;
+	switch (RAND(12))
+	{
+	case 1:
+		num = 1;
+		break;
+	case 2:
+	case 3:
+		num = 2;
+		break;
+	case 4:
+	case 5:
+	case 6:
+	case 7:
+	case 8:
+		num = 3;
+		break;
+	case 9:
+	case 10:
+		num = RAND(3) + 3;
+		break;
+	case 11:
+		num = RAND(6) + 3;
+		break;
+	default:
+		num = RAND(9) + 3;
+		break;
+	}
+	int i;
+	for (i = 0; i < num; ++i)
+	{
+		switch (RAND(12))
+		{
+		case 1:
+			info.addMonster("こんにちわv2");
+			break;
+		case 2:
+			info.addMonster("重課金戦士群");
+			break;
+		case 3:
+			info.addMonster("凶悪ハニー");
+			break;
+		case 4:
+			info.addMonster("つみれマン");
+			break;
+		case 5:
+		case 6:
+			info.addMonster("ゲーリング");
+			break;
+		case 7:
+		case 8:
+			info.addMonster("バグ群");
+			break;
+		case 9:
+		case 10:
+			info.addMonster("サメラ～イ");
+			break;
+		default:
+			info.addMonster("オッズ");
+			break;
+		}
+	}
+	info.setItem("世色癌1", 制御／戦闘／アイテム確率設定(3));
+	info.setBattleBackGroundId("地上灯台");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ＴＯＷＥＲ／五層Ｂ()
+{
+	BattleInfomation info;
+	int num;
+	switch (RAND(12))
+	{
+	case 1:
+		num = 1;
+		break;
+	case 2:
+	case 3:
+		num = 2;
+		break;
+	case 4:
+	case 5:
+	case 6:
+	case 7:
+	case 8:
+		num = 3;
+		break;
+	case 9:
+	case 10:
+		num = RAND(3) + 3;
+		break;
+	case 11:
+		num = RAND(6) + 3;
+		break;
+	default:
+		num = RAND(9) + 3;
+		break;
+	}
+	int i;
+	for (i = 0; i < num; ++i)
+	{
+		switch (RAND(12))
+		{
+		case 1:
+			info.addMonster("バグ群");
+			break;
+		case 2:
+			info.addMonster("ダブルハニー");
+			break;
+		case 3:
+			info.addMonster("コンテ");
+			break;
+		case 4:
+			info.addMonster("コンタートル");
+			break;
+		case 5:
+		case 6:
+			info.addMonster("ゲーリング");
+			break;
+		case 7:
+		case 8:
+			info.addMonster("こんにちわv2");
+			break;
+		case 9:
+			info.addMonster("ハチ女");
+			break;
+		case 10:
+			info.addMonster("うしドバーン");
+			break;
+		default:
+			info.addMonster("大王イカマン群");
+			break;
+		}
+	}
+	info.setItem("アサクヒロク1", 制御／戦闘／アイテム確率設定(3));
+	info.setBattleBackGroundId("地上灯台");
+	openBattle2(info);
+}
+
+void 制御／モンスター／ＴＯＷＥＲ／五層Ｃ()
+{
+	BattleInfomation info;
+	info.addMonster("ウルンセル赤");
+	info.addMonster("ウルンセル青");
+	info.addMonster("ウルンセル緑");
+	info.addMonster("ウルンセル天");
+	info.addMonster("ウルンセル");
+	info.addMonster("ウルンセル");
+	info.addMonster("ウルンセル青");
+	info.addMonster("ウルンセル");
+	info.addMonster("ウルンセル");
+	info.addMonster("ウルンセル緑");
+	info.addMonster("ウルンセル");
+	info.setBattleBackGroundId("地上灯台");
+	info.setMusicId("音楽／戦闘／大ボス");
+	info.setExtraBattleFlag(1);
+	openBattle2(info);
+}
+

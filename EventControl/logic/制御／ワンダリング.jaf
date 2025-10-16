@@ -1,0 +1,583 @@
+string 制御／ワンダリング()
+{
+	if (!EV("ＥＶ／リスの洞窟／入口／初回", -2147483648))
+	{
+		switch (RAND(2))
+		{
+		case 1:
+			return "01章1";
+			break;
+		case 2:
+			return "01章2";
+			break;
+		}
+	}
+	else if (!EV("ＥＶ／ノス／三魔人／初回", -2147483648))
+	{
+		switch (RAND(5))
+		{
+		case 1:
+			return "01章1";
+			break;
+		case 2:
+			return "01章2";
+			break;
+		case 3:
+			return "01章3";
+			break;
+		case 4:
+			return "01章4";
+			break;
+		case 5:
+			if (制御／数値フラグ確認("幸福きゃんきゃん01章") != 1)
+			{
+				制御／数値フラグ設定("幸福きゃんきゃん01章", 1);
+				return "01章5";
+			}
+			else
+			{
+				return "01章2";
+			}
+			break;
+		}
+	}
+	else if (!EV("ＥＶ／解放軍司令部／カスタム／初回", -2147483648))
+	{
+		switch (RAND(6))
+		{
+		case 1:
+			return "02章1";
+			break;
+		case 2:
+			return "02章2";
+			break;
+		case 3:
+			return "02章3";
+			break;
+		case 4:
+			return "02章4";
+			break;
+		case 5:
+			if (制御／数値フラグ確認("幸福きゃんきゃん02章") != 1)
+			{
+				制御／数値フラグ設定("幸福きゃんきゃん02章", 1);
+				return "02章5";
+			}
+			else
+			{
+				return "01章4";
+			}
+			break;
+		case 6:
+			return "01章3";
+			break;
+		}
+	}
+	else if (!EV("ＥＶ／解放軍司令部／ラジール／初回", -2147483648))
+	{
+		switch (RAND(7))
+		{
+		case 1:
+			return "03章1";
+			break;
+		case 2:
+			return "03章2";
+			break;
+		case 3:
+			return "03章3";
+			break;
+		case 4:
+			return "03章4";
+			break;
+		case 5:
+			if (制御／数値フラグ確認("幸福きゃんきゃん03章") != 1)
+			{
+				制御／数値フラグ設定("幸福きゃんきゃん03章", 1);
+				return "03章5";
+			}
+			else
+			{
+				return "03章4";
+			}
+			break;
+		case 6:
+			return "01章3";
+			break;
+		case 7:
+			return "02章4";
+			break;
+		}
+	}
+	else if (!EV("ＥＶ／解放軍司令部／ラジール／四回目", -2147483648))
+	{
+		switch (RAND(7))
+		{
+		case 1:
+			return "04章1";
+			break;
+		case 2:
+			return "04章2";
+			break;
+		case 3:
+			return "04章3";
+			break;
+		case 4:
+			if (RAND(3) != 1)
+			{
+				return "04章4b";
+			}
+			else
+			{
+				return "04章4";
+			}
+			break;
+		case 5:
+			if (制御／数値フラグ確認("幸福きゃんきゃん04章") != 1)
+			{
+				制御／数値フラグ設定("幸福きゃんきゃん04章", 1);
+				return "04章5";
+			}
+			else
+			{
+				return "04章6";
+			}
+			break;
+		case 6:
+			return "04章1";
+			break;
+		case 7:
+			return "03章2";
+			break;
+		}
+	}
+	else if (!EV("ＥＶ／都市／レッド／入る／初回", -2147483648))
+	{
+		switch (RAND(3))
+		{
+		case 1:
+			return "05章1";
+			break;
+		case 2:
+		case 3:
+			return "05章2";
+			break;
+		}
+	}
+	else if (!EV("ＥＶ／宿屋／入る／セル", -2147483648))
+	{
+		switch (RAND(7))
+		{
+		case 1:
+			return "06章1";
+			break;
+		case 2:
+			return "06章2";
+			break;
+		case 3:
+			return "06章3";
+			break;
+		case 4:
+			if (制御／数値フラグ確認("ルイス06章") != 1)
+			{
+				制御／数値フラグ設定("ルイス06章", 1);
+				return "06章4";
+			}
+			else
+			{
+				return "06章6";
+			}
+			break;
+		case 5:
+			if (制御／数値フラグ確認("幸福きゃんきゃん06章") != 1)
+			{
+				制御／数値フラグ設定("幸福きゃんきゃん06章", 1);
+				return "06章5";
+			}
+			else
+			{
+				return "06章3";
+			}
+			break;
+		case 6:
+			return "03章3";
+			break;
+		case 7:
+			return "04章3";
+			break;
+		}
+	}
+	else if (!EV("ＥＶ／解放軍司令部／レッド／四回目", -2147483648))
+	{
+		switch (RAND(6))
+		{
+		case 1:
+			return "07章1";
+			break;
+		case 2:
+			return "07章2";
+			break;
+		case 3:
+			return "07章3";
+			break;
+		case 4:
+			return "07章4";
+			break;
+		case 5:
+			if (制御／数値フラグ確認("幸福きゃんきゃん07章") != 1)
+			{
+				制御／数値フラグ設定("幸福きゃんきゃん07章", 1);
+				return "07章5";
+			}
+			else
+			{
+				return "07章6";
+			}
+			break;
+		case 6:
+			return "04章1";
+			break;
+		}
+	}
+	else if (!EV("ＥＶ／解放軍司令部／レッド／五回目", -2147483648))
+	{
+		switch (RAND(2))
+		{
+		case 1:
+			return "01章1";
+			break;
+		case 2:
+			return "04章1";
+			break;
+		}
+	}
+	else if (!EV("ＥＶ／ホッホ峡／入口／初回", -2147483648))
+	{
+		switch (RAND(3))
+		{
+		case 1:
+			return "08章1";
+			break;
+		case 2:
+			return "08章2";
+			break;
+		case 3:
+			if (制御／数値フラグ確認("幸福きゃんきゃん08章") != 1)
+			{
+				制御／数値フラグ設定("幸福きゃんきゃん08章", 1);
+				return "08章5";
+			}
+			else
+			{
+				return "06章6";
+			}
+			break;
+		}
+	}
+	else if (!EV("ＥＶ／解放軍司令部／ジオ／初回", -2147483648))
+	{
+		switch (RAND(3))
+		{
+		case 1:
+			return "08章3";
+			break;
+		case 2:
+			return "08章4";
+			break;
+		case 3:
+			if (制御／数値フラグ確認("幸福きゃんきゃん08章") != 1)
+			{
+				制御／数値フラグ設定("幸福きゃんきゃん08章", 1);
+				return "08章5";
+			}
+			else
+			{
+				return "08章2";
+			}
+			break;
+		}
+	}
+	else if (!EV("ＥＶ／都市／オク／入る／二回目", -2147483648))
+	{
+		switch (RAND(7))
+		{
+		case 1:
+			return "09章1";
+			break;
+		case 2:
+			return "09章2";
+			break;
+		case 3:
+			return "09章3";
+			break;
+		case 4:
+			return "09章4";
+			break;
+		case 5:
+			if (制御／数値フラグ確認("幸福きゃんきゃん09章") != 1)
+			{
+				制御／数値フラグ設定("幸福きゃんきゃん09章", 1);
+				return "09章5";
+			}
+			else
+			{
+				return "06章6";
+			}
+			break;
+		case 6:
+			return "07章3";
+			break;
+		case 7:
+			return "08章2";
+			break;
+		}
+	}
+	else if (!EV("ＥＶ／解放軍司令部／オク／三回目", -2147483648))
+	{
+		switch (RAND(7))
+		{
+		case 1:
+			return "10章1";
+			break;
+		case 2:
+			if (RAND(3) != 1)
+			{
+				return "10章2b";
+			}
+			else
+			{
+				return "10章2";
+			}
+			break;
+		case 3:
+			return "10章3";
+			break;
+		case 4:
+			if (制御／数値フラグ確認("ルイス10章") != 1)
+			{
+				制御／数値フラグ設定("ルイス10章", 1);
+				return "10章4";
+			}
+			else
+			{
+				return "06章6";
+			}
+			break;
+		case 5:
+			if (制御／数値フラグ確認("幸福きゃんきゃん10章") != 1)
+			{
+				制御／数値フラグ設定("幸福きゃんきゃん10章", 1);
+				return "10章5";
+			}
+			else
+			{
+				return "09章3";
+			}
+			break;
+		case 6:
+			return "08章1";
+			break;
+		case 7:
+			if (RAND(3) != 1)
+			{
+				return "10章6";
+			}
+			else
+			{
+				return "04章4b";
+			}
+			break;
+		}
+	}
+	else if (!EV("ＥＶ／都市／城下町／入る／三回目", -2147483648))
+	{
+		switch (RAND(9))
+		{
+		case 1:
+			return "11章1";
+			break;
+		case 2:
+			if (RAND(2) == 1)
+			{
+				return "11章2";
+			}
+			else
+			{
+				return "12章1";
+			}
+			break;
+		case 3:
+			return "11章3";
+			break;
+		case 4:
+			return "11章4";
+			break;
+		case 5:
+			if (RAND(2) == 1)
+			{
+				return "11章5";
+			}
+			else
+			{
+				return "11章6";
+			}
+			break;
+		case 6:
+			return "08章2";
+			break;
+		case 7:
+			return "11章7";
+			break;
+		case 8:
+			if (制御／数値フラグ確認("ルイス11章") != 1)
+			{
+				制御／数値フラグ設定("ルイス11章", 1);
+				return "10章4";
+			}
+			else
+			{
+				return "11章8";
+			}
+			break;
+		case 9:
+			if (制御／数値フラグ確認("幸福きゃんきゃん11章") != 1)
+			{
+				制御／数値フラグ設定("幸福きゃんきゃん11章", 1);
+				return "11章9";
+			}
+			else
+			{
+				return "11章1";
+			}
+			break;
+		}
+	}
+	else if (!EV("ＥＶ／居館／一階／入口／ジル前", -2147483648))
+	{
+		switch (RAND(5))
+		{
+		case 1:
+			return "12章1";
+			break;
+		case 2:
+			return "12章2";
+			break;
+		case 3:
+			return "12章3";
+			break;
+		case 4:
+			if (制御／数値フラグ確認("ルイス12章") != 1)
+			{
+				制御／数値フラグ設定("ルイス12章", 1);
+				return "12章4";
+			}
+			else
+			{
+				return "12章2";
+			}
+			break;
+		case 5:
+			if (制御／数値フラグ確認("幸福きゃんきゃん12章") != 1)
+			{
+				制御／数値フラグ設定("幸福きゃんきゃん12章", 1);
+				return "12章5";
+			}
+			else
+			{
+				return "12章3";
+			}
+			break;
+		}
+	}
+	else
+	{
+		switch (RAND(9))
+		{
+		case 1:
+			if (RAND(3) != 1)
+			{
+				return "12章1";
+			}
+			else
+			{
+				return "14章1";
+			}
+			break;
+		case 2:
+			if (RAND(3) != 1)
+			{
+				return "12章2";
+			}
+			else
+			{
+				return "14章2";
+			}
+			break;
+		case 3:
+			if (RAND(3) != 1)
+			{
+				return "12章3";
+			}
+			else
+			{
+				return "14章3";
+			}
+			break;
+		case 4:
+			return "14章4";
+			break;
+		case 5:
+			if (RAND(3) != 1)
+			{
+				return "08章2";
+			}
+			else
+			{
+				return "14章5";
+			}
+			break;
+		case 6:
+			if (RAND(3) != 1)
+			{
+				return "08章1";
+			}
+			else
+			{
+				return "14章6";
+			}
+			break;
+		case 7:
+			if (RAND(3) != 1)
+			{
+				return "11章7";
+			}
+			else
+			{
+				return "14章7";
+			}
+			break;
+		case 8:
+			if (RAND(3) != 1)
+			{
+				return "12章1";
+			}
+			else
+			{
+				return "14章8";
+			}
+			break;
+		case 9:
+			if (制御／数値フラグ確認("幸福きゃんきゃん14章") != 1)
+			{
+				制御／数値フラグ設定("幸福きゃんきゃん14章", 1);
+				return "14章9";
+			}
+			else
+			{
+				return "14章9b";
+			}
+			break;
+		}
+	}
+	return "00章1";
+}
+

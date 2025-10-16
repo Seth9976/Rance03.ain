@@ -1,0 +1,607 @@
+CAEEditConstructionDialog::CAEEditConstructionDialog()
+{
+	this.m_ProcessNameList.PushBack("作成");
+	this.m_ProcessNameList.PushBack("ピクセル作成");
+	this.m_ProcessNameList.PushBack("ＣＧ設定");
+	this.m_ProcessNameList.PushBack("ＲＧＢ色塗り");
+	this.m_ProcessNameList.PushBack("ブレンド塗り");
+	this.m_ProcessNameList.PushBack("アルファ塗り");
+	this.m_ProcessNameList.PushBack("ＲＧＢＡ色塗り");
+	this.m_ProcessNameList.PushBack("テキストブレンド");
+	this.m_ProcessNameList.PushBack("テキストコピー");
+	this.m_ProcessNameList.PushBack("グラデーション");
+	this.m_ProcessNameList.PushBack("矩形");
+	this.m_ProcessNameList.PushBack("ＣＧ部分ブレンド");
+	this.m_ProcessNameList.PushBack("ＣＧ部分拡大縮小ブレンド");
+	this.m_ProcessNameList.PushBack("ＣＧ部分コピー");
+	this.m_ProcessNameList.PushBack("ＣＧ部分拡大縮小コピー");
+	this.m_ProcessNameList.PushBack("ＣＧ部分アルファブレンド");
+	this.m_ProcessNameList.PushBack("ＣＧ部分拡大縮小アルファブレンド");
+	this.m_ProcessNameList.PushBack("ＣＧ部分アルファ塗り");
+	this.m_ProcessNameList.PushBack("ＣＧ部分拡大縮小アルファ塗り");
+	this.m_ProcessNameList.PushBack("白黒フィルタ全");
+	this.m_ProcessNameList.PushBack("白黒フィルタ");
+	this.m_ProcessNameList.PushBack("加算フィルタ全");
+	this.m_ProcessNameList.PushBack("加算フィルタ");
+	this.m_ProcessNameList.PushBack("乗算フィルタ全");
+	this.m_ProcessNameList.PushBack("乗算フィルタ");
+	this.m_ProcessNameList.PushBack("線");
+}
+
+CAEEditConstructionDialog::~CAEEditConstructionDialog()
+{
+	this.Release();
+}
+
+void CAEEditConstructionDialog::CreateParts(int PosX, int PosY, ref array@CASConstructionProcess List)
+{
+	this.m_ProcessList.Realloc(List.Numof());
+	this.m_ProcessList.Copy(0, List, 0, List.Numof());
+	this.CreateRootLayoutBox();
+	this.CreateProcessFieldLayout();
+	this.CreateProcessNameBG();
+	this.CreateProcessBG();
+	this.CreateProcessLayout();
+	this.CreateProcessForm(this.m_ProcessLayout, this.m_ProcessNameBG, this.m_ProcessBG, 200, this.m_ProcessList);
+	this.CreateAddButton();
+	this.CreateRemoveButton();
+	this.CreateUpButton();
+	this.CreateDownButton();
+	this.CreateVScroll();
+	this.CreateHScroll();
+	this.CreateButtonLayout();
+	this.CreateOkButton();
+	this.CreateCancelButton();
+	this.CreateBG(PosX, PosY);
+}
+
+void CAEEditConstructionDialog::ReleaseProcessList()
+{
+	int Index;
+	for (Index = 0; Index < this.m_EditProcessList.Numof(); ++Index)
+	{
+		this.m_EditProcessList[Index].Release();
+	}
+	this.m_EditProcessList.Free();
+}
+
+void CAEEditConstructionDialog::CreateRootLayoutBox()
+{
+	this.m_RootLayout = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿パディング設定(this.m_RootLayout, 6, 6, 6, 6);
+	Ｐ＿レイアウトボックス＿配置設定(this.m_RootLayout, 3);
+	AFL_Parts_AddMouseWheelEvent(this.m_RootLayout, this.MouseWheelEvent);
+}
+
+void CAEEditConstructionDialog::CreateProcessFieldLayout()
+{
+	this.m_ProcessFieldLayout = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿追加(this.m_RootLayout, this.m_ProcessFieldLayout);
+	Ｐ＿レイアウトボックス＿折り返し設定(this.m_ProcessFieldLayout, true, 256.0);
+	Ｐ＿Ｚ座標設定(this.m_ProcessFieldLayout, 1);
+	AFL_Parts_AddMouseWheelEvent(this.m_ProcessFieldLayout, this.MouseWheelEvent);
+}
+
+void CAEEditConstructionDialog::CreateProcessNameBG()
+{
+	this.m_ProcessNameBG = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿構築手順＿作成(this.m_ProcessNameBG, 200, 256, 1);
+	Ｐ＿構築手順＿色塗り(this.m_ProcessNameBG, 0, 0, 200, 256, 255, 255, 255, 255, 1);
+	Ｐ＿構築ビルド(this.m_ProcessNameBG, 1);
+	Ｐ＿レイアウトボックス＿追加(this.m_ProcessFieldLayout, this.m_ProcessNameBG);
+	Ｐ＿マージン設定(this.m_ProcessNameBG, 0, 16, 0, 0);
+	AFL_Parts_AddMouseWheelEvent(this.m_ProcessNameBG, this.MouseWheelEvent);
+}
+
+void CAEEditConstructionDialog::CreateProcessBG()
+{
+	this.m_ProcessBG = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿構築手順＿作成(this.m_ProcessBG, 552, 256, 1);
+	Ｐ＿構築手順＿色塗り(this.m_ProcessBG, 0, 0, 552, 256, 255, 255, 255, 255, 1);
+	Ｐ＿構築手順＿色塗り(this.m_ProcessBG, 0, 0, 1, 256, 200, 200, 200, 255, 1);
+	Ｐ＿構築ビルド(this.m_ProcessBG, 1);
+	Ｐ＿レイアウトボックス＿追加(this.m_ProcessFieldLayout, this.m_ProcessBG);
+	Ｐ＿マージン設定(this.m_ProcessBG, 0, 16, 0, 16);
+	AFL_Parts_AddMouseWheelEvent(this.m_ProcessBG, this.MouseWheelEvent);
+}
+
+void CAEEditConstructionDialog::CreateProcessLayout()
+{
+	this.m_ProcessLayout = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿親設定(this.m_ProcessLayout, this.m_ProcessNameBG);
+	Ｐ＿Ｚ座標設定(this.m_ProcessLayout, 1);
+	AFL_Parts_AddMouseWheelEvent(this.m_ProcessLayout, this.MouseWheelEvent);
+}
+
+void CAEEditConstructionDialog::CreateAddButton()
+{
+	this.m_AddButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿サイズ設定(this.m_AddButton, 60, 24);
+	Ｐ＿ボタン＿テキスト設定(this.m_AddButton, "追加");
+	Ｐ＿マージン設定(this.m_AddButton, 1, 1, 3, 0);
+	Ｐ＿レイアウトボックス＿追加(this.m_ProcessFieldLayout, this.m_AddButton);
+	AFL_Parts_AddMouseLClickEvent(this.m_AddButton, this.MouseLClickEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_AddButton, this.MouseWheelEvent);
+}
+
+void CAEEditConstructionDialog::CreateRemoveButton()
+{
+	this.m_RemoveButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿サイズ設定(this.m_RemoveButton, 60, 24);
+	Ｐ＿ボタン＿テキスト設定(this.m_RemoveButton, "削除");
+	Ｐ＿マージン設定(this.m_RemoveButton, 1, 1, 3, 0);
+	Ｐ＿レイアウトボックス＿追加(this.m_ProcessFieldLayout, this.m_RemoveButton);
+	AFL_Parts_AddMouseLClickEvent(this.m_RemoveButton, this.MouseLClickEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_RemoveButton, this.MouseWheelEvent);
+}
+
+void CAEEditConstructionDialog::CreateUpButton()
+{
+	this.m_UpButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿サイズ設定(this.m_UpButton, 60, 24);
+	Ｐ＿ボタン＿テキスト設定(this.m_UpButton, "↑");
+	Ｐ＿マージン設定(this.m_UpButton, 1, 1, 3, 0);
+	Ｐ＿レイアウトボックス＿追加(this.m_ProcessFieldLayout, this.m_UpButton);
+	AFL_Parts_AddMouseLClickEvent(this.m_UpButton, this.MouseLClickEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_UpButton, this.MouseWheelEvent);
+}
+
+void CAEEditConstructionDialog::CreateDownButton()
+{
+	this.m_DownButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿サイズ設定(this.m_DownButton, 60, 24);
+	Ｐ＿ボタン＿テキスト設定(this.m_DownButton, "↓");
+	Ｐ＿マージン設定(this.m_DownButton, 1, 1, 3, 0);
+	Ｐ＿レイアウトボックス＿追加(this.m_ProcessFieldLayout, this.m_DownButton);
+	AFL_Parts_AddMouseLClickEvent(this.m_DownButton, this.MouseLClickEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_DownButton, this.MouseWheelEvent);
+}
+
+void CAEEditConstructionDialog::CreateVScroll()
+{
+	this.m_VScroll = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿縦スクロールバー＿サイズ設定(this.m_VScroll, 16, 256);
+	Ｐ＿親設定(this.m_VScroll, this.m_ProcessNameBG);
+	Ｐ＿座標設定(this.m_VScroll, 752.0, 0.0);
+	Ｐ＿Ｚ座標設定(this.m_VScroll, 1);
+	AFL_Parts_AddScrollEvent(this.m_VScroll, this.ScrollEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_VScroll, this.MouseWheelEvent);
+}
+
+void CAEEditConstructionDialog::CreateHScroll()
+{
+	this.m_HScroll = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿横スクロールバー＿サイズ設定(this.m_HScroll, 552, 16);
+	Ｐ＿親設定(this.m_HScroll, this.m_ProcessNameBG);
+	Ｐ＿座標設定(this.m_HScroll, 200.0, 256.0);
+	Ｐ＿Ｚ座標設定(this.m_HScroll, 1);
+	AFL_Parts_AddScrollEvent(this.m_HScroll, this.ScrollEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_HScroll, this.MouseWheelEvent);
+}
+
+void CAEEditConstructionDialog::CreateButtonLayout()
+{
+	this.m_ButtonLayout = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿レイアウトタイプ設定(this.m_ButtonLayout, 2);
+	Ｐ＿レイアウトボックス＿パディング設定(this.m_ButtonLayout, 3, 3, 3, 3);
+	Ｐ＿レイアウトボックス＿追加(this.m_RootLayout, this.m_ButtonLayout);
+	AFL_Parts_AddMouseWheelEvent(this.m_RootLayout, this.MouseWheelEvent);
+}
+
+void CAEEditConstructionDialog::CreateOkButton()
+{
+	this.m_OKButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(this.m_OKButton, "決定");
+	Ｐ＿ボタン＿サイズ設定(this.m_OKButton, 65, 22);
+	Ｐ＿マージン設定(this.m_OKButton, 0, 0, 3, 0);
+	Ｐ＿レイアウトボックス＿追加(this.m_ButtonLayout, this.m_OKButton);
+	AFL_Parts_AddMouseLClickEvent(this.m_OKButton, this.ClickOKButtonEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_OKButton, this.MouseWheelEvent);
+}
+
+void CAEEditConstructionDialog::CreateCancelButton()
+{
+	this.m_CancelButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(this.m_CancelButton, "キャンセル");
+	Ｐ＿ボタン＿サイズ設定(this.m_CancelButton, 100, 22);
+	Ｐ＿マージン設定(this.m_CancelButton, 0, 0, 3, 0);
+	Ｐ＿レイアウトボックス＿追加(this.m_ButtonLayout, this.m_CancelButton);
+	AFL_Parts_AddMouseLClickEvent(this.m_CancelButton, this.ClickCancelButtonEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_CancelButton, this.MouseWheelEvent);
+}
+
+void CAEEditConstructionDialog::CreateBG(int PosX, int PosY)
+{
+	int Width = AFL_Parts_GetWidth(this.m_RootLayout, 1);
+	int Height = AFL_Parts_GetHeight(this.m_RootLayout, 1);
+	this.m_BG = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿構築手順＿ピクセル作成(this.m_BG, Width, Height, 1);
+	Ｐ＿構築手順＿色塗り(this.m_BG, 0, 0, Width, Height, 200, 200, 200, -1, 1);
+	Ｐ＿構築ビルド(this.m_BG, 1);
+	Ｐ＿親設定(this.m_RootLayout, this.m_BG);
+	PosX = Math.Max(0, Math.Min(AFL_View_GetWidth() - Width, PosX));
+	PosY = Math.Max(0, Math.Min(AFL_View_GetHeight() - Height, PosY));
+	Ｐ＿座標設定(this.m_BG, PosX, PosY);
+	Ｐ＿ドラッグ可能設定(this.m_BG, true);
+	AFL_Parts_AddDragEndEvent(this.m_BG, this.DragEndEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_BG, this.MouseWheelEvent);
+}
+
+void CAEEditConstructionDialog::Release()
+{
+	this.m_ProcessList.Free();
+	this.m_dgChangedConstructionProcessList.Clear();
+	this.ReleaseProcessList();
+	PARTS_ReleaseWithInit(this.m_AddButton);
+	PARTS_ReleaseWithInit(this.m_RemoveButton);
+	PARTS_ReleaseWithInit(this.m_UpButton);
+	PARTS_ReleaseWithInit(this.m_DownButton);
+	PARTS_ReleaseWithInit(this.m_BG);
+	PARTS_ReleaseWithInit(this.m_CancelButton);
+	PARTS_ReleaseWithInit(this.m_OKButton);
+	PARTS_ReleaseWithInit(this.m_ButtonLayout);
+	PARTS_ReleaseWithInit(this.m_HScroll);
+	PARTS_ReleaseWithInit(this.m_VScroll);
+	PARTS_ReleaseWithInit(this.m_ProcessLayout);
+	PARTS_ReleaseWithInit(this.m_ProcessBG);
+	PARTS_ReleaseWithInit(this.m_ProcessNameBG);
+	PARTS_ReleaseWithInit(this.m_ProcessFieldLayout);
+	PARTS_ReleaseWithInit(this.m_RootLayout);
+}
+
+void CAEEditConstructionDialog::Show(int ID, int PosX, int PosY, ref array@CASConstructionProcess List, DG_ChangedConstructionProcessList dgChangedConstructionProcessList)
+{
+	AFL_Parts_AddLayer(-1);
+	this.m_dgChangedConstructionProcessList = dgChangedConstructionProcessList;
+	this.m_ParentID = ID;
+	this.CreateParts(PosX, PosY, List);
+	this.UpdateScroll();
+	this.ScrollEvent(0, 0, 0);
+	this.m_OK = false;
+	this.m_Cancel = false;
+	for (; ; )
+	{
+		Ｐ＿クリック実行(false);
+		if (this.m_OK)
+		{
+			break;
+		}
+		if (this.m_Cancel)
+		{
+			dgChangedConstructionProcessList(ID, List);
+			break;
+		}
+	}
+	AFL_Parts_EraseLayer(-1);
+}
+
+void CAEEditConstructionDialog::ClickOKButtonEvent(int ID, int MouseX, int MouseY)
+{
+	this.m_OK = true;
+	AFL_Parts_EndWaitForClick(0);
+}
+
+void CAEEditConstructionDialog::ClickCancelButtonEvent(int ID, int MouseX, int MouseY)
+{
+	this.m_Cancel = true;
+	AFL_Parts_EndWaitForClick(0);
+}
+
+void CAEEditConstructionDialog::DragEndEvent(int ID)
+{
+	int PosX = Ｐ＿Ｘ座標取得(ID);
+	int PosY = Ｐ＿Ｙ座標取得(ID);
+	int Width = AFL_Parts_GetWidth(ID, 1);
+	int Height = AFL_Parts_GetHeight(ID, 1);
+	PosX = Math.Max(0, Math.Min(AFL_View_GetWidth() - Width, PosX));
+	PosY = Math.Max(0, Math.Min(AFL_View_GetHeight() - Height, PosY));
+	Ｐ＿座標設定(ID, PosX, PosY);
+}
+
+void CAEEditConstructionDialog::MouseClickProcessName(int ID, int MouseX, int MouseY)
+{
+	int Index;
+	for (Index = 0; Index < this.m_EditProcessList.Numof(); ++Index)
+	{
+		this.m_EditProcessList[Index].SetActive(this.m_EditProcessList[Index].GetID() == ID);
+	}
+	this.UpdateScroll();
+}
+
+void CAEEditConstructionDialog::CreateProcessForm(int LayoutID, int ProcessNameAlphaClipper, int ProcessAlphaClipper, int NameWidth, ref array@CASConstructionProcess List)
+{
+	int XPos = this.m_HScroll == 0 ? 0 : Ｐ＿横スクロールバー＿スクロール位置取得(this.m_HScroll);
+	this.ReleaseProcessList();
+	int Index;
+	for (Index = 0; Index < List.Numof(); ++Index)
+	{
+		this.m_EditProcessList.Realloc(Index + 1);
+		this.m_EditProcessList[Index].Create(LayoutID, ProcessNameAlphaClipper, ProcessAlphaClipper, NameWidth, List[Index]);
+		this.m_EditProcessList[Index].SetLButtonClick(this.MouseClickProcessName);
+		this.m_EditProcessList[Index].SetMouseWheelEvent(this.MouseWheelEvent);
+		this.m_EditProcessList[Index].SetChangedEvent(this.ChangedEvent);
+		this.m_EditProcessList[Index].SetProcessLabelX(-XPos);
+	}
+}
+
+void CAEEditConstructionDialog::UpdateScroll()
+{
+	Ｐ＿縦スクロールバー＿全体量設定(this.m_VScroll, AFL_Parts_GetHeight(this.m_ProcessLayout, 1));
+	Ｐ＿縦スクロールバー＿表示量設定(this.m_VScroll, AFL_Parts_GetHeight(this.m_ProcessNameBG, 1));
+	int Index;
+	int MaxWidth;
+	for (Index = 0; Index < this.m_EditProcessList.Numof(); ++Index)
+	{
+		MaxWidth = Math.Max(MaxWidth, this.m_EditProcessList[Index].GetProcessLabelWidth());
+	}
+	int Pos = Ｐ＿横スクロールバー＿スクロール位置取得(this.m_HScroll);
+	Ｐ＿横スクロールバー＿全体量設定(this.m_HScroll, MaxWidth);
+	Ｐ＿横スクロールバー＿表示量設定(this.m_HScroll, AFL_Parts_GetWidth(this.m_ProcessBG, 1));
+	Ｐ＿横スクロールバー＿スクロール位置設定(this.m_HScroll, Pos);
+}
+
+void CAEEditConstructionDialog::UpScroll()
+{
+	int TotalHeight = Ｐ＿縦スクロールバー＿全体量取得(this.m_VScroll);
+	int ProcessHeight = TotalHeight / this.m_EditProcessList.Numof();
+	int Pos = Ｐ＿縦スクロールバー＿スクロール位置取得(this.m_VScroll);
+	Ｐ＿縦スクロールバー＿スクロール位置設定(this.m_VScroll, Pos - ProcessHeight);
+}
+
+void CAEEditConstructionDialog::DownScroll()
+{
+	int TotalHeight = Ｐ＿縦スクロールバー＿全体量取得(this.m_VScroll);
+	int ProcessHeight = TotalHeight / this.m_EditProcessList.Numof();
+	int Pos = Ｐ＿縦スクロールバー＿スクロール位置取得(this.m_VScroll);
+	Ｐ＿縦スクロールバー＿スクロール位置設定(this.m_VScroll, Pos + ProcessHeight);
+}
+
+void CAEEditConstructionDialog::ScrollEvent(int ID, int ScrollPos, int Total)
+{
+	int YPos = Ｐ＿縦スクロールバー＿スクロール位置取得(this.m_VScroll);
+	Ｐ＿座標設定(this.m_ProcessLayout, 0.0, -YPos);
+	int XPos = Ｐ＿横スクロールバー＿スクロール位置取得(this.m_HScroll);
+	int Index;
+	for (Index = 0; Index < this.m_EditProcessList.Numof(); ++Index)
+	{
+		this.m_EditProcessList[Index].SetProcessLabelX(-XPos);
+	}
+}
+
+void CAEEditConstructionDialog::MouseWheelEvent(int ID, int Forward, int Back)
+{
+	int Pos = Ｐ＿縦スクロールバー＿スクロール位置取得(this.m_VScroll);
+	Ｐ＿縦スクロールバー＿スクロール位置設定(this.m_VScroll, (Pos - Forward * 36) + Back * 36);
+}
+
+void CAEEditConstructionDialog::MouseLClickEvent(int ID, int MouseX, int MouseY)
+{
+	if (ID == this.m_AddButton)
+	{
+		this.AddItem(MouseX, MouseY);
+	}
+	else if (ID == this.m_RemoveButton)
+	{
+		this.RemoveItem();
+	}
+	else if (ID == this.m_UpButton)
+	{
+		this.UpItem();
+	}
+	else if (ID == this.m_DownButton)
+	{
+		this.DownItem();
+	}
+	this.UpdateScroll();
+	this.ChangedEvent(0);
+}
+
+void CAEEditConstructionDialog::AddItem(int MouseX, int MouseY)
+{
+	this.m_SelectIndex = -1;
+	CAESelectTextDialog Form;
+	Form.Show(0, "追加する手順を選択してください", MouseX, MouseY, this.m_ProcessNameList, "", this.SelecteTextEvent);
+	CASConstructionProcess Process;
+	switch (this.m_SelectIndex)
+	{
+	case 0:
+		Process.SetCommand(0);
+		break;
+	case 1:
+		Process.SetCommand(1);
+		break;
+	case 2:
+		Process.SetCommand(2);
+		break;
+	case 3:
+		Process.SetCommand(3);
+		break;
+	case 4:
+		Process.SetCommand(4);
+		break;
+	case 5:
+		Process.SetCommand(5);
+		break;
+	case 6:
+		Process.SetCommand(6);
+		break;
+	case 7:
+		Process.SetCommand(7);
+		break;
+	case 8:
+		Process.SetCommand(8);
+		break;
+	case 9:
+		Process.SetCommand(9);
+		break;
+	case 10:
+		Process.SetCommand(10);
+		break;
+	case 11:
+		Process.SetCommand(11);
+		break;
+	case 12:
+		Process.SetCommand(13);
+		break;
+	case 13:
+		Process.SetCommand(12);
+		break;
+	case 14:
+		Process.SetCommand(14);
+		break;
+	case 15:
+		Process.SetCommand(19);
+		break;
+	case 16:
+		Process.SetCommand(20);
+		break;
+	case 17:
+		Process.SetCommand(21);
+		break;
+	case 18:
+		Process.SetCommand(22);
+		break;
+	case 19:
+		Process.SetCommand(15);
+		break;
+	case 20:
+		Process.SetCommand(15);
+		break;
+	case 21:
+		Process.SetCommand(16);
+		break;
+	case 22:
+		Process.SetCommand(16);
+		break;
+	case 23:
+		Process.SetCommand(17);
+		break;
+	case 24:
+		Process.SetCommand(17);
+		break;
+	case 25:
+		Process.SetCommand(18);
+		break;
+	default:
+		return;
+	}
+	if (this.m_SelectIndex == 19 || this.m_SelectIndex == 21 || this.m_SelectIndex == 23)
+	{
+		Process.SetFullSize(true);
+	}
+	int Index;
+	for (Index = 0; Index < this.m_EditProcessList.Numof(); ++Index)
+	{
+		if (this.m_EditProcessList[Index].IsActive())
+		{
+			break;
+		}
+	}
+	++Index;
+	if (this.m_ProcessList.Numof() <= Index)
+	{
+		this.m_ProcessList.PushBack(Process);
+	}
+	else
+	{
+		this.m_ProcessList.Insert(Index, Process);
+	}
+	this.CreateProcessForm(this.m_ProcessLayout, this.m_ProcessNameBG, this.m_ProcessBG, 200, this.m_ProcessList);
+	Index = Math.Max(0, Math.Min(this.m_EditProcessList.Numof() - 1, Index));
+	this.m_EditProcessList[Index].SetActive(true);
+	this.DownScroll();
+}
+
+void CAEEditConstructionDialog::CreateContentEvent(int LayoutBox)
+{
+}
+
+void CAEEditConstructionDialog::SelectedEvent(int ID, int Selected)
+{
+	this.m_SelectIndex = Selected;
+}
+
+void CAEEditConstructionDialog::RemoveItem()
+{
+	int Index;
+	for (Index = 0; Index < this.m_EditProcessList.Numof(); ++Index)
+	{
+		if (this.m_EditProcessList[Index].IsActive())
+		{
+			break;
+		}
+	}
+	if (this.m_EditProcessList.Numof() <= Index)
+	{
+		return;
+	}
+	this.m_ProcessList.Erase(Index);
+	this.CreateProcessForm(this.m_ProcessLayout, this.m_ProcessNameBG, this.m_ProcessBG, 200, this.m_ProcessList);
+	if (this.m_ProcessList.Empty())
+	{
+		return;
+	}
+	Index = Math.Max(0, Math.Min(this.m_EditProcessList.Numof() - 1, Index));
+	this.m_EditProcessList[Index].SetActive(true);
+}
+
+void CAEEditConstructionDialog::UpItem()
+{
+	int Index;
+	for (Index = 0; Index < this.m_EditProcessList.Numof(); ++Index)
+	{
+		if (!this.m_EditProcessList[Index].IsActive())
+		{
+			continue;
+		}
+		if (Index <= 0)
+		{
+			return;
+		}
+		this.m_ProcessList[Index] <=> this.m_ProcessList[Index - 1];
+		break;
+	}
+	if (this.m_EditProcessList.Numof() <= Index)
+	{
+		return;
+	}
+	this.CreateProcessForm(this.m_ProcessLayout, this.m_ProcessNameBG, this.m_ProcessBG, 200, this.m_ProcessList);
+	this.m_EditProcessList[Index - 1].SetActive(true);
+	this.UpScroll();
+}
+
+void CAEEditConstructionDialog::DownItem()
+{
+	int Index;
+	for (Index = 0; Index < this.m_EditProcessList.Numof(); ++Index)
+	{
+		if (!this.m_EditProcessList[Index].IsActive())
+		{
+			continue;
+		}
+		if (this.m_EditProcessList.Numof() - 1 <= Index)
+		{
+			return;
+		}
+		this.m_ProcessList[Index] <=> this.m_ProcessList[Index + 1];
+		break;
+	}
+	if (this.m_EditProcessList.Numof() <= Index)
+	{
+		return;
+	}
+	this.CreateProcessForm(this.m_ProcessLayout, this.m_ProcessNameBG, this.m_ProcessBG, 200, this.m_ProcessList);
+	this.m_EditProcessList[Index + 1].SetActive(true);
+	this.DownScroll();
+}
+
+void CAEEditConstructionDialog::ChangedEvent(int ID)
+{
+	this.m_dgChangedConstructionProcessList(this.m_ParentID, this.m_ProcessList);
+}
+
+void CAEEditConstructionDialog::SelecteTextEvent(int ID, string Name)
+{
+	this.m_SelectIndex = this.m_ProcessNameList.Find(0, this.m_ProcessNameList.Numof(), Name);
+}
+

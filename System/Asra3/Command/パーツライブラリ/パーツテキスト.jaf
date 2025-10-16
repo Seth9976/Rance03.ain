@@ -1,0 +1,173 @@
+void Ｐ＿テキスト設定(int パーツ番号, string テキスト, int 状態)
+{
+	PartsEngine.Parts_SetText(パーツ番号, テキスト, 状態);
+}
+
+void Ｐ＿テキスト追加(int パーツ番号, string テキスト, int 状態)
+{
+	PartsEngine.Parts_AddPartsText(パーツ番号, テキスト, 状態);
+}
+
+string Ｐ＿テキスト取得(int パーツ番号, int 状態)
+{
+	string Out;
+	PartsEngine.GetTextPartsText(Out, パーツ番号, 状態);
+	return Out;
+}
+
+void Ｐ＿テキスト追加表示(int パーツ番号, string テキスト, int 時間, int 状態)
+{
+	int TotalTime = テキスト.Length() * 時間;
+	int EndIndex;
+	CASTimer Timer;
+	Timer.Reset();
+	for (; ; )
+	{
+		int Time = Timer.Get();
+		int Index = (テキスト.Length() * Time) / TotalTime;
+		if (Index >= テキスト.Length())
+		{
+			Index = テキスト.Length() - 1;
+		}
+		while (Index >= EndIndex)
+		{
+			string OneChar = テキスト.GetPart(EndIndex, 1);
+			if (!OneChar.Empty())
+			{
+				Ｐ＿テキスト追加(パーツ番号, OneChar, 状態);
+			}
+			EndIndex++;
+		}
+		AFL_View_Update(true);
+		if (Time >= TotalTime)
+		{
+			break;
+		}
+	}
+}
+
+void Ｐ＿テキスト先頭行削除(int パーツ番号, int 状態)
+{
+	PartsEngine.Parts_DeletePartsTopTextLine(パーツ番号, 状態);
+}
+
+void Ｐ＿テキスト表示範囲設定(int パーツ番号, int Ｘ, int Ｙ, int 幅, int 高さ, int 状態)
+{
+	PartsEngine.Parts_SetPartsTextSurfaceArea(パーツ番号, Ｘ, Ｙ, 幅, 高さ, 状態);
+}
+
+void Ｐ＿テキスト表示範囲取得(int パーツ番号, ref int Ｘ, ref int Ｙ, ref int 幅, ref int 高さ, int 状態)
+{
+	PartsEngine.GetPartsTextSurfaceArea(パーツ番号, Ｘ, Ｙ, 幅, 高さ, 状態);
+}
+
+void Ｐ＿フォント設定(int パーツ番号, int 種類, int サイズ, int Ｒ, int Ｇ, int Ｂ, float 太字幅, int 縁取りＲ, int 縁取りＧ, int 縁取りＢ, float 縁取り幅, int 状態)
+{
+	PartsEngine.Parts_SetFont(パーツ番号, 種類, サイズ, Ｒ, Ｇ, Ｂ, 太字幅, 縁取りＲ, 縁取りＧ, 縁取りＢ, 縁取り幅, 状態);
+}
+
+void Ｐ＿フォント種類設定(int パーツ番号, int 種類, int 状態)
+{
+	PartsEngine.Parts_SetPartsFontType(パーツ番号, 種類, 状態);
+}
+
+void Ｐ＿フォントサイズ設定(int パーツ番号, int サイズ, int 状態)
+{
+	PartsEngine.Parts_SetPartsFontSize(パーツ番号, サイズ, 状態);
+}
+
+void Ｐ＿フォント色設定(int パーツ番号, int Ｒ, int Ｇ, int Ｂ, int 状態)
+{
+	PartsEngine.Parts_SetPartsFontColor(パーツ番号, Ｒ, Ｇ, Ｂ, 状態);
+}
+
+void Ｐ＿フォント太字幅設定(int パーツ番号, float 太字幅, int 状態)
+{
+	PartsEngine.Parts_SetPartsFontBoldWeight(パーツ番号, 太字幅, 状態);
+}
+
+void Ｐ＿フォント縁取り色設定(int パーツ番号, int Ｒ, int Ｇ, int Ｂ, int 状態)
+{
+	PartsEngine.Parts_SetPartsFontEdgeColor(パーツ番号, Ｒ, Ｇ, Ｂ, 状態);
+}
+
+void Ｐ＿フォント縁取り幅設定(int パーツ番号, float 縁取り幅, int 状態)
+{
+	PartsEngine.Parts_SetPartsFontEdgeWeight(パーツ番号, 縁取り幅, 状態);
+}
+
+void Ｐ＿フォント取得(int パーツ番号, ref int 種類, ref int サイズ, ref int Ｒ, ref int Ｇ, ref int Ｂ, ref float 太字幅, ref int 縁取りＲ, ref int 縁取りＧ, ref int 縁取りＢ, ref float 縁取り幅, int 状態)
+{
+	PartsEngine.GetPartsTextFontProperty(パーツ番号, 種類, サイズ, Ｒ, Ｇ, Ｂ, 太字幅, 縁取りＲ, 縁取りＧ, 縁取りＢ, 縁取り幅, 状態);
+}
+
+void Ｐ＿テキスト字間隔設定(int パーツ番号, int _字間隔, int 状態)
+{
+	PartsEngine.Parts_SetTextCharSpace(パーツ番号, _字間隔, 状態);
+}
+
+int Ｐ＿テキスト字間隔取得(int パーツ番号, int 状態)
+{
+	return PartsEngine.Parts_GetTextCharSpace(パーツ番号, 状態);
+}
+
+void Ｐ＿テキスト行間隔設定(int パーツ番号, int _行間隔, int 状態)
+{
+	PartsEngine.Parts_SetTextLineSpace(パーツ番号, _行間隔, 状態);
+}
+
+int Ｐ＿テキスト行間隔取得(int パーツ番号, int 状態)
+{
+	return PartsEngine.Parts_GetTextLineSpace(パーツ番号, 状態);
+}
+
+void Ｐ＿テキスト表示時間設定(int パーツ番号, int 時間, int 状態)
+{
+	PartsEngine.Parts_SetTextShowTime(パーツ番号, 時間, 状態);
+}
+
+int Ｐ＿テキスト表示時間取得(int パーツ番号, int 状態)
+{
+	return PartsEngine.Parts_GetTextShowTime(パーツ番号, 状態);
+}
+
+void Ｐ＿テキスト位置設定(int パーツ番号, int 位置, int 状態)
+{
+	PartsEngine.Parts_SetTextPos(パーツ番号, 位置, 状態);
+}
+
+int Ｐ＿テキスト位置取得(int パーツ番号, int 状態)
+{
+	return PartsEngine.Parts_GetTextPos(パーツ番号, 状態);
+}
+
+void Ｐ＿テキストタグ有効設定(int パーツ番号, bool 有効, int 状態)
+{
+	PartsEngine.Parts_SetTextEnableTag(パーツ番号, 有効, 状態);
+}
+
+bool Ｐ＿テキストタグ有効設定取得(int パーツ番号, int 状態)
+{
+	return PartsEngine.Parts_IsTextEnableTag(パーツ番号, 状態);
+}
+
+void Ｐ＿テキストルビフォント設定(int パーツ番号, int 種類, int サイズ, int Ｒ, int Ｇ, int Ｂ, float 太字幅, int 縁取りＲ, int 縁取りＧ, int 縁取りＢ, float 縁取り幅, int 状態)
+{
+	PartsEngine.Parts_SetRubyFont(パーツ番号, 種類, サイズ, Ｒ, Ｇ, Ｂ, 太字幅, 縁取りＲ, 縁取りＧ, 縁取りＢ, 縁取り幅, 状態);
+}
+
+void Ｐ＿テキストルビフォント取得(int パーツ番号, ref int 種類, ref int サイズ, ref int Ｒ, ref int Ｇ, ref int Ｂ, ref float 太字幅, ref int 縁取りＲ, ref int 縁取りＧ, ref int 縁取りＢ, ref float 縁取り幅, int 状態)
+{
+	PartsEngine.Parts_GetRubyFont(パーツ番号, 種類, サイズ, Ｒ, Ｇ, Ｂ, 太字幅, 縁取りＲ, 縁取りＧ, 縁取りＢ, 縁取り幅, 状態);
+}
+
+void Ｐ＿テキストルビ字間隔設定(int パーツ番号, int _字間隔, int 状態)
+{
+	PartsEngine.Parts_SetRubyCharSpace(パーツ番号, _字間隔, 状態);
+}
+
+int Ｐ＿テキストルビ字間隔取得(int パーツ番号, int 状態)
+{
+	return PartsEngine.Parts_GetRubyCharSpace(パーツ番号, 状態);
+}
+

@@ -1,0 +1,116 @@
+CParts3DLayerManager::CParts3DLayerManager()
+{
+	this.Release();
+}
+
+CParts3DLayerManager::~CParts3DLayerManager()
+{
+	this.Release();
+}
+
+void CParts3DLayerManager::Release()
+{
+	this.m_SuspendList.Free();
+	this.m_List.Free();
+}
+
+void CParts3DLayerManager::Add(int Number)
+{
+	this.Remove(Number);
+	this.m_List.PushBack(Number);
+	this.m_SuspendList.Free();
+}
+
+void CParts3DLayerManager::Remove(int Number)
+{
+	int Index = this.m_List.Find(0, this.m_List.Numof(), Number);
+	if (Index == -1)
+	{
+		return;
+	}
+	this.m_List.Erase(Index);
+	this.m_SuspendList.Free();
+}
+
+void CParts3DLayerManager::SetShow(bool Show)
+{
+	int i;
+	for (i = 0; i < this.Numof(); ++i)
+	{
+		int Number = this.Get(i);
+		if (!Ｐ＿存在確認(Number))
+		{
+			continue;
+		}
+		Ｐ＿表示設定(Number, Show);
+	}
+}
+
+void CParts3DLayerManager::SuspendShowState()
+{
+	if (this.IsSuspendShowState())
+	{
+		return;
+	}
+	int i;
+	for (i = 0; i < this.Numof(); ++i)
+	{
+		int Number = this.Get(i);
+		if (!Ｐ＿存在確認(Number))
+		{
+			continue;
+		}
+		this.m_SuspendList.PushBack(Ｐ＿表示設定取得(Number) ? 1 : 0);
+	}
+}
+
+void CParts3DLayerManager::ResumeShowState()
+{
+	if (!this.IsSuspendShowState())
+	{
+		return;
+	}
+	int i;
+	for (i = 0; i < this.Numof(); ++i)
+	{
+		int Number = this.Get(i);
+		if (!Ｐ＿存在確認(Number))
+		{
+			continue;
+		}
+		Ｐ＿表示設定(Number, this.m_SuspendList[i] == 1);
+	}
+	this.m_SuspendList.Free();
+}
+
+bool CParts3DLayerManager::IsSuspendShowState()
+{
+	if (this.Numof() == 0)
+	{
+		return false;
+	}
+	if (this.Numof() != this.m_SuspendList.Numof())
+	{
+		return false;
+	}
+	return true;
+}
+
+int CParts3DLayerManager::Numof()
+{
+	return this.m_List.Numof();
+}
+
+int CParts3DLayerManager::Get(int Index)
+{
+	if (Index < 0)
+	{
+		return -1;
+	}
+	if (this.Numof() <= Index)
+	{
+		return -1;
+	}
+	return this.m_List[Index];
+}
+

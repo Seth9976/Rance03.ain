@@ -1,0 +1,19 @@
+FrameManager::FrameManager()
+{
+	this.timer_.Reset();
+}
+
+void FrameManager::updateFrame()
+{
+	this.udpateInputDevices();
+	g_partsMotionManager.update();
+	g_globalTimer.update();
+	AFL_View_Update(true);
+}
+
+void FrameManager::udpateInputDevices()
+{
+	g_mouse.update();
+	g_keyboard.update();
+}
+

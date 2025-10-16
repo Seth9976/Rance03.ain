@@ -1,0 +1,122 @@
+void キー待ち(bool _ignore_skip_mode)
+{
+	SYS_バックシーン登録();
+	CASClick LButtonClick;
+	CASClick MButtonClick;
+	CASClick EnterKeyClick;
+	CASClick UpKeyClick;
+	CASClick DownKeyClick;
+	CASClick EscapeKeyClick;
+	CASClick AKeyClick;
+	CASClick SKeyClick;
+	CASClick PageUpKeyClick;
+	CASClick HomeKeyClick;
+	CASClick BackSpaceKeyClick;
+	LButtonClick.Init(1, true);
+	MButtonClick.Init(4, true);
+	EnterKeyClick.Init(13, true);
+	UpKeyClick.Init(38, true);
+	DownKeyClick.Init(40, true);
+	EscapeKeyClick.Init(27, true);
+	AKeyClick.Init(65, true);
+	SKeyClick.Init(83, true);
+	PageUpKeyClick.Init(33, true);
+	HomeKeyClick.Init(36, true);
+	BackSpaceKeyClick.Init(32, true);
+	CASJoyClickAssignedKey JoyOkClick;
+	JoyOkClick.Init(4, true);
+	int _time_out = system.GetTime() + SYS_オートモード待機時間計算(15);
+	bool IsViewUpdate = false;
+	for (; ; )
+	{
+		if (SYS_全文スキップ中確認())
+		{
+			SYS_メッセージスキップ待ち();
+			break;
+		}
+		if (LButtonClick.IsClick(-2147483648))
+		{
+			break;
+		}
+		if (MButtonClick.IsClick(-2147483648))
+		{
+			Ｓ＿既読スキップ();
+		}
+		if (EnterKeyClick.IsClick(-2147483648))
+		{
+			break;
+		}
+		if (UpKeyClick.IsClick(-2147483648))
+		{
+			SYS_RunCommandMouseWheelForward();
+			_time_out = system.GetTime() + SYS_オートモード待機時間計算(15);
+		}
+		if (DownKeyClick.IsClick(-2147483648))
+		{
+			break;
+		}
+		if (EscapeKeyClick.IsClick(-2147483648))
+		{
+			Ｓ＿コンフィグ();
+			_time_out = system.GetTime() + SYS_オートモード待機時間計算(15);
+		}
+		if (AKeyClick.IsClick(-2147483648))
+		{
+			Ｓ＿オート();
+		}
+		if (SKeyClick.IsClick(-2147483648))
+		{
+			Ｓ＿既読スキップ();
+		}
+		if (PageUpKeyClick.IsClick(-2147483648))
+		{
+			Ｓ＿バックログ();
+			_time_out = system.GetTime() + SYS_オートモード待機時間計算(15);
+		}
+		if (HomeKeyClick.IsClick(-2147483648))
+		{
+			Ｓ＿バックシーン();
+			_time_out = system.GetTime() + SYS_オートモード待機時間計算(15);
+		}
+		if (BackSpaceKeyClick.IsClick(-2147483648))
+		{
+			Ｓ＿ボイスリプレイ();
+		}
+		if (JoyOkClick.IsClick(-2147483648))
+		{
+			break;
+		}
+		if (!_ignore_skip_mode)
+		{
+			if (SYS_全文スキップ中確認() || SYS_スキップ中確認())
+			{
+				SYS_メッセージスキップ待ち();
+				break;
+			}
+			if (Ａ＿オートモード中確認())
+			{
+				if (system.GetTime() >= _time_out)
+				{
+					break;
+				}
+			}
+		}
+		if (SYS_ホイールフォア即確認())
+		{
+			SYS_RunCommandMouseWheelForward();
+			_time_out = system.GetTime() + SYS_オートモード待機時間計算(15);
+		}
+		if (SYS_ホイールバック確認())
+		{
+			break;
+		}
+		AFL_View_Update(true);
+		IsViewUpdate = true;
+	}
+	if (!IsViewUpdate)
+	{
+		AFL_View_Update(true);
+	}
+	IbisInputEngine.Mouse_HideByStepMessage();
+}
+

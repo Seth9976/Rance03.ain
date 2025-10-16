@@ -1,0 +1,135 @@
+CAEPartsPropertyPanel::CAEPartsPropertyPanel()
+{
+}
+
+CAEPartsPropertyPanel::~CAEPartsPropertyPanel()
+{
+	this.Release();
+}
+
+void CAEPartsPropertyPanel::Init(int LayoutID)
+{
+	this.Release();
+	this.m_Panel.Init(LayoutID);
+	this.m_Panel.AddKeyDownEvent(this.KeyDownEvent);
+	this.m_Panel.AddMouseWheelEvent(this.MouseWheelEvent);
+}
+
+void CAEPartsPropertyPanel::Release()
+{
+	this.m_dgKeyDownEvent.Clear();
+	this.m_dgMouseWheelEvent.Clear();
+	this.m_Panel.Release();
+	PARTS_ReleaseListWithFree(this.m_PartsList);
+}
+
+ref CAEPropertyItem CAEPartsPropertyPanel::AddTextBoxItem(string Label, string Text, bool OpenIMEGainFocus)
+{
+	return this.m_Panel.AddTextBoxItem(Label, 155, Text, 80, OpenIMEGainFocus);
+}
+
+ref CAEPropertyItem CAEPartsPropertyPanel::AddButtonItem(string Label, string Text)
+{
+	return this.m_Panel.AddButtonItem(Label, 155, Text, 80, 5);
+}
+
+ref CAEPropertyItem CAEPartsPropertyPanel::AddCheckBoxItem(string Label, bool Flg)
+{
+	return this.m_Panel.AddCheckBoxItem(Label, 155, 80, Flg);
+}
+
+ref CAEPropertyItem CAEPartsPropertyPanel::AddComboBoxItem(string Label, array@string List, int Index)
+{
+	return this.m_Panel.AddComboBoxItem(Label, 155, 80, 80, List, Index);
+}
+
+ref CAEPropertyItem CAEPartsPropertyPanel::AddLabelItem(string Label)
+{
+	return this.m_Panel.AddLabelItem(Label, 235);
+}
+
+bool CAEPartsPropertyPanel::IsExistItem(string Label)
+{
+	return this.m_Panel.IsExistItem(Label);
+}
+
+ref CAEPropertyItem CAEPartsPropertyPanel::GetItem(int ID)
+{
+	return this.m_Panel.GetItem(ID);
+}
+
+ref CAEPropertyItem CAEPartsPropertyPanel::GetItemByLabel(string Label)
+{
+	return this.m_Panel.GetItemByLabel(Label);
+}
+
+void CAEPartsPropertyPanel::KeyDownEvent(int ID, int KeyID)
+{
+	this.m_dgKeyDownEvent(ID, KeyID);
+}
+
+void CAEPartsPropertyPanel::MouseWheelEvent(int ID, int Forward, int Back)
+{
+	this.m_dgMouseWheelEvent(ID, Forward, Back);
+}
+
+void CAEPartsPropertyPanel::AddKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent += DelegateObject;
+}
+
+void CAEPartsPropertyPanel::EraseKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent -= DelegateObject;
+}
+
+void CAEPartsPropertyPanel::AddMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent += DelegateObject;
+}
+
+void CAEPartsPropertyPanel::EraseMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent -= DelegateObject;
+}
+
+void CAEPartsPropertyPanel::AddChangeTextEvent(DG_ChangedHandler DelegateObject)
+{
+	this.m_Panel.AddChangeTextEvent(DelegateObject);
+}
+
+void CAEPartsPropertyPanel::EraseChangeTextEvent(DG_ChangedHandler DelegateObject)
+{
+	this.m_Panel.EraseChangeTextEvent(DelegateObject);
+}
+
+void CAEPartsPropertyPanel::AddMouseClickEvent(DG_MouseClickHandler DelegateObject)
+{
+	this.m_Panel.AddMouseClickEvent(DelegateObject);
+}
+
+void CAEPartsPropertyPanel::EraseMouseClickEvent(DG_MouseClickHandler DelegateObject)
+{
+	this.m_Panel.EraseMouseClickEvent(DelegateObject);
+}
+
+void CAEPartsPropertyPanel::AddChangedCheckBoxEvent(DG_ChangedFlgHandler DelegateObject)
+{
+	this.m_Panel.AddChangedCheckBoxEvent(DelegateObject);
+}
+
+void CAEPartsPropertyPanel::EraseChangedCheckBoxEvent(DG_ChangedFlgHandler DelegateObject)
+{
+	this.m_Panel.EraseChangedCheckBoxEvent(DelegateObject);
+}
+
+void CAEPartsPropertyPanel::AddSelectedEvent(DG_SelectedHandler DelegateObject)
+{
+	this.m_Panel.AddSelectedEvent(DelegateObject);
+}
+
+void CAEPartsPropertyPanel::EraseSelectedEvent(DG_SelectedHandler DelegateObject)
+{
+	this.m_Panel.EraseSelectedEvent(DelegateObject);
+}
+

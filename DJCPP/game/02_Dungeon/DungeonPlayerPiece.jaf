@@ -1,0 +1,156 @@
+DungeonPlayerPiece::DungeonPlayerPiece()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void DungeonPlayerPiece::init(string playerId, int position)
+{
+	this.playerId_ = playerId;
+	this.position_ = position;
+	this.initParts();
+}
+
+void DungeonPlayerPiece::initParts()
+{
+	if (this.playerId_ == "")
+	{
+		this.playerId_ = "ランス";
+		this.parts_[0].init("システム／ダンジョン／背中／ランス／裸", 0);
+	}
+	else
+	{
+		this.parts_[0].init("システム／ダンジョン／背中／%s" % getPlayerFromId(this.playerId_).getShortName(), 0);
+	}
+	this.parts_[0].setOrigin(2);
+	createPartsGroup(this.parent_, this.parts_, 1500 + this.position_);
+	this.setPartsShow();
+	this.setPartsPos();
+}
+
+void DungeonPlayerPiece::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void DungeonPlayerPiece::setPartsPos()
+{
+	int x;
+	int y;
+	this.getPartsPos(x, y, this.position_);
+	this.parent_.setPos(x, y);
+}
+
+void DungeonPlayerPiece::getPartsPos(ref int x, ref int y, int index)
+{
+	switch (index)
+	{
+	case 0:
+		x = 512;
+		y = 675;
+		break;
+	case 1:
+		x = 512;
+		y = 755;
+		break;
+	case 2:
+		x = 362;
+		y = 755;
+		break;
+	case 3:
+		x = 662;
+		y = 755;
+		break;
+	case 4:
+		x = 437;
+		y = 835;
+		break;
+	case 5:
+		x = 587;
+		y = 835;
+		break;
+	case 6:
+		x = 287;
+		y = 835;
+		break;
+	case 7:
+		x = 737;
+		y = 835;
+		break;
+	}
+}
+
+void DungeonPlayerPiece::update()
+{
+}
+
+void DungeonPlayerPiece::fadeIn(bool val)
+{
+	this.parent_.setShow(true);
+	PartsMotion m;
+	m.setTime(val ? 200 : 150);
+	if (val)
+	{
+		m.setAlpha(0, 255, 0);
+	}
+	else
+	{
+		m.setAlpha(255, 0, 0);
+	}
+	this.parent_.runMotion(m, NULL);
+}
+
+void DungeonPlayerPiece::moveSideWays(bool isLeft)
+{
+	array@PartsMotion m[3];
+	int moveTo = (isLeft ? 1 : -1) * 15;
+	m[0].setTime(RAND(50));
+	m[1].setMove(0, 0, moveTo, 0, 7);
+	m[2].setMove(moveTo, 0, 0, 0, 7);
+	m[1].setTime(110);
+	m[2].setTime(110);
+	this.parts_[0].runMotionArray(m, NULL);
+}
+
+void DungeonPlayerPiece::moveFront()
+{
+	array@PartsMotion m[3];
+	int moveTo = -20;
+	m[0].setTime(RAND(200));
+	m[1].setMove(0, 0, 0, moveTo, 7);
+	m[2].setMove(0, moveTo, 0, 0, 7);
+	m[1].setTime(150);
+	m[2].setTime(150);
+	this.parts_[0].runMotionArray(m, NULL);
+}
+
+void DungeonPlayerPiece::changePosition(int position)
+{
+	int fx;
+	int fy;
+	int tx;
+	int ty;
+	this.getPartsPos(fx, fy, this.position_);
+	this.getPartsPos(tx, ty, position);
+	this.position_ = position;
+	PartsMotion m;
+	m.setTime(500);
+	m.setMove(fx, fy, tx, ty, 1);
+	this.parent_.setZ(1500 + this.position_);
+	this.parent_.runMotion(m, this.onFinish);
+}
+
+void DungeonPlayerPiece::onFinish()
+{
+	pass(this.playerId_);
+}
+
+string DungeonPlayerPiece::getId()
+{
+	return this.playerId_;
+}
+

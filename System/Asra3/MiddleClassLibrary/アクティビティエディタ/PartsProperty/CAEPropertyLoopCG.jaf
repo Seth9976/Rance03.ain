@@ -1,0 +1,128 @@
+CAEPropertyLoopCG::CAEPropertyLoopCG()
+{
+	this.Release();
+}
+
+CAEPropertyLoopCG::~CAEPropertyLoopCG()
+{
+	this.Release();
+}
+
+void CAEPropertyLoopCG::Init(int LayoutID, ref CAEInstanceItem Item, int State)
+{
+	this.Release();
+	if (Item === NULL)
+	{
+		return;
+	}
+	this.m_Item <- Item;
+	this.m_PartsState = State;
+	this.m_Panel.Init(LayoutID);
+	this.m_Panel.AddKeyDownEvent(this.KeyDownEvent);
+	this.m_Panel.AddMouseWheelEvent(this.MouseWheelEvent);
+	this.m_Panel.AddChangeTextEvent(this.ChangeTextEvent);
+	int ID = this.m_Item.GetID();
+	int X;
+	int Y;
+	int Width;
+	int Height;
+	Ｐ＿ループＣＧ表示範囲取得(ID, X, Y, Width, Height, State);
+	this.m_Panel.AddTextBoxItem("ＣＧ名", Ｐ＿ループＣＧ名取得(ID, State), true);
+	this.m_Panel.AddTextBoxItem("開始番号", string(Ｐ＿ループＣＧ開始番号取得(ID, State)), false);
+	this.m_Panel.AddTextBoxItem("ＣＧ枚数", string(Ｐ＿ループＣＧ枚数取得(ID, State)), false);
+	this.m_Panel.AddTextBoxItem("切り替え時間", string(Ｐ＿ループＣＧ切り替え時間取得(ID, State)), false);
+	this.m_Panel.AddTextBoxItem("表示範囲／Ｘ", string(X), false);
+	this.m_Panel.AddTextBoxItem("表示範囲／Ｙ", string(Y), false);
+	this.m_Panel.AddTextBoxItem("表示範囲／幅", string(Width), false);
+	this.m_Panel.AddTextBoxItem("表示範囲／高さ", string(Height), false);
+}
+
+void CAEPropertyLoopCG::Release()
+{
+	this.m_dgMouseWheelEvent.Clear();
+	this.m_dgKeyDownEvent.Clear();
+	this.m_Item <- NULL;
+	this.m_Panel.Release();
+}
+
+void CAEPropertyLoopCG::KeyDownEvent(int ID, int KeyID)
+{
+	this.m_dgKeyDownEvent(ID, KeyID);
+}
+
+void CAEPropertyLoopCG::MouseWheelEvent(int ID, int Forward, int Back)
+{
+	this.m_dgMouseWheelEvent(ID, Forward, Back);
+}
+
+void CAEPropertyLoopCG::ChangeTextEvent(int ID)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	int X;
+	int Y;
+	int Width;
+	int Height;
+	Ｐ＿ループＣＧ表示範囲取得(PartsID, X, Y, Width, Height, this.m_PartsState);
+	string CGName = Ｐ＿ループＣＧ名取得(PartsID, this.m_PartsState);
+	int StartNo = Ｐ＿ループＣＧ開始番号取得(PartsID, this.m_PartsState);
+	int Numof = Ｐ＿ループＣＧ枚数取得(PartsID, this.m_PartsState);
+	int Interval = Ｐ＿ループＣＧ切り替え時間取得(PartsID, this.m_PartsState);
+	if (Item.GetLabel() == "ＣＧ名")
+	{
+		Ｐ＿ループＣＧ設定(PartsID, Item.GetTextBoxText(), StartNo, Numof, Interval, this.m_PartsState);
+	}
+	else if (Item.GetLabel() == "開始番号")
+	{
+		Ｐ＿ループＣＧ設定(PartsID, CGName, Item.GetTextBoxInt(), Numof, Interval, this.m_PartsState);
+	}
+	else if (Item.GetLabel() == "ＣＧ枚数")
+	{
+		Ｐ＿ループＣＧ設定(PartsID, CGName, StartNo, Item.GetTextBoxInt(), Interval, this.m_PartsState);
+	}
+	else if (Item.GetLabel() == "切り替え時間")
+	{
+		Ｐ＿ループＣＧ設定(PartsID, CGName, StartNo, Numof, Item.GetTextBoxInt(), this.m_PartsState);
+	}
+	else if (Item.GetLabel() == "表示範囲／Ｘ")
+	{
+		Ｐ＿ループＣＧ表示範囲設定(PartsID, Item.GetTextBoxInt(), Y, Width, Height, this.m_PartsState);
+	}
+	else if (Item.GetLabel() == "表示範囲／Ｙ")
+	{
+		Ｐ＿ループＣＧ表示範囲設定(PartsID, X, Item.GetTextBoxInt(), Width, Height, this.m_PartsState);
+	}
+	else if (Item.GetLabel() == "表示範囲／幅")
+	{
+		Ｐ＿ループＣＧ表示範囲設定(PartsID, X, Y, Item.GetTextBoxInt(), Height, this.m_PartsState);
+	}
+	else if (Item.GetLabel() == "表示範囲／高さ")
+	{
+		Ｐ＿ループＣＧ表示範囲設定(PartsID, X, Y, Width, Item.GetTextBoxInt(), this.m_PartsState);
+	}
+}
+
+void CAEPropertyLoopCG::AddKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent += DelegateObject;
+}
+
+void CAEPropertyLoopCG::EraseKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent -= DelegateObject;
+}
+
+void CAEPropertyLoopCG::AddMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent += DelegateObject;
+}
+
+void CAEPropertyLoopCG::EraseMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent -= DelegateObject;
+}
+

@@ -1,0 +1,170 @@
+CampHopIcon::CampHopIcon()
+{
+	this.gameObjectId_ = g_gameObjectManager.addFocusObject(this.update, this.isHover);
+	this.bounceCount_ = 3;
+	this.x_ = 435.0;
+}
+
+void CampHopIcon::init(string cgName)
+{
+	this.cgName_ = cgName;
+	this.initParts();
+}
+
+void CampHopIcon::initParts()
+{
+	this.parts_[0].init(this.cgName_, 0);
+	this.parts_[0].setHitTestAsPixel(true);
+	this.parts_[0].setOrigin(2);
+	createPartsGroup(this.parent_, this.parts_, 4300);
+	this.setPartsShow();
+}
+
+void CampHopIcon::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void CampHopIcon::setPartsPos()
+{
+}
+
+void CampHopIcon::update()
+{
+	if (g_mouse.isClickWithFocus(this.gameObjectId_))
+	{
+		g_sysSound.play(5, "効果音／キャラクリック");
+		if (this.onClick_.Numof() == 0)
+		{
+			int r = RAND(2) == 1 ? -1 : 1;
+			this.vx_ = r * 1.5;
+			this.bounceCount_ = 3;
+			if (this.y_ >= this.maxY_)
+			{
+				this.y_ = this.maxY_ - 1.0;
+			}
+			this.vy_ = -10.0;
+		}
+		else
+		{
+			this.onClick_();
+		}
+	}
+	float dt = this.timer_.getTime() - this.lastTime_;
+	if (dt < 10.0)
+	{
+		return;
+	}
+	if (dt > 80.0)
+	{
+		dt = 10.0;
+	}
+	this.lastTime_ = this.timer_.getTime();
+	if (this.bounceCount_ > 0)
+	{
+		this.vy_ += dt * 0.04;
+	}
+	if (this.y_ >= this.maxY_ && 26 <= this.x_ && this.x_ <= 780.0)
+	{
+		if (this.bounceCount_ > 0)
+		{
+			this.vy_ = -this.vy_ * 0.5;
+			--this.bounceCount_;
+		}
+		this.y_ = this.maxY_;
+	}
+	if (this.bounceCount_ == 0)
+	{
+		this.vy_ = 0.0;
+		this.vx_ = 0.0;
+	}
+	this.y_ += this.vy_;
+	this.x_ += this.vx_;
+	if (this.maxY_ == 1500.0)
+	{
+		float r = this.fadeTimer_.getTime() / 150.0;
+		this.parent_.setAlpha(getMotionValue(0, 255.0, 0.0, r));
+	}
+	if (this.isBlink_)
+	{
+		int t = 1500;
+		float v = float(t - this.blink_.getTime() % t) / float(t);
+		this.parts_[0].setAddColorValue(v * 200.0, v * 200.0, v * 100.0);
+	}
+	this.parent_.setPos(this.x_, this.y_);
+}
+
+bool CampHopIcon::isHover()
+{
+	return this.parts_[0].isHit(g_mouse.getX(), g_mouse.getY());
+}
+
+void CampHopIcon::run()
+{
+	this.timer_.reset();
+}
+
+void CampHopIcon::setIconPosition(int pos)
+{
+	switch (pos)
+	{
+	case 0:
+		this.x_ = 168.0;
+		this.maxY_ = 473.0;
+		break;
+	case 1:
+		this.x_ = 283.0;
+		this.maxY_ = 513.0;
+		this.parent_.setZ(4320.0);
+		break;
+	case 2:
+		this.x_ = 531.0;
+		this.maxY_ = 513.0;
+		this.parent_.setZ(4320.0);
+		break;
+	case 3:
+		this.x_ = 641.0;
+		this.maxY_ = 473.0;
+		break;
+	default:
+		this.x_ = 168 + RAND(323);
+		if (this.x_ > 329.0)
+		{
+			this.x_ += 150.0;
+		}
+		this.maxY_ = 493.0;
+		break;
+	}
+	this.y_ = -RAND(200);
+}
+
+void CampHopIcon::fall()
+{
+	this.bounceCount_ = 3;
+	this.fadeTimer_.reset();
+	this.maxY_ = 1500.0;
+}
+
+void CampHopIcon::setOnClickCallback(DG_GeneralCallback cb)
+{
+	this.onClick_ = cb;
+	int n;
+	int i;
+	for (i = 0; i < g_mirrorPiece.Numof(); ++i)
+	{
+		if (g_mirrorPiece[i].isShownAtViewer())
+		{
+			++n;
+		}
+	}
+	if (n != 3)
+	{
+		this.isBlink_ = true;
+	}
+}
+

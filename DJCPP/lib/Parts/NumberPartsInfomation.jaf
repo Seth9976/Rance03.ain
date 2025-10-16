@@ -1,0 +1,77 @@
+NumberPartsInfomation::NumberPartsInfomation()
+{
+	this.cg_ = "";
+	this.span_ = 0;
+	this.isUseComma_ = false;
+}
+
+void NumberPartsInfomation::setCgName(string cgName)
+{
+	this.cg_ = cgName;
+}
+
+void NumberPartsInfomation::setWidth(int w0, int w1, int w2, int w3, int w4, int w5, int w6, int w7, int w8, int w9, int wMinus, int wComma)
+{
+	this.w_[0] = w0;
+	this.w_[1] = w1;
+	this.w_[2] = w2;
+	this.w_[3] = w3;
+	this.w_[4] = w4;
+	this.w_[5] = w5;
+	this.w_[6] = w6;
+	this.w_[7] = w7;
+	this.w_[8] = w8;
+	this.w_[9] = w9;
+	this.w_[10] = wMinus;
+	this.w_[11] = wComma;
+}
+
+void NumberPartsInfomation::setUseComma(bool val)
+{
+	this.isUseComma_ = val;
+}
+
+void NumberPartsInfomation::setSpan(int val)
+{
+	this.span_ = val;
+}
+
+string NumberPartsInfomation::getCgName()
+{
+	return this.cg_;
+}
+
+int NumberPartsInfomation::getWidth(int index)
+{
+	return this.w_[index];
+}
+
+bool NumberPartsInfomation::isUseComma()
+{
+	return this.isUseComma_;
+}
+
+int NumberPartsInfomation::getSpan()
+{
+	return this.span_;
+}
+
+void NumberPartsInfomation::setSameWidth(int w)
+{
+	int i;
+	for (i = 0; i < this.w_.Numof(); ++i)
+	{
+		this.w_[i] = w;
+	}
+}
+
+void NumberPartsInfomation::setDigit(int val)
+{
+	this.digit_ = val;
+}
+
+int NumberPartsInfomation::getDigit()
+{
+	return this.digit_;
+}
+

@@ -1,0 +1,313 @@
+AdvStand::AdvStand()
+{
+}
+
+void AdvStand::init(int x, int y, int offsetZ, string prefixString)
+{
+	this.defaultX_ = x;
+	this.defaultY_ = y;
+	this.offsetZ_ = offsetZ;
+	this.prefixString_ = prefixString;
+}
+
+void AdvStand::show(string standName, int inType, bool immidiate)
+{
+	string current = this.standName_;
+	if (standName == "")
+	{
+		return;
+	}
+	if (standName == current)
+	{
+		return;
+	}
+	if (current == "")
+	{
+		this.innerShow(standName, inType, immidiate);
+		this.standName_ = standName;
+	}
+	else
+	{
+		int n = current.Find("／");
+		if (n != -1 && standName.GetPart(0, n) == current.GetPart(0, n))
+		{
+			this.showBlackStand(standName);
+			this.resetParts(standName);
+			this.standName_ = standName;
+		}
+		else
+		{
+			this.hide(0, true);
+			this.innerShow(standName, 0, true);
+			this.standName_ = standName;
+		}
+	}
+}
+
+void AdvStand::innerShow(string standName, int inType, bool immidiate)
+{
+	this.resetParts(standName);
+	this.parent_.runMotion(this.getPartsMotionShow(inType), NULL);
+	if (immidiate)
+	{
+		RunPartsMotion();
+	}
+}
+
+void AdvStand::resetParts(string standName)
+{
+	this.cgName_ = this.prefixString_ + standName;
+	this.parent_.initAsDummy();
+	this.offsetParent_.initAsDummy();
+	this.parts_[0].init("trim_" + this.cgName_, 0);
+	this.parts_[2].initAsCgPlaneImage("trim_" + this.cgName_, 0, 0, 0);
+	this.setMultiColorValue();
+	this.setPartsParent();
+	this.setPartsPos();
+	this.setPartsShow();
+}
+
+void AdvStand::setPartsParent()
+{
+	this.offsetParent_.setParent(this.parent_.getPartsNumber());
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setParent(this.offsetParent_.getPartsNumber());
+	}
+}
+
+void AdvStand::setMultiColorValue()
+{
+	string name = g_advBackGround.getCgName();
+	int r = 255;
+	int g = 255;
+	int b = 255;
+	int i;
+	for (i = 0; i < g_standBackgroundFillInfomation.Numof(); ++i)
+	{
+		if ("背景／" + g_standBackgroundFillInfomation[i].getId() == name)
+		{
+			r = g_standBackgroundFillInfomation[i].getR();
+			g = g_standBackgroundFillInfomation[i].getG();
+			b = g_standBackgroundFillInfomation[i].getB();
+			break;
+		}
+	}
+	this.parts_[0].setMultiColorValue(r, g, b);
+}
+
+void AdvStand::setPartsPos()
+{
+	int x;
+	int y;
+	this.getStandOffset(this.cgName_, x, y);
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setPos(x, y);
+		this.parts_[i].setZ(i);
+	}
+	this.parent_.setZ(3100 + this.offsetZ_);
+	this.offsetParent_.setPos(this.defaultX_, this.defaultY_);
+}
+
+void AdvStand::setPartsShow()
+{
+	this.parts_[0].setShow(true);
+	this.parts_[1].setShow(true);
+	this.offsetParent_.setShow(true);
+	this.parent_.setShow(true);
+}
+
+void AdvStand::showBlackStand(string standName)
+{
+	this.parts_[2].setShow(true);
+	PartsMotion m;
+	m.setAlpha(0, 255, 0);
+	m.setTime(150);
+	this.parts_[2].runMotion(m, NULL);
+	RunPartsMotion();
+}
+
+PartsMotion AdvStand::getPartsMotionShow(int inType)
+{
+	int fromX;
+	int fromY;
+	switch (inType)
+	{
+	case 2:
+		fromX = -150;
+		break;
+	case 1:
+		fromX = 150;
+		break;
+	case 4:
+		fromY = -150;
+		break;
+	case 3:
+		fromY = 150;
+		break;
+	}
+	PartsMotion m;
+	m.setTime(250);
+	m.setAlpha(0, 255, 0);
+	m.setMove(fromX, fromY, 0, 0, 3);
+	return m;
+}
+
+PartsMotion AdvStand::getPartsMotionHide(int outType)
+{
+	int toX;
+	int toY;
+	switch (outType)
+	{
+	case 2:
+		toX = -100;
+		break;
+	case 1:
+		toX = 100;
+		break;
+	case 4:
+		toY = -100;
+		break;
+	case 3:
+		toY = 100;
+		break;
+	}
+	PartsMotion m;
+	m.setTime(150);
+	m.setMove(0, 0, toX, toY, 7);
+	m.setAlpha(255, 0, 0);
+	return m;
+}
+
+void AdvStand::hide(int outType, bool immidiate)
+{
+	if (!this.parts_[0].isInitialized())
+	{
+		return;
+	}
+	this.parent_.runMotion(this.getPartsMotionHide(outType), this.release);
+	if (immidiate)
+	{
+		RunPartsMotion();
+	}
+}
+
+void AdvStand::motion(int motionType)
+{
+	switch (motionType)
+	{
+	case 0:
+		array@PartsMotion m;
+		this.getPartsMotionBow(m);
+		this.parent_.runMotionArray(m, NULL);
+		break;
+	case 1:
+		array@PartsMotion m;
+		this.getPartsMotionJump(m);
+		this.parent_.runMotionArray(m, NULL);
+		break;
+	case 2:
+		this.parent_.runMotion(this.getPartsMotionShake(true, true), NULL);
+		break;
+	case 3:
+		this.parent_.runMotion(this.getPartsMotionShake(false, true), NULL);
+		break;
+	case 4:
+		this.parent_.runMotion(this.getPartsMotionShake(true, false), NULL);
+		break;
+	}
+	RunPartsMotion();
+}
+
+void AdvStand::getPartsMotionBow(ref array@PartsMotion m)
+{
+	m.Alloc(3);
+	m[0].setTime(200);
+	m[0].setMove(0, 0, 0, 50, 1);
+	m[1].setTime(150);
+	m[1].setMove(0, 50, 0, 0, 3);
+}
+
+void AdvStand::getPartsMotionJump(ref array@PartsMotion m)
+{
+	m.Alloc(3);
+	m[0].setTime(150);
+	m[0].setMove(0, 5, 0, -50, 1);
+	m[1].setTime(200);
+	m[1].setMove(0, -50, 0, 15, 5);
+	m[2].setTime(45);
+	m[2].setMove(0, 15, 0, 0, 0);
+}
+
+PartsMotion AdvStand::getPartsMotionShake(bool isHorizontal, bool isVertical)
+{
+	PartsMotion m;
+	m.setTime(350);
+	if (isHorizontal && isVertical)
+	{
+		m.setKey(7, 50, 0, 0);
+		m.setKey(8, 50, 0, 0);
+	}
+	else if (isHorizontal)
+	{
+		m.setKey(7, 100, 30, 0);
+	}
+	else if (isVertical)
+	{
+		m.setKey(8, 100, 30, 0);
+	}
+	return m;
+}
+
+string AdvStand::truncateStandPrefix(string n)
+{
+	int pos = n.Find(this.prefixString_) + this.prefixString_.Length();
+	return n.GetPart(pos, n.Length() - pos);
+}
+
+void AdvStand::getStandOffset(string cgName, ref int x, ref int y)
+{
+	x = EX_SA2Int("立ち絵オフセット", cgName, "x", 0);
+	y = EX_SA2Int("立ち絵オフセット", cgName, "y", 0);
+}
+
+void AdvStand::release()
+{
+	this.parent_.release();
+	this.offsetParent_.release();
+	this.parts_[0].release();
+	this.parts_[2].release();
+	this.standName_ = "";
+}
+
+bool AdvStand::isShow()
+{
+	return this.parts_[0].isInitialized();
+}
+
+void AdvStand::setShopMode(bool val)
+{
+	if (val)
+	{
+		PartsMotion m;
+		m.setMove(this.defaultX_, this.defaultY_, this.defaultX_ + 80, this.defaultY_, 1);
+		this.offsetParent_.runMotion(m, NULL);
+		this.parent_.setZ(4200.0);
+	}
+	else
+	{
+		PartsMotion m;
+		m.setMove(this.defaultX_ + 80, this.defaultY_, this.defaultX_, this.defaultY_, 1);
+		this.offsetParent_.runMotion(m, NULL);
+		this.parent_.setZ(3100 + this.offsetZ_);
+	}
+}
+
+string AdvStand::getStandName()
+{
+	return this.standName_;
+}
+

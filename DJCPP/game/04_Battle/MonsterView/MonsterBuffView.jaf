@@ -1,0 +1,73 @@
+MonsterBuffView::MonsterBuffView()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void MonsterBuffView::init(ref MonsterInstance instance)
+{
+	this.instance_ <- instance;
+	this.instance_.getBuffIdList(this.idList_, -1);
+	this.instance_.setBuffCallback(this.onAddBuff, this.onEraseBuff);
+	this.parent_.initAsDummy();
+	this.parent_.setZ(1.0);
+	this.initParts();
+}
+
+void MonsterBuffView::initParts()
+{
+	this.parts_.Free();
+	this.parts_.Alloc(this.idList_.Numof());
+	int i;
+	for (i = 0; i < this.idList_.Numof(); ++i)
+	{
+		this.parts_[i].init(getMonsterBuffFromId(this.idList_[i]).getImageName(), 0);
+		this.parts_[i].setPos(159 - i * 20, 0.0);
+		this.parts_[i].setOrigin(9);
+		this.parts_[i].setZ(100 + i * 5);
+		this.parts_[i].setParent(this.parent_.getPartsNumber());
+	}
+	this.setPartsShow();
+}
+
+void MonsterBuffView::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void MonsterBuffView::setPartsPos()
+{
+}
+
+void MonsterBuffView::update()
+{
+}
+
+void MonsterBuffView::onAddBuff(string id)
+{
+}
+
+void MonsterBuffView::onEraseBuff(string id)
+{
+}
+
+void MonsterBuffView::updateState()
+{
+	this.instance_.getBuffIdList(this.idList_, -1);
+	this.initParts();
+}
+
+void MonsterBuffView::setPos(int x, int y)
+{
+	this.parent_.setPos(x, y);
+}
+
+void MonsterBuffView::setParent(int parentPartsNumber)
+{
+	this.parent_.setParent(parentPartsNumber);
+}
+

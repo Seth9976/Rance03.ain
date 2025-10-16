@@ -1,0 +1,60 @@
+bool AFL_Parts_SetPartsFlatAndStop(int PartsNumber, string pIFlatFileName, int State)
+{
+	if (!PartsEngine.Parts_SetPartsFlatAndStop(PartsNumber, pIFlatFileName, State))
+	{
+		PARTS_Warning("AFL_Parts_SetPartsFlatAndStop(パーツ番号 = %d, フラットファイル名 = \"%s\", 状態 = %d\n" % PartsNumber % pIFlatFileName % State);
+		return false;
+	}
+	return true;
+}
+
+bool AFL_Parts_StopPartsFlat(int PartsNumber, int State)
+{
+	return PartsEngine.Parts_StopPartsFlat(PartsNumber, State);
+}
+
+bool AFL_Parts_StartPartsFlat(int PartsNumber, int State)
+{
+	return PartsEngine.Parts_StartPartsFlat(PartsNumber, State);
+}
+
+bool AFL_Parts_IsStopPartsFlat(int PartsNumber, int State)
+{
+	return PartsEngine.Parts_IsPartsFlatStop(PartsNumber, State);
+}
+
+bool AFL_Parts_GoFramePartsFlat(int PartsNumber, int FrameNumber, int State)
+{
+	return PartsEngine.Parts_GoFramePartsFlat(PartsNumber, FrameNumber, State);
+}
+
+void AFL_Parts_GoLabelPartsFlat(int PartsNumber, string Label, int State)
+{
+	PartsEngine.Parts_JumpFlatLabel(PartsNumber, Label, State);
+}
+
+int AFL_Parts_GetPartsFlatEndFrameNumber(int PartsNumber, int State)
+{
+	return PartsEngine.Parts_GetPartsFlatEndFrame(PartsNumber, State);
+}
+
+int AFL_Parts_GetPartsFlatCurrentFrameNumber(int PartsNumber, int State)
+{
+	return PartsEngine.Parts_GetPartsFlatCurrentFrameNumber(PartsNumber, State);
+}
+
+void AFL_Parts_SetFlatUpdateSpeedRate(int PartsNumber, float Rate, int State)
+{
+	PartsEngine.SetFlatFPSRate(PartsNumber, Rate, State);
+}
+
+float AFL_Parts_GetFlatUpdateSpeedRate(int PartsNumber, int State)
+{
+	return PartsEngine.GetFlatFPSRate(PartsNumber, State);
+}
+
+int AFL_Parts_GetFlatFPS(int PartsNumber, int State)
+{
+	return PartsEngine.GetFlatFPS(PartsNumber, State);
+}
+

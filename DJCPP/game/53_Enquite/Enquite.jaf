@@ -1,0 +1,162 @@
+void openEnquite()
+{
+	Enquite scene;
+	scene.run();
+}
+
+void Enquite::run()
+{
+	if (g_enquiteSelection.Empty())
+	{
+		loadEnquiteSelection();
+	}
+	Ｐ＿アクティビティ実行("アンケート／０１", this.onLoad, this.onRelease, this.onExit);
+}
+
+void Enquite::onLoad(string activityFileName, string activityName)
+{
+	this.currentFileName_ = activityFileName;
+	this.currentActivityName_ = activityName;
+	setCursorClickSoundToActivity(this.currentActivityName_);
+	switch (activityFileName)
+	{
+	case "アンケート／０１":
+	case "アンケート／０２":
+	case "アンケート／０３":
+	case "アンケート／０４":
+		this.normalPage_ <- new EnquiteNormalPage;
+		this.normalPage_.init(this.currentFileName_, this.currentActivityName_);
+		break;
+	case "アンケート／０５":
+	case "アンケート／０６":
+	case "アンケート／０７":
+		this.characterPage_ <- new EnquiteCharacterPage;
+		this.characterPage_.init(this.currentFileName_, this.currentActivityName_);
+		break;
+	case "アンケート／０８":
+		this.sendingPage_ <- new EnquiteSendingPage;
+		this.sendingPage_.init(this.currentFileName_, this.currentActivityName_);
+		break;
+	case "アンケート／自由記入":
+		this.freeInputPage_ <- new EnquiteFreeInput;
+		this.freeInputPage_.init(this.currentFileName_, this.currentActivityName_);
+		break;
+	}
+}
+
+void Enquite::onRelease(string ActivityFileName, string ActivityName)
+{
+	switch (ActivityFileName)
+	{
+	case "アンケート／０１":
+	case "アンケート／０２":
+	case "アンケート／０３":
+	case "アンケート／０４":
+		this.normalPage_ <- NULL;
+		break;
+	case "アンケート／０５":
+	case "アンケート／０６":
+	case "アンケート／０７":
+		this.characterPage_ <- NULL;
+		break;
+	case "アンケート／０８":
+		this.sendingPage_ <- NULL;
+		break;
+	case "アンケート／自由記入":
+		this.freeInputPage_ <- NULL;
+		break;
+	}
+	共有セーブ();
+}
+
+void Enquite::onExit(ref bool isCancel)
+{
+	if (this.normalPage_ !== NULL)
+	{
+		if (this.normalPage_.getClickedButton() == 2)
+		{
+			switch (this.currentFileName_)
+			{
+			case "アンケート／０１":
+				if (!this.isAllAnswered(1, 4))
+				{
+					this.openNotAnsweredDialog();
+					isCancel = true;
+				}
+				break;
+			case "アンケート／０２":
+				if (!this.isAllAnswered(5, 7))
+				{
+					this.openNotAnsweredDialog();
+					isCancel = true;
+				}
+				break;
+			case "アンケート／０３":
+				if (!this.isAllAnswered(8, 12))
+				{
+					this.openNotAnsweredDialog();
+					isCancel = true;
+				}
+				break;
+			case "アンケート／０４":
+				if (!this.isAllAnswered(13, 15))
+				{
+					this.openNotAnsweredDialog();
+					isCancel = true;
+				}
+				break;
+			}
+		}
+		else if (this.normalPage_.getClickedButton() == 0)
+		{
+			EnquiteYesNoDialog dialog;
+			if (!dialog.open("アンケート／送信せずに閉じる"))
+			{
+				isCancel = true;
+			}
+		}
+	}
+	else if (this.characterPage_ !== NULL)
+	{
+		if (this.characterPage_.getClickedButton() == 0)
+		{
+			EnquiteYesNoDialog dialog;
+			if (!dialog.open("アンケート／送信せずに閉じる"))
+			{
+				isCancel = true;
+			}
+		}
+	}
+	else if (this.sendingPage_ !== NULL)
+	{
+		if (this.sendingPage_.isClickExit())
+		{
+			EnquiteYesNoDialog dialog;
+			if (!dialog.open("アンケート／送信せずに閉じる"))
+			{
+				this.sendingPage_.resetIsClickExit();
+				isCancel = true;
+			}
+		}
+	}
+}
+
+void Enquite::openNotAnsweredDialog()
+{
+	EnquiteInfoDialog dialog;
+	dialog.open("アンケート／記入漏れ");
+}
+
+bool Enquite::isAllAnswered(int startAnswerId, int endAnswerId)
+{
+	int i;
+	for (i = startAnswerId; i <= endAnswerId; ++i)
+	{
+		if (!isEnquiteAnswered(i))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+

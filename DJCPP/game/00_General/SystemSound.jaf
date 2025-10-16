@@ -1,0 +1,39 @@
+void SystemSound::playLoop(string name)
+{
+	Ａ＿ループ効果音１(name, -1, -1);
+}
+
+void SystemSound::stopLoop(int time)
+{
+	Ａ＿ループ効果音停止(time);
+}
+
+void SystemSound::play(int type, string name)
+{
+	if (name == "")
+	{
+		return;
+	}
+	AFL_SystemSE_Play(name, type);
+}
+
+void SystemSound::playVoice(int number)
+{
+	AFL_SystemSE_Play("%05d" % number, 7);
+}
+
+void playCursor()
+{
+	g_sysSound.play(4, "効果音／カーソル");
+}
+
+void playClick()
+{
+	g_sysSound.play(5, "効果音／クリック");
+}
+
+void playCancel()
+{
+	g_sysSound.play(5, "効果音／キャンセル");
+}
+

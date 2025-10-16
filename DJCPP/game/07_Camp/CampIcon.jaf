@@ -1,0 +1,134 @@
+CampIcon::CampIcon()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void CampIcon::init(DG_GeneralCallback onClickMirrorPiece)
+{
+	gameGetJoinedPlayer(this.playerId_);
+	int i;
+	while (i < this.playerId_.Numof())
+	{
+		string sn = getPlayerFromId(this.playerId_[i]).getShortName();
+		if (Ａ＿ＣＧ存在確認("システム／キャンプ／ＳＤ／%s" % sn))
+		{
+			++i;
+		}
+		else
+		{
+			this.playerId_.Erase(i);
+		}
+	}
+	while (this.playerId_.Numof() > 4)
+	{
+		this.playerId_.Erase(RAND(this.playerId_.Numof()) - 1);
+	}
+	array@int pos[4];
+	for (i = 0; i < pos.Numof(); ++i)
+	{
+		pos[i] = i;
+	}
+	for (i = 0; i < 10; ++i)
+	{
+		int r = RAND(4) - 1;
+		int r2 = RAND(4) - 1;
+		pos[r] <=> pos[r2];
+	}
+	this.icon_.Alloc(this.playerId_.Numof());
+	for (i = 0; i < this.icon_.Numof(); ++i)
+	{
+		string sn = getPlayerFromId(this.playerId_[i]).getShortName();
+		this.icon_[i].init("システム／キャンプ／ＳＤ／%s" % sn);
+		this.icon_[i].setIconPosition(pos[i]);
+		this.icon_[i].run();
+	}
+	if (this.isGetMirrorPiece())
+	{
+		this.icon_.Realloc(this.icon_.Numof() + 1);
+		int index = this.icon_.Numof() - 1;
+		this.icon_[index].init("システム／キャンプ／鏡の破片");
+		this.icon_[index].setIconPosition(-1);
+		this.icon_[index].setOnClickCallback(onClickMirrorPiece);
+		this.icon_[index].run();
+	}
+	this.initParts();
+}
+
+bool CampIcon::isGetMirrorPiece()
+{
+	int i;
+	for (i = 0; i < g_mirrorPiece.Numof(); ++i)
+	{
+		if (g_mirrorPiece[i].getCount() > 0)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void CampIcon::initParts()
+{
+	this.parts_[0].init("システム／キャンプ／土台", 0);
+	this.parts_[1].init("システム／キャンプ／木", 0);
+	this.parts_[2].init("システム／キャンプ／テント", 0);
+	this.parts_[3].init("システム／キャンプ／焚き火", 0);
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setOrigin(2);
+	}
+	createPartsGroup(this.parent_, this.parts_, 4200);
+	this.setPartsShow();
+	this.setPartsPos();
+}
+
+void CampIcon::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void CampIcon::setPartsPos()
+{
+	this.parts_[0].setPos(404.0, 551.0);
+	this.parts_[1].setPos(540.0, 377.0);
+	this.parts_[2].setPos(399.0, 451.0);
+	this.parts_[3].setPos(406.0, 512.0);
+}
+
+void CampIcon::update()
+{
+}
+
+void CampIcon::run()
+{
+}
+
+void CampIcon::fadeIn(bool val)
+{
+	if (val)
+	{
+		PartsMotion m;
+		m.setTime(350);
+		m.setScaling(0, 100, 1);
+		this.parent_.runMotion(m, NULL);
+	}
+	else
+	{
+		PartsMotion m;
+		m.setTime(50);
+		m.setScaling(100, 0, 0);
+		this.parent_.runMotion(m, NULL);
+		int i;
+		for (i = 0; i < this.icon_.Numof(); ++i)
+		{
+			this.icon_[i].fall();
+		}
+	}
+}
+

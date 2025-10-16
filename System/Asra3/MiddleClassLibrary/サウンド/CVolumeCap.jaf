@@ -1,0 +1,48 @@
+CVolumeCap::CVolumeCap()
+{
+	this.m_CapVolume = 0.6;
+	this.m_FadeOutTime = 100;
+	this.m_WaitForFadeInTime = 1000;
+	this.m_FadeInTime = 450;
+}
+
+void CVolumeCap::Set(float CapVolume, int FadeOutTime, int WaitForFadeInTime, int FadeInTime)
+{
+	if (CapVolume >= 0.0)
+	{
+		this.m_CapVolume = CapVolume;
+	}
+	if (FadeOutTime >= 0)
+	{
+		this.m_FadeOutTime = FadeOutTime;
+	}
+	if (WaitForFadeInTime >= 0)
+	{
+		this.m_WaitForFadeInTime = WaitForFadeInTime;
+	}
+	if (FadeInTime >= 0)
+	{
+		this.m_FadeInTime = FadeInTime;
+	}
+}
+
+float CVolumeCap::GetCapVolume()
+{
+	return this.m_CapVolume;
+}
+
+int CVolumeCap::GetFadeOutTime()
+{
+	return this.m_FadeOutTime;
+}
+
+int CVolumeCap::GetWaitForFadeInTime()
+{
+	return this.m_WaitForFadeInTime;
+}
+
+int CVolumeCap::GetFadeInTime()
+{
+	return this.m_FadeInTime;
+}
+

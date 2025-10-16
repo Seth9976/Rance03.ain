@@ -1,0 +1,169 @@
+CAEPropertyLayoutBox::CAEPropertyLayoutBox()
+{
+	this.Init(0, NULL);
+}
+
+CAEPropertyLayoutBox::~CAEPropertyLayoutBox()
+{
+	this.Release();
+}
+
+void CAEPropertyLayoutBox::Init(int LayoutID, ref CAEInstanceItem Item)
+{
+	this.Release();
+	if (Item === NULL)
+	{
+		return;
+	}
+	this.m_Item <- Item;
+	this.m_Panel.Init(LayoutID);
+	this.m_Panel.AddKeyDownEvent(this.KeyDownEvent);
+	this.m_Panel.AddMouseWheelEvent(this.MouseWheelEvent);
+	this.m_Panel.AddChangeTextEvent(this.ChangeTextEvent);
+	this.m_Panel.AddMouseClickEvent(this.MouseLClickEvent);
+	this.m_Panel.AddSelectedEvent(this.SelectedComboBoxEvent);
+	this.m_Panel.AddChangedCheckBoxEvent(this.ChangedCheckBoxEvent);
+	int ID = this.m_Item.GetID();
+	array@string LayoutTypeList;
+	LayoutTypeList.PushBack("フリー");
+	LayoutTypeList.PushBack("縦");
+	LayoutTypeList.PushBack("横");
+	this.m_Panel.AddComboBoxItem("レイアウトタイプ", LayoutTypeList, Ｐ＿レイアウトボックス＿レイアウトタイプ取得(ID));
+	this.m_Panel.AddCheckBoxItem("折り返し", Ｐ＿レイアウトボックス＿折り返し設定取得(ID));
+	this.m_Panel.AddTextBoxItem("折り返しサイズ", Ｐ＿レイアウトボックス＿折り返しサイズ取得(ID).String(), false);
+	this.m_Panel.AddCheckBoxItem("折り返しサイズレート設定", Ｐ＿レイアウトボックス＿折り返しサイズレート設定取得(ID));
+	this.m_Panel.AddButtonItem("配置設定", PARTS_GetOriginPosModeName(Ｐ＿レイアウトボックス＿配置設定取得(ID)));
+	this.m_Panel.AddTextBoxItem("上パディング", string(Ｐ＿レイアウトボックス＿上パディング取得(ID)), false);
+	this.m_Panel.AddTextBoxItem("下パディング", string(Ｐ＿レイアウトボックス＿下パディング取得(ID)), false);
+	this.m_Panel.AddTextBoxItem("左パディング", string(Ｐ＿レイアウトボックス＿左パディング取得(ID)), false);
+	this.m_Panel.AddTextBoxItem("右パディング", string(Ｐ＿レイアウトボックス＿右パディング取得(ID)), false);
+	this.m_Panel.AddLabelItem("項目");
+}
+
+void CAEPropertyLayoutBox::Release()
+{
+	this.m_dgMouseWheelEvent.Clear();
+	this.m_dgKeyDownEvent.Clear();
+	this.m_Item <- NULL;
+	this.m_Panel.Release();
+}
+
+void CAEPropertyLayoutBox::KeyDownEvent(int ID, int KeyID)
+{
+	this.m_dgKeyDownEvent(ID, KeyID);
+}
+
+void CAEPropertyLayoutBox::MouseWheelEvent(int ID, int Forward, int Back)
+{
+	this.m_dgMouseWheelEvent(ID, Forward, Back);
+}
+
+void CAEPropertyLayoutBox::ChangeTextEvent(int ID)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	if (Item.GetLabel() == "折り返しサイズ")
+	{
+		Ｐ＿レイアウトボックス＿折り返し設定(PartsID, Ｐ＿レイアウトボックス＿折り返し設定取得(PartsID), Item.GetTextBoxFloat());
+	}
+	else if (Item.GetLabel() == "上パディング")
+	{
+		Ｐ＿レイアウトボックス＿パディング設定(PartsID, Item.GetTextBoxInt(), Ｐ＿レイアウトボックス＿下パディング取得(PartsID), Ｐ＿レイアウトボックス＿左パディング取得(PartsID), Ｐ＿レイアウトボックス＿右パディング取得(PartsID));
+	}
+	else if (Item.GetLabel() == "下パディング")
+	{
+		Ｐ＿レイアウトボックス＿パディング設定(PartsID, Ｐ＿レイアウトボックス＿上パディング取得(PartsID), Item.GetTextBoxInt(), Ｐ＿レイアウトボックス＿左パディング取得(PartsID), Ｐ＿レイアウトボックス＿右パディング取得(PartsID));
+	}
+	else if (Item.GetLabel() == "左パディング")
+	{
+		Ｐ＿レイアウトボックス＿パディング設定(PartsID, Ｐ＿レイアウトボックス＿上パディング取得(PartsID), Ｐ＿レイアウトボックス＿下パディング取得(PartsID), Item.GetTextBoxInt(), Ｐ＿レイアウトボックス＿右パディング取得(PartsID));
+	}
+	else if (Item.GetLabel() == "右パディング")
+	{
+		Ｐ＿レイアウトボックス＿パディング設定(PartsID, Ｐ＿レイアウトボックス＿上パディング取得(PartsID), Ｐ＿レイアウトボックス＿下パディング取得(PartsID), Ｐ＿レイアウトボックス＿左パディング取得(PartsID), Item.GetTextBoxInt());
+	}
+}
+
+void CAEPropertyLayoutBox::MouseLClickEvent(int ID, int MouseX, int MouseY)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	if (Item.GetLabel() == "配置設定")
+	{
+		CAESelectOriginDialog Form;
+		Form.Show(ID, MouseX, MouseY, Ｐ＿レイアウトボックス＿配置設定取得(PartsID), this.ChangedOriginTypeEvent);
+	}
+}
+
+void CAEPropertyLayoutBox::ChangedOriginTypeEvent(int ID, int Type)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	if (Item.GetLabel() == "配置設定")
+	{
+		Ｐ＿レイアウトボックス＿配置設定(PartsID, Type);
+		Item.SetButtonText(PARTS_GetOriginPosModeName(Type));
+	}
+}
+
+void CAEPropertyLayoutBox::ChangedCheckBoxEvent(int ID, bool Check)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	if (Item.GetLabel() == "折り返し")
+	{
+		Ｐ＿レイアウトボックス＿折り返し設定(PartsID, Item.GetFlg(), Ｐ＿レイアウトボックス＿折り返しサイズ取得(PartsID));
+	}
+	else if (Item.GetLabel() == "折り返しサイズレート設定")
+	{
+		Ｐ＿レイアウトボックス＿折り返しサイズレート設定(PartsID, Item.GetFlg());
+	}
+}
+
+void CAEPropertyLayoutBox::SelectedComboBoxEvent(int ID, int Index)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	Ｐ＿レイアウトボックス＿レイアウトタイプ設定(PartsID, Index);
+}
+
+void CAEPropertyLayoutBox::AddKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent += DelegateObject;
+}
+
+void CAEPropertyLayoutBox::EraseKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent -= DelegateObject;
+}
+
+void CAEPropertyLayoutBox::AddMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent += DelegateObject;
+}
+
+void CAEPropertyLayoutBox::EraseMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent -= DelegateObject;
+}
+

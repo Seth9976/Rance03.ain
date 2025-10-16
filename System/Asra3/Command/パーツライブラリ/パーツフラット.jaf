@@ -1,0 +1,100 @@
+void Ｐ＿フラット設定(int パーツ番号, string ファイル名, int 状態)
+{
+	if (!PartsEngine.Parts_SetPartsFlat(パーツ番号, ファイル名, 状態))
+	{
+		PARTS_Warning("Ｐ＿フラット設定(パーツ番号 = %d, ファイル名 = \"%s\", 状態 = %d)\n" % パーツ番号 % ファイル名 % 状態);
+	}
+}
+
+string Ｐ＿フラット名取得(int パーツ番号, int 状態)
+{
+	string Out;
+	PartsEngine.Parts_GetPartsFlatName(Out, パーツ番号, 状態);
+	return Out;
+}
+
+bool Ｐ＿フラット終了確認(int パーツ番号, int 状態)
+{
+	return PartsEngine.Parts_IsPartsFlatEnd(パーツ番号, 状態);
+}
+
+void Ｐ＿フラット開始フレーム移動(int パーツ番号, int 状態)
+{
+	PartsEngine.Parts_BackPartsFlatBeginFrame(パーツ番号, 状態);
+}
+
+void Ｐ＿フラット最終フレームステップ(int パーツ番号, int 状態)
+{
+	PartsEngine.Parts_StepPartsFlatFinalFrame(パーツ番号, 状態);
+}
+
+void Ｐ＿フラットＣＧ名リスト取得(int パーツ番号, ref array@string リスト, int 状態)
+{
+	int NumofCG = PartsEngine.NumofFlatCG(パーツ番号, 状態);
+	リスト.Free();
+	int Index;
+	for (Index = 0; Index < NumofCG; ++Index)
+	{
+		string Out;
+		PartsEngine.GetFlatCGName(Out, パーツ番号, Index, 状態);
+		リスト.PushBack(Out);
+	}
+}
+
+void Ｐ＿フラットＣＧ変更(int パーツ番号, string フラット内ＣＧ名, string 代替ＣＧ名, int 状態)
+{
+	PartsEngine.Parts_ChangeFlatCG(パーツ番号, フラット内ＣＧ名, 代替ＣＧ名, 状態);
+}
+
+string Ｐ＿フラット代替ＣＧ名取得(int パーツ番号, string フラット内ＣＧ名, int 状態)
+{
+	string Out;
+	PartsEngine.GetProxyFlatCGName(Out, パーツ番号, フラット内ＣＧ名, 状態);
+	return Out;
+}
+
+void Ｐ＿フラットＣＧ変更一部キャンセル(int パーツ番号, string フラット内ＣＧ名, int 状態)
+{
+	PartsEngine.ReturnChangeFlatCG(パーツ番号, フラット内ＣＧ名, 状態);
+}
+
+void Ｐ＿フラットＣＧ変更キャンセル(int パーツ番号, int 状態)
+{
+	PartsEngine.ClearChangeFlatCG(パーツ番号, 状態);
+}
+
+void Ｐ＿フラットサウンド名リスト取得(int パーツ番号, ref array@string リスト, int 状態)
+{
+	int NumofCG = PartsEngine.NumofFlatSound(パーツ番号, 状態);
+	リスト.Free();
+	int Index;
+	for (Index = 0; Index < NumofCG; ++Index)
+	{
+		string Out;
+		PartsEngine.GetFlatSoundName(Out, パーツ番号, Index, 状態);
+		リスト.PushBack(Out);
+	}
+}
+
+void Ｐ＿フラットサウンド変更(int パーツ番号, string フラット内サウンド名, string 代替サウンド名, int 状態)
+{
+	PartsEngine.Parts_ChangeFlatSound(パーツ番号, フラット内サウンド名, 代替サウンド名, 状態);
+}
+
+int Ｐ＿フラット代替サウンド取得(int パーツ番号, string フラット内サウンド名, int 状態)
+{
+	string Out;
+	PartsEngine.GetProxyFlatSound(Out, パーツ番号, フラット内サウンド名, 状態);
+	return Out.Int();
+}
+
+void Ｐ＿フラットサウンド変更一部キャンセル(int パーツ番号, string フラット内サウンド名, int 状態)
+{
+	PartsEngine.ReturnChangeFlatSound(パーツ番号, フラット内サウンド名, 状態);
+}
+
+void Ｐ＿フラットサウンド変更キャンセル(int パーツ番号, int 状態)
+{
+	PartsEngine.ClearChangeFlatSound(パーツ番号, 状態);
+}
+

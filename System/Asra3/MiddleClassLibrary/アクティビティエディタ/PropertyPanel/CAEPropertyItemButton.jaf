@@ -1,0 +1,126 @@
+CAEPropertyItemButton::CAEPropertyItemButton()
+{
+}
+
+CAEPropertyItemButton::~CAEPropertyItemButton()
+{
+	this.Release();
+}
+
+int CAEPropertyItemButton::Init(string Name, int LabelWidth, int ButtonWidth, int TextPos, ref CAEPropertyToolTip ToolTip)
+{
+	this.Release();
+	this.m_LayoutID = PARTS_GetFreeSystemPartsNumber();
+	this.m_Label = PARTS_GetFreeSystemPartsNumber();
+	this.m_Button = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿レイアウトタイプ設定(this.m_LayoutID, 2);
+	Ｐ＿レイアウトボックス＿配置設定(this.m_LayoutID, 4);
+	Ｐ＿マージン設定(this.m_LayoutID, 1, 1, 3, 3);
+	Ｐ＿フォント設定(this.m_Label, 0, 14, 0, 0, 0, 0.0, 0, 0, 0, 0.0, 1);
+	Ｐ＿テキスト設定(this.m_Label, Name, 1);
+	Ｐ＿オンカーソル透過設定(this.m_Label, true);
+	Ｐ＿マージン設定(this.m_Label, 0, 0, 0, LabelWidth - AFL_Parts_GetWidth(this.m_Label, 1));
+	Ｐ＿レイアウトボックス＿追加(this.m_LayoutID, this.m_Label);
+	Ｐ＿ボタン＿サイズ設定(this.m_Button, ButtonWidth, 18);
+	Ｐ＿ボタン＿フォント設定(this.m_Button, 0, 14, 0, 0, 0, 0.0, 0, 0, 0, 0.0);
+	Ｐ＿ボタン＿テキスト位置設定(this.m_Button, TextPos);
+	Ｐ＿レイアウトボックス＿追加(this.m_LayoutID, this.m_Button);
+	AFL_Parts_AddKeyDownEvent(this.m_LayoutID, this.KeyDownEvent);
+	AFL_Parts_AddKeyDownEvent(this.m_Label, this.KeyDownEvent);
+	AFL_Parts_AddKeyDownEvent(this.m_Button, this.KeyDownEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_LayoutID, this.MouseWheelEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_Label, this.MouseWheelEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_Button, this.MouseWheelEvent);
+	AFL_Parts_AddMouseLClickEvent(this.m_Button, this.MouseLClickEvent);
+	if (ToolTip !== NULL)
+	{
+		ToolTip.AddParts(this.m_Button);
+	}
+	return this.m_LayoutID;
+}
+
+void CAEPropertyItemButton::Release()
+{
+	this.m_dgMouseClickEvent.Clear();
+	this.m_dgMouseWheelEvent.Clear();
+	this.m_dgKeyDownEvent.Clear();
+	PARTS_ReleaseWithInit(this.m_Button);
+	PARTS_ReleaseWithInit(this.m_Label);
+	PARTS_ReleaseWithInit(this.m_LayoutID);
+}
+
+int CAEPropertyItemButton::GetID()
+{
+	return this.m_LayoutID;
+}
+
+string CAEPropertyItemButton::GetLabel()
+{
+	return Ｐ＿テキスト取得(this.m_Label, 1);
+}
+
+void CAEPropertyItemButton::SetText(string Text)
+{
+	Ｐ＿ボタン＿テキスト設定(this.m_Button, Text);
+}
+
+string CAEPropertyItemButton::GetText()
+{
+	return Ｐ＿ボタン＿テキスト取得(this.m_Button);
+}
+
+string CAEPropertyItemButton::GetToolTipText()
+{
+	return this.GetText();
+}
+
+void CAEPropertyItemButton::AddParts(int Number)
+{
+	Ｐ＿レイアウトボックス＿追加(this.m_LayoutID, Number);
+}
+
+void CAEPropertyItemButton::KeyDownEvent(int ID, int KeyID)
+{
+	this.m_dgKeyDownEvent(ID, KeyID);
+}
+
+void CAEPropertyItemButton::MouseWheelEvent(int ID, int Forward, int Back)
+{
+	this.m_dgMouseWheelEvent(ID, Forward, Back);
+}
+
+void CAEPropertyItemButton::MouseLClickEvent(int ID, int MouseX, int MouseY)
+{
+	this.m_dgMouseClickEvent(ID, MouseX, MouseY);
+}
+
+void CAEPropertyItemButton::AddKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent += DelegateObject;
+}
+
+void CAEPropertyItemButton::EraseKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent -= DelegateObject;
+}
+
+void CAEPropertyItemButton::AddMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent += DelegateObject;
+}
+
+void CAEPropertyItemButton::EraseMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent -= DelegateObject;
+}
+
+void CAEPropertyItemButton::AddMouseClickEvent(DG_MouseClickHandler DelegateObject)
+{
+	this.m_dgMouseClickEvent += DelegateObject;
+}
+
+void CAEPropertyItemButton::EraseMouseClickEvent(DG_MouseClickHandler DelegateObject)
+{
+	this.m_dgMouseClickEvent -= DelegateObject;
+}
+

@@ -1,0 +1,241 @@
+void SYS_Activity_RunSingle(string ActivityName, DG_PARTS_LoadedActivityHandler dgLoadedObject, DG_PARTS_ReleasingActivityHandler dgReleasingObject, DG_PARTS_IntentActivityHandler dgIntentActivityEvent)
+{
+	array@string List;
+	List.PushBack(ActivityName);
+	SYS_Activity_RunList(List, dgLoadedObject, dgReleasingObject, dgIntentActivityEvent);
+}
+
+void SYS_Activity_RunList(array@string ActivityName, DG_PARTS_LoadedActivityHandler dgLoadedObject, DG_PARTS_ReleasingActivityHandler dgReleasingObject, DG_PARTS_IntentActivityHandler dgIntentActivityEvent)
+{
+	CActivityIntentData IntentData;
+	IntentData.AddRangeDestination(ActivityName);
+	SYS_Activity_Run(IntentData, dgLoadedObject, dgReleasingObject, dgIntentActivityEvent);
+}
+
+void SYS_Activity_RunEXText(string Data, DG_PARTS_LoadedActivityHandler dgLoadedObject, DG_PARTS_ReleasingActivityHandler dgReleasingObject, DG_PARTS_IntentActivityHandler dgIntentActivityEvent)
+{
+	CActivityIntentData IntentData;
+	IntentData.AddDestinationData(Data);
+	SYS_Activity_Run(IntentData, dgLoadedObject, dgReleasingObject, dgIntentActivityEvent);
+}
+
+void SYS_Activity_Run(CActivityIntentData IntentData, DG_PARTS_LoadedActivityHandler dgLoadedObject, DG_PARTS_ReleasingActivityHandler dgReleasingObject, DG_PARTS_IntentActivityHandler dgIntentActivityEvent)
+{
+	for (; ; )
+	{
+		CASPartsActivity PartsActivity;
+		IntentData = PartsActivity.Run(IntentData, dgLoadedObject, dgReleasingObject, dgIntentActivityEvent);
+		if (IntentData.IsRemoveActivity() && !IntentData.IsExistDestination())
+		{
+			break;
+		}
+	}
+}
+
+string SYS_Activity_GetFreeName(string BaseName)
+{
+	if (BaseName.Empty())
+	{
+		BaseName = "NoName";
+	}
+	string Name = BaseName;
+	int Index;
+	for (Index = 0; SYS_Activity_IsLoaded(Name); ++Index)
+	{
+		Name = "%s:%d" % BaseName % Index;
+	}
+	return Name;
+}
+
+bool SYS_Activity_IsLoaded(string Name)
+{
+	return PartsEngine.IsExistActivity(Name);
+}
+
+bool SYS_Activity_Create(string Name)
+{
+	return PartsEngine.CreateActivity(Name);
+}
+
+bool SYS_Activity_IsExistFile(string FileName)
+{
+	return PartsEngine.IsExistActivityFile(FileName);
+}
+
+bool SYS_Activity_AddParts(string Name, string PartsName, int Number)
+{
+	return PartsEngine.AddActivityParts(Name, PartsName, Number);
+}
+
+bool SYS_Activity_RemoveParts(string Name, string PartsName)
+{
+	return PartsEngine.RemoveActivityParts(Name, PartsName);
+}
+
+bool SYS_Activity_RemoveAllParts(string Name)
+{
+	return PartsEngine.RemoveAllActivityParts(Name);
+}
+
+int SYS_Activity_NumofParts(string Name)
+{
+	return PartsEngine.NumofActivityParts(Name);
+}
+
+bool SYS_Activity_GetParts(int Index, string Name, ref string PartsName, ref int Number)
+{
+	return PartsEngine.GetActivityParts(Index, Name, PartsName, Number);
+}
+
+bool SYS_Activity_Release(string Name)
+{
+	array@int DelegateIndexList;
+	if (!PartsEngine.ReleaseActivity(Name, DelegateIndexList))
+	{
+		SYS_ERROR("アクティビティの削除に失敗しました【%s】" % Name, 0);
+		return false;
+	}
+	g_PartsMessageManager.ReleaseFunctionSetList(DelegateIndexList);
+	return true;
+}
+
+bool SYS_Activity_SaveEXText(ref string Text, string Name)
+{
+	return PartsEngine.SaveActivityEXText(Text, Name);
+}
+
+bool SYS_Activity_LoadEXText(string Name, string Text)
+{
+	return PartsEngine.LoadActivityEXText(Name, Text);
+}
+
+bool SYS_Activity_ReadFile(string Name, string FileName)
+{
+	return PartsEngine.ReadActivityFile(Name, FileName);
+}
+
+bool SYS_Activity_WriteFile(string Name, string FileName)
+{
+	return PartsEngine.WriteActivityFile(Name, FileName);
+}
+
+bool SYS_Activity_IsExistPartsByName(string Name, string PartsName)
+{
+	return PartsEngine.IsExistActivityPartsByName(Name, PartsName);
+}
+
+bool SYS_Activity_IsExistPartsByNumber(string Name, int Number)
+{
+	return PartsEngine.IsExistActivityPartsByNumber(Name, Number);
+}
+
+int SYS_Activity_GetPartsNumber(string Name, string PartsName)
+{
+	return PartsEngine.GetActivityPartsNumber(Name, PartsName);
+}
+
+string SYS_Activity_GetPartsName(string Name, int Number)
+{
+	string Out;
+	PartsEngine.GetActivityPartsName(Out, Name, Number);
+	return Out;
+}
+
+void SYS_Activity_AddClosePartsName(string Name, string PartsName)
+{
+	PartsEngine.AddActivityCloseParts(Name, PartsName);
+}
+
+void SYS_Activity_RemoveClosePartsName(string Name, string PartsName)
+{
+	PartsEngine.RemoveActivityCloseParts(Name, PartsName);
+}
+
+void SYS_Activity_RemoveAllClosePartsName(string Name)
+{
+	PartsEngine.RemoveAllActivityCloseParts(Name);
+}
+
+bool SYS_Activity_IsExistClosePartsName(string Name, string PartsName)
+{
+	return PartsEngine.IsExistActivityCloseParts(Name, PartsName);
+}
+
+void SYS_Activity_SetIntentData(string Name, string PartsName, string Destination, int IntentType)
+{
+	PartsEngine.SetActivityIntentData(Name, PartsName, Destination, IntentType);
+}
+
+void SYS_Activity_SetIntentDataList(string Name, string PartsName, ref array@string Destination, int IntentType)
+{
+	if (Destination.Empty())
+	{
+		SYS_Activity_SetIntentData(Name, PartsName, "", IntentType);
+		return;
+	}
+	SYS_Activity_SetIntentData(Name, PartsName, Destination[0], IntentType);
+	int Index;
+	for (Index = 1; Index < Destination.Numof(); ++Index)
+	{
+		SYS_Activity_AddIntentDestination(Name, PartsName, Destination[Index]);
+	}
+}
+
+void SYS_Activity_AddIntentDestination(string Name, string PartsName, string Destination)
+{
+	PartsEngine.AddActivityIntentDataDestination(Name, PartsName, Destination);
+}
+
+bool SYS_Activity_IsExistIntentData(string Name, string PartsName)
+{
+	return PartsEngine.IsExistActivityIntentData(Name, PartsName);
+}
+
+int SYS_Activity_NumofIntentDataDestination(string Name, string PartsName)
+{
+	return PartsEngine.NumofActivityIntentDataDestination(Name, PartsName);
+}
+
+void SYS_Activity_GetIntentDataDestination(string Name, string PartsName, ref array@string List)
+{
+	List.Free();
+	int Numof = SYS_Activity_NumofIntentDataDestination(Name, PartsName);
+	int Index;
+	for (Index = 0; Index < Numof; ++Index)
+	{
+		string Out;
+		PartsEngine.GetActivityIntentDataDestination(Out, Index, Name, PartsName);
+		List.PushBack(Out);
+	}
+}
+
+int SYS_Activity_GetIntentDataType(string Name, string PartsName)
+{
+	return PartsEngine.GetActivityIntentDataType(Name, PartsName);
+}
+
+void SYS_Activity_SetEndKey(string ActivityName, int Key)
+{
+	PartsEngine.SetActivityEndKey(ActivityName, Key);
+}
+
+void SYS_Activity_EraseEndKey(string ActivityName, int Key)
+{
+	PartsEngine.EraseActivityEndKey(ActivityName, Key);
+}
+
+bool SYS_Activity_IsExistEndKey(string ActivityName, int Key)
+{
+	return PartsEngine.IsExistActivityEndKey(ActivityName, Key);
+}
+
+void SYS_Activity_GetEndKeyList(string ActivityName, ref array@int KeyList)
+{
+	int Numof = PartsEngine.NumofActivityEndKey(ActivityName);
+	int Index;
+	for (Index = 0; Index < Numof; ++Index)
+	{
+		KeyList.PushBack(PartsEngine.GetActivityEndKey(ActivityName, Index));
+	}
+}
+

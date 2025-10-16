@@ -1,0 +1,66 @@
+void SceneLoad::init()
+{
+	this.isFinish_ = false;
+	this.list_.init(true);
+	this.list_.setOnClickCallback(this.onClick);
+	this.btnExit_.init("システム／ボタン／幅１７０", "閉じる", "", true);
+	this.btnExit_.setPos(839, 691);
+	this.btnExit_.setClickCallback(this.onClickButtonExit, 0);
+}
+
+void SceneLoad::onClickButtonExit(int id)
+{
+	this.fadeIn(false, this.onFinishFadeOut);
+}
+
+void SceneLoad::run()
+{
+	this.fadeIn(true, NULL);
+}
+
+bool SceneLoad::update()
+{
+	if (!this.timerCb_.isRunning() && g_mouse.isClick(1))
+	{
+		playCancel();
+		this.fadeIn(false, this.onFinishFadeOut);
+	}
+	return !this.isFinish_;
+}
+
+void SceneLoad::onFinishFadeOut()
+{
+	this.isFinish_ = true;
+}
+
+void SceneLoad::onClick(int index)
+{
+	if (AFL_Config_GetLoadConfirm())
+	{
+		DialogInfomation info;
+		info.setCaption("ロードします");
+		info.setMessage("よろしいですか");
+		info.setPictureImageName("システム／ダイアログ／写真／情報");
+		info.setAnswerTypeYesNo(true);
+		if (openDialog(info) == 1)
+		{
+			return;
+		}
+	}
+	if (g_saveDataManager.isSaved(index))
+	{
+		g_sysSound.play(6, "効果音／ロード");
+		g_saveDataManager.load(index);
+	}
+}
+
+void SceneLoad::fadeIn(bool val, DG_GeneralCallback cb)
+{
+	this.list_.fadeIn(val);
+	this.btnExit_.fadeIn(val);
+	if (cb.Numof() != 0)
+	{
+		this.timerCb_.setTimer(300, cb);
+	}
+}
+

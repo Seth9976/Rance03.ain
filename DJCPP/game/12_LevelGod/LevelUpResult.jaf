@@ -1,0 +1,270 @@
+LevelUpResult::LevelUpResult()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void LevelUpResult::init(string playerId)
+{
+	this.player_ <- getPlayerFromId(playerId);
+	this.dummy_ = this.player_;
+	this.dummy_.levelUp();
+	this.newSkillId_ = this.dummy_.getCurrentLevelNewSkillId();
+	this.getSkillId_ = this.newSkillId_;
+	this.nextLevel_ = -1;
+	if (this.newSkillId_ == "")
+	{
+		this.dummy_.getNextSkillId(this.newSkillId_, this.nextLevel_);
+	}
+	this.newSkill_.init(this.newSkillId_, this.nextLevel_);
+	this.initParts();
+	this.msg_ = this.getLevelUpMessage();
+	this.popup_.init(this.msg_);
+}
+
+void LevelUpResult::initParts()
+{
+	string sn = this.player_.getShortName();
+	this.parts_[0].initAsFlat("システム／レベルアップ／背景");
+	this.parts_[20].initAsFlat("システム／レベルアップ／シンボル");
+	this.parts_[2].init("trim_システム／立ち絵／%s" % sn, 0);
+	this.parts_[1].init("システム／編成／名札／%s" % sn, 0);
+	this.parts_[3].initAsNumber("システム／数字／幅４２／グラデ", NULL);
+	this.parts_[4].init("システム／レベルアップ／体力", 0);
+	this.parts_[8].init("システム／レベルアップ／筋力", 0);
+	this.parts_[12].init("システム／レベルアップ／魔力", 0);
+	this.parts_[16].init("システム／レベルアップ／技量", 0);
+	this.parts_[5].initAsNumber("システム／数字／幅１８／白", NULL);
+	this.parts_[9].initAsNumber("システム／数字／幅１８／白", NULL);
+	this.parts_[13].initAsNumber("システム／数字／幅１８／白", NULL);
+	this.parts_[17].initAsNumber("システム／数字／幅１８／白", NULL);
+	this.parts_[7].initAsNumber("システム／数字／幅２８／黄", NULL);
+	this.parts_[11].initAsNumber("システム／数字／幅２８／黄", NULL);
+	this.parts_[15].initAsNumber("システム／数字／幅２８／黄", NULL);
+	this.parts_[18].initAsNumber("システム／数字／幅２８／黄", NULL);
+	this.parts_[6].initAsFlat("システム／矢印");
+	this.parts_[10].initAsFlat("システム／矢印");
+	this.parts_[14].initAsFlat("システム／矢印");
+	this.parts_[19].initAsFlat("システム／矢印");
+	if (this.nextLevel_ != -1)
+	{
+		this.parts_[22].initAsNumber("システム／数字／幅２６／グレー", NULL);
+		this.parts_[22].setNumber(this.nextLevel_);
+	}
+	createPartsGroup(this.parent_, this.parts_, 4000);
+	this.setPartsValue();
+	this.setPartsShow();
+	this.setPartsPos();
+	this.startArrowFlat();
+}
+
+void LevelUpResult::setPartsValue()
+{
+	this.upNumber(3, this.dummy_.getLevel());
+	this.upNumber(5, this.player_.getMaxHp());
+	this.upNumber(9, this.player_.getStrength());
+	this.upNumber(13, this.player_.getMind());
+	this.upNumber(17, this.player_.getDexterity());
+	this.upNumber(7, this.dummy_.getMaxHp());
+	this.upNumber(11, this.dummy_.getStrength());
+	this.upNumber(15, this.dummy_.getMind());
+	this.upNumber(18, this.dummy_.getDexterity());
+}
+
+void LevelUpResult::startArrowFlat()
+{
+	this.parts_[6].startFlat(false, 1.0);
+	this.parts_[10].startFlat(false, 1.0);
+	this.parts_[14].startFlat(false, 1.0);
+	this.parts_[19].startFlat(false, 1.0);
+}
+
+void LevelUpResult::upNumber(int partsNumber, int value)
+{
+	this.parts_[partsNumber].setNumber(value);
+}
+
+void LevelUpResult::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void LevelUpResult::setPartsPos()
+{
+	this.parts_[1].setPos(79.0, 57.0);
+	this.parts_[2].setPos(771.0, 980.0);
+	this.parts_[2].setOrigin(2);
+	this.parts_[3].setPos(315.0, 182.0);
+	this.parts_[3].setOrigin(2);
+	this.parts_[4].setPos(241.0, 286.0);
+	this.parts_[8].setPos(241.0, 384.0);
+	this.parts_[12].setPos(241.0, 436.0);
+	this.parts_[16].setPos(241.0, 488.0);
+	this.parts_[5].setPos(375.0, 314.0);
+	this.parts_[9].setPos(375.0, 412.0);
+	this.parts_[13].setPos(375.0, 464.0);
+	this.parts_[17].setPos(375.0, 516.0);
+	this.parts_[6].setPos(429.0, 288.0);
+	this.parts_[10].setPos(429.0, 386.0);
+	this.parts_[14].setPos(429.0, 438.0);
+	this.parts_[19].setPos(429.0, 490.0);
+	this.parts_[7].setPos(525.0, 314.0);
+	this.parts_[11].setPos(525.0, 412.0);
+	this.parts_[15].setPos(525.0, 464.0);
+	this.parts_[18].setPos(525.0, 516.0);
+	this.parts_[22].setPos(456.0, 687.0);
+	this.parts_[5].setOrigin(2);
+	this.parts_[9].setOrigin(2);
+	this.parts_[13].setOrigin(2);
+	this.parts_[17].setOrigin(2);
+	this.parts_[7].setOrigin(2);
+	this.parts_[11].setOrigin(2);
+	this.parts_[15].setOrigin(2);
+	this.parts_[18].setOrigin(2);
+	this.parts_[22].setOrigin(3);
+}
+
+void LevelUpResult::update()
+{
+}
+
+void LevelUpResult::fadeIn(bool val, DG_GeneralCallback onFinishFade)
+{
+	this.popup_.fadeIn(val);
+	this.newSkill_.fadeIn(val);
+	this.fadeInFlat(val);
+	this.fadeInStand(val);
+	this.fadeInNumbers(val);
+	this.fadeInName(val);
+	this.fadeInLevel(val);
+	this.fadeInNextLevel(val);
+	this.timerCb_.setTimer(300, onFinishFade);
+	if (val)
+	{
+		int num = getVoiceFinderFromId(this.player_.getId()).getFromText(this.msg_);
+		g_sysSound.playVoice(num);
+	}
+}
+
+void LevelUpResult::fadeInLevel(bool val)
+{
+	PartsMotion m;
+	if (val)
+	{
+		m.setMove(-85, 182, 315, 182, 0);
+		m.setAlpha(0, 255, 0);
+	}
+	else
+	{
+		m.setMove(315, 182, -85, 182, 0);
+		m.setTime(100);
+		m.setAlpha(255, 0, 0);
+	}
+	this.parts_[3].runMotion(m, NULL);
+}
+
+void LevelUpResult::fadeInNextLevel(bool val)
+{
+	PartsMotion m;
+	if (val)
+	{
+		m.setAlpha(0, 255, 0);
+	}
+	else
+	{
+		m.setAlpha(255, 0, 0);
+	}
+	this.parts_[22].runMotion(m, NULL);
+}
+
+void LevelUpResult::fadeInName(bool val)
+{
+	PartsMotion m;
+	if (val)
+	{
+		int w = this.parts_[1].getWidth();
+		int h = this.parts_[1].getHeight();
+		m.setCgRangeMove(0, 0, 0, h, 0, 0, w, h, 0);
+	}
+	else
+	{
+		m.setMove(79, 57, -221, 57, 0);
+		m.setTime(100);
+		m.setAlpha(255, 0, 0);
+	}
+	this.parts_[1].runMotion(m, NULL);
+}
+
+void LevelUpResult::fadeInFlat(bool val)
+{
+	if (val)
+	{
+		this.parts_[0].startFlat(false, 1.0);
+		this.parts_[20].startFlat(false, 1.0);
+	}
+	else
+	{
+		this.parts_[0].runMotion(getStandardMotion(1), NULL);
+		this.parts_[20].runMotion(getStandardMotion(1), NULL);
+	}
+}
+
+void LevelUpResult::fadeInStand(bool val)
+{
+	PartsMotion m;
+	if (val)
+	{
+		m.setMove(1500, 980, 771, 980, 2);
+		m.setTime(300);
+	}
+	else
+	{
+		m.setMove(771, 980, 1500, 980, 0);
+		m.setAlpha(255, 0, 0);
+		m.setTime(100);
+	}
+	this.parts_[2].runMotion(m, NULL);
+}
+
+void LevelUpResult::fadeInNumbers(bool val)
+{
+	int i;
+	for (i = 4; i <= 19; ++i)
+	{
+		int x = this.parts_[i].getX();
+		int y = this.parts_[i].getY();
+		if (val)
+		{
+			array@PartsMotion m[2];
+			m[0].setTime((i / 4) * 30 + (i % 4) * 20);
+			m[0].setAlpha(0, 0, 0);
+			m[1].setMove(x - 500, y, x, y, 1);
+			m[1].setAlpha(0, 255, 0);
+			this.parts_[i].runMotionArray(m, NULL);
+		}
+		else
+		{
+			PartsMotion m;
+			m.setMove(x, y, x - 500, y, 0);
+			m.setAlpha(255, 0, 0);
+			m.setTime(100);
+			this.parts_[i].runMotion(m, NULL);
+		}
+	}
+}
+
+string LevelUpResult::getLevelUpMessage()
+{
+	DG_LevelUpMessage fn;
+	fn = EX_String("レベルアップメッセージ取得関数", "");
+	if (fn.Numof() == 0)
+	{
+		return " ";
+	}
+	return fn(this.player_.getId(), this.player_.getLevel() + 1, this.getSkillId_);
+}
+

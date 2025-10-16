@@ -1,0 +1,59 @@
+void BattleBackgroundInfomation::init(string id)
+{
+	string key = "戦闘背景情報";
+	this.id_ = id;
+	this.imageName_ = EX_SA2String(key, this.id_, "imageName", "");
+	this.ambientR_ = EX_SA2Int(key, this.id_, "ambientR", 0);
+	this.ambientG_ = EX_SA2Int(key, this.id_, "ambientG", 0);
+	this.ambientB_ = EX_SA2Int(key, this.id_, "ambientB", 0);
+	this.ambientMaxAlpha_ = EX_SA2Int(key, this.id_, "ambientMaxAlpha", 0);
+	this.unfocusShadowR_ = EX_SA2Int(key, this.id_, "unfocusShadowR", 0);
+	this.unfocusShadowG_ = EX_SA2Int(key, this.id_, "unfocusShadowG", 0);
+	this.unfocusShadowB_ = EX_SA2Int(key, this.id_, "unfocusShadowB", 0);
+}
+
+string BattleBackgroundInfomation::getId()
+{
+	return this.id_;
+}
+
+string BattleBackgroundInfomation::getImageName()
+{
+	return this.imageName_;
+}
+
+int BattleBackgroundInfomation::getAmbientR()
+{
+	return this.ambientR_;
+}
+
+int BattleBackgroundInfomation::getAmbientG()
+{
+	return this.ambientG_;
+}
+
+int BattleBackgroundInfomation::getAmbientB()
+{
+	return this.ambientB_;
+}
+
+int BattleBackgroundInfomation::getAmbientMaxAlpha()
+{
+	return this.ambientMaxAlpha_;
+}
+
+int BattleBackgroundInfomation::getUnfocusShadowR()
+{
+	return this.unfocusShadowR_;
+}
+
+int BattleBackgroundInfomation::getUnfocusShadowG()
+{
+	return this.unfocusShadowG_;
+}
+
+int BattleBackgroundInfomation::getUnfocusShadowB()
+{
+	return this.unfocusShadowB_;
+}
+

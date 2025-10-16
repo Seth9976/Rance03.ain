@@ -1,0 +1,123 @@
+CAEPropertyConstruction::CAEPropertyConstruction()
+{
+	this.Release();
+}
+
+CAEPropertyConstruction::~CAEPropertyConstruction()
+{
+	this.Release();
+}
+
+void CAEPropertyConstruction::Init(int LayoutID, ref CAEInstanceItem Item, int State)
+{
+	this.Release();
+	if (Item === NULL)
+	{
+		return;
+	}
+	this.m_Item <- Item;
+	this.m_PartsState = State;
+	this.m_Panel.Init(LayoutID);
+	this.m_Panel.AddKeyDownEvent(this.KeyDownEvent);
+	this.m_Panel.AddMouseWheelEvent(this.MouseWheelEvent);
+	this.m_Panel.AddMouseClickEvent(this.MouseLClickEvent);
+	int ID = this.m_Item.GetID();
+	this.m_Panel.AddButtonItem("構築手順", "編集");
+}
+
+void CAEPropertyConstruction::Release()
+{
+	this.m_dgMouseWheelEvent.Clear();
+	this.m_dgKeyDownEvent.Clear();
+	this.m_Item <- NULL;
+	this.m_Panel.Release();
+}
+
+void CAEPropertyConstruction::KeyDownEvent(int ID, int KeyID)
+{
+	this.m_dgKeyDownEvent(ID, KeyID);
+}
+
+void CAEPropertyConstruction::MouseWheelEvent(int ID, int Forward, int Back)
+{
+	this.m_dgMouseWheelEvent(ID, Forward, Back);
+}
+
+void CAEPropertyConstruction::MouseLClickEvent(int ID, int MouseX, int MouseY)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	if (Item.GetLabel() == "構築手順")
+	{
+		int NumofProcess = AFL_Parts_NumofConstructProcess(PartsID, this.m_PartsState);
+		int Index;
+		array@CASConstructionProcess List;
+		for (Index = 0; Index < NumofProcess; ++Index)
+		{
+			CASConstructionProcess Process;
+			AFL_Parts_GetConstructProcess(PartsID, Index, Process, this.m_PartsState);
+			List.PushBack(Process);
+		}
+		CAEEditConstructionDialog Form;
+		Form.Show(ID, MouseX, MouseY, List, this.ChangedListEvent);
+	}
+}
+
+void CAEPropertyConstruction::ChangedListEvent(int ID, ref array@CASConstructionProcess List)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	if (Item.GetLabel() == "構築手順")
+	{
+		this.Build(PartsID, List);
+	}
+}
+
+void CAEPropertyConstruction::SelecteTextEvent(int ID, string Name)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+}
+
+void CAEPropertyConstruction::Build(int PartsNumber, ref array@CASConstructionProcess List)
+{
+	Ｐ＿構築手順＿初期化(PartsNumber, this.m_PartsState);
+	int Index;
+	for (Index = 0; Index < List.Numof(); ++Index)
+	{
+		AFL_Parts_AddConstructProcess(PartsNumber, List[Index], this.m_PartsState);
+	}
+	Ｐ＿構築ビルド(PartsNumber, this.m_PartsState);
+}
+
+void CAEPropertyConstruction::AddKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent += DelegateObject;
+}
+
+void CAEPropertyConstruction::EraseKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent -= DelegateObject;
+}
+
+void CAEPropertyConstruction::AddMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent += DelegateObject;
+}
+
+void CAEPropertyConstruction::EraseMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent -= DelegateObject;
+}
+

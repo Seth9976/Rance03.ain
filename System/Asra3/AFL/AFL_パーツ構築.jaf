@@ -1,0 +1,115 @@
+int AFL_Parts_NumofConstructProcess(int PartsNumber, int State)
+{
+	return PartsEngine.Parts_GetPartsConstructionProcessCount(PartsNumber, State);
+}
+
+void AFL_Parts_GetConstructProcess(int PartsNumber, int Index, ref CASConstructionProcess Process, int State)
+{
+	array@int ArrayInt;
+	array@float ArrayFloat;
+	array@string ArrayString;
+	ArrayInt.PushBack(PartsNumber);
+	ArrayInt.PushBack(Index);
+	ArrayInt.PushBack(State);
+	ArrayInt.Realloc(33);
+	ArrayFloat.Realloc(2);
+	ArrayString.Realloc(2);
+	PartsEngine.GetPartsConstructionProcess(ArrayInt, ArrayFloat, ArrayString);
+	int IntCount = 3;
+	int FloatCount;
+	int StringCount;
+	Process.SetCommand(ArrayInt[IntCount++]);
+	Process.SetInterpolationType(ArrayInt[IntCount++]);
+	Process.SetSrcX(ArrayInt[IntCount++]);
+	Process.SetSrcY(ArrayInt[IntCount++]);
+	Process.SetSrcWidth(ArrayInt[IntCount++]);
+	Process.SetSrcHeight(ArrayInt[IntCount++]);
+	Process.SetDestX(ArrayInt[IntCount++]);
+	Process.SetDestY(ArrayInt[IntCount++]);
+	Process.SetDestX2(ArrayInt[IntCount++]);
+	Process.SetDestY2(ArrayInt[IntCount++]);
+	Process.SetDestWidth(ArrayInt[IntCount++]);
+	Process.SetDestHeight(ArrayInt[IntCount++]);
+	Process.SetR(ArrayInt[IntCount++]);
+	Process.SetG(ArrayInt[IntCount++]);
+	Process.SetB(ArrayInt[IntCount++]);
+	Process.SetA(ArrayInt[IntCount++]);
+	Process.SetR2(ArrayInt[IntCount++]);
+	Process.SetG2(ArrayInt[IntCount++]);
+	Process.SetB2(ArrayInt[IntCount++]);
+	Process.SetCharSpace(ArrayInt[IntCount++]);
+	Process.SetLineSpace(ArrayInt[IntCount++]);
+	CASCharSpriteProperty Font;
+	Font.SetType(ArrayInt[IntCount++]);
+	Font.SetSize(ArrayInt[IntCount++]);
+	int FontColorR = ArrayInt[IntCount++];
+	int FontColorG = ArrayInt[IntCount++];
+	int FontColorB = ArrayInt[IntCount++];
+	Font.SetColor(CF_CASColor(FontColorR, FontColorG, FontColorB, 255));
+	int EdgeColorR = ArrayInt[IntCount++];
+	int EdgeColorG = ArrayInt[IntCount++];
+	int EdgeColorB = ArrayInt[IntCount++];
+	Font.SetEdgeColor(CF_CASColor(EdgeColorR, EdgeColorG, EdgeColorB, 255));
+	Font.SetBoldWeight(ArrayFloat[FloatCount++]);
+	Font.SetEdgeWeight(ArrayFloat[FloatCount++]);
+	Process.SetFontProperty(Font);
+	Process.SetText(ArrayString[StringCount++]);
+	Process.SetCGName(ArrayString[StringCount++]);
+	Process.SetFullSize(ArrayInt[IntCount++] != 0);
+}
+
+void AFL_Parts_AddConstructProcess(int PartsNumber, ref CASConstructionProcess Process, int State)
+{
+	array@int ArrayInt;
+	array@float ArrayFloat;
+	array@string ArrayString;
+	ArrayInt.PushBack(PartsNumber);
+	ArrayInt.PushBack(State);
+	ArrayInt.Realloc(32);
+	ArrayFloat.Realloc(2);
+	ArrayString.Realloc(2);
+	int IntCount = 2;
+	int FloatCount;
+	int StringCount;
+	ArrayInt[IntCount++] = Process.GetCommand();
+	ArrayInt[IntCount++] = Process.GetInterpolationType();
+	ArrayInt[IntCount++] = Process.GetSrcX();
+	ArrayInt[IntCount++] = Process.GetSrcY();
+	ArrayInt[IntCount++] = Process.GetSrcWidth();
+	ArrayInt[IntCount++] = Process.GetSrcHeight();
+	ArrayInt[IntCount++] = Process.GetDestX();
+	ArrayInt[IntCount++] = Process.GetDestY();
+	ArrayInt[IntCount++] = Process.GetDestX2();
+	ArrayInt[IntCount++] = Process.GetDestY2();
+	ArrayInt[IntCount++] = Process.GetDestWidth();
+	ArrayInt[IntCount++] = Process.GetDestHeight();
+	ArrayInt[IntCount++] = Process.GetR();
+	ArrayInt[IntCount++] = Process.GetG();
+	ArrayInt[IntCount++] = Process.GetB();
+	ArrayInt[IntCount++] = Process.GetA();
+	ArrayInt[IntCount++] = Process.GetR2();
+	ArrayInt[IntCount++] = Process.GetG2();
+	ArrayInt[IntCount++] = Process.GetB2();
+	ArrayInt[IntCount++] = Process.GetCharSpace();
+	ArrayInt[IntCount++] = Process.GetLineSpace();
+	ref CASCharSpriteProperty Font = Process.GetFontProperty();
+	CASColor Color;
+	Color = Font.GetColor();
+	CASColor EdgeColor;
+	EdgeColor = Font.GetEdgeColor();
+	ArrayInt[IntCount++] = Font.GetType();
+	ArrayInt[IntCount++] = Font.GetSize();
+	ArrayInt[IntCount++] = Color.GetR();
+	ArrayInt[IntCount++] = Color.GetG();
+	ArrayInt[IntCount++] = Color.GetB();
+	ArrayFloat[FloatCount++] = Font.GetBoldWeight();
+	ArrayInt[IntCount++] = EdgeColor.GetR();
+	ArrayInt[IntCount++] = EdgeColor.GetG();
+	ArrayInt[IntCount++] = EdgeColor.GetB();
+	ArrayFloat[FloatCount++] = Font.GetEdgeWeight();
+	ArrayString[StringCount++] = Process.GetText();
+	ArrayString[StringCount++] = Process.GetCGName();
+	ArrayInt[IntCount++] = Process.IsFullSize() ? 1 : 0;
+	PartsEngine.AddPartsConstructionProcess(ArrayInt, ArrayFloat, ArrayString);
+}
+

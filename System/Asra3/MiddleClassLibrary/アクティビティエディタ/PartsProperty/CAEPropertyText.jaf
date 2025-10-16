@@ -1,0 +1,252 @@
+CAEPropertyText::CAEPropertyText()
+{
+	this.Release();
+}
+
+CAEPropertyText::~CAEPropertyText()
+{
+	this.Release();
+}
+
+void CAEPropertyText::Init(int LayoutID, ref CAEInstanceItem Item, int State)
+{
+	this.Release();
+	if (Item === NULL)
+	{
+		return;
+	}
+	this.m_Item <- Item;
+	this.m_PartsState = State;
+	this.m_Panel.Init(LayoutID);
+	this.m_Panel.AddKeyDownEvent(this.KeyDownEvent);
+	this.m_Panel.AddMouseWheelEvent(this.MouseWheelEvent);
+	this.m_Panel.AddChangeTextEvent(this.ChangeTextEvent);
+	this.m_Panel.AddMouseClickEvent(this.MouseLClickEvent);
+	this.m_Panel.AddChangedCheckBoxEvent(this.ChangedCheckBoxEvent);
+	int ID = this.m_Item.GetID();
+	int X;
+	int Y;
+	int Width;
+	int Height;
+	Ｐ＿テキスト表示範囲取得(ID, X, Y, Width, Height, State);
+	float 太字幅;
+	float 縁取り幅;
+	int 種類;
+	int サイズ;
+	int 赤;
+	int 緑;
+	int 青;
+	int 縁取り赤;
+	int 縁取り緑;
+	int 縁取り青;
+	Ｐ＿フォント取得(ID, 種類, サイズ, 赤, 緑, 青, 太字幅, 縁取り赤, 縁取り緑, 縁取り青, 縁取り幅, State);
+	this.m_Panel.AddButtonItem("テキスト", Ｐ＿テキスト取得(ID, State));
+	this.m_Panel.AddTextBoxItem("表示範囲／Ｘ", string(X), false);
+	this.m_Panel.AddTextBoxItem("表示範囲／Ｙ", string(Y), false);
+	this.m_Panel.AddTextBoxItem("表示範囲／幅", string(Width), false);
+	this.m_Panel.AddTextBoxItem("表示範囲／高さ", string(Height), false);
+	this.m_Panel.AddButtonItem("フォント", "%s, サイズ[%d]" % PARTS_GetFontName(種類) % サイズ);
+	this.m_Panel.AddTextBoxItem("字間隔", string(Ｐ＿テキスト字間隔取得(ID, State)), false);
+	this.m_Panel.AddTextBoxItem("行間隔", string(Ｐ＿テキスト行間隔取得(ID, State)), false);
+	this.m_Panel.AddTextBoxItem("表示時間", string(Ｐ＿テキスト表示時間取得(ID, State)), false);
+	this.m_Panel.AddButtonItem("位置", PARTS_GetOriginPosModeName(Ｐ＿テキスト位置取得(ID, State)));
+	this.m_Panel.AddCheckBoxItem("タグ有効", Ｐ＿テキストタグ有効設定取得(ID, State));
+}
+
+void CAEPropertyText::Release()
+{
+	this.m_dgMouseWheelEvent.Clear();
+	this.m_dgKeyDownEvent.Clear();
+	this.m_Item <- NULL;
+	this.m_Panel.Release();
+}
+
+void CAEPropertyText::KeyDownEvent(int ID, int KeyID)
+{
+	this.m_dgKeyDownEvent(ID, KeyID);
+}
+
+void CAEPropertyText::MouseWheelEvent(int ID, int Forward, int Back)
+{
+	this.m_dgMouseWheelEvent(ID, Forward, Back);
+}
+
+void CAEPropertyText::ChangeTextEvent(int ID)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	int X;
+	int Y;
+	int Width;
+	int Height;
+	Ｐ＿テキスト表示範囲取得(PartsID, X, Y, Width, Height, this.m_PartsState);
+	if (Item.GetLabel() == "表示範囲／Ｘ")
+	{
+		Ｐ＿テキスト表示範囲設定(PartsID, Item.GetTextBoxInt(), Y, Width, Height, this.m_PartsState);
+	}
+	else if (Item.GetLabel() == "表示範囲／Ｙ")
+	{
+		Ｐ＿テキスト表示範囲設定(PartsID, X, Item.GetTextBoxInt(), Width, Height, this.m_PartsState);
+	}
+	else if (Item.GetLabel() == "表示範囲／幅")
+	{
+		Ｐ＿テキスト表示範囲設定(PartsID, X, Y, Item.GetTextBoxInt(), Height, this.m_PartsState);
+	}
+	else if (Item.GetLabel() == "表示範囲／高さ")
+	{
+		Ｐ＿テキスト表示範囲設定(PartsID, X, Y, Width, Item.GetTextBoxInt(), this.m_PartsState);
+	}
+	else if (Item.GetLabel() == "字間隔")
+	{
+		Ｐ＿テキスト字間隔設定(PartsID, Item.GetTextBoxInt(), this.m_PartsState);
+	}
+	else if (Item.GetLabel() == "行間隔")
+	{
+		Ｐ＿テキスト行間隔設定(PartsID, Item.GetTextBoxInt(), this.m_PartsState);
+	}
+	else if (Item.GetLabel() == "表示時間")
+	{
+		Ｐ＿テキスト表示時間設定(PartsID, Item.GetTextBoxInt(), this.m_PartsState);
+	}
+}
+
+void CAEPropertyText::MouseLClickEvent(int ID, int MouseX, int MouseY)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	if (Item.GetLabel() == "テキスト")
+	{
+		CAEEditTextDialog Form;
+		Form.Show(ID, MouseX, MouseY, Ｐ＿テキスト取得(PartsID, this.m_PartsState), this.ChangedStringEvent);
+	}
+	else if (Item.GetLabel() == "フォント")
+	{
+		float 太字幅;
+		float 縁取り幅;
+		int 種類;
+		int サイズ;
+		int 赤;
+		int 緑;
+		int 青;
+		int 縁取り赤;
+		int 縁取り緑;
+		int 縁取り青;
+		Ｐ＿フォント取得(PartsID, 種類, サイズ, 赤, 緑, 青, 太字幅, 縁取り赤, 縁取り緑, 縁取り青, 縁取り幅, this.m_PartsState);
+		CASCharSpriteProperty Font;
+		Font.SetType(種類);
+		Font.SetSize(サイズ);
+		Font.SetColor(CF_CASColor(赤, 緑, 青, 255));
+		Font.SetBoldWeight(太字幅);
+		Font.SetEdgeWeight(縁取り幅);
+		Font.SetEdgeColor(CF_CASColor(縁取り赤, 縁取り緑, 縁取り青, 255));
+		CAESelectFontDialog Form;
+		Form.Show(ID, MouseX, MouseY, Font, this.ChangedFontEvent);
+	}
+	else if (Item.GetLabel() == "位置")
+	{
+		CAESelectOriginDialog Form;
+		Form.Show(ID, MouseX, MouseY, this.m_Item.GetOriginPosMode(), this.ChangedOriginTypeEvent);
+	}
+}
+
+void CAEPropertyText::SelecteTextEvent(int ID, string Name)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+}
+
+void CAEPropertyText::ChangedFontEvent(int ID, ref CASCharSpriteProperty Font)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	CASColor Color;
+	Color = Font.GetColor();
+	CASColor EdgeColor;
+	EdgeColor = Font.GetEdgeColor();
+	if (Item.GetLabel() == "フォント")
+	{
+		Ｐ＿フォント設定(PartsID, Font.GetType(), Font.GetSize(), Color.GetR(), Color.GetG(), Color.GetB(), Font.GetBoldWeight(), EdgeColor.GetR(), EdgeColor.GetG(), EdgeColor.GetB(), Font.GetEdgeWeight(), this.m_PartsState);
+		Item.SetButtonText("%s, サイズ[%d]" % PARTS_GetFontName(Font.GetType()) % Font.GetSize());
+		Ｐ＿テキスト設定(PartsID, Ｐ＿テキスト取得(PartsID, this.m_PartsState), this.m_PartsState);
+	}
+}
+
+void CAEPropertyText::ChangedStringEvent(int ID, string Text)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	if (Item.GetLabel() == "テキスト")
+	{
+		Ｐ＿テキスト設定(PartsID, Text, this.m_PartsState);
+		Item.SetButtonText(Text);
+	}
+}
+
+void CAEPropertyText::ChangedCheckBoxEvent(int ID, bool Check)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	if (Item.GetLabel() == "タグ有効")
+	{
+		Ｐ＿テキストタグ有効設定(PartsID, Item.GetFlg(), 1);
+	}
+}
+
+void CAEPropertyText::ChangedOriginTypeEvent(int ID, int Type)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	if (Item.GetLabel() == "位置")
+	{
+		Ｐ＿テキスト位置設定(PartsID, Type, this.m_PartsState);
+		Item.SetButtonText(PARTS_GetOriginPosModeName(Type));
+	}
+}
+
+void CAEPropertyText::AddKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent += DelegateObject;
+}
+
+void CAEPropertyText::EraseKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent -= DelegateObject;
+}
+
+void CAEPropertyText::AddMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent += DelegateObject;
+}
+
+void CAEPropertyText::EraseMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent -= DelegateObject;
+}
+

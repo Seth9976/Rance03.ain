@@ -1,0 +1,221 @@
+void CSystemButtonModelList::SetCGButtonModel(sys_btn_fnc_t CommandFunc, int _x, int _y, int _z, string PlainName, string OnCursorName, string KeyDownName, bool PixelDecide)
+{
+	this.m_SystemButtonModelList[this.FindOrNewIndex(CommandFunc)].SetCGButtonModel(_x, _y, _z, PlainName, OnCursorName, KeyDownName, CommandFunc, PixelDecide);
+}
+
+void CSystemButtonModelList::SetFlatButtonModel(sys_btn_fnc_t CommandFunc, int _x, int _y, int _z, string PlainName, string OnCursorName, string KeyDownName, bool PixelDecide)
+{
+	this.m_SystemButtonModelList[this.FindOrNewIndex(CommandFunc)].SetFlatButtonModel(_x, _y, _z, PlainName, OnCursorName, KeyDownName, CommandFunc, PixelDecide);
+}
+
+void CSystemButtonModelList::SetCGButtonModelForReminisceMode(sys_btn_fnc_t CommandFunc, string CoverName)
+{
+	this.m_SystemButtonModelList[this.FindOrNewIndex(CommandFunc)].SetCGButtonModelForReminisceMode(CoverName);
+}
+
+void CSystemButtonModelList::SetFlatButtonModelForReminisceMode(sys_btn_fnc_t CommandFunc, string CoverName)
+{
+	this.m_SystemButtonModelList[this.FindOrNewIndex(CommandFunc)].SetFlatButtonModelForReminisceMode(CoverName);
+}
+
+void CSystemButtonModelList::SetDisableCG(sys_btn_fnc_t CommandFunc, string DisableCGName)
+{
+	this.m_SystemButtonModelList[this.FindOrNewIndex(CommandFunc)].SetDisableCG(DisableCGName);
+}
+
+void CSystemButtonModelList::SetDisableFlat(sys_btn_fnc_t CommandFunc, string DisableFlatName)
+{
+	this.m_SystemButtonModelList[this.FindOrNewIndex(CommandFunc)].SetDisableFlat(DisableFlatName);
+}
+
+void CSystemButtonModelList::SetIsEnableSystemButtonFunc(sys_btn_fnc_t CommandFunc, FTIsEnableSystemButton Func)
+{
+	this.m_SystemButtonModelList[this.FindOrNewIndex(CommandFunc)].SetIsEnableSystemButtonFunc(Func);
+}
+
+void CSystemButtonModelList::Clear()
+{
+	this.m_SystemButtonModelList.Free();
+}
+
+int CSystemButtonModelList::GetButtonCount()
+{
+	return this.m_SystemButtonModelList.Numof();
+}
+
+int CSystemButtonModelList::FindOrNewIndex(sys_btn_fnc_t CommandFunc)
+{
+	int _i = this.FindFunction(CommandFunc);
+	if (_i != -2147483648)
+	{
+		return _i;
+	}
+	this.m_SystemButtonModelList.Realloc(this.m_SystemButtonModelList.Numof() + 1);
+	return this.m_SystemButtonModelList.Numof() - 1;
+}
+
+int CSystemButtonModelList::FindFunction(sys_btn_fnc_t CommandFunc)
+{
+	int Index;
+	for (Index = 0; Index < this.m_SystemButtonModelList.Numof(); ++Index)
+	{
+		sys_btn_fnc_t func = this.m_SystemButtonModelList[Index].GetFunction();
+		if (func.Numof() == 0)
+		{
+			func.Clear();
+			continue;
+		}
+		if (SYS_IsSame_sys_btn_fnc_t(func, CommandFunc))
+		{
+			return Index;
+		}
+		func.Clear();
+	}
+	return -2147483648;
+}
+
+bool CSystemButtonModelList::IsEnable(int ButtonIndex)
+{
+	if (!this.AsserteButtonIndex(ButtonIndex))
+	{
+		return false;
+	}
+	return this.m_SystemButtonModelList[ButtonIndex].IsEnable();
+}
+
+sys_btn_fnc_t CSystemButtonModelList::GetFunction(int ButtonIndex)
+{
+	if (!this.AsserteButtonIndex(ButtonIndex))
+	{
+		return NULL;
+	}
+	return this.m_SystemButtonModelList[ButtonIndex].GetFunction();
+}
+
+int CSystemButtonModelList::GetX(int ButtonIndex)
+{
+	if (!this.AsserteButtonIndex(ButtonIndex))
+	{
+		return -2147483648;
+	}
+	return this.m_SystemButtonModelList[ButtonIndex].GetX();
+}
+
+int CSystemButtonModelList::GetY(int ButtonIndex)
+{
+	if (!this.AsserteButtonIndex(ButtonIndex))
+	{
+		return -2147483648;
+	}
+	return this.m_SystemButtonModelList[ButtonIndex].GetY();
+}
+
+int CSystemButtonModelList::GetZ(int ButtonIndex)
+{
+	if (!this.AsserteButtonIndex(ButtonIndex))
+	{
+		return 1;
+	}
+	return this.m_SystemButtonModelList[ButtonIndex].GetZ();
+}
+
+string CSystemButtonModelList::GetPlainName(int ButtonIndex)
+{
+	if (!this.AsserteButtonIndex(ButtonIndex))
+	{
+		return "";
+	}
+	return this.m_SystemButtonModelList[ButtonIndex].GetPlainName();
+}
+
+string CSystemButtonModelList::GetOnCursorName(int ButtonIndex)
+{
+	if (!this.AsserteButtonIndex(ButtonIndex))
+	{
+		return "";
+	}
+	return this.m_SystemButtonModelList[ButtonIndex].GetOnCursorName();
+}
+
+string CSystemButtonModelList::GetKeyDownName(int ButtonIndex)
+{
+	if (!this.AsserteButtonIndex(ButtonIndex))
+	{
+		return "";
+	}
+	return this.m_SystemButtonModelList[ButtonIndex].GetKeyDownName();
+}
+
+string CSystemButtonModelList::GetDisableName(int ButtonIndex)
+{
+	if (!this.AsserteButtonIndex(ButtonIndex))
+	{
+		return "";
+	}
+	return this.m_SystemButtonModelList[ButtonIndex].GetDisableName();
+}
+
+string CSystemButtonModelList::GetCoverName(int ButtonIndex)
+{
+	if (!this.AsserteButtonIndex(ButtonIndex))
+	{
+		return "";
+	}
+	return this.m_SystemButtonModelList[ButtonIndex].GetCoverName();
+}
+
+bool CSystemButtonModelList::IsInvalidByReminisceMode(int ButtonIndex)
+{
+	if (!this.AsserteButtonIndex(ButtonIndex))
+	{
+		return false;
+	}
+	return this.m_SystemButtonModelList[ButtonIndex].IsInvalidByReminisceMode();
+}
+
+bool CSystemButtonModelList::AsserteButtonIndex(int ButtonIndex)
+{
+	if (ButtonIndex >= 0 && ButtonIndex < this.m_SystemButtonModelList.Numof())
+	{
+		return true;
+	}
+	system.Error("ButtonIndex = %d\nm_SystemButtonModelList.Numof() = %d\n" % ButtonIndex % this.m_SystemButtonModelList.Numof());
+	return false;
+}
+
+bool CSystemButtonModelList::IsPixelDecide(int ButtonIndex)
+{
+	if (!this.AsserteButtonIndex(ButtonIndex))
+	{
+		return false;
+	}
+	return this.m_SystemButtonModelList[ButtonIndex].IsPixelDecide();
+}
+
+bool CSystemButtonModelList::IsFlatButton(int ButtonIndex)
+{
+	if (!this.AsserteButtonIndex(ButtonIndex))
+	{
+		return false;
+	}
+	return this.m_SystemButtonModelList[ButtonIndex].IsFlatButton();
+}
+
+bool CSystemButtonModelList::IsFlatDisable(int ButtonIndex)
+{
+	if (!this.AsserteButtonIndex(ButtonIndex))
+	{
+		return false;
+	}
+	return this.m_SystemButtonModelList[ButtonIndex].IsFlatDisable();
+}
+
+bool CSystemButtonModelList::IsFlatCover(int ButtonIndex)
+{
+	if (!this.AsserteButtonIndex(ButtonIndex))
+	{
+		return false;
+	}
+	return this.m_SystemButtonModelList[ButtonIndex].IsFlatCover();
+}
+

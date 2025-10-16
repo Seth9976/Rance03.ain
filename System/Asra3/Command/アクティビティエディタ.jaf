@@ -1,0 +1,9 @@
+void Ｐ＿アクティビティエディタ実行(string アクティビティ名)
+{
+	字枠(0, -2147483648, -1, -1);
+	AFL_View_SetResizableMode(true);
+	CActivityEditor Editor;
+	Editor.Run(アクティビティ名);
+	AFL_View_SetResizableMode(false);
+}
+

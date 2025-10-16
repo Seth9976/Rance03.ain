@@ -1,0 +1,118 @@
+SaveObjectList::SaveObjectList()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void SaveObjectList::reset()
+{
+	this.initButton();
+	this.showButtonImmediate();
+	this.setPartsNewPos();
+}
+
+void SaveObjectList::init(bool isLoadMode)
+{
+	this.pageCount_ = 8;
+	this.isLoadMode_ = isLoadMode;
+	string baseName;
+	if (isLoadMode)
+	{
+		baseName = "システム／ロード／下地";
+	}
+	else
+	{
+		baseName = "システム／セーブ／下地";
+	}
+	this.base_.init(this.pageCount_, baseName, false);
+	this.partsNew_.init("システム／セーブ／ＮＥＷ", 0);
+	this.partsNew_.setOrigin(4);
+	this.partsNew_.setParent(this.base_.getPartsNumber());
+	this.partsNew_.setZ(5000.0);
+	this.setPartsNewPos();
+	this.initButton();
+}
+
+void SaveObjectList::initButton()
+{
+	int i;
+	for (i = 0; i < this.btn_.Numof(); ++i)
+	{
+		string n = g_saveDataManager.getSaveComment(i);
+		this.btn_[i].init("システム／ボタン／幅８６６", n, "", true);
+		this.btn_[i].setParent(this.base_.getPartsNumber());
+		this.btn_[i].setZ(4500);
+		this.btn_[i].setClickCallback(this.onClick, i);
+		this.btn_[i].setTextLeftAlign(100);
+		int x;
+		int y;
+		this.getButtonPos(x, y, i);
+		this.btn_[i].setPos(x, y);
+		if (this.isLoadMode_)
+		{
+			this.btn_[i].setEnable(n != "データがありません");
+		}
+	}
+}
+
+void SaveObjectList::getButtonPos(ref int x, ref int y, int index)
+{
+	int page = index / 10;
+	int py = index % 10;
+	x = 81 + 1024 * page;
+	y = 122 + py * 56;
+}
+
+void SaveObjectList::update()
+{
+}
+
+void SaveObjectList::setOnClickCallback(DG_OnClickSaveObjectCallback cb)
+{
+	this.cb_ = cb;
+}
+
+void SaveObjectList::onClick(int id)
+{
+	this.cb_(id);
+}
+
+void SaveObjectList::fadeIn(bool val)
+{
+	int i;
+	for (i = 0; i < this.btn_.Numof(); ++i)
+	{
+		this.btn_[i].fadeIn(val);
+	}
+	this.base_.fadeIn(val, NULL);
+	if (val)
+	{
+		this.base_.jumpPage(g_common_latestSaveIndex / 10);
+	}
+	this.partsNew_.runMotion(getStandardMotion(val ? 0 : 1), NULL);
+}
+
+void SaveObjectList::showButtonImmediate()
+{
+	int i;
+	for (i = 0; i < this.btn_.Numof(); ++i)
+	{
+		this.btn_[i].setShow(true);
+	}
+}
+
+void SaveObjectList::setPartsNewPos()
+{
+	if (g_common_latestSaveIndex == -1)
+	{
+		this.partsNew_.setShow(false);
+	}
+	else
+	{
+		int x;
+		int y;
+		this.partsNew_.setShow(true);
+		this.getButtonPos(x, y, g_common_latestSaveIndex);
+		this.partsNew_.setPos(x + 20, y + 24);
+	}
+}
+

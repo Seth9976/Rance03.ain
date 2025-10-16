@@ -1,0 +1,135 @@
+PlayerStandView::PlayerStandView()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+	this.isInitialized_ = false;
+}
+
+void PlayerStandView::init(string playerId)
+{
+	this.playerId_ = playerId;
+}
+
+void PlayerStandView::initParts(string playerId)
+{
+	string cg = "trim_システム／立ち絵／%s" % getPlayerFromId(playerId).getShortName();
+	if (getPlayerFromId(this.playerId_).getHp() > 0)
+	{
+		this.parts_[0].init(cg, 0);
+	}
+	else
+	{
+		this.parts_[0].initAsCgPlaneImage(cg, 160, 32, 32);
+	}
+	this.parts_[0].setOrigin(2);
+	createPartsGroup(this.parent_, this.parts_, 4100);
+	this.setPartsShow();
+	this.setPartsPos();
+}
+
+void PlayerStandView::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void PlayerStandView::setPartsPos()
+{
+	if (-4 <= this.virtualPos_ && this.virtualPos_ <= 4.0)
+	{
+		this.parent_.setPos(this.gx_, this.gy_);
+		this.parent_.setShow(true);
+		float xPos;
+		float yPos;
+		float scaling;
+		float alpha;
+		convertVirtualPartyPositionToXY(this.virtualPos_, xPos, yPos, scaling, alpha);
+		this.parts_[0].setScaling(scaling);
+		this.parts_[0].setPos(xPos, yPos);
+		this.parts_[0].setMultiColorValue(alpha, alpha, alpha);
+	}
+	else
+	{
+		this.parent_.setShow(false);
+	}
+	this.parent_.setZ((22 - Math.AbsF(this.virtualPos_)) + 4100.0);
+}
+
+void convertVirtualPartyPositionToXY(float virtualPos, ref float xPos, ref float yPos, ref float scaling, ref float alpha)
+{
+	float v = virtualPos / 4.0;
+	float rad = ((-v + 1.0) / 2.0) * 180.0;
+	if (-0.25 < v && v < 0.25)
+	{
+		alpha = 255 - Math.AbsF(v * 4.0) * 128.0;
+	}
+	else
+	{
+		alpha = 170 - Math.AbsF(v) * 170.0;
+	}
+	xPos = 500 * Math.Cos(rad);
+	yPos = 400 * Math.Sin(rad);
+	scaling = Math.Sin(rad) * 60.0 + 40.0;
+}
+
+void PlayerStandView::update()
+{
+}
+
+int PlayerStandView::getIndex()
+{
+	return this.currentIndex_;
+}
+
+void PlayerStandView::setVirtualPos(float virtualPos)
+{
+	this.virtualPos_ = virtualPos;
+	if (-4 <= this.virtualPos_ && this.virtualPos_ <= 4.0)
+	{
+		if (!this.isInitialized_)
+		{
+			this.initParts(this.playerId_);
+			this.isInitialized_ = true;
+		}
+	}
+	this.setPartsPos();
+}
+
+void PlayerStandView::setGroupPos(int x, int y, bool isImmediate)
+{
+	if (isImmediate)
+	{
+		this.gx_ = x;
+		this.gy_ = y;
+		this.parent_.setPos(this.gx_, this.gy_);
+	}
+	else
+	{
+		PartsMotion m;
+		m.setMove(this.gx_, this.gy_, x, y, 1);
+		this.parent_.runMotion(m, NULL);
+		this.gx_ = x;
+		this.gy_ = y;
+	}
+}
+
+void PlayerStandView::fadeIn(bool val)
+{
+	PartsMotion m;
+	if (val)
+	{
+		m.setKey(5, 60, 0, 3);
+		m.setAlpha(0, 255, 0);
+		m.setTime(250);
+	}
+	else
+	{
+		m.setAlpha(255, 0, 0);
+		m.setTime(150);
+	}
+	this.parts_[0].runMotion(m, NULL);
+}
+

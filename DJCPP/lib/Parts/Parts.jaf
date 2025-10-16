@@ -1,0 +1,785 @@
+Parts::Parts()
+{
+	this.clear();
+}
+
+void Parts::init(string cgName, int loadingMode)
+{
+	if (cgName == "")
+	{
+		return;
+	}
+	this.release();
+	this.partsNumber_ = g_partsNumberProvider.getNumber();
+	switch (loadingMode)
+	{
+	case 0:
+		Ｐ＿ＣＧ設定(this.partsNumber_, cgName, 1);
+		break;
+	case 1:
+		Ｐ＿上下反転ＣＧ設定(this.partsNumber_, cgName, 1);
+		break;
+	case 2:
+		Ｐ＿左右反転ＣＧ設定(this.partsNumber_, cgName, 1);
+		break;
+	}
+	Ｐ＿表示設定(this.partsNumber_, false);
+	this.type_ = 1;
+	this.resetCgRange();
+}
+
+void Parts::initAsText(string text, int size, bool isEdge, int type, int r, int g, int b)
+{
+	if (text == "")
+	{
+		this.initAsPlaneImage(1, 1, 0, 0, 0, 0);
+		this.text_ = "";
+		return;
+	}
+	else if (this.text_ == text)
+	{
+		return;
+	}
+	this.text_ = text;
+	this.release();
+	this.partsNumber_ = g_partsNumberProvider.getNumber();
+	int textSpanWidth = -2;
+	int w;
+	int h;
+	getRenderedTextSize(w, h, text, size, type, isEdge, textSpanWidth);
+	CASCharSpriteProperty prop;
+	prop = getCharSpriteProperty(size, isEdge, type, r, g, b);
+	Ｐ＿構築手順＿作成(this.partsNumber_, w, h, 1);
+	Ｐ＿構築手順＿テキストコピー(this.partsNumber_, 0, 0, text, prop, textSpanWidth, 0, 1);
+	Ｐ＿構築ビルド(this.partsNumber_, 1);
+	Ｐ＿表示設定(this.partsNumber_, false);
+	this.type_ = 5;
+	this.resetCgRange();
+}
+
+void Parts::initAsPlaneImage(int w, int h, int r, int g, int b, int a)
+{
+	this.release();
+	this.partsNumber_ = g_partsNumberProvider.getNumber();
+	Ｐ＿構築手順＿作成(this.partsNumber_, w, h, 1);
+	Ｐ＿構築手順＿色塗り(this.partsNumber_, 0, 0, w, h, r, g, b, -1, 1);
+	Ｐ＿構築手順＿アルファ塗り(this.partsNumber_, 0, 0, w, h, a, 1);
+	Ｐ＿構築ビルド(this.partsNumber_, 1);
+	Ｐ＿表示設定(this.partsNumber_, false);
+	this.type_ = 5;
+	this.resetCgRange();
+}
+
+void Parts::initAsCgPlaneImage(string cgName, int r, int g, int b)
+{
+	this.release();
+	this.partsNumber_ = g_partsNumberProvider.getNumber();
+	Ｐ＿構築手順＿ＣＧ設定(this.partsNumber_, cgName, 1);
+	Ｐ＿構築手順＿ブレンド塗り(this.partsNumber_, 0, 0, Ａ＿ＣＧ幅取得(cgName), Ａ＿ＣＧ高さ取得(cgName), r, g, b, 255, 1);
+	Ｐ＿構築ビルド(this.partsNumber_, 1);
+	Ｐ＿表示設定(this.partsNumber_, false);
+	this.type_ = 5;
+	this.resetCgRange();
+}
+
+void Parts::initAsNumber(string cgName, ref NumberPartsInfomation info)
+{
+	this.release();
+	this.partsNumber_ = g_partsNumberProvider.getNumber();
+	if (!Ａ＿ＣＧ存在確認(cgName))
+	{
+		pass("%s は存在しません" % cgName);
+	}
+	if (info === NULL)
+	{
+		int w = getIntFromString(cgName);
+		Ｐ＿数字連結ＣＧ設定(this.partsNumber_, cgName, w, w, w, w, w, w, w, w, w, w, w, w, 1);
+		Ｐ＿数字コンマ表示設定(this.partsNumber_, false, 1);
+		Ｐ＿数字字間隔設定(this.partsNumber_, 0, 1);
+	}
+	else
+	{
+		Ｐ＿数字連結ＣＧ設定(this.partsNumber_, cgName, info.getWidth(0), info.getWidth(1), info.getWidth(2), info.getWidth(3), info.getWidth(4), info.getWidth(5), info.getWidth(6), info.getWidth(7), info.getWidth(8), info.getWidth(9), info.getWidth(10), info.getWidth(11), 1);
+		Ｐ＿数字コンマ表示設定(this.partsNumber_, info.isUseComma(), 1);
+		Ｐ＿数字字間隔設定(this.partsNumber_, info.getSpan(), 1);
+		Ｐ＿数字桁設定(this.partsNumber_, info.getDigit(), 1);
+	}
+	Ｐ＿数字設定(this.partsNumber_, 0, 1);
+	Ｐ＿表示設定(this.partsNumber_, false);
+	this.type_ = 2;
+	this.resetCgRange();
+}
+
+int getIntFromString(string target)
+{
+	string t;
+	int i;
+	for (i = 0; i < target.Length(); ++i)
+	{
+		string n = target.GetPart(i, 1);
+		if ("0" <= n && n <= "9" || "０" <= n && n <= "９")
+		{
+			t += n;
+		}
+	}
+	return t.Int();
+}
+
+void Parts::initAsDummy()
+{
+	this.release();
+	this.partsNumber_ = g_partsNumberProvider.getNumber();
+	Ｐ＿座標設定(this.partsNumber_, 0.0, 0.0);
+	Ｐ＿表示設定(this.partsNumber_, false);
+	this.type_ = 3;
+	this.resetCgRange();
+}
+
+void Parts::initAsFlat(string flatName)
+{
+	this.release();
+	this.partsNumber_ = g_partsNumberProvider.getNumber();
+	AFL_Parts_SetPartsFlatAndStop(this.partsNumber_, flatName, 1);
+	Ｐ＿表示設定(this.partsNumber_, false);
+	this.type_ = 4;
+}
+
+void Parts::initAsUserStructure()
+{
+	this.initAsDummy();
+	this.type_ = 5;
+}
+
+void Parts::setNumber(float num)
+{
+	if (!this.isInitialized())
+	{
+		return;
+	}
+	if (this.type_ != 2)
+	{
+		return;
+	}
+	this.number_ = num;
+	Ｐ＿数字設定(this.partsNumber_, this.number_, 1);
+}
+
+void Parts::setParent(int parent)
+{
+	if (!this.isInitialized())
+	{
+		return;
+	}
+	if (this.partsNumber_ == parent)
+	{
+		return;
+	}
+	if (this.partsNumber_ == 0)
+	{
+		Ｐ＿親解放(this.partsNumber_);
+	}
+	else
+	{
+		Ｐ＿親設定(this.partsNumber_, parent);
+	}
+}
+
+void Parts::setOrigin(int val)
+{
+	if (!this.isInitialized())
+	{
+		return;
+	}
+	this.origin_ = val;
+	Ｐ＿原点座標設定(this.partsNumber_, asraPartsOriginFromPartsOriginMode(this.origin_));
+}
+
+void Parts::setPos(float x, float y)
+{
+	if (!this.isInitialized())
+	{
+		return;
+	}
+	this.x_ = x;
+	this.y_ = y;
+	Ｐ＿座標設定(this.partsNumber_, this.x_, this.y_);
+}
+
+void Parts::setX(float x)
+{
+	if (!this.isInitialized())
+	{
+		return;
+	}
+	this.x_ = x;
+	Ｐ＿座標設定(this.partsNumber_, this.x_, Ｐ＿Ｙ座標取得(this.partsNumber_));
+}
+
+void Parts::setY(float y)
+{
+	if (!this.isInitialized())
+	{
+		return;
+	}
+	this.y_ = y;
+	Ｐ＿座標設定(this.partsNumber_, Ｐ＿Ｘ座標取得(this.partsNumber_), y);
+}
+
+void Parts::setZ(float z)
+{
+	if (!this.isInitialized())
+	{
+		return;
+	}
+	this.z_ = z;
+	AFL_Parts_SetZByBaseZ(this.partsNumber_, this.z_, this.baseZ_);
+}
+
+void Parts::setScaling(float per)
+{
+	this.setXScaling(per);
+	this.setYScaling(per);
+}
+
+void Parts::setXScaling(float per)
+{
+	if (!this.isInitialized())
+	{
+		return;
+	}
+	if (this.xScaling_ == per)
+	{
+		return;
+	}
+	this.xScaling_ = per;
+	Ｐ＿Ｘ拡大率設定(this.partsNumber_, this.xScaling_ / 100.0);
+}
+
+void Parts::setYScaling(float per)
+{
+	if (!this.isInitialized())
+	{
+		return;
+	}
+	if (this.yScaling_ == per)
+	{
+		return;
+	}
+	this.yScaling_ = per;
+	Ｐ＿Ｙ拡大率設定(this.partsNumber_, this.yScaling_ / 100.0);
+}
+
+void Parts::setXYRot(float rot)
+{
+	if (!this.isInitialized())
+	{
+		return;
+	}
+	if (this.xyRot_ == rot)
+	{
+		return;
+	}
+	this.xyRot_ = rot;
+	Ｐ＿Ｚ回転角度設定(this.partsNumber_, rot);
+}
+
+void Parts::setXZRot(float rot)
+{
+	if (!this.isInitialized())
+	{
+		return;
+	}
+	if (this.xzRot_ == rot)
+	{
+		return;
+	}
+	this.xzRot_ = rot;
+	Ｐ＿Ｙ回転角度設定(this.partsNumber_, rot);
+}
+
+void Parts::setYZRot(float rot)
+{
+	if (!this.isInitialized())
+	{
+		return;
+	}
+	if (this.yzRot_ == rot)
+	{
+		return;
+	}
+	this.yzRot_ = rot;
+	Ｐ＿Ｘ回転角度設定(this.partsNumber_, rot);
+}
+
+void Parts::setShow(bool val)
+{
+	if (!this.isInitialized())
+	{
+		return;
+	}
+	this.isShow_ = val;
+	Ｐ＿表示設定(this.partsNumber_, this.isShow_);
+}
+
+void Parts::setAlpha(float val)
+{
+	if (!this.isInitialized())
+	{
+		return;
+	}
+	if (this.alpha_ == val)
+	{
+		return;
+	}
+	this.alpha_ = val;
+	Ｐ＿アルファ値設定(this.partsNumber_, this.alpha_);
+}
+
+void Parts::setCgRange(int x, int y, int w, int h)
+{
+	this.left_ = x;
+	this.top_ = y;
+	this.width_ = w;
+	this.height_ = h;
+	this.updateCgRangeRect();
+}
+
+void Parts::updateCgRangeRect()
+{
+	if (!this.isInitialized())
+	{
+		return;
+	}
+	if (this.type_ == 5)
+	{
+		Ｐ＿構築表示範囲設定(this.partsNumber_, this.left_, this.top_, this.width_, this.height_, 1);
+	}
+	else if (this.type_ == 1)
+	{
+		Ｐ＿ＣＧ表示範囲設定(this.partsNumber_, this.left_, this.top_, this.width_, this.height_, 1);
+	}
+}
+
+void Parts::setCgRangeRect(int l, int t, int r, int b)
+{
+	this.left_ = l;
+	this.top_ = t;
+	this.width_ = r - l;
+	this.height_ = b - t;
+	this.updateCgRangeRect();
+}
+
+void Parts::resetCgRange()
+{
+	if (!this.isInitialized())
+	{
+		return;
+	}
+	this.left_ = this.top_ = 0;
+	this.width_ = this.getWidth();
+	this.height_ = this.getHeight();
+}
+
+void Parts::setCgRangeLeft(float val)
+{
+	this.left_ = val;
+	this.updateCgRangeRect();
+}
+
+void Parts::setCgRangeRight(float val)
+{
+	this.width_ = val - this.left_;
+	this.updateCgRangeRect();
+}
+
+void Parts::setCgRangeTop(float val)
+{
+	this.top_ = val;
+	this.updateCgRangeRect();
+}
+
+void Parts::setCgRangeBottom(float val)
+{
+	this.height_ = val - this.top_;
+	this.updateCgRangeRect();
+}
+
+void Parts::setFilterType(int filterType)
+{
+	if (!this.isInitialized())
+	{
+		return;
+	}
+	Ｐ＿描画フィルタ設定(this.partsNumber_, filterType);
+}
+
+void Parts::setAddColorValue(int r, int g, int b)
+{
+	if (!this.isInitialized())
+	{
+		return;
+	}
+	Ｐ＿加算色設定(this.partsNumber_, r, g, b);
+}
+
+void Parts::setMultiColorValue(int r, int g, int b)
+{
+	if (!this.isInitialized())
+	{
+		return;
+	}
+	Ｐ＿乗算色設定(this.partsNumber_, r, g, b);
+}
+
+float Parts::getX()
+{
+	if (!this.isInitialized())
+	{
+		return 0.0;
+	}
+	return this.x_;
+}
+
+float Parts::getY()
+{
+	if (!this.isInitialized())
+	{
+		return 0.0;
+	}
+	return this.y_;
+}
+
+int Parts::getZ()
+{
+	if (!this.isInitialized())
+	{
+		return 0;
+	}
+	return this.z_;
+}
+
+int Parts::getWidth()
+{
+	if (!this.isInitialized())
+	{
+		return 0;
+	}
+	return AFL_Parts_GetWidth(this.partsNumber_, 1);
+}
+
+int Parts::getHeight()
+{
+	if (!this.isInitialized())
+	{
+		return 0;
+	}
+	return AFL_Parts_GetHeight(this.partsNumber_, 1);
+}
+
+int Parts::getAlpha()
+{
+	if (!this.isInitialized())
+	{
+		return 0;
+	}
+	return Ｐ＿アルファ値取得(this.partsNumber_);
+}
+
+float Parts::getXYRot()
+{
+	return this.xyRot_;
+}
+
+float Parts::getScaling()
+{
+	return this.xScaling_;
+}
+
+bool Parts::isShow()
+{
+	return this.isShow_;
+}
+
+int Parts::getPartsNumber()
+{
+	return this.partsNumber_;
+}
+
+void Parts::release()
+{
+	if (!this.isInitialized())
+	{
+		return;
+	}
+	g_partsNumberProvider.releaseNumber(this.partsNumber_);
+	this.clear();
+}
+
+float Parts::getXZRot()
+{
+	return this.xzRot_;
+}
+
+float Parts::getYZRot()
+{
+	return this.yzRot_;
+}
+
+Parts::~Parts()
+{
+	this.release();
+}
+
+void Parts::clear()
+{
+	this.partsNumber_ = 0;
+	this.type_ = 0;
+	this.xScaling_ = this.yScaling_ = 100.0;
+	this.xyRot_ = this.xzRot_ = this.yzRot_ = 0.0;
+	this.isShow_ = false;
+	this.text_ = "";
+	this.alpha_ = 255;
+	this.number_ = 0;
+	this.z_ = 1;
+	this.baseZ_ = 0;
+	this.left_ = this.top_ = this.width_ = this.height_ = 0;
+	this.origin_ = 7;
+}
+
+int Parts::getScreenX()
+{
+	return AFL_Parts_GetUpperLeftPosX(this.partsNumber_, 1);
+}
+
+int Parts::getScreenY()
+{
+	return AFL_Parts_GetUpperLeftPosY(this.partsNumber_, 1);
+}
+
+void Parts::setZBasePos(int zbase)
+{
+	this.baseZ_ = zbase;
+	AFL_Parts_SetZByBaseZ(this.partsNumber_, this.z_, this.baseZ_);
+}
+
+bool Parts::isInitialized()
+{
+	return this.partsNumber_ != 0;
+}
+
+int Parts::getNumber()
+{
+	return this.number_;
+}
+
+void Parts::runMotionFromEx(string motionDefineName, DG_GeneralCallback onFinish)
+{
+	if (!this.isInitialized())
+	{
+		return;
+	}
+	PartsMotioner m;
+	m.setDelegateOnMotionFinish(onFinish);
+	m.runEx(this, motionDefineName);
+	g_partsMotionManager.add(m);
+}
+
+void Parts::runMotion(PartsMotion motion, DG_GeneralCallback onFinish)
+{
+	if (!this.isInitialized())
+	{
+		return;
+	}
+	PartsMotioner m;
+	m.setDelegateOnMotionFinish(onFinish);
+	m.run(this, motion);
+	g_partsMotionManager.add(m);
+}
+
+void Parts::runMotionArray(array@PartsMotion motion, DG_GeneralCallback onFinish)
+{
+	if (!this.isInitialized())
+	{
+		return;
+	}
+	PartsMotioner m;
+	m.setDelegateOnMotionFinish(onFinish);
+	m.runArray(this, motion);
+	g_partsMotionManager.add(m);
+}
+
+bool Parts::isMotion()
+{
+	return g_partsMotionManager.isMotion(this.getPartsNumber());
+}
+
+string Parts::getCgName()
+{
+	if (!this.isInitialized())
+	{
+		return "";
+	}
+	return Ｐ＿ＣＧ名取得(this.getPartsNumber(), 1);
+}
+
+bool Parts::isHit(int x, int y)
+{
+	if (!this.isInitialized())
+	{
+		return false;
+	}
+	return AFL_Parts_IsPointIn(this.getPartsNumber(), x, y, 1);
+}
+
+void Parts::startFlat(bool isStartLastFrame, float timeScaling)
+{
+	if (!this.isInitialized())
+	{
+		return;
+	}
+	if (isStartLastFrame)
+	{
+		Ｐ＿フラット最終フレームステップ(this.partsNumber_, 1);
+	}
+	else
+	{
+		Ｐ＿フラット開始フレーム移動(this.partsNumber_, 1);
+	}
+	AFL_Parts_SetFlatUpdateSpeedRate(this.partsNumber_, g_common_configTimerScaling * timeScaling, 1);
+	AFL_Parts_StartPartsFlat(this.partsNumber_, 1);
+}
+
+void Parts::changeFlatCg(string source, string target)
+{
+	if (!this.isInitialized())
+	{
+		return;
+	}
+	Ｐ＿フラットＣＧ変更(this.partsNumber_, source, target, 1);
+}
+
+void Parts::setHitTestAsPixel(bool val)
+{
+	Ｐ＿ピクセル判定設定(this.partsNumber_, val);
+}
+
+void Parts::setAlphaClipperParts(int alphaClipperPartsNumber)
+{
+	Ｐ＿アルファクリッパー設定(this.partsNumber_, alphaClipperPartsNumber);
+}
+
+bool Parts::isMotionFlat()
+{
+	return !Ｐ＿フラット終了確認(this.partsNumber_, 1);
+}
+
+void Parts::changeOrigin(int val)
+{
+	float w = this.getWidth();
+	float h = this.getHeight();
+	float x = this.getX();
+	float y = this.getY();
+	if (this.width_ != 0)
+	{
+		w = (this.width_ * this.xScaling_) / 100.0;
+	}
+	if (this.height_ != 0)
+	{
+		h = (this.height_ * this.yScaling_) / 100.0;
+	}
+	float nX = x;
+	float nY = y;
+	switch (this.origin_)
+	{
+	case 1:
+	case 2:
+	case 3:
+		if (val == 4 || val == 5 || val == 6)
+		{
+			nY = y - h / 2.0;
+		}
+		else if (val == 7 || val == 8 || val == 9)
+		{
+			nY = y - h;
+		}
+		break;
+	case 4:
+	case 5:
+	case 6:
+		if (val == 1 || val == 2 || val == 3)
+		{
+			nY = y + h / 2.0;
+		}
+		else if (val == 7 || val == 8 || val == 9)
+		{
+			nY = y - h / 2.0;
+		}
+		break;
+	case 7:
+	case 8:
+	case 9:
+		if (val == 1 || val == 2 || val == 3)
+		{
+			nY = y + h;
+		}
+		else if (val == 4 || val == 5 || val == 6)
+		{
+			nY = y + h / 2.0;
+		}
+		break;
+	}
+	switch (this.origin_)
+	{
+	case 1:
+	case 4:
+	case 7:
+		if (val == 2 || val == 5 || val == 8)
+		{
+			nX = x + w / 2.0;
+		}
+		else if (val == 3 || val == 6 || val == 9)
+		{
+			nX = x + w;
+		}
+		break;
+	case 2:
+	case 5:
+	case 8:
+		if (val == 1 || val == 4 || val == 7)
+		{
+			nX = x - w / 2.0;
+		}
+		else if (val == 3 || val == 6 || val == 9)
+		{
+			nX = x + w / 2.0;
+		}
+		break;
+	case 3:
+	case 6:
+	case 9:
+		if (val == 1 || val == 4 || val == 7)
+		{
+			nX = x - w;
+		}
+		else if (val == 2 || val == 5 || val == 8)
+		{
+			nX = x - w / 2.0;
+		}
+		break;
+	}
+	this.setPos(nX, nY);
+	this.setOrigin(val);
+}
+
+void Parts::loadAndStartFlat(string flatName, int x, int y, int z)
+{
+	this.release();
+	this.partsNumber_ = g_partsNumberProvider.getNumber();
+	AFL_Parts_SetPartsFlatAndStop(this.partsNumber_, flatName, 1);
+	AFL_Parts_GoFramePartsFlat(this.partsNumber_, 0, 1);
+	Ｐ＿座標設定(this.partsNumber_, x, y);
+	Ｐ＿Ｚ座標設定(this.partsNumber_, z);
+	Ｐ＿表示設定(this.partsNumber_, true);
+	AFL_Parts_StartPartsFlat(this.partsNumber_, 1);
+}
+

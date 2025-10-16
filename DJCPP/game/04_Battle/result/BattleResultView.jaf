@@ -1,0 +1,137 @@
+BattleResultView::BattleResultView()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void BattleResultView::init(ref array@BattleBonus expBonus, ref array@BattleBonus goldBonus, int exp, int gold, string itemId)
+{
+	this.parts_[0].initAsPlaneImage(1024, 768, 0, 0, 0, 255);
+	this.parts_[0].setAlpha(200.0);
+	this.parts_[0].setPos(0.0, 0.0);
+	this.initBonusParts(this.partsExp_, expBonus, exp, 100, 100, "EXP");
+	this.initBonusParts(this.partsGold_, goldBonus, gold, 200, 300, "GOLD");
+	this.initStandParts();
+	this.initItemParts(itemId);
+	this.setPartsParent();
+	this.setPartsShow();
+}
+
+void BattleResultView::initStandParts()
+{
+	this.parts_[1].init("立ち絵／切り替え／かなみ", 0);
+	this.parts_[1].setShow(true);
+	this.parts_[1].setPos(768.0, 768.0);
+	this.parts_[1].setScaling(60.0);
+	this.parts_[1].setOrigin(2);
+}
+
+int BattleResultView::calcBonus(array@BattleBonus b, int value)
+{
+	int per;
+	int i;
+	for (i = 0; i < b.Numof(); ++i)
+	{
+		per += b[i].getValue();
+	}
+	return (float(value) * float(per + 100)) / 100.0;
+}
+
+void BattleResultView::initBonusParts(ref array@Parts p, ref array@BattleBonus bonus, int value, int x, int y, string caption)
+{
+	PartsFloatingLayout fl;
+	fl.reset(x, y, true);
+	p.Alloc(bonus.Numof() * 2 + 4);
+	p[0].initAsText("%s：" % caption, 50, true, 256, 255, 255, 255);
+	p[1].initAsText("%d" % this.calcBonus(bonus, value), 50, true, 256, 255, 255, 255);
+	p[2].initAsText("%s：" % caption, 30, false, 256, 255, 255, 255);
+	p[3].initAsText("%d" % value, 30, false, 256, 255, 255, 255);
+	fl.add(p[2]);
+	fl.add(p[3]);
+	fl.br();
+	int i;
+	for (i = 0; i < bonus.Numof(); ++i)
+	{
+		p[4 + i * 2 + 0].initAsText("%s:" % bonus[i].getName(), 20, false, 256, 255, 255, 255);
+		p[4 + i * 2 + 1].initAsText("%d％" % bonus[i].getValue(), 20, false, 256, 255, 255, 255);
+		fl.add(p[4 + i * 2 + 0]);
+		fl.add(p[4 + i * 2 + 1]);
+		fl.br();
+	}
+	fl.add(p[0]);
+	fl.add(p[1]);
+}
+
+void BattleResultView::initItemParts(string itemId)
+{
+	if (itemId == "")
+	{
+		return;
+	}
+	this.partsItem_.Alloc(3);
+	this.partsItem_[0].init("システム／スキル／アイコン／チューリップ", 0);
+	this.partsItem_[1].initAsText("%sを取得しました" % getItemFromId(itemId).getName(), 50, true, 256, 255, 255, 255);
+	this.partsItem_[2].initAsText("%s" % getItemFromId(itemId).getDesc(), 20, true, 256, 255, 255, 255);
+	this.partsItem_[0].setCgRange(0, 0, this.partsItem_[0].getWidth() / 4, this.partsItem_[0].getHeight());
+	PartsFloatingLayout fl;
+	fl.reset(300, 500, true);
+	fl.add(this.partsItem_[0]);
+	fl.br();
+	fl.add(this.partsItem_[1]);
+	fl.br();
+	fl.add(this.partsItem_[2]);
+}
+
+void BattleResultView::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	for (i = 0; i < this.partsExp_.Numof(); ++i)
+	{
+		this.partsExp_[i].setShow(true);
+	}
+	for (i = 0; i < this.partsGold_.Numof(); ++i)
+	{
+		this.partsGold_[i].setShow(true);
+	}
+	for (i = 0; i < this.partsItem_.Numof(); ++i)
+	{
+		this.partsItem_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void BattleResultView::setPartsParent()
+{
+	this.parent_.initAsDummy();
+	this.parent_.setPos(0.0, 0.0);
+	this.parent_.setZ(3500.0);
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setParent(this.parent_.getPartsNumber());
+	}
+	for (i = 0; i < this.partsExp_.Numof(); ++i)
+	{
+		this.partsExp_[i].setParent(this.parent_.getPartsNumber());
+	}
+	for (i = 0; i < this.partsGold_.Numof(); ++i)
+	{
+		this.partsGold_[i].setParent(this.parent_.getPartsNumber());
+	}
+	for (i = 0; i < this.partsItem_.Numof(); ++i)
+	{
+		this.partsItem_[i].setParent(this.parent_.getPartsNumber());
+	}
+}
+
+void BattleResultView::setPartsPos()
+{
+}
+
+void BattleResultView::update()
+{
+}
+

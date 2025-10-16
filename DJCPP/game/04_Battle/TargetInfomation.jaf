@@ -1,0 +1,90 @@
+void TargetInfomation::setPlayerSkillId(string id)
+{
+	this.playerSkillId_ = id;
+}
+
+string TargetInfomation::getPlayerSkillId()
+{
+	return this.playerSkillId_;
+}
+
+int TargetInfomation::getDamage()
+{
+	return this.damage_;
+}
+
+int TargetInfomation::getType()
+{
+	return this.type_;
+}
+
+string TargetInfomation::getMessage()
+{
+	return this.message_;
+}
+
+void TargetInfomation::setDamage(int val)
+{
+	this.damage_ = val;
+}
+
+void TargetInfomation::setType(int val)
+{
+	this.type_ = val;
+}
+
+void TargetInfomation::setMessage(string val)
+{
+	this.message_ = val;
+}
+
+void TargetInfomation::setSourceId(string id)
+{
+	this.sourceId_ = id;
+}
+
+void TargetInfomation::setSourceIndex(int index)
+{
+	this.sourceIndex_ = index;
+}
+
+void TargetInfomation::setTargetId(string id)
+{
+	this.targetId_ = id;
+}
+
+void TargetInfomation::setTargetIndex(int index)
+{
+	this.targetIndex_ = index;
+}
+
+string TargetInfomation::getSourceId()
+{
+	return this.sourceId_;
+}
+
+int TargetInfomation::getSourceIndex()
+{
+	return this.sourceIndex_;
+}
+
+string TargetInfomation::getTargetId()
+{
+	return this.targetId_;
+}
+
+int TargetInfomation::getTargetIndex()
+{
+	return this.targetIndex_;
+}
+
+bool TargetInfomation::isSourcePlayer()
+{
+	return this.sourceId_ != "";
+}
+
+bool TargetInfomation::isTargetPlayer()
+{
+	return this.targetId_ != "";
+}
+

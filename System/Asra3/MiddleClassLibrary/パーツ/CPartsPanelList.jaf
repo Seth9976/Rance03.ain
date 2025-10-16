@@ -1,0 +1,662 @@
+CPartsPanelList::CPartsPanelList()
+{
+	this.m_Z = 2000;
+	this.m_ScrollBarSize = 18;
+	this.m_LayoutType = 1;
+}
+
+CPartsPanelList::~CPartsPanelList()
+{
+	this.Release();
+}
+
+void CPartsPanelList::PanelCaptionDragBeginEvent(int BaseNumber)
+{
+	this.m_DraggingPanel = BaseNumber;
+	ref CPartsPanel Panel = this.GetPanelFromBase(BaseNumber);
+	if (Panel !== NULL)
+	{
+		Panel.SetZ(1);
+	}
+}
+
+void CPartsPanelList::PanelCaptionDragingEvent(int BaseNumber, int BeginMouseX, int BeginMouseY, int MouseX, int MouseY)
+{
+	switch (this.m_LayoutType)
+	{
+	case 1:
+		this.VerticalSort(BaseNumber, MouseY);
+		break;
+	case 2:
+		this.HorizonSort(BaseNumber, MouseX);
+		break;
+	}
+}
+
+void CPartsPanelList::PanelCaptionDragEndEvent(int BaseNumber)
+{
+	this.m_DraggingPanel = 0;
+	ref CPartsPanel Panel = this.GetPanelFromBase(BaseNumber);
+	if (Panel !== NULL)
+	{
+		Panel.SetZ(0);
+	}
+	this.m_dgUpdateLayoutEvent();
+}
+
+void CPartsPanelList::FloatingPanelCaptionDragEndEvent(int BaseNumber)
+{
+	this.m_dgUpdateLayoutEvent();
+}
+
+void CPartsPanelList::VerticalSort(int BaseNumber, int Y)
+{
+	Ｐ＿レイアウトボックス＿解放(this.m_Layout, BaseNumber);
+	int i;
+	int Numof = Ｐ＿レイアウトボックス＿個数取得(this.m_Layout);
+	for (i = 0; i < Numof; ++i)
+	{
+		int num = Ｐ＿レイアウトボックス＿番号取得(this.m_Layout, i);
+		if (Y < PARTS_GetAbsoluteY(num) + AFL_Parts_GetHeight(num, 1) / 2)
+		{
+			Ｐ＿レイアウトボックス＿挿入(this.m_Layout, i, BaseNumber);
+			return;
+		}
+	}
+	Ｐ＿レイアウトボックス＿追加(this.m_Layout, BaseNumber);
+}
+
+void CPartsPanelList::HorizonSort(int BaseNumber, int X)
+{
+	Ｐ＿レイアウトボックス＿解放(this.m_Layout, BaseNumber);
+	int i;
+	int Numof = Ｐ＿レイアウトボックス＿個数取得(this.m_Layout);
+	for (i = 0; i < Numof; ++i)
+	{
+		int num = Ｐ＿レイアウトボックス＿番号取得(this.m_Layout, i);
+		int left = AFL_Parts_GetUpperLeftPosX(num, 1);
+		int right = left + AFL_Parts_GetWidth(num, 1) / 2;
+		if (X < PARTS_GetAbsoluteX(num) + AFL_Parts_GetWidth(num, 1) / 2)
+		{
+			Ｐ＿レイアウトボックス＿挿入(this.m_Layout, i, BaseNumber);
+			return;
+		}
+	}
+	Ｐ＿レイアウトボックス＿追加(this.m_Layout, BaseNumber);
+}
+
+void CPartsPanelList::PanelChangedActiveFlgEvent(int BaseNumber, bool Active)
+{
+	if (!Active)
+	{
+		return;
+	}
+	int i;
+	int Numof = this.m_PanelList.Numof();
+	for (i = 0; i < Numof; ++i)
+	{
+		if (this.m_PanelList[i].GetBaseParts() != BaseNumber)
+		{
+			this.m_PanelList[i].SetActive(false);
+		}
+	}
+}
+
+void CPartsPanelList::FloatingPanelChangedActiveFlgEvent(int BaseNumber, bool Active)
+{
+	if (!Active)
+	{
+		return;
+	}
+	this.PanelChangedActiveFlgEvent(BaseNumber, Active);
+	int FindIndex = this.m_FloatingPanelLayer.Find(0, this.m_FloatingPanelLayer.Numof(), BaseNumber);
+	if (FindIndex == -1)
+	{
+		return;
+	}
+	this.m_FloatingPanelLayer.Erase(FindIndex);
+	this.m_FloatingPanelLayer.PushBack(BaseNumber);
+	this.UpdateZPos();
+}
+
+void CPartsPanelList::UpdateZPos()
+{
+	int PosZ = this.m_Z + 100;
+	int i;
+	int Numof = this.m_FloatingPanelLayer.Numof();
+	for (i = 0; i < Numof; ++i)
+	{
+		ref CPartsPanel Panel = this.GetPanelFromBase(this.m_FloatingPanelLayer[i]);
+		if (Panel === NULL)
+		{
+			continue;
+		}
+		Panel.SetZ(PosZ);
+		PosZ = Panel.GetLastZ() + 1;
+	}
+}
+
+void CPartsPanelList::PanelUpdateSizeEvent(int BaseNumber, int Width, int Height)
+{
+	this.UpdateSize();
+}
+
+void CPartsPanelList::PanelChangedCloseFlgEvent(int BaseNumber, bool Closed)
+{
+	this.m_dgUpdateLayoutEvent();
+}
+
+void CPartsPanelList::Create()
+{
+	this.Reset(PARTS_GetFreeSystemPartsNumber());
+}
+
+void CPartsPanelList::Reset(int Number)
+{
+	this.Release();
+	this.m_Base = Number;
+	Ｐ＿座標設定(this.m_Base, this.m_X, this.m_Y);
+	Ｐ＿Ｚ座標設定(this.m_Base, this.m_Z);
+	this.m_Layout = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿親設定(this.m_Layout, this.m_Base);
+	Ｐ＿Ｚ座標設定(this.m_Layout, 1);
+	Ｐ＿レイアウトボックス＿レイアウトタイプ設定(this.m_Layout, this.m_LayoutType);
+	this.UpdateSize();
+}
+
+void CPartsPanelList::Release()
+{
+	PARTS_ReleaseWithInit(this.m_Base);
+	PARTS_ReleaseWithInit(this.m_Layout);
+	PARTS_ReleaseWithInit(this.m_AlphaClipper);
+	PARTS_ReleaseWithInit(this.m_HScroll);
+	PARTS_ReleaseWithInit(this.m_VScroll);
+	this.m_DraggingPanel = 0;
+	this.ClearPanel();
+}
+
+string CPartsPanelList::GetEXString(string Key)
+{
+	string Result = "%s(key string Title, int Index, int Closed, float X, float Y)\n" % Key;
+	Result += "{\n";
+	int i;
+	int Numof = this.m_PanelList.Numof();
+	for (i = 0; i < Numof; ++i)
+	{
+		Result += "\t\"%s\",\t%d,\t%d,\t%f,\t%f;\n" % this.m_PanelList[i].GetTitle() % Ｐ＿子インデックス取得(this.m_Layout, this.m_PanelList[i].GetBaseParts()) % (this.m_PanelList[i].IsClosed() ? 1 : 0) % this.m_PanelList[i].GetX() % this.m_PanelList[i].GetY();
+	}
+	Result += "}\n";
+	return Result;
+}
+
+bool CPartsPanelList::Restore(string Key)
+{
+	if (!this.m_Layout)
+	{
+		return false;
+	}
+	Ｐ＿レイアウトボックス＿全解放(this.m_Layout);
+	int Numof = this.m_PanelList.Numof();
+	array@int BasePartsList;
+	BasePartsList.Alloc(Numof);
+	int i;
+	for (i = 0; i < Numof; ++i)
+	{
+		int BaseNumber = this.m_PanelList[i].GetBaseParts();
+		string Title = this.m_PanelList[i].GetTitle();
+		if (this.m_FloatingPanelLayer.Find(0, this.m_FloatingPanelLayer.Numof(), BaseNumber) == -1)
+		{
+			int Index = EX_SA2Int(Key, Title, "Index", -1);
+			if (Index >= 0 && Index < Numof)
+			{
+				BasePartsList[Index] = BaseNumber;
+			}
+			else
+			{
+				BasePartsList.PushBack(BaseNumber);
+			}
+		}
+		int IsClosed = EX_SA2Int(Key, Title, "Closed", -1);
+		if (IsClosed == 0)
+		{
+			this.m_PanelList[i].Open();
+		}
+		else if (IsClosed == 1)
+		{
+			this.m_PanelList[i].Close();
+		}
+		float X = EX_SA2Float(Key, Title, "X", -340282346638528860000000000000000000000.0);
+		float Y = EX_SA2Float(Key, Title, "Y", -340282346638528860000000000000000000000.0);
+		if (X != -340282346638528860000000000000000000000.0 && Y != -340282346638528860000000000000000000000.0)
+		{
+			this.m_PanelList[i].SetPos(X, Y);
+		}
+	}
+	Numof = BasePartsList.Numof();
+	for (i = 0; i < Numof; ++i)
+	{
+		if (BasePartsList[i])
+		{
+			Ｐ＿レイアウトボックス＿追加(this.m_Layout, BasePartsList[i]);
+		}
+	}
+	return true;
+}
+
+int CPartsPanelList::GetPartsNumber()
+{
+	return this.m_Base;
+}
+
+void CPartsPanelList::SetPos(float X, float Y)
+{
+	this.m_X = X;
+	this.m_Y = Y;
+	if (this.m_Base)
+	{
+		Ｐ＿座標設定(this.m_Base, this.m_X, this.m_Y);
+	}
+}
+
+void CPartsPanelList::SetZ(int Z)
+{
+	this.m_Z = Z;
+	if (this.m_Base)
+	{
+		Ｐ＿Ｚ座標設定(this.m_Base, this.m_Z);
+	}
+}
+
+int CPartsPanelList::GetX()
+{
+	if (this.m_Base)
+	{
+		this.m_X = Ｐ＿Ｘ座標取得(this.m_Base);
+	}
+	return this.m_X;
+}
+
+int CPartsPanelList::GetY()
+{
+	if (this.m_Base)
+	{
+		this.m_Y = Ｐ＿Ｙ座標取得(this.m_Base);
+	}
+	return this.m_Y;
+}
+
+int CPartsPanelList::GetZ()
+{
+	if (this.m_Base)
+	{
+		this.m_Z = Ｐ＿Ｚ座標取得(this.m_Base);
+	}
+	return this.m_Z;
+}
+
+void CPartsPanelList::SetSize(int Width, int Height)
+{
+	this.m_Width = Width;
+	this.m_Height = Height;
+	this.UpdateSize();
+}
+
+void CPartsPanelList::UpdateSize()
+{
+	int BaseWidth = this.GetWidth();
+	int BaseHeight = this.GetHeight();
+	Ｐ＿構築手順＿作成(this.m_Base, BaseWidth, BaseHeight, 1);
+	Ｐ＿構築手順＿色塗り(this.m_Base, 0, 0, BaseWidth, BaseHeight, 240, 235, 235, 255, 1);
+	Ｐ＿構築ビルド(this.m_Base, 1);
+	this.UpdateHScroll();
+	this.UpdateVScroll();
+	this.UpdateAlphaClipper();
+}
+
+void CPartsPanelList::UpdateHScroll()
+{
+	if (this.m_Width <= 0)
+	{
+		PARTS_ReleaseWithInit(this.m_HScroll);
+		PARTS_SetScrollPosXLink(this.m_Layout, 0);
+		return;
+	}
+	if (!this.m_HScroll)
+	{
+		this.m_HScroll = PARTS_GetFreeSystemPartsNumber();
+		Ｐ＿親設定(this.m_HScroll, this.m_Base);
+		Ｐ＿Ｚ座標設定(this.m_HScroll, 2);
+		Ｐ＿原点座標設定(this.m_HScroll, 7);
+		Ｐ＿横スクロールバー＿左ボタン幅設定(this.m_HScroll, this.m_ScrollBarSize);
+		Ｐ＿横スクロールバー＿右ボタン幅設定(this.m_HScroll, this.m_ScrollBarSize);
+		PARTS_SetScrollPosXLink(this.m_Layout, this.m_HScroll);
+	}
+	Ｐ＿座標設定(this.m_HScroll, 0.0, this.GetHeight());
+	Ｐ＿横スクロールバー＿サイズ設定(this.m_HScroll, this.GetClientWidth(), this.m_ScrollBarSize);
+	Ｐ＿横スクロールバー＿全体量設定(this.m_HScroll, AFL_Parts_GetWidth(this.m_Layout, 1));
+	Ｐ＿横スクロールバー＿表示量設定(this.m_HScroll, this.GetClientWidth());
+}
+
+void CPartsPanelList::UpdateVScroll()
+{
+	if (this.m_Height <= 0)
+	{
+		PARTS_ReleaseWithInit(this.m_VScroll);
+		PARTS_SetScrollPosYLink(this.m_Layout, 0);
+		return;
+	}
+	if (!this.m_VScroll)
+	{
+		this.m_VScroll = PARTS_GetFreeSystemPartsNumber();
+		Ｐ＿親設定(this.m_VScroll, this.m_Base);
+		Ｐ＿Ｚ座標設定(this.m_VScroll, 2);
+		Ｐ＿原点座標設定(this.m_VScroll, 3);
+		Ｐ＿縦スクロールバー＿上ボタン高さ設定(this.m_VScroll, this.m_ScrollBarSize);
+		Ｐ＿縦スクロールバー＿下ボタン高さ設定(this.m_VScroll, this.m_ScrollBarSize);
+		PARTS_SetScrollPosYLink(this.m_Layout, this.m_VScroll);
+	}
+	Ｐ＿座標設定(this.m_VScroll, this.GetWidth(), 0.0);
+	Ｐ＿縦スクロールバー＿サイズ設定(this.m_VScroll, this.m_ScrollBarSize, this.GetClientHeight());
+	Ｐ＿縦スクロールバー＿全体量設定(this.m_VScroll, AFL_Parts_GetHeight(this.m_Layout, 1));
+	Ｐ＿縦スクロールバー＿表示量設定(this.m_VScroll, this.GetClientHeight());
+}
+
+void CPartsPanelList::UpdateAlphaClipper()
+{
+	if (!this.m_AlphaClipper)
+	{
+		this.m_AlphaClipper = PARTS_GetFreeSystemPartsNumber();
+		Ｐ＿親設定(this.m_AlphaClipper, this.m_Base);
+		Ｐ＿座標設定(this.m_AlphaClipper, 0.0, 0.0);
+		Ｐ＿表示設定(this.m_AlphaClipper, false);
+		int i;
+		int Numof = this.m_PanelList.Numof();
+		for (i = 0; i < Numof; ++i)
+		{
+			Ｐ＿アルファクリッパー設定(this.m_PanelList[i].GetBaseParts(), this.m_AlphaClipper);
+		}
+	}
+	int ClientWidth = this.GetClientWidth();
+	int ClientHeight = this.GetClientHeight();
+	Ｐ＿構築手順＿作成(this.m_AlphaClipper, ClientWidth, ClientHeight, 1);
+	Ｐ＿構築手順＿色塗り(this.m_AlphaClipper, 0, 0, ClientWidth, ClientHeight, 255, 255, 255, 255, 1);
+	Ｐ＿構築ビルド(this.m_AlphaClipper, 1);
+}
+
+int CPartsPanelList::GetWidth()
+{
+	if (this.m_Width > 0)
+	{
+		return this.m_Width;
+	}
+	return AFL_Parts_GetWidth(this.m_Layout, 1) + (this.m_Height > 0 ? this.m_ScrollBarSize : 0);
+}
+
+int CPartsPanelList::GetHeight()
+{
+	if (this.m_Height > 0)
+	{
+		return this.m_Height;
+	}
+	return AFL_Parts_GetHeight(this.m_Layout, 1) + (this.m_Width > 0 ? this.m_ScrollBarSize : 0);
+}
+
+int CPartsPanelList::GetClientWidth()
+{
+	if (this.m_Width <= 0)
+	{
+		return AFL_Parts_GetWidth(this.m_Layout, 1);
+	}
+	return this.m_Width - (this.m_Height > 0 ? this.m_ScrollBarSize : 0);
+}
+
+int CPartsPanelList::GetClientHeight()
+{
+	if (this.m_Height <= 0)
+	{
+		return AFL_Parts_GetHeight(this.m_Layout, 1);
+	}
+	return this.m_Height - (this.m_Width > 0 ? this.m_ScrollBarSize : 0);
+}
+
+void CPartsPanelList::SetShow(bool Show)
+{
+	Ｐ＿表示設定(this.m_Base, Show);
+}
+
+bool CPartsPanelList::IsShow()
+{
+	return Ｐ＿表示設定取得(this.m_Base);
+}
+
+void CPartsPanelList::SetLayoutType(int LayoutType)
+{
+	this.m_LayoutType = LayoutType;
+	if (this.m_Layout)
+	{
+		Ｐ＿レイアウトボックス＿レイアウトタイプ設定(this.m_Layout, this.m_LayoutType);
+	}
+}
+
+int CPartsPanelList::GetLayoutType()
+{
+	return this.m_LayoutType;
+}
+
+int CPartsPanelList::CreatePanel(string Title)
+{
+	return this.ResetPanel(Title, PARTS_GetFreeSystemPartsNumber());
+}
+
+int CPartsPanelList::CreateFloatingPanel(string Title)
+{
+	return this.ResetFloatingPanel(Title, PARTS_GetFreeSystemPartsNumber());
+}
+
+int CPartsPanelList::CreateTranslucentPanel(string Title)
+{
+	return this.ResetTranslucentPanel(Title, PARTS_GetFreeSystemPartsNumber());
+}
+
+int CPartsPanelList::ResetPanel(string Title, int PartsNumber)
+{
+	if (!this.m_Base)
+	{
+		this.Create();
+		if (!this.m_Base)
+		{
+			return 0;
+		}
+	}
+	int Index = this.m_PanelList.Numof();
+	this.m_PanelList.Realloc(Index + 1);
+	ref CPartsPanel Panel = this.m_PanelList[Index];
+	Panel.Reset(PartsNumber);
+	Panel.SetTitle(Title);
+	Panel.SetMinimizable(true);
+	Panel.AddCaptionDragBeginEvent(this.PanelCaptionDragBeginEvent);
+	Panel.AddCaptionDragingEvent(this.PanelCaptionDragingEvent);
+	Panel.AddCaptionDragEndEvent(this.PanelCaptionDragEndEvent);
+	Panel.AddChangedActiveFlgEvent(this.PanelChangedActiveFlgEvent);
+	Panel.AddUpdateSizeEvent(this.PanelUpdateSizeEvent);
+	Panel.AddChangedCloseFlgEvent(this.PanelChangedCloseFlgEvent);
+	Ｐ＿レイアウトボックス＿追加(this.m_Layout, Panel.GetBaseParts());
+	if (this.m_AlphaClipper)
+	{
+		Ｐ＿アルファクリッパー設定(Panel.GetBaseParts(), this.m_AlphaClipper);
+	}
+	Panel.Open();
+	this.UpdateSize();
+	return Panel.GetLayout();
+}
+
+int CPartsPanelList::ResetFloatingPanel(string Title, int PartsNumber)
+{
+	if (!this.m_Base)
+	{
+		this.Create();
+		if (!this.m_Base)
+		{
+			return 0;
+		}
+	}
+	int Index = this.m_PanelList.Numof();
+	this.m_PanelList.Realloc(Index + 1);
+	ref CPartsPanel Panel = this.m_PanelList[Index];
+	Panel.Reset(PartsNumber);
+	Panel.SetTitle(Title);
+	Panel.SetMinimizable(false);
+	Panel.AddCaptionDragEndEvent(this.FloatingPanelCaptionDragEndEvent);
+	Panel.AddChangedActiveFlgEvent(this.FloatingPanelChangedActiveFlgEvent);
+	Panel.AddChangedCloseFlgEvent(this.PanelChangedCloseFlgEvent);
+	this.m_FloatingPanelLayer.PushBack(Panel.GetBaseParts());
+	this.UpdateZPos();
+	return Panel.GetLayout();
+}
+
+int CPartsPanelList::ResetTranslucentPanel(string Title, int PartsNumber)
+{
+	int LayoutNumber = this.ResetFloatingPanel(Title, PartsNumber);
+	ref CPartsPanel Panel = this.GetPanelFromLayout(LayoutNumber);
+	if (Panel === NULL)
+	{
+		return 0;
+	}
+	Panel.SetTranslucent(true);
+	return LayoutNumber;
+}
+
+void CPartsPanelList::ClearPanel()
+{
+	this.m_PanelList.Free();
+	this.m_FloatingPanelLayer.Free();
+}
+
+ref CPartsPanel CPartsPanelList::GetPanelFromBase(int BaseNumber)
+{
+	int i;
+	int Numof = this.m_PanelList.Numof();
+	for (i = 0; i < Numof; ++i)
+	{
+		if (this.m_PanelList[i].GetBaseParts() == BaseNumber)
+		{
+			return this.m_PanelList[i];
+		}
+	}
+	return NULL;
+}
+
+ref CPartsPanel CPartsPanelList::GetPanelFromLayout(int LayoutNumber)
+{
+	int i;
+	int Numof = this.m_PanelList.Numof();
+	for (i = 0; i < Numof; ++i)
+	{
+		if (this.m_PanelList[i].GetLayout() == LayoutNumber)
+		{
+			return this.m_PanelList[i];
+		}
+	}
+	return NULL;
+}
+
+void CPartsPanelList::OpenPanel(int LayoutNumber)
+{
+	ref CPartsPanel Panel = this.GetPanelFromLayout(LayoutNumber);
+	if (Panel === NULL)
+	{
+		return;
+	}
+	Panel.Open();
+}
+
+void CPartsPanelList::ClosePanel(int LayoutNumber)
+{
+	ref CPartsPanel Panel = this.GetPanelFromLayout(LayoutNumber);
+	if (Panel === NULL)
+	{
+		return;
+	}
+	Panel.Close();
+}
+
+void CPartsPanelList::SetPanelPos(int LayoutNumber, float X, float Y)
+{
+	ref CPartsPanel Panel = this.GetPanelFromLayout(LayoutNumber);
+	if (Panel === NULL)
+	{
+		return;
+	}
+	Panel.SetPos(X, Y);
+}
+
+void CPartsPanelList::SetPanelSize(int LayoutNumber, int Width, int Height)
+{
+	ref CPartsPanel Panel = this.GetPanelFromLayout(LayoutNumber);
+	if (Panel === NULL)
+	{
+		return;
+	}
+	Panel.SetSize(Width, Height);
+}
+
+void CPartsPanelList::SetPanelWidth(int LayoutNumber, int Width)
+{
+	ref CPartsPanel Panel = this.GetPanelFromLayout(LayoutNumber);
+	if (Panel === NULL)
+	{
+		return;
+	}
+	Panel.SetSize(Width, Panel.GetHeight());
+}
+
+void CPartsPanelList::SetPanelHeight(int LayoutNumber, int Height)
+{
+	ref CPartsPanel Panel = this.GetPanelFromLayout(LayoutNumber);
+	if (Panel === NULL)
+	{
+		return;
+	}
+	Panel.SetSize(Panel.GetWidth(), Height);
+}
+
+void CPartsPanelList::SetPanelTitle(int LayoutNumber, string Title)
+{
+	ref CPartsPanel Panel = this.GetPanelFromLayout(LayoutNumber);
+	if (Panel === NULL)
+	{
+		return;
+	}
+	Panel.SetTitle(Title);
+}
+
+void CPartsPanelList::SetPanelCaptionColor(int LayoutNumber, int nR, int nG, int nB)
+{
+	ref CPartsPanel Panel = this.GetPanelFromLayout(LayoutNumber);
+	if (Panel === NULL)
+	{
+		return;
+	}
+	Panel.SetCaptionColor(nR, nG, nB);
+}
+
+void CPartsPanelList::SetPanelCaptionLightColor(int LayoutNumber, int nR, int nG, int nB)
+{
+	ref CPartsPanel Panel = this.GetPanelFromLayout(LayoutNumber);
+	if (Panel === NULL)
+	{
+		return;
+	}
+	Panel.SetCaptionLightColor(nR, nG, nB);
+}
+
+void CPartsPanelList::AddUpdateLayoutEvent(DG_PanelList_UpdateLayoutHandler DelegateObject)
+{
+	this.m_dgUpdateLayoutEvent += DelegateObject;
+}
+
+void CPartsPanelList::EraseUpdateLayoutEvent(DG_PanelList_UpdateLayoutHandler DelegateObject)
+{
+	this.m_dgUpdateLayoutEvent -= DelegateObject;
+}
+

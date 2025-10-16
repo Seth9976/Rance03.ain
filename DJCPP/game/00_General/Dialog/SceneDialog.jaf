@@ -1,0 +1,67 @@
+void SceneDialog::init(DialogInfomation info)
+{
+	this.result_ = -1;
+	this.state_ = 0;
+	this.dialog_.init(info);
+	this.dialog_.setOnFinishCallback(this.onFinishDialog);
+	this.dialog_.setOnClickCallback(this.onClick);
+	this.isYesNo_ = info.isYesNo();
+	if (!this.isYesNo_)
+	{
+		this.addToBacklog(info);
+	}
+}
+
+void SceneDialog::addToBacklog(ref DialogInfomation info)
+{
+	バックログ登録("【%s】" % info.getCaption());
+	array@string n;
+	info.getMessage(n);
+	int i;
+	for (i = 0; i < n.Numof(); ++i)
+	{
+		バックログ登録(n[i]);
+	}
+	バックログ登録("");
+}
+
+void SceneDialog::onClick(int index)
+{
+	this.result_ = index;
+	this.closeDialog();
+}
+
+void SceneDialog::onFinishDialog()
+{
+	this.state_ = 2;
+}
+
+void SceneDialog::run()
+{
+	this.dialog_.fadeIn(true);
+}
+
+bool SceneDialog::update()
+{
+	if (!this.isYesNo_ && this.state_ == 0)
+	{
+		if (g_mouse.isClick(1) || g_mouse.isClick(0))
+		{
+			this.result_ = 0;
+			this.closeDialog();
+		}
+	}
+	return this.state_ != 2;
+}
+
+void SceneDialog::closeDialog()
+{
+	this.dialog_.fadeIn(false);
+	this.state_ = 1;
+}
+
+int SceneDialog::getResult()
+{
+	return this.result_;
+}
+

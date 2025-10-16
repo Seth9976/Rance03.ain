@@ -1,0 +1,89 @@
+OmakeScrollBase::OmakeScrollBase()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void OmakeScrollBase::init(int pageCount, string bgImageName, bool isMirrorPieceMode)
+{
+	this.pageCount_ = pageCount;
+	this.lastPage_ = -1;
+	this.tab_.init(this.pageCount_, isMirrorPieceMode);
+	this.tab_.setOnClickCallback(this.onClickTab);
+	this.scroller_.init(0, 0, 1024, 768, 1024 * (this.pageCount_ - 1), 1024, false);
+	this.initButton();
+	this.initBg(bgImageName);
+}
+
+void OmakeScrollBase::initBg(string bgImageName)
+{
+	this.partsBg_.init(bgImageName, 0);
+	this.partsBg_.setZ(4000.0);
+}
+
+void OmakeScrollBase::initButton()
+{
+	this.btnMovePage_[0].init("システム／左移動", "", "", false);
+	this.btnMovePage_[1].init("システム／右移動", "", "", false);
+	this.btnMovePage_[0].setPos(0, 128);
+	this.btnMovePage_[1].setPos(960, 128);
+	this.btnMovePage_[0].setClickCallback(this.onClickMovePage, 0);
+	this.btnMovePage_[1].setClickCallback(this.onClickMovePage, 1);
+}
+
+void OmakeScrollBase::onClickMovePage(int index)
+{
+	int page = roundOff(this.scroller_.getCurrentPosition() / 1024.0);
+	if (index == 0 && page > 0)
+	{
+		this.jumpPage(page - 1);
+	}
+	else if (index == 1 && page < this.pageCount_ - 1)
+	{
+		this.jumpPage(page + 1);
+	}
+}
+
+void OmakeScrollBase::onClickTab(int index)
+{
+	this.jumpPage(index);
+}
+
+void OmakeScrollBase::jumpPage(int page)
+{
+	this.scroller_.scrollTo(page * 1024);
+}
+
+void OmakeScrollBase::update()
+{
+	int page = this.getCurrentPage();
+	if (this.lastPage_ != page)
+	{
+		this.btnMovePage_[0].setEnable(page > 0);
+		this.btnMovePage_[1].setEnable(page < this.pageCount_ - 1);
+		this.tab_.setCurrentPage(page);
+		this.lastPage_ = page;
+	}
+}
+
+int OmakeScrollBase::getCurrentPage()
+{
+	return roundOff(this.scroller_.getCurrentPosition() / 1024.0);
+}
+
+void OmakeScrollBase::fadeIn(bool val, unknown_delegate onFinish)
+{
+	this.tab_.fadeIn(val, NULL);
+	int i;
+	for (i = 0; i < this.btnMovePage_.Numof(); ++i)
+	{
+		this.btnMovePage_[i].fadeIn(val);
+	}
+	this.partsBg_.setShow(true);
+	this.partsBg_.runMotion(getStandardMotion(val ? 0 : 1), NULL);
+}
+
+int OmakeScrollBase::getPartsNumber()
+{
+	return this.scroller_.getPartsNumber();
+}
+

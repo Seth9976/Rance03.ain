@@ -1,0 +1,432 @@
+SkillSelector::SkillSelector()
+{
+	this.gameObjectId_ = g_gameObjectManager.addFocusObject(this.update, this.isHover);
+	this.selectedIndex_ = -1;
+	this.isEnable_ = false;
+	this.lastHover_ = false;
+}
+
+void SkillSelector::init(string skillId, string playerId, int index, bool isPartyMode)
+{
+	this.isPartyMode_ = isPartyMode;
+	this.skillId_ = skillId;
+	this.playerId_ = playerId;
+	this.index_ = index;
+	this.initParts();
+}
+
+void SkillSelector::initParts()
+{
+	ref PlayerSkill skill = getPlayerSkillFromId(this.skillId_);
+	string baseCgName = "システム／スキル／下地／%s" % getPlayerFromId(this.playerId_).getShortName();
+	this.parts_[0].init(baseCgName, 0);
+	this.parts_[3].init(skill.getIconImageName(), 0);
+	this.parts_[4].init("システム／スキル／ランク／星%D" % skill.getGroupRank(), 0);
+	this.parts_[1].initAsPlaneImage(this.parts_[0].getWidth() / 4 - 6, this.parts_[0].getHeight(), 255, 0, 0, 255);
+	this.parts_[1].setAlpha(0.0);
+	this.parts_[2].initAsCgPlaneImage(baseCgName, 170, 0, 0);
+	this.parts_[2].setAlpha(128.0);
+	this.parts_[11].initAsCgPlaneImage(baseCgName, 255, 255, 255);
+	this.parts_[11].setAlpha(0.0);
+	this.parts_[11].setCgRange(0, 0, this.parts_[11].getWidth() / 4, this.parts_[11].getHeight());
+	if (this.isPartyMode_)
+	{
+		this.parts_[8].init("システム／編成／クールタイム", 0);
+		this.parts_[9].initAsNumber("システム／数字／幅２３／白フチ", NULL);
+	}
+	else
+	{
+		this.parts_[8].initAsFlat("システム／戦闘／クールタイム");
+		this.parts_[9].initAsNumber("システム／数字／幅３５／白", NULL);
+	}
+	this.parts_[7].init(getPlayerAttackTargetTypeIconName(skill), 0);
+	this.parts_[5].initAsText(skill.getName(), 20, true, 256, 255, 255, 255);
+	PlayerSkillAttribute attr;
+	attr = getPlayerSkillAttributeFromId(skill.getAttributeId());
+	this.parts_[6].init(attr.getImageName(), 0);
+	createPartsGroup(this.parent_, this.parts_, 2650);
+	this.adjustNameWidth();
+	this.setPartsShow();
+	this.setPartsPos();
+	this.setPartsCgRange();
+}
+
+void SkillSelector::adjustNameWidth()
+{
+	float w = this.parts_[5].getWidth();
+	if (w > 110.0)
+	{
+		float r = (110.0 / w) * 100.0;
+		this.parts_[5].setXScaling(r);
+	}
+}
+
+void SkillSelector::setPartsCgRange()
+{
+	int pos = this.isAvailable() ? 0 : 3;
+	if (this.isHover())
+	{
+		pos = g_mouse.isDown(0) ? 2 : 1;
+	}
+	this.parts_[0].setCgRange((this.parts_[0].getWidth() / 4) * pos, 0, this.parts_[0].getWidth() / 4, this.parts_[0].getHeight());
+	this.parts_[3].setCgRange((this.parts_[3].getWidth() / 5) * pos, 0, this.parts_[3].getWidth() / 5, this.parts_[3].getHeight());
+	this.parts_[2].setCgRange((this.parts_[2].getWidth() / 4) * pos, 0, this.parts_[2].getWidth() / 4, this.parts_[2].getHeight());
+	bool v = this.isPartyMode_ && getPlayerFromId(this.playerId_).getHp() == 0;
+	this.parts_[2].setShow(v);
+}
+
+void SkillSelector::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	if (this.isPartyMode_)
+	{
+		this.parts_[8].setShow(this.coolTime_ > 0);
+		this.parts_[9].setShow(this.coolTime_ > 0);
+	}
+	else
+	{
+		this.parts_[8].setShow(this.coolTime_ > 0);
+		this.parts_[9].setShow(this.coolTime_ > 0);
+	}
+}
+
+void SkillSelector::setPartsPos()
+{
+	this.parts_[3].setOrigin(8);
+	this.parts_[3].setPos(59.0, 9.0);
+	this.parts_[1].setPos(3.0, 0.0);
+	this.parts_[5].setOrigin(2);
+	this.parts_[5].setPos(59.0, 106.0);
+	this.parts_[6].setPos(13.0, 101.0);
+	this.parts_[7].setPos(40.0, 119.0);
+	this.parts_[4].setOrigin(7);
+	this.parts_[4].setPos(51.0, 103.0);
+	if (this.isPartyMode_)
+	{
+		this.parts_[8].setPos(82.0, 0.0);
+		this.parts_[8].setOrigin(7);
+		this.parts_[9].setPos(100.0, 17.0);
+		this.parts_[9].setOrigin(5);
+	}
+	else
+	{
+		this.parts_[8].setOrigin(8);
+		this.parts_[8].setPos(-30.0, 18.0);
+		this.parts_[9].setOrigin(5);
+		this.parts_[9].setPos(59.0, 61.0);
+	}
+}
+
+void SkillSelector::update()
+{
+	this.setPartsCgRange();
+	this.updateHover();
+	if (this.lastHover_ != this.isHover_)
+	{
+		this.hoverCb_(this.index_, this.isHover_);
+	}
+	if (g_mouse.isClickWithFocus(this.gameObjectId_))
+	{
+		this.clickCb_(this.index_);
+	}
+	if (!this.lastHover_ && this.isHover_)
+	{
+		playCursor();
+	}
+	if (this.isHover_ && g_mouse.onDown(0))
+	{
+		playClick();
+	}
+	this.lastHover_ = this.isHover_;
+}
+
+void SkillSelector::updateHover()
+{
+	this.isHover_ = this.getHoverState();
+}
+
+void SkillSelector::setSelected(int index)
+{
+	if (index >= 0)
+	{
+		this.parts_[10].initAsFlat("システム／戦闘／行動順／%D" % (index + 1));
+		this.parts_[10].setPos(20.0, 18.0);
+		this.parts_[10].setShow(true);
+		this.parts_[10].setZ(10.0);
+		this.parts_[10].setParent(this.parent_.getPartsNumber());
+		if (this.selectedIndex_ == -1)
+		{
+			this.parts_[10].startFlat(false, 1.0);
+		}
+		else
+		{
+			this.parts_[10].startFlat(true, 1.0);
+		}
+	}
+	else
+	{
+		this.parts_[10].release();
+	}
+	this.selectedIndex_ = index;
+}
+
+void SkillSelector::fadeIn(bool val, bool isImmidiate)
+{
+	int x;
+	int y;
+	this.getPos(x, y, this.index_);
+	this.parent_.setShow(true);
+	if (val)
+	{
+		array@PartsMotion m[2];
+		m[0].setTime(isImmidiate ? 0 : 40 * this.index_);
+		m[0].setMove(0, 768, 0, 768, 1);
+		m[1].setTime(200);
+		m[1].setMove(x - 20, 768, x, y, 1);
+		this.parent_.runMotionArray(m, NULL);
+	}
+	else
+	{
+		PartsMotion m;
+		m.setTime(150);
+		m.setMove(x, y, x - 20, y + 200, 1);
+		m.setAlpha(255, 0, 0);
+		this.parent_.runMotion(m, NULL);
+	}
+}
+
+void SkillSelector::setShowMoveOff()
+{
+	int x;
+	int y;
+	this.getPos(x, y, this.index_);
+	int mx = 113 * this.index_ + 15;
+	int my = 10 * this.index_ + 563;
+	this.setEnable(false);
+	this.parent_.setShow(true);
+	this.parent_.setPos(mx, my);
+}
+
+void SkillSelector::changeIndex(int index)
+{
+	if (this.index_ == index)
+	{
+		return;
+	}
+	int fx;
+	int fy;
+	int tx;
+	int ty;
+	this.getPos(fx, fy, this.index_);
+	this.getPos(tx, ty, index);
+	PartsMotion m;
+	m.setMove(fx, fy, tx, ty, 1);
+	m.setTime(150);
+	this.parent_.runMotion(m, NULL);
+	this.index_ = index;
+}
+
+bool SkillSelector::isHover()
+{
+	this.updateHover();
+	return this.isHover_;
+}
+
+bool SkillSelector::getHoverState()
+{
+	if (!this.isAvailable())
+	{
+		return false;
+	}
+	return AFL_Parts_IsPointIn(this.parts_[1].getPartsNumber(), g_mouse.getX(), g_mouse.getY(), 1);
+}
+
+void SkillSelector::setOnClickCallback(DG_OnSkillSelectorClickCallback cb)
+{
+	this.clickCb_ = cb;
+}
+
+int SkillSelector::getSelected()
+{
+	return this.selectedIndex_;
+}
+
+void SkillSelector::setCoolTime(int value)
+{
+	if (this.isPartyMode_)
+	{
+		this.parts_[9].setNumber(value);
+		this.setShowCoolTimeParts(value > 0);
+	}
+	else if (this.coolTime_ == 0 && value > 0)
+	{
+		this.setShowCoolTimeParts(true);
+		this.parts_[8].startFlat(false, 1.0);
+		this.parts_[9].setNumber(value);
+	}
+	else if (this.coolTime_ > 0 && value > 0)
+	{
+		this.parts_[9].setNumber(value);
+	}
+	else
+	{
+		this.setShowCoolTimeParts(false);
+	}
+	this.coolTime_ = value;
+}
+
+void SkillSelector::setShowCoolTimeParts(bool val)
+{
+	if (this.isPartyMode_)
+	{
+		this.parts_[8].setShow(val);
+		this.parts_[9].setShow(val);
+	}
+	else
+	{
+		this.parts_[8].setShow(val);
+		this.parts_[9].setShow(val);
+	}
+}
+
+void SkillSelector::setEnable(bool val)
+{
+	this.isEnable_ = val;
+	this.setPartsShowState();
+}
+
+void SkillSelector::updateShowState()
+{
+	this.setPartsShowState();
+}
+
+void SkillSelector::setPartsShowState()
+{
+	if (this.isPartyMode_)
+	{
+		return;
+	}
+	int hp = getPlayerFromId(this.playerId_).getHp();
+	if (hp == 0)
+	{
+		this.parts_[3].setShow(false);
+		this.parts_[4].setShow(false);
+		this.parts_[5].setShow(false);
+		this.parts_[6].setShow(false);
+		this.parts_[7].setShow(false);
+	}
+}
+
+void SkillSelector::hideSelected()
+{
+	this.parts_[10].setShow(false);
+	PartsMotion m;
+	m = getStandardMotion(1);
+	this.parts_[11].runMotion(m, NULL);
+}
+
+void SkillSelector::setShow(bool val)
+{
+	int x;
+	int y;
+	this.getPos(x, y, this.index_);
+	this.parent_.setPos(x, y);
+	this.parent_.setShow(true);
+}
+
+void SkillSelector::getPos(ref int x, ref int y, int index)
+{
+	x = 113 * index + 15;
+	y = 14 * index + 508;
+}
+
+void SkillSelector::setZ(int z)
+{
+	this.parent_.setZ(z);
+}
+
+string SkillSelector::getId()
+{
+	return this.skillId_;
+}
+
+void SkillSelector::moveOff(bool val)
+{
+	int x;
+	int y;
+	this.getPos(x, y, this.index_);
+	int mx = 113 * this.index_ + 15;
+	int my = 10 * this.index_ + 563;
+	PartsMotion m;
+	if (val)
+	{
+		m.setMove(x, y, mx, my, 1);
+	}
+	else
+	{
+		m.setMove(mx, my, x, y, 1);
+	}
+	this.parent_.runMotion(m, NULL);
+}
+
+void SkillSelector::setOnHoverCallback(DG_OnSkillSelecterHoverCallback hoverCb)
+{
+	this.hoverCb_ = hoverCb;
+}
+
+bool SkillSelector::isEnable()
+{
+	return this.isEnable_;
+}
+
+bool SkillSelector::isAvailable()
+{
+	if (!this.isEnable_)
+	{
+		return false;
+	}
+	if (!this.isPartyMode_)
+	{
+		if (this.coolTime_ > 0)
+		{
+			return false;
+		}
+		if (getPlayerFromId(this.playerId_).getHp() == 0)
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+string getPlayerAttackTargetTypeIconName(ref PlayerSkill skill)
+{
+	PlayerSkillAttribute attr;
+	attr = getPlayerSkillAttributeFromId(skill.getAttributeId());
+	int type = skill.getTargetType();
+	if (attr.getAttackKind() == 0)
+	{
+		if (type == 0)
+		{
+			return "システム／スキル／距離／近接";
+		}
+		else if (type == 1)
+		{
+			return "システム／スキル／距離／遠隔";
+		}
+	}
+	else if (type == 1)
+	{
+		return "システム／スキル／距離／単体";
+	}
+	else if (type == 0)
+	{
+		return "システム／スキル／距離／自分";
+	}
+	return "システム／スキル／距離／味方全体";
+}
+

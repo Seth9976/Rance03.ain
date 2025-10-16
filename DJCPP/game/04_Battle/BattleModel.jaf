@@ -1,0 +1,803 @@
+void BattleModel::setTurn(int turn)
+{
+	this.turn_ = turn;
+	this.turnTotalCoolTime_ = 0;
+	this.updateMonsterInstanceAttackHp();
+}
+
+int BattleModel::getTurn()
+{
+	return this.turn_;
+}
+
+int BattleModel::getEvaluation()
+{
+	int mHp = this.getMonsterTotalHp();
+	if (mHp == 0)
+	{
+		return 1000;
+	}
+	return this.getPlayerTotalHp() - mHp - this.turnTotalCoolTime_ * 50;
+}
+
+int BattleModel::getPlayerTotalHp()
+{
+	array@string pIds;
+	int total;
+	int max;
+	g_party.getPlayerIdList(pIds);
+	int i;
+	for (i = 0; i < pIds.Numof(); ++i)
+	{
+		total += this.getPlayerFromId2(pIds[i]).getHp();
+		max += this.getPlayerFromId2(pIds[i]).getMaxHp();
+	}
+	return (float(total) / float(max)) * 1000.0;
+}
+
+int BattleModel::getMonsterTotalHp()
+{
+	int total;
+	int i;
+	for (i = 0; i < this.monsterInstance_.Numof(); ++i)
+	{
+		total += this.monsterInstance_[i].getHp();
+	}
+	for (i = 0; i < this.queuedMonsterId_.Numof(); ++i)
+	{
+		total += getMonsterFromId(this.queuedMonsterId_[i]).getHp();
+	}
+	int r = (float(total) / float(this.allMonsterHp_)) * 1000.0;
+	if (r == 0 && total > 0)
+	{
+		r = 1;
+	}
+	return r;
+}
+
+void BattleModel::updateMonsterInstanceAttackHp()
+{
+	int i;
+	for (i = 0; i < this.monsterInstance_.Numof(); ++i)
+	{
+		this.monsterInstance_[i].updateAttackHp();
+	}
+}
+
+void BattleModel::init(array@string monsterList)
+{
+	this.turn_ = 0;
+	int i;
+	for (i = 0; i < monsterList.Numof(); ++i)
+	{
+		this.allMonsterHp_ += getMonsterFromId(monsterList[i]).getHp();
+	}
+	this.queuedMonsterId_.Alloc(monsterList.Numof());
+	this.queueIndex_ = this.queuedMonsterId_.Numof() - 1;
+	this.queuedMonsterId_.Copy(0, monsterList, 0, monsterList.Numof());
+}
+
+void BattleModel::run()
+{
+	this.dequeueMonster();
+}
+
+void BattleModel::setCallbackOnEraseMonster(DG_OnEraseMonsterCallback cb)
+{
+	this.onEraseMonster_ = cb;
+}
+
+void BattleModel::setCallbackOnChangeMonster(DG_OnChangeMonsterCallback cb)
+{
+	this.onChangeMonster_ = cb;
+}
+
+void BattleModel::setCallbackOnAddMonster(DG_OnAddMonsterCallback cb)
+{
+	this.onAddMonster_ = cb;
+}
+
+void BattleModel::clearCallback()
+{
+	this.onAddMonster_.Clear();
+	this.onChangeMonster_.Clear();
+	this.onEraseMonster_.Clear();
+}
+
+void BattleModel::setPlayerAction(string playerSkillId)
+{
+	this.playerSkill_ <- getPlayerSkillFromId(playerSkillId);
+	this.player_ <- this.getPlayerFromId2(this.playerSkill_.getPlayerId());
+	this.turnTotalCoolTime_ += this.playerSkill_.getCoolTime();
+}
+
+void BattleModel::processPlayerAction(ref array@TargetInfomation result, ref int actionKind)
+{
+	ref PlayerSkillAttribute attr = getPlayerSkillAttributeFromId(this.playerSkill_.getAttributeId());
+	switch (attr.getAttackKind())
+	{
+	case 0:
+		this.playerAttack();
+		break;
+	case 1:
+		this.playerHeal();
+		break;
+	case 2:
+		this.playerBuff();
+		break;
+	}
+	actionKind = attr.getAttackKind();
+	this.getTargetInfomation(result);
+}
+
+void BattleModel::playerAttack()
+{
+	this.getTargetListPlayerAttack(this.player_.getId(), this.playerSkill_.getTargetType());
+	this.calcDamagePlayerAttack();
+	this.decMonsterHp();
+	this.eraseSourceBuff();
+	this.eraseTargetBuff();
+}
+
+void BattleModel::playerHeal()
+{
+	this.getTargetListPlayerHeal(this.player_.getId(), this.playerSkill_.getTargetType());
+	this.calcHealPlayer(this.playerSkill_);
+	this.healPlayerHp();
+}
+
+void BattleModel::playerBuff()
+{
+	this.getTargetListPlayerBuff(this.player_.getId(), this.playerSkill_.getTargetType(), this.playerSkill_.getBuffId());
+	this.addPlayerBuff(this.playerSkill_.getBuffId());
+}
+
+void BattleModel::setMonsterAction(int attackerIndex, MonsterAttack atk)
+{
+	this.attackerIndex_ = attackerIndex;
+	this.monsterAttack_ = atk;
+}
+
+void BattleModel::processMonsterAction(ref array@TargetInfomation result, ref int kind)
+{
+	this.setMonsterAction(this.monsterAttackerIndexList_[0], this.monsterAttackList_[0]);
+	string attrId = this.monsterAttack_.getAttributeId();
+	MonsterAttackAttribute attr;
+	attr = getMonsterAttackAttributeFromId(attrId);
+	switch (attr.getType())
+	{
+	case 0:
+		this.monsterAttack();
+		break;
+	case 2:
+		this.monsterHeal();
+		break;
+	case 3:
+		this.monsterBuff();
+		break;
+	case 1:
+	case 4:
+		this.callNoActionMonsterShowLogCallback();
+		break;
+	}
+	kind = attr.getType();
+	this.getTargetInfomation(result);
+}
+
+void BattleModel::callNoActionMonsterShowLogCallback()
+{
+	DG_MonsterBattleLogCallback fn;
+	fn = EX_String("モンスター非行動時コールバック", "");
+	string monsterId = this.monsterInstance_[this.attackerIndex_].getId();
+	fn(this.turn_, monsterId, this.monsterAttack_);
+}
+
+void BattleModel::monsterAttack()
+{
+	string attrId = this.monsterAttack_.getAttributeId();
+	MonsterAttackAttribute attr;
+	attr = getMonsterAttackAttributeFromId(attrId);
+	int targetType = this.monsterAttack_.getTargetType();
+	int index = this.attackerIndex_;
+	this.getTargetListMonsterAttack(index, targetType);
+	this.calcDamageMonsterAttack();
+	this.decPlayerHp();
+	this.eraseTargetBuff();
+	this.eraseSourceBuff();
+}
+
+void BattleModel::monsterHeal()
+{
+	string attrId = this.monsterAttack_.getAttributeId();
+	MonsterAttackAttribute attr;
+	attr = getMonsterAttackAttributeFromId(attrId);
+	int targetType = this.monsterAttack_.getTargetType();
+	int index = this.attackerIndex_;
+	this.getTargetListMonsterHeal(index, targetType);
+	this.calcHealMonster();
+	this.healMonsterHp();
+}
+
+void BattleModel::monsterBuff()
+{
+	string attrId = this.monsterAttack_.getAttributeId();
+	MonsterAttackAttribute attr;
+	attr = getMonsterAttackAttributeFromId(attrId);
+	int targetType = this.monsterAttack_.getTargetType();
+	int index = this.attackerIndex_;
+	this.getTargetListMonsterBuff(index, targetType, this.monsterAttack_.getBuffId());
+	this.addMonsterBuff(this.monsterAttack_.getBuffId());
+}
+
+void BattleModel::getTargetInfomation(ref array@TargetInfomation targets)
+{
+	targets.Alloc(this.targets_.Numof());
+	targets.Copy(0, this.targets_, 0, this.targets_.Numof());
+}
+
+void BattleModel::getTargetListPlayerAttack(string sourceId, int targetType)
+{
+	if (targetType == 2)
+	{
+		this.targets_.Alloc(this.monsterInstance_.Numof());
+		int i;
+		for (i = 0; i < this.targets_.Numof(); ++i)
+		{
+			this.targets_[i].setSourceId(sourceId);
+			this.targets_[i].setTargetIndex(i);
+		}
+	}
+	else
+	{
+		this.targets_.Alloc(1);
+		this.targets_[0].setSourceId(sourceId);
+		if (targetType == 1)
+		{
+			this.targets_[0].setTargetIndex(this.monsterInstance_.Numof() - 1);
+		}
+		else
+		{
+			this.targets_[0].setTargetIndex(0);
+		}
+	}
+	this.targets_[0].setPlayerSkillId(this.playerSkill_.getId());
+}
+
+void BattleModel::getTargetListPlayerHeal(string sourceId, int targetType)
+{
+	if (targetType == 2)
+	{
+		array@string targetId;
+		getAlivePlayerList(targetId);
+		this.targets_.Alloc(targetId.Numof());
+		int i;
+		for (i = 0; i < this.targets_.Numof(); ++i)
+		{
+			this.targets_[i].setSourceId(sourceId);
+			this.targets_[i].setTargetId(targetId[i]);
+		}
+	}
+	else if (targetType == 0)
+	{
+		this.targets_.Alloc(1);
+		this.targets_[0].setSourceId(sourceId);
+		this.targets_[0].setTargetId(sourceId);
+	}
+	else if (targetType == 1)
+	{
+		this.targets_.Alloc(1);
+		this.targets_[0].setSourceId(sourceId);
+		array@string ap;
+		getAlivePlayerList(ap);
+		this.targets_[0].setTargetId(getMostDamagedPlayer(ap));
+	}
+	this.targets_[0].setPlayerSkillId(this.playerSkill_.getId());
+}
+
+void BattleModel::getTargetListPlayerBuff(string sourceId, int targetType, string buffId)
+{
+	if (targetType == 2)
+	{
+		array@string targetId;
+		getAlivePlayerList(targetId);
+		this.targets_.Alloc(targetId.Numof());
+		int i;
+		for (i = 0; i < this.targets_.Numof(); ++i)
+		{
+			this.targets_[i].setSourceId(sourceId);
+			this.targets_[i].setTargetId(targetId[i]);
+		}
+	}
+	else if (targetType == 0)
+	{
+		this.targets_.Alloc(1);
+		this.targets_[0].setSourceId(sourceId);
+		this.targets_[0].setTargetId(sourceId);
+	}
+	else if (targetType == 1)
+	{
+		array@string playerIds;
+		getAlivePlayerList(playerIds);
+		getExceptBuffPlayerList(playerIds, sourceId, buffId);
+		this.targets_.Alloc(1);
+		this.targets_[0].setSourceId(sourceId);
+		if (playerIds.Empty())
+		{
+			this.targets_[0].setTargetId(sourceId);
+		}
+		else
+		{
+			this.targets_[0].setTargetId(getMostDamagedPlayer(playerIds));
+		}
+	}
+	this.targets_[0].setPlayerSkillId(this.playerSkill_.getId());
+}
+
+void BattleModel::getTargetListMonsterAttack(int sourceIndex, int targetType)
+{
+	array@string t;
+	getPlayerRandomTarget(t, targetType % 10);
+	this.targets_.Alloc(t.Numof());
+	int i;
+	for (i = 0; i < this.targets_.Numof(); ++i)
+	{
+		this.targets_[i].setSourceIndex(sourceIndex);
+		this.targets_[i].setTargetId(t[i]);
+	}
+}
+
+void BattleModel::getTargetListMonsterHeal(int sourceIndex, int targetType)
+{
+	if (targetType == 1)
+	{
+		this.targets_.Alloc(1);
+		this.targets_[0].setSourceIndex(sourceIndex);
+		this.targets_[0].setTargetIndex(sourceIndex);
+	}
+	else if (targetType == 2)
+	{
+		this.targets_.Alloc(1);
+		this.targets_[0].setSourceIndex(sourceIndex);
+		array@int indexes;
+		indexes.Alloc(this.monsterInstance_.Numof());
+		int i;
+		for (i = 0; i < indexes.Numof(); ++i)
+		{
+			indexes[i] = i;
+		}
+		this.targets_[0].setTargetIndex(getMonsterInstanceIndexMostDamaged(indexes, this.monsterInstance_));
+	}
+	else
+	{
+		this.targets_.Alloc(this.monsterInstance_.Numof());
+		int i;
+		for (i = 0; i < this.targets_.Numof(); ++i)
+		{
+			this.targets_[i].setSourceIndex(sourceIndex);
+			this.targets_[i].setTargetIndex(i);
+		}
+	}
+}
+
+void BattleModel::getTargetListMonsterBuff(int sourceIndex, int targetType, string buffId)
+{
+	if (targetType == 1)
+	{
+		this.targets_.Alloc(1);
+		this.targets_[0].setSourceIndex(sourceIndex);
+		this.targets_[0].setTargetIndex(sourceIndex);
+	}
+	else if (targetType == 2)
+	{
+		this.targets_.Alloc(1);
+		this.targets_[0].setSourceIndex(sourceIndex);
+		array@int indexes;
+		indexes.Alloc(this.monsterInstance_.Numof());
+		int i;
+		for (i = 0; i < indexes.Numof(); ++i)
+		{
+			indexes[i] = i;
+		}
+		getExceptBuffPlayerIndexes(indexes, sourceIndex, this.monsterInstance_, buffId);
+		if (indexes.Empty())
+		{
+			this.targets_[0].setTargetIndex(sourceIndex);
+		}
+		else
+		{
+			this.targets_[0].setTargetIndex(getMonsterInstanceIndexMostDamaged(indexes, this.monsterInstance_));
+		}
+	}
+	else
+	{
+		this.targets_.Alloc(this.monsterInstance_.Numof());
+		int i;
+		for (i = 0; i < this.targets_.Numof(); ++i)
+		{
+			this.targets_[i].setSourceIndex(sourceIndex);
+			this.targets_[i].setTargetIndex(i);
+		}
+	}
+}
+
+void BattleModel::calcDamagePlayerAttack()
+{
+	int i;
+	for (i = 0; i < this.targets_.Numof(); ++i)
+	{
+		ref MonsterInstance inst = this.monsterInstance_[this.targets_[i].getTargetIndex()];
+		DG_CalcPlayerAttackDamage fn;
+		fn = EX_String("プレイヤー攻撃ダメージ計算関数", "");
+		string msg;
+		int type;
+		int dmg = fn(this.turn_, this.player_, this.playerSkill_, inst, i, this.targets_.Numof(), type, msg);
+		this.targets_[i].setDamage(dmg);
+		this.targets_[i].setMessage(msg);
+		this.targets_[i].setType(type);
+		fn.Clear();
+	}
+}
+
+void BattleModel::calcDamageMonsterAttack()
+{
+	int i;
+	for (i = 0; i < this.targets_.Numof(); ++i)
+	{
+		ref Player p = this.getPlayerFromId2(this.targets_[i].getTargetId());
+		DG_CalcMonsterAttackDamage fn;
+		fn = EX_String("敵攻撃ダメージ計算関数", "");
+		int val = fn(this.turn_, this.monsterInstance_[this.targets_[i].getSourceIndex()], this.monsterAttack_, p, i, this.targets_.Numof());
+		this.targets_[i].setDamage(val);
+		fn.Clear();
+	}
+}
+
+void BattleModel::calcHealPlayer(ref PlayerSkill skill)
+{
+	int i;
+	for (i = 0; i < this.targets_.Numof(); ++i)
+	{
+		DG_CalcPlayerHeal fn;
+		fn = EX_String("プレイヤー回復量計算関数", "");
+		int type;
+		string msg;
+		int val = fn(this.turn_, this.getPlayerFromId2(this.targets_[i].getSourceId()), this.getPlayerFromId2(this.targets_[i].getTargetId()), skill, i, this.targets_.Numof(), type, msg);
+		this.targets_[i].setDamage(val);
+		this.targets_[i].setType(type);
+		this.targets_[i].setMessage(msg);
+		fn.Clear();
+	}
+}
+
+void BattleModel::calcHealMonster()
+{
+	int i;
+	for (i = 0; i < this.targets_.Numof(); ++i)
+	{
+		DG_CalcMonsterHeal fn;
+		fn = EX_String("敵回復量計算関数", "");
+		int val = fn(this.turn_, getMonsterFromId(this.monsterInstance_[this.targets_[i].getSourceIndex()].getId()), getMonsterFromId(this.monsterInstance_[this.targets_[i].getTargetIndex()].getId()), this.monsterAttack_, i, this.targets_.Numof());
+		this.targets_[i].setDamage(val);
+		fn.Clear();
+	}
+}
+
+void BattleModel::addPlayerBuff(string buffId)
+{
+	int i;
+	for (i = 0; i < this.targets_.Numof(); ++i)
+	{
+		this.getPlayerFromId2(this.targets_[i].getTargetId()).addBuff(buffId);
+		string t = this.targets_[i].getTargetId();
+		string s = this.targets_[i].getSourceId();
+		DG_PlayerBuffAddCallback fn;
+		fn = EX_String("プレイヤーバフ追加時コールバック関数", "");
+		if (fn.Numof() == 0)
+		{
+			g_battleLog.add("%sが%sによって%sにかけられた" % buffId % s % t, 0);
+		}
+		else
+		{
+			fn(this.playerSkill_.getId(), s, t);
+		}
+		fn.Clear();
+	}
+}
+
+void BattleModel::healPlayerHp()
+{
+	int i;
+	for (i = 0; i < this.targets_.Numof(); ++i)
+	{
+		ref Player c = this.getPlayerFromId2(this.targets_[i].getTargetId());
+		c.setHp(c.getHp() + this.targets_[i].getDamage());
+	}
+}
+
+void BattleModel::healMonsterHp()
+{
+	int i;
+	for (i = 0; i < this.targets_.Numof(); ++i)
+	{
+		int index = this.targets_[i].getTargetIndex();
+		this.monsterInstance_[index].setHp(this.monsterInstance_[index].getHp() + this.targets_[i].getDamage());
+	}
+}
+
+void BattleModel::decPlayerHp()
+{
+	int i;
+	for (i = 0; i < this.targets_.Numof(); ++i)
+	{
+		ref Player c = this.getPlayerFromId2(this.targets_[i].getTargetId());
+		c.setHp(c.getHp() - this.targets_[i].getDamage());
+		if (c.getHp() == 0)
+		{
+			g_battleLog.add("%sが倒れた！" % c.getShortName(), 3);
+		}
+	}
+}
+
+void BattleModel::decMonsterHp()
+{
+	int i;
+	int killCount;
+	for (i = 0; i < this.targets_.Numof(); ++i)
+	{
+		int index = this.targets_[i].getTargetIndex();
+		int lost = this.monsterInstance_[index].setHp(this.monsterInstance_[index].getHp() - this.targets_[i].getDamage());
+		if (this.monsterInstance_[index].getHp() == 0)
+		{
+			++killCount;
+		}
+	}
+	this.callCheckBonusOnFinishAttack(killCount);
+	this.turnKillCount_ += killCount;
+}
+
+void BattleModel::eraseSourceBuff()
+{
+	int i;
+	for (i = 0; i < this.targets_.Numof(); ++i)
+	{
+		if (this.targets_[i].isSourcePlayer())
+		{
+			ref Player p = this.getPlayerFromId2(this.targets_[i].getSourceId());
+			p.eraseAttackBuff();
+		}
+		else
+		{
+			this.monsterInstance_[this.targets_[i].getSourceIndex()].eraseBuffByType(0);
+		}
+	}
+}
+
+void BattleModel::eraseTargetBuff()
+{
+	int i;
+	for (i = 0; i < this.targets_.Numof(); ++i)
+	{
+		if (this.targets_[i].isTargetPlayer())
+		{
+			ref Player p = this.getPlayerFromId2(this.targets_[i].getTargetId());
+			p.eraseDeffenceBuff();
+		}
+		else
+		{
+			this.monsterInstance_[this.targets_[i].getTargetIndex()].eraseBuffByType(1);
+		}
+	}
+}
+
+bool BattleModel::eraseDeadMonster()
+{
+	bool isChanged = false;
+	int i;
+	while (i < this.monsterInstance_.Numof())
+	{
+		if (this.monsterInstance_[i].getHp() == 0)
+		{
+			ref Monster m = getMonsterFromId(this.monsterInstance_[i].getId());
+			if (m.getChangeToMonsterId() != "")
+			{
+				DG_GeneralCallback cb = this.monsterInstance_[i].getOnChangePositionCallback();
+				this.monsterInstance_[i].init(m.getChangeToMonsterId(), this.monsterInstance_[i].getPosition(), i, this.turn_);
+				this.monsterInstance_[i].setOnChangePositionCallback(cb);
+				if (!this.isPonanChangCalcMode_)
+				{
+					isChanged = true;
+					this.monsterInstance_[i].setChanged(true);
+					this.onChangeMonster_(i, this.monsterInstance_[i]);
+				}
+				cb.Clear();
+			}
+			else
+			{
+				this.monsterInstance_.Erase(i);
+				if (!this.isPonanChangCalcMode_)
+				{
+					this.onEraseMonster_(i);
+				}
+				isChanged = true;
+			}
+		}
+		else
+		{
+			++i;
+		}
+	}
+	for (i = 0; i < this.monsterInstance_.Numof(); ++i)
+	{
+		this.monsterInstance_[i].setPosition(i);
+	}
+	return isChanged;
+}
+
+bool BattleModel::dequeueMonster()
+{
+	bool isAdded = false;
+	while (this.monsterInstance_.Numof() < 3 && !this.queuedMonsterId_.Empty())
+	{
+		string newId = this.queuedMonsterId_[0];
+		this.queuedMonsterId_.Erase(0);
+		int index = this.queueIndex_;
+		--this.queueIndex_;
+		int c = this.monsterInstance_.Numof();
+		this.monsterInstance_.Realloc(c + 1);
+		this.monsterInstance_[c].init(newId, c, index, this.turn_);
+		if (!this.isPonanChangCalcMode_)
+		{
+			this.onAddMonster_(this.monsterInstance_[c]);
+		}
+		isAdded = true;
+	}
+	return isAdded;
+}
+
+bool BattleModel::updateMonsterList()
+{
+	bool isChanged = this.eraseDeadMonster();
+	bool isAdded = this.dequeueMonster();
+	return isChanged || isAdded;
+}
+
+bool BattleModel::isNoMonster()
+{
+	return this.monsterInstance_.Empty() && this.queuedMonsterId_.Empty();
+}
+
+void BattleModel::addMonsterBuff(string buffId)
+{
+	int i;
+	for (i = 0; i < this.targets_.Numof(); ++i)
+	{
+		this.monsterInstance_[this.targets_[i].getTargetIndex()].addBuff(buffId);
+		DG_MonsterBuffAddCallback fn;
+		fn = EX_String("モンスターバフ追加時コールバック関数", "");
+		string s = this.monsterInstance_[this.targets_[i].getSourceIndex()].getId();
+		string t = this.monsterInstance_[this.targets_[i].getTargetIndex()].getId();
+		if (fn.Numof() == 0)
+		{
+			g_battleLog.add("%sによって%sに%sがかけられた" % s % t % buffId, 0);
+		}
+		else
+		{
+			fn(buffId, s, t);
+		}
+		fn.Clear();
+	}
+}
+
+void BattleModel::getMonsterAttackList(ref array@MonsterAttack list, ref array@int indexList)
+{
+	list.Free();
+	indexList.Free();
+	int i;
+	for (i = 0; i < this.monsterInstance_.Numof(); ++i)
+	{
+		ref Monster m = getMonsterFromId(this.monsterInstance_[i].getId());
+		MonsterAttack atk;
+		atk = this.monsterInstance_[i].getAttack(this.turn_);
+		MonsterAttackAttribute attr;
+		attr = getMonsterAttackAttributeFromId(atk.getAttributeId());
+		if (attr.getType() == 0)
+		{
+			if (isMonsterAttackAvailable(atk, this.monsterInstance_[i].getPosition()))
+			{
+				list.PushBack(atk);
+				indexList.PushBack(i);
+			}
+		}
+		else
+		{
+			list.PushBack(atk);
+			indexList.PushBack(i);
+		}
+	}
+}
+
+int BattleModel::getMonsterCount()
+{
+	return this.monsterInstance_.Numof();
+}
+
+void BattleModel::loadMonsterAttackList(ref MonsterAttack atk)
+{
+	this.getMonsterAttackList(this.monsterAttackList_, this.monsterAttackerIndexList_);
+	if (!this.monsterAttackList_.Empty() && atk !== NULL)
+	{
+		atk = this.monsterAttackList_[0];
+	}
+}
+
+void BattleModel::popMonsterAttack(ref MonsterAttack atk)
+{
+	this.monsterAttackList_.Erase(0);
+	this.monsterAttackerIndexList_.Erase(0);
+	if (!this.monsterAttackList_.Empty() && atk !== NULL)
+	{
+		atk = this.monsterAttackList_[0];
+	}
+}
+
+bool BattleModel::isEmptyMonsterAttack()
+{
+	return this.monsterAttackList_.Empty();
+}
+
+void BattleModel::callCheckBonusOnFinishAttack(int killCount)
+{
+	DG_CheckBattleBonusOnPlayerAttack fn;
+	fn = EX_String("プレイヤー攻撃時ボーナスチェック関数", "");
+	fn(this.turn_, killCount);
+}
+
+void BattleModel::callCheckBonusOnFinishPlayerTurn(bool isFinalTurn)
+{
+	DG_CheckBattleBonusOnPlayerTurn fn;
+	fn = EX_String("ターン終了時ボーナスチェック関数", "");
+	fn(this.turn_, this.turnKillCount_, isFinalTurn);
+	this.turnKillCount_ = 0;
+}
+
+void BattleModel::setDummyMode(bool val)
+{
+	this.isPonanChangCalcMode_ = val;
+	if (this.isPonanChangCalcMode_)
+	{
+		this.dummyPlayer_.Alloc(g_player.Numof());
+		this.dummyPlayer_.Copy(0, g_player, 0, g_player.Numof());
+	}
+	int i;
+	for (i = 0; i < this.monsterInstance_.Numof(); ++i)
+	{
+		this.monsterInstance_[i].clearCallback();
+	}
+	this.clearCallback();
+}
+
+ref Player BattleModel::getPlayerFromId2(string id)
+{
+	if (this.isPonanChangCalcMode_)
+	{
+		int i;
+		for (i = 0; i < this.dummyPlayer_.Numof(); ++i)
+		{
+			if (this.dummyPlayer_[i].getId() == id)
+			{
+				return this.dummyPlayer_[i];
+			}
+		}
+	}
+	return getPlayerFromId(id);
+}
+
+ref MonsterInstance BattleModel::getMonsterInstance(int index)
+{
+	if (0 <= index && index < this.monsterInstance_.Numof())
+	{
+		return this.monsterInstance_[index];
+	}
+	return NULL;
+}
+

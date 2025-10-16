@@ -1,0 +1,70 @@
+FullScreenFlat::FullScreenFlat()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+	this.isRunning_ = false;
+}
+
+void FullScreenFlat::init(string flatName, string soundName, bool isCenter)
+{
+	this.release();
+	this.soundName_ = soundName;
+	this.parts_.initAsFlat(flatName);
+	this.parts_.setZ(30000.0);
+	if (isCenter)
+	{
+		this.parts_.setPos(512.0, 384.0);
+	}
+}
+
+void FullScreenFlat::update()
+{
+	if (this.isRunning_ && this.isFinish())
+	{
+		this.release();
+	}
+}
+
+void FullScreenFlat::release()
+{
+	this.parts_.release();
+	this.isRunning_ = false;
+	this.onFinish_();
+}
+
+void FullScreenFlat::join(int time)
+{
+	if (!this.isRunning_)
+	{
+		return;
+	}
+	LocalTimer t;
+	if (time < 0)
+	{
+		time = 1000000;
+	}
+	t.reset();
+	while (t.getTime() < time && !this.isFinish())
+	{
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+}
+
+bool FullScreenFlat::isFinish()
+{
+	return !this.parts_.isMotionFlat();
+}
+
+void FullScreenFlat::run(float timeScaling)
+{
+	g_sysSound.play(1, this.soundName_);
+	this.parts_.setShow(true);
+	this.parts_.startFlat(false, timeScaling);
+	this.isRunning_ = true;
+}
+
+void FullScreenFlat::setOnFinishCallback(DG_GeneralCallback onFinish)
+{
+	this.onFinish_ = onFinish;
+}
+

@@ -1,0 +1,544 @@
+CAEEditConstructionProcessUnit::CAEEditConstructionProcessUnit()
+{
+	this.Release();
+}
+
+void CAEEditConstructionProcessUnit::Create(int LayoutID, ref CASConstructionProcess Process)
+{
+	this.Release();
+	this.m_Process <- Process;
+	this.m_ItemPanel.Init(LayoutID);
+	this.m_ItemPanel.AddMouseWheelEvent(this.MouseWheelEvent);
+	this.m_ItemPanel.AddChangeTextEvent(this.ChangeTextEvent);
+	this.m_ItemPanel.AddMouseClickEvent(this.MouseLClickEvent);
+	int Command = Process.GetCommand();
+	switch (Command)
+	{
+	case 0:
+		this.CreateProcessEditForCreate(Process);
+		break;
+	case 1:
+		this.CreateProcessEditForCreatePixelOnly(Process);
+		break;
+	case 2:
+		this.CreateProcessEditForCreateCG(Process);
+		break;
+	case 3:
+		this.CreateProcessEditForFill(Process);
+		break;
+	case 4:
+		this.CreateProcessEditForFillAlphaColor(Process);
+		break;
+	case 5:
+		this.CreateProcessEditForFillAMap(Process);
+		break;
+	case 6:
+		this.CreateProcessEditForFillWithAlpha(Process);
+		break;
+	case 7:
+		this.CreateProcessEditForDrawText(Process);
+		break;
+	case 8:
+		this.CreateProcessEditForCopyText(Process);
+		break;
+	case 9:
+		this.CreateProcessEditForFillFillGradation(Process);
+		break;
+	case 10:
+		this.CreateProcessEditForDrawRect(Process);
+		break;
+	case 11:
+		this.CreateProcessEditForDrawCutCG(Process);
+		break;
+	case 12:
+		this.CreateProcessEditForCopyCutCG(Process);
+		break;
+	case 13:
+		this.CreateProcessEditForDrawCutScaleCG(Process);
+		break;
+	case 14:
+		this.CreateProcessEditForCopyCutScaleCG(Process);
+		break;
+	case 15:
+		this.CreateProcessEditForGrayFilter(Process);
+		break;
+	case 16:
+		this.CreateProcessEditForAddFilter(Process);
+		break;
+	case 17:
+		this.CreateProcessEditForMulFilter(Process);
+		break;
+	case 18:
+		this.CreateProcessEditForDrawLine(Process);
+		break;
+	case 19:
+		this.CreateProcessEditForAlphaBlendCutCG(Process);
+		break;
+	case 20:
+		this.CreateProcessEditForAlphaBlendCutScaleCG(Process);
+		break;
+	case 21:
+		this.CreateProcessEditForDrawOnlyAlphaCutCG(Process);
+		break;
+	case 22:
+		this.CreateProcessEditForDrawOnlyAlphaCutScaleCG(Process);
+		break;
+	}
+}
+
+void CAEEditConstructionProcessUnit::Release()
+{
+	this.m_dgChangedEvent.Clear();
+	this.m_dgMouseWheelEvent.Clear();
+	this.m_ItemPanel.Release();
+	this.m_Process <- NULL;
+}
+
+void CAEEditConstructionProcessUnit::CreateProcessEditForCreate(ref CASConstructionProcess Process)
+{
+	this.m_ItemPanel.AddTextBoxItem("幅：", 28, string(Process.GetDestWidth()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("高さ：", 42, string(Process.GetDestHeight()), 30, false);
+}
+
+void CAEEditConstructionProcessUnit::CreateProcessEditForCreatePixelOnly(ref CASConstructionProcess Process)
+{
+	this.m_ItemPanel.AddTextBoxItem("幅：", 28, string(Process.GetDestWidth()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("高さ：", 42, string(Process.GetDestHeight()), 30, false);
+}
+
+void CAEEditConstructionProcessUnit::CreateProcessEditForCreateCG(ref CASConstructionProcess Process)
+{
+	this.m_ItemPanel.AddTextBoxItem("ＣＧ名：", 56, Process.GetCGName(), 100, true);
+}
+
+void CAEEditConstructionProcessUnit::CreateProcessEditForFill(ref CASConstructionProcess Process)
+{
+	this.m_ItemPanel.AddTextBoxItem("Ｘ：", 28, string(Process.GetDestX()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("Ｙ：", 28, string(Process.GetDestY()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("幅：", 28, string(Process.GetDestWidth()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("高さ：", 42, string(Process.GetDestHeight()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("Ｒ：", 28, string(Process.GetR()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("Ｇ：", 28, string(Process.GetG()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("Ｂ：", 28, string(Process.GetB()), 30, false);
+}
+
+void CAEEditConstructionProcessUnit::CreateProcessEditForFillAlphaColor(ref CASConstructionProcess Process)
+{
+	this.m_ItemPanel.AddTextBoxItem("Ｘ：", 28, string(Process.GetDestX()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("Ｙ：", 28, string(Process.GetDestY()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("幅：", 28, string(Process.GetDestWidth()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("高さ：", 42, string(Process.GetDestHeight()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("Ｒ：", 28, string(Process.GetR()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("Ｇ：", 28, string(Process.GetG()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("Ｂ：", 28, string(Process.GetB()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("α：", 28, string(Process.GetA()), 30, false);
+}
+
+void CAEEditConstructionProcessUnit::CreateProcessEditForFillAMap(ref CASConstructionProcess Process)
+{
+	this.m_ItemPanel.AddTextBoxItem("Ｘ：", 28, string(Process.GetDestX()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("Ｙ：", 28, string(Process.GetDestY()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("幅：", 28, string(Process.GetDestWidth()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("高さ：", 42, string(Process.GetDestHeight()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("α：", 28, string(Process.GetA()), 30, false);
+}
+
+void CAEEditConstructionProcessUnit::CreateProcessEditForFillWithAlpha(ref CASConstructionProcess Process)
+{
+	this.m_ItemPanel.AddTextBoxItem("Ｘ：", 28, string(Process.GetDestX()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("Ｙ：", 28, string(Process.GetDestY()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("幅：", 28, string(Process.GetDestWidth()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("高さ：", 42, string(Process.GetDestHeight()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("Ｒ：", 28, string(Process.GetR()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("Ｇ：", 28, string(Process.GetG()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("Ｂ：", 28, string(Process.GetB()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("α：", 28, string(Process.GetA()), 30, false);
+}
+
+void CAEEditConstructionProcessUnit::CreateProcessEditForDrawText(ref CASConstructionProcess Process)
+{
+	string FontText = "%s, サイズ[%d]" % PARTS_GetFontName(Process.GetFontProperty().GetType()) % Process.GetFontProperty().GetSize();
+	this.m_ItemPanel.AddTextBoxItem("Ｘ：", 28, string(Process.GetDestX()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("Ｙ：", 28, string(Process.GetDestY()), 30, false);
+	this.m_ItemPanel.AddButtonItem("フォント：", 70, FontText, 60, 5);
+	this.m_ItemPanel.AddButtonItem("テキスト：", 70, Process.GetText(), 60, 5);
+	this.m_ItemPanel.AddTextBoxItem("文字間隔：", 70, string(Process.GetCharSpace()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("行間隔：", 56, string(Process.GetLineSpace()), 30, false);
+}
+
+void CAEEditConstructionProcessUnit::CreateProcessEditForCopyText(ref CASConstructionProcess Process)
+{
+	string FontText = "%s, サイズ[%d]" % PARTS_GetFontName(Process.GetFontProperty().GetType()) % Process.GetFontProperty().GetSize();
+	this.m_ItemPanel.AddTextBoxItem("Ｘ：", 28, string(Process.GetDestX()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("Ｙ：", 28, string(Process.GetDestY()), 30, false);
+	this.m_ItemPanel.AddButtonItem("フォント：", 70, FontText, 60, 5);
+	this.m_ItemPanel.AddButtonItem("テキスト：", 70, Process.GetText(), 60, 5);
+	this.m_ItemPanel.AddTextBoxItem("文字間隔：", 70, string(Process.GetCharSpace()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("行間隔：", 56, string(Process.GetLineSpace()), 30, false);
+}
+
+void CAEEditConstructionProcessUnit::CreateProcessEditForFillFillGradation(ref CASConstructionProcess Process)
+{
+	this.m_ItemPanel.AddTextBoxItem("Ｘ：", 28, string(Process.GetDestX()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("Ｙ：", 28, string(Process.GetDestY()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("幅：", 28, string(Process.GetDestWidth()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("高さ：", 42, string(Process.GetDestHeight()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("上Ｒ：", 42, string(Process.GetR()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("上Ｇ：", 42, string(Process.GetG()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("上Ｂ：", 42, string(Process.GetB()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("下Ｒ：", 42, string(Process.GetR2()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("下Ｇ：", 42, string(Process.GetG2()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("下Ｂ：", 42, string(Process.GetB2()), 30, false);
+}
+
+void CAEEditConstructionProcessUnit::CreateProcessEditForDrawRect(ref CASConstructionProcess Process)
+{
+	this.m_ItemPanel.AddTextBoxItem("Ｘ：", 28, string(Process.GetDestX()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("Ｙ：", 28, string(Process.GetDestY()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("幅：", 28, string(Process.GetDestWidth()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("高さ：", 42, string(Process.GetDestHeight()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("Ｒ：", 28, string(Process.GetR()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("Ｇ：", 28, string(Process.GetG()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("Ｂ：", 28, string(Process.GetB()), 30, false);
+}
+
+void CAEEditConstructionProcessUnit::CreateProcessEditForDrawCutCG(ref CASConstructionProcess Process)
+{
+	this.m_ItemPanel.AddTextBoxItem("ＣＧ名：", 56, Process.GetCGName(), 100, true);
+	this.m_ItemPanel.AddTextBoxItem("貼り付け先Ｘ：", 98, string(Process.GetDestX()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("貼り付け先Ｙ：", 98, string(Process.GetDestY()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("切り取り元Ｘ：", 98, string(Process.GetSrcX()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("切り取り元Ｙ：", 98, string(Process.GetSrcY()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("幅：", 28, string(Process.GetDestWidth()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("高さ：", 42, string(Process.GetDestHeight()), 30, false);
+}
+
+void CAEEditConstructionProcessUnit::CreateProcessEditForCopyCutCG(ref CASConstructionProcess Process)
+{
+	this.m_ItemPanel.AddTextBoxItem("ＣＧ名：", 56, Process.GetCGName(), 100, true);
+	this.m_ItemPanel.AddTextBoxItem("貼り付け先Ｘ：", 98, string(Process.GetDestX()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("貼り付け先Ｙ：", 98, string(Process.GetDestY()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("切り取り元Ｘ：", 98, string(Process.GetSrcX()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("切り取り元Ｙ：", 98, string(Process.GetSrcY()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("幅：", 28, string(Process.GetDestWidth()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("高さ：", 42, string(Process.GetDestHeight()), 30, false);
+}
+
+void CAEEditConstructionProcessUnit::CreateProcessEditForDrawCutScaleCG(ref CASConstructionProcess Process)
+{
+	this.m_ItemPanel.AddTextBoxItem("ＣＧ名：", 56, Process.GetCGName(), 100, true);
+	this.m_ItemPanel.AddTextBoxItem("貼り付け先Ｘ：", 98, string(Process.GetDestX()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("貼り付け先Ｙ：", 98, string(Process.GetDestY()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("貼り付け先幅：", 98, string(Process.GetDestWidth()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("貼り付け先高さ：", 112, string(Process.GetDestHeight()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("切り取り元Ｘ：", 98, string(Process.GetSrcX()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("切り取り元Ｙ：", 98, string(Process.GetSrcY()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("切り取り元幅：", 98, string(Process.GetSrcWidth()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("切り取り元高さ：", 112, string(Process.GetSrcHeight()), 30, false);
+}
+
+void CAEEditConstructionProcessUnit::CreateProcessEditForCopyCutScaleCG(ref CASConstructionProcess Process)
+{
+	this.m_ItemPanel.AddTextBoxItem("ＣＧ名：", 56, Process.GetCGName(), 100, true);
+	this.m_ItemPanel.AddTextBoxItem("貼り付け先Ｘ：", 98, string(Process.GetDestX()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("貼り付け先Ｙ：", 98, string(Process.GetDestY()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("貼り付け先幅：", 98, string(Process.GetDestWidth()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("貼り付け先高さ：", 112, string(Process.GetDestHeight()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("切り取り元Ｘ：", 98, string(Process.GetSrcX()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("切り取り元Ｙ：", 98, string(Process.GetSrcY()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("切り取り元幅：", 98, string(Process.GetSrcWidth()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("切り取り元高さ：", 112, string(Process.GetSrcHeight()), 30, false);
+}
+
+void CAEEditConstructionProcessUnit::CreateProcessEditForGrayFilter(ref CASConstructionProcess Process)
+{
+	if (Process.IsFullSize())
+	{
+		return;
+	}
+	this.m_ItemPanel.AddTextBoxItem("Ｘ：", 28, string(Process.GetDestX()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("Ｙ：", 28, string(Process.GetDestY()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("幅：", 28, string(Process.GetDestWidth()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("高さ：", 42, string(Process.GetDestHeight()), 30, false);
+}
+
+void CAEEditConstructionProcessUnit::CreateProcessEditForAddFilter(ref CASConstructionProcess Process)
+{
+	if (!Process.IsFullSize())
+	{
+		this.m_ItemPanel.AddTextBoxItem("Ｘ：", 28, string(Process.GetDestX()), 30, false);
+		this.m_ItemPanel.AddTextBoxItem("Ｙ：", 28, string(Process.GetDestY()), 30, false);
+		this.m_ItemPanel.AddTextBoxItem("幅：", 28, string(Process.GetDestWidth()), 30, false);
+		this.m_ItemPanel.AddTextBoxItem("高さ：", 42, string(Process.GetDestHeight()), 30, false);
+	}
+	this.m_ItemPanel.AddTextBoxItem("Ｒ：", 28, string(Process.GetR()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("Ｇ：", 28, string(Process.GetG()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("Ｂ：", 28, string(Process.GetB()), 30, false);
+}
+
+void CAEEditConstructionProcessUnit::CreateProcessEditForMulFilter(ref CASConstructionProcess Process)
+{
+	if (!Process.IsFullSize())
+	{
+		this.m_ItemPanel.AddTextBoxItem("Ｘ：", 28, string(Process.GetDestX()), 30, false);
+		this.m_ItemPanel.AddTextBoxItem("Ｙ：", 28, string(Process.GetDestY()), 30, false);
+		this.m_ItemPanel.AddTextBoxItem("幅：", 28, string(Process.GetDestWidth()), 30, false);
+		this.m_ItemPanel.AddTextBoxItem("高さ：", 42, string(Process.GetDestHeight()), 30, false);
+	}
+	this.m_ItemPanel.AddTextBoxItem("Ｒ：", 28, string(Process.GetR()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("Ｇ：", 28, string(Process.GetG()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("Ｂ：", 28, string(Process.GetB()), 30, false);
+}
+
+void CAEEditConstructionProcessUnit::CreateProcessEditForDrawLine(ref CASConstructionProcess Process)
+{
+	this.m_ItemPanel.AddTextBoxItem("開始Ｘ：", 56, string(Process.GetDestX()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("開始Ｙ：", 56, string(Process.GetDestY()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("終了Ｘ：", 56, string(Process.GetDestX2()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("終了Ｙ：", 56, string(Process.GetDestY2()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("Ｒ：", 28, string(Process.GetR()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("Ｇ：", 28, string(Process.GetG()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("Ｂ：", 28, string(Process.GetB()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("α：", 28, string(Process.GetA()), 30, false);
+}
+
+void CAEEditConstructionProcessUnit::CreateProcessEditForAlphaBlendCutCG(ref CASConstructionProcess Process)
+{
+	this.m_ItemPanel.AddTextBoxItem("ＣＧ名：", 56, Process.GetCGName(), 100, true);
+	this.m_ItemPanel.AddTextBoxItem("貼り付け先Ｘ：", 98, string(Process.GetDestX()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("貼り付け先Ｙ：", 98, string(Process.GetDestY()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("切り取り元Ｘ：", 98, string(Process.GetSrcX()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("切り取り元Ｙ：", 98, string(Process.GetSrcY()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("幅：", 28, string(Process.GetDestWidth()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("高さ：", 42, string(Process.GetDestHeight()), 30, false);
+}
+
+void CAEEditConstructionProcessUnit::CreateProcessEditForAlphaBlendCutScaleCG(ref CASConstructionProcess Process)
+{
+	this.m_ItemPanel.AddTextBoxItem("ＣＧ名：", 56, Process.GetCGName(), 100, true);
+	this.m_ItemPanel.AddTextBoxItem("貼り付け先Ｘ：", 98, string(Process.GetDestX()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("貼り付け先Ｙ：", 98, string(Process.GetDestY()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("貼り付け先幅：", 98, string(Process.GetDestWidth()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("貼り付け先高さ：", 112, string(Process.GetDestHeight()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("切り取り元Ｘ：", 98, string(Process.GetSrcX()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("切り取り元Ｙ：", 98, string(Process.GetSrcY()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("切り取り元幅：", 98, string(Process.GetSrcWidth()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("切り取り元高さ：", 112, string(Process.GetSrcHeight()), 30, false);
+}
+
+void CAEEditConstructionProcessUnit::CreateProcessEditForDrawOnlyAlphaCutCG(ref CASConstructionProcess Process)
+{
+	this.m_ItemPanel.AddTextBoxItem("ＣＧ名：", 56, Process.GetCGName(), 100, true);
+	this.m_ItemPanel.AddTextBoxItem("貼り付け先Ｘ：", 98, string(Process.GetDestX()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("貼り付け先Ｙ：", 98, string(Process.GetDestY()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("切り取り元Ｘ：", 98, string(Process.GetSrcX()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("切り取り元Ｙ：", 98, string(Process.GetSrcY()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("幅：", 28, string(Process.GetDestWidth()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("高さ：", 42, string(Process.GetDestHeight()), 30, false);
+}
+
+void CAEEditConstructionProcessUnit::CreateProcessEditForDrawOnlyAlphaCutScaleCG(ref CASConstructionProcess Process)
+{
+	this.m_ItemPanel.AddTextBoxItem("ＣＧ名：", 56, Process.GetCGName(), 100, true);
+	this.m_ItemPanel.AddTextBoxItem("貼り付け先Ｘ：", 98, string(Process.GetDestX()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("貼り付け先Ｙ：", 98, string(Process.GetDestY()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("貼り付け先幅：", 98, string(Process.GetDestWidth()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("貼り付け先高さ：", 112, string(Process.GetDestHeight()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("切り取り元Ｘ：", 98, string(Process.GetSrcX()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("切り取り元Ｙ：", 98, string(Process.GetSrcY()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("切り取り元幅：", 98, string(Process.GetSrcWidth()), 30, false);
+	this.m_ItemPanel.AddTextBoxItem("切り取り元高さ：", 112, string(Process.GetSrcHeight()), 30, false);
+}
+
+void CAEEditConstructionProcessUnit::MouseWheelEvent(int ID, int Forward, int Back)
+{
+	this.m_dgMouseWheelEvent(ID, Forward, Back);
+}
+
+void CAEEditConstructionProcessUnit::ChangeTextEvent(int ID)
+{
+	ref CAEPropertyItem Item = this.m_ItemPanel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	if (Item.GetLabel() == "幅：")
+	{
+		this.m_Process.SetDestWidth(Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "高さ：")
+	{
+		this.m_Process.SetDestHeight(Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "ＣＧ名：")
+	{
+		this.m_Process.SetCGName(Item.GetTextBoxText());
+	}
+	else if (Item.GetLabel() == "Ｘ：")
+	{
+		this.m_Process.SetDestX(Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "Ｙ：")
+	{
+		this.m_Process.SetDestY(Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "Ｒ：")
+	{
+		this.m_Process.SetR(Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "Ｇ：")
+	{
+		this.m_Process.SetG(Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "Ｂ：")
+	{
+		this.m_Process.SetB(Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "α：")
+	{
+		this.m_Process.SetA(Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "文字間隔：")
+	{
+		this.m_Process.SetCharSpace(Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "行間隔：")
+	{
+		this.m_Process.SetLineSpace(Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "上Ｒ：")
+	{
+		this.m_Process.SetR(Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "上Ｇ：")
+	{
+		this.m_Process.SetG(Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "上Ｂ：")
+	{
+		this.m_Process.SetB(Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "下Ｒ：")
+	{
+		this.m_Process.SetR2(Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "下Ｇ：")
+	{
+		this.m_Process.SetG2(Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "下Ｂ：")
+	{
+		this.m_Process.SetB2(Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "貼り付け先Ｘ：")
+	{
+		this.m_Process.SetDestX(Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "貼り付け先Ｙ：")
+	{
+		this.m_Process.SetDestY(Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "切り取り元Ｘ：")
+	{
+		this.m_Process.SetSrcX(Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "切り取り元Ｙ：")
+	{
+		this.m_Process.SetSrcY(Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "貼り付け先幅：")
+	{
+		this.m_Process.SetDestWidth(Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "貼り付け先高さ：")
+	{
+		this.m_Process.SetDestHeight(Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "切り取り元幅：")
+	{
+		this.m_Process.SetSrcWidth(Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "切り取り元高さ：")
+	{
+		this.m_Process.SetSrcHeight(Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "開始Ｘ：")
+	{
+		this.m_Process.SetDestX(Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "開始Ｙ：")
+	{
+		this.m_Process.SetDestY(Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "終了Ｘ：")
+	{
+		this.m_Process.SetDestX2(Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "終了Ｙ：")
+	{
+		this.m_Process.SetDestY2(Item.GetTextBoxInt());
+	}
+	this.m_dgChangedEvent(0);
+}
+
+void CAEEditConstructionProcessUnit::MouseLClickEvent(int ID, int MouseX, int MouseY)
+{
+	ref CAEPropertyItem Item = this.m_ItemPanel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	if (Item.GetLabel() == "テキスト：")
+	{
+		CAEEditTextDialog Form;
+		Form.Show(ID, MouseX, MouseY, this.m_Process.GetText(), this.ChangedStringEvent);
+	}
+	else if (Item.GetLabel() == "フォント：")
+	{
+		CASCharSpriteProperty Font;
+		Font = this.m_Process.GetFontProperty();
+		CAESelectFontDialog Form;
+		Form.Show(ID, MouseX, MouseY, Font, this.ChangedFontEvent);
+	}
+	this.m_dgChangedEvent(0);
+}
+
+void CAEEditConstructionProcessUnit::ChangedFontEvent(int ID, ref CASCharSpriteProperty Font)
+{
+	ref CAEPropertyItem Item = this.m_ItemPanel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	if (Item.GetLabel() == "フォント：")
+	{
+		this.m_Process.SetFontProperty(Font);
+		string FontText = "%s, サイズ[%d]" % PARTS_GetFontName(Font.GetType()) % Font.GetSize();
+		Item.SetButtonText(FontText);
+	}
+}
+
+void CAEEditConstructionProcessUnit::ChangedStringEvent(int ID, string Text)
+{
+	ref CAEPropertyItem Item = this.m_ItemPanel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	if (Item.GetLabel() == "テキスト：")
+	{
+		this.m_Process.SetText(Text);
+		Item.SetButtonText(Text);
+	}
+}
+
+void CAEEditConstructionProcessUnit::SetMouseWheelEvent(DG_MouseWheelHandler dgObject)
+{
+	this.m_dgMouseWheelEvent = dgObject;
+}
+
+void CAEEditConstructionProcessUnit::SetChangedEvent(DG_ChangedHandler dgObject)
+{
+	this.m_dgChangedEvent = dgObject;
+}
+

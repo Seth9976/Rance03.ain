@@ -1,0 +1,502 @@
+void 制御／アイテム(string itemId, ref Player target)
+{
+	string targetId;
+	switch (itemId)
+	{
+	case "カキン枠":
+		制御／アイテム／カキン枠();
+		break;
+	case "世色癌1":
+	case "世色癌2":
+	case "世色癌3":
+	case "世色癌4":
+		targetId = target.getId();
+		制御／アイテム／世色癌(itemId, targetId);
+		break;
+	case "アサクヒロク1":
+	case "アサクヒロク2":
+	case "アサクヒロク3":
+		制御／アイテム／アサクヒロク(itemId);
+		break;
+	case "マヨネーズ":
+		制御／アイテム／マヨネーズ();
+		break;
+	case "バラバラ時計":
+	case "量産型バラバラ時計":
+		制御／アイテム／バラバラ時計();
+		break;
+	case "専属看護婦さん":
+		制御／アイテム／専属看護婦さん();
+		break;
+	case "セーブライオン":
+		制御／アイテム／セーブライオン();
+		break;
+	case "欠けスター":
+		targetId = target.getId();
+		制御／アイテム／欠けスター(targetId);
+		break;
+	case "ひいきの種・体":
+		targetId = target.getId();
+		制御／アイテム／ひいきの種・体(targetId);
+		break;
+	case "ひいきの種・筋":
+		targetId = target.getId();
+		制御／アイテム／ひいきの種・筋(targetId);
+		break;
+	case "ひいきの種・魔":
+		targetId = target.getId();
+		制御／アイテム／ひいきの種・魔(targetId);
+		break;
+	case "ひいきの種・技":
+		targetId = target.getId();
+		制御／アイテム／ひいきの種・技(targetId);
+		break;
+	case "珍味1":
+	case "珍味2":
+	case "珍味3":
+	case "珍味4":
+	case "珍味5":
+	case "珍味6":
+		targetId = target.getId();
+		制御／アイテム／珍味(itemId, targetId);
+		break;
+	}
+}
+
+void 制御／アイテム／カキン枠()
+{
+	int beforeParty;
+	int afterParty;
+	beforeParty = g_party.getMaxCount();
+	afterParty = g_party.getMaxCount() + 1;
+	g_party.setMaxCount(afterParty);
+	DialogInfomation info;
+	info.setCaption("カキン枠を使った！");
+	info.setMessage("パーティスキル枠が、|なぜかひとつ増えた！|%d枠 → %d枠" % beforeParty % afterParty);
+	info.setPictureImageName("システム／ダイアログ／写真／カキン枠");
+	openDialog(info);
+}
+
+void 制御／アイテム／世色癌(string itemId, string targetId)
+{
+	int val;
+	int beforeHp;
+	int afterHp;
+	switch (itemId)
+	{
+	case "世色癌1":
+		val = 200;
+		break;
+	case "世色癌2":
+		val = 500;
+		break;
+	case "世色癌3":
+		val = 1200;
+		break;
+	case "世色癌4":
+		val = 2700;
+		break;
+	}
+	string yorks;
+	if (制御／パーティ／ゼロスリースキル確認("ミリ") || 制御／パーティ／ゼロスリースキル確認("ミル"))
+	{
+		int consecutive;
+		int consecutiveMilli;
+		int consecutiveMill;
+		int rank;
+		if (制御／パーティ／ゼロスリースキル確認("ミリ"))
+		{
+			consecutiveMilli = getPlayerFromId("ミリ").getConsecutiveBattleCount();
+			pass("consecutiveMilli %d" % consecutiveMilli);
+		}
+		else
+		{
+			consecutiveMilli = -1;
+		}
+		if (制御／パーティ／ゼロスリースキル確認("ミル"))
+		{
+			consecutiveMill = getPlayerFromId("ミル").getConsecutiveBattleCount();
+		}
+		else
+		{
+			consecutiveMill = -1;
+		}
+		if (consecutiveMilli >= consecutiveMill)
+		{
+			consecutive = consecutiveMilli;
+			yorks = "ミリのヨークス薬用法も相まって、|";
+		}
+		else
+		{
+			consecutive = consecutiveMill;
+			yorks = "ミルのヨークス薬用法も相まって、|";
+		}
+		switch (consecutive)
+		{
+		case 0:
+			rank = 110;
+			break;
+		case 1:
+			rank = 120;
+			break;
+		case 2:
+			rank = 120;
+			break;
+		case 3:
+			rank = 130;
+			break;
+		case 4:
+			rank = 140;
+			break;
+		case 5:
+			rank = 150;
+			break;
+		case 6:
+			rank = 160;
+			break;
+		case 7:
+			rank = 170;
+			break;
+		case 8:
+			rank = 180;
+			break;
+		case 9:
+			rank = 190;
+			break;
+		default:
+			rank = 200;
+			break;
+		}
+		pass("val1 %d" % val);
+		val = (val * rank) / 100;
+		pass("val2 %d" % val);
+	}
+	string max;
+	if (getPlayerFromId(targetId).getHp() + val >= getPlayerFromId(targetId).getMaxHp())
+	{
+		val = getPlayerFromId(targetId).getMaxHp() - getPlayerFromId(targetId).getHp();
+		max = "(まんたん)";
+	}
+	beforeHp = getPlayerFromId(targetId).getHp();
+	afterHp = getPlayerFromId(targetId).getHp() + val;
+	getPlayerFromId(targetId).setHp(getPlayerFromId(targetId).getHp() + val);
+	string caption;
+	string desc;
+	caption = getItemFromId(itemId).getName() + "を服用！";
+	desc = yorks + getPlayerFromId(targetId).getShortName() + "はHPが%d回復した！|HP:%d → %d%s" % val % beforeHp % afterHp % max;
+	DialogInfomation info;
+	info.setCaption(caption);
+	info.setMessage(desc);
+	info.setPictureImageName("システム／ダイアログ／写真／回復");
+	openDialog(info);
+}
+
+void 制御／アイテム／アサクヒロク(string itemId)
+{
+	int val;
+	int beforeHp;
+	int afterHp;
+	switch (itemId)
+	{
+	case "アサクヒロク1":
+		val = 150;
+		break;
+	case "アサクヒロク2":
+		val = 400;
+		break;
+	case "アサクヒロク3":
+		val = 1000;
+		break;
+	}
+	string yorks;
+	if (制御／パーティ／ゼロスリースキル確認("ミリ") || 制御／パーティ／ゼロスリースキル確認("ミル"))
+	{
+		int consecutive;
+		int consecutiveMilli;
+		int consecutiveMill;
+		int rank;
+		if (制御／パーティ／ゼロスリースキル確認("ミリ"))
+		{
+			consecutiveMilli = getPlayerFromId("ミリ").getConsecutiveBattleCount();
+			pass("consecutiveMilli %d" % consecutiveMilli);
+		}
+		else
+		{
+			consecutiveMilli = -1;
+		}
+		if (制御／パーティ／ゼロスリースキル確認("ミル"))
+		{
+			consecutiveMill = getPlayerFromId("ミル").getConsecutiveBattleCount();
+			pass("consecutiveMill %d" % consecutiveMill);
+		}
+		else
+		{
+			consecutiveMill = -1;
+		}
+		if (consecutiveMilli >= consecutiveMill)
+		{
+			consecutive = consecutiveMilli;
+			yorks = "ミリのヨークス薬用法も相まって、|";
+		}
+		else
+		{
+			consecutive = consecutiveMill;
+			yorks = "ミルのヨークス薬用法も相まって、|";
+		}
+		switch (consecutive)
+		{
+		case 0:
+			rank = 110;
+			break;
+		case 1:
+			rank = 120;
+			break;
+		case 2:
+			rank = 120;
+			break;
+		case 3:
+			rank = 130;
+			break;
+		case 4:
+			rank = 140;
+			break;
+		case 5:
+			rank = 150;
+			break;
+		case 6:
+			rank = 160;
+			break;
+		case 7:
+			rank = 170;
+			break;
+		case 8:
+			rank = 180;
+			break;
+		case 9:
+			rank = 190;
+			break;
+		default:
+			rank = 200;
+			break;
+		}
+		pass("val1 %d" % val);
+		val = (val * rank) / 100;
+		pass("val2 %d" % val);
+	}
+	int i;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		if (g_player[i].isJoin() && g_player[i].getHp() != 0)
+		{
+			int afterHp;
+			afterHp = g_player[i].getHp() + val;
+			g_player[i].setHp(afterHp);
+		}
+	}
+	string caption;
+	string desc;
+	caption = getItemFromId(itemId).getName() + "を服用！";
+	desc = yorks + "編成されていないパーティも含め、|HPがそれぞれ%d回復した！" % val;
+	DialogInfomation info;
+	info.setCaption(caption);
+	info.setMessage(desc);
+	info.setPictureImageName("システム／ダイアログ／写真／回復");
+	openDialog(info);
+}
+
+void 制御／アイテム／マヨネーズ()
+{
+	g_playerCommonParam.clearBadCondition();
+	DialogInfomation info;
+	info.setCaption("マヨネーズを吸った！");
+	info.setMessage("かかっていた状態異常が、|うその様に全て消え去った！");
+	info.setPictureImageName("システム／ダイアログ／写真／回復");
+	openDialog(info);
+}
+
+void 制御／アイテム／バラバラ時計()
+{
+	int i;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		if (g_player[i].isJoin())
+		{
+			g_player[i].clearCoolTime("");
+		}
+	}
+	DialogInfomation info;
+	info.setCaption("バラバラ時計をぶち壊した！");
+	info.setMessage("編成されていないパーティも含め、|クールタイムがリセットされた！");
+	info.setPictureImageName("システム／ダイアログ／写真／バラバラ時計");
+	openDialog(info);
+}
+
+void 制御／アイテム／専属看護婦さん()
+{
+	int i;
+	int max;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		if (g_player[i].isJoin())
+		{
+			max = g_player[i].getMaxHp();
+			g_player[i].setHp(max);
+			g_player[i].clearCoolTime("");
+			g_playerCommonParam.clearBadCondition();
+		}
+	}
+	DialogInfomation info;
+	info.setCaption("専属看護婦さんが看護した！");
+	info.setMessage("編成されていないパーティも含め、|もろもろ全快した！");
+	info.setPictureImageName("システム／ダイアログ／写真／回復");
+	openDialog(info);
+}
+
+void 制御／アイテム／セーブライオン()
+{
+	DialogInfomation info;
+	info.setCaption("セーブライオンが吠えた！");
+	info.setMessage("がおー");
+	openDialog(info);
+	制御／セーブ();
+}
+
+void 制御／アイテム／欠けスター(string targetId)
+{
+	int val;
+	int beforeMaxLevel;
+	int afterMaxLevel;
+	val = 5;
+	beforeMaxLevel = getPlayerFromId(targetId).getMaxLevel();
+	afterMaxLevel = getPlayerFromId(targetId).getMaxLevel() + val;
+	if (afterMaxLevel > 999)
+	{
+		afterMaxLevel = 999;
+	}
+	getPlayerFromId(targetId).setMaxLevel(afterMaxLevel);
+	string caption;
+	string desc;
+	desc = getPlayerFromId(targetId).getShortName() + "は限界レベルを%d突破した！|限界レベル:%d → %d" % val % beforeMaxLevel % afterMaxLevel;
+	DialogInfomation info;
+	info.setCaption("ザ・欠けスターが不気味に輝いた！");
+	info.setMessage(desc);
+	info.setPictureImageName("システム／ダイアログ／写真／回復");
+	openDialog(info);
+}
+
+void 制御／アイテム／ひいきの種・体(string targetId)
+{
+	int val;
+	int beforeMaxHp;
+	int afterMaxHp;
+	val = 18;
+	beforeMaxHp = getPlayerFromId(targetId).getMaxHp();
+	afterMaxHp = getPlayerFromId(targetId).getMaxHp() + val;
+	getPlayerFromId(targetId).setMaxHp(afterMaxHp);
+	string caption;
+	string desc;
+	desc = "苦い！|" + getPlayerFromId(targetId).getShortName() + "は最大HPが%d増えた！|最大HP:%d → %d" % val % beforeMaxHp % afterMaxHp;
+	DialogInfomation info;
+	info.setCaption("ひいきの種・体を食べた！");
+	info.setMessage(desc);
+	info.setPictureImageName("システム／ダイアログ／写真／回復");
+	openDialog(info);
+}
+
+void 制御／アイテム／ひいきの種・筋(string targetId)
+{
+	int val;
+	int beforeStrength;
+	int afterStrength;
+	val = 3;
+	beforeStrength = getPlayerFromId(targetId).getStrength();
+	afterStrength = getPlayerFromId(targetId).getStrength() + val;
+	getPlayerFromId(targetId).setStrength(afterStrength);
+	string caption;
+	string desc;
+	desc = "渋い！|" + getPlayerFromId(targetId).getShortName() + "は筋力が%d増えた！|筋力:%d → %d" % val % beforeStrength % afterStrength;
+	DialogInfomation info;
+	info.setCaption("ひいきの種・筋を食べた！");
+	info.setMessage(desc);
+	info.setPictureImageName("システム／ダイアログ／写真／回復");
+	openDialog(info);
+}
+
+void 制御／アイテム／ひいきの種・魔(string targetId)
+{
+	int val;
+	int beforeMind;
+	int afterMind;
+	val = 3;
+	beforeMind = getPlayerFromId(targetId).getMind();
+	afterMind = getPlayerFromId(targetId).getMind() + val;
+	getPlayerFromId(targetId).setMind(afterMind);
+	string caption;
+	string desc;
+	desc = "酸い！|" + getPlayerFromId(targetId).getShortName() + "は魔力が%d増えた！|魔力:%d → %d" % val % beforeMind % afterMind;
+	DialogInfomation info;
+	info.setCaption("ひいきの種・魔を食べた！");
+	info.setMessage(desc);
+	info.setPictureImageName("システム／ダイアログ／写真／回復");
+	openDialog(info);
+}
+
+void 制御／アイテム／ひいきの種・技(string targetId)
+{
+	int val;
+	int beforeDexterity;
+	int afterDexterity;
+	val = 3;
+	beforeDexterity = getPlayerFromId(targetId).getDexterity();
+	afterDexterity = getPlayerFromId(targetId).getDexterity() + val;
+	getPlayerFromId(targetId).setDexterity(afterDexterity);
+	string caption;
+	string desc;
+	desc = "辛い！|" + getPlayerFromId(targetId).getShortName() + "は技量が%d増えた！|技量:%d → %d" % val % beforeDexterity % afterDexterity;
+	DialogInfomation info;
+	info.setCaption("ひいきの種・技を食べた！");
+	info.setMessage(desc);
+	info.setPictureImageName("システム／ダイアログ／写真／回復");
+	openDialog(info);
+}
+
+void 制御／アイテム／珍味(string itemId, string targetId)
+{
+	int val;
+	int beforeExp;
+	int afterExp;
+	switch (itemId)
+	{
+	case "珍味1":
+		val = 50;
+		break;
+	case "珍味2":
+		val = 300;
+		break;
+	case "珍味3":
+		val = 3000;
+		break;
+	case "珍味4":
+		val = 15000;
+		break;
+	case "珍味5":
+		val = 150000;
+		break;
+	case "珍味6":
+		val = 500000;
+		break;
+	}
+	beforeExp = getPlayerFromId(targetId).getExp();
+	afterExp = getPlayerFromId(targetId).getExp() + val;
+	getPlayerFromId(targetId).setExp(getPlayerFromId(targetId).getExp() + val);
+	string caption;
+	string desc;
+	caption = getItemFromId(itemId).getName() + "を食べた！";
+	desc = getPlayerFromId(targetId).getShortName() + "は経験点が%d増えた！|EXP:%d → %d" % val % beforeExp % afterExp;
+	DialogInfomation info;
+	info.setCaption(caption);
+	info.setMessage(desc);
+	info.setPictureImageName("システム／ダイアログ／写真／珍味");
+	openDialog(info);
+}
+

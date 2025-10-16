@@ -1,0 +1,59 @@
+KeyInput::KeyInput()
+{
+	array@int key;
+	key.PushBack(13);
+	key.PushBack(16);
+	key.PushBack(17);
+	key.PushBack(27);
+	key.PushBack(32);
+	key.PushBack(33);
+	key.PushBack(36);
+	key.PushBack(37);
+	key.PushBack(38);
+	key.PushBack(39);
+	key.PushBack(40);
+	key.PushBack(65);
+	key.PushBack(67);
+	key.PushBack(83);
+	key.PushBack(88);
+	key.PushBack(90);
+	key.PushBack(119);
+	key.PushBack(120);
+	this.monitoringKey_.Free();
+	this.monitoringKey_.Alloc(key.Numof());
+	this.monitoringKey_.Copy(0, key, 0, key.Numof());
+	int num = this.monitoringKey_.Numof();
+	this.bs_.Alloc(num);
+	this.rep_.Alloc(num);
+}
+
+void KeyInput::update()
+{
+	int i;
+	for (i = 0; i < this.monitoringKey_.Numof(); ++i)
+	{
+		this.bs_[i].update(AFL_IsKeyDown(this.monitoringKey_[i]));
+		this.rep_[i].update(AFL_IsKeyDown(this.monitoringKey_[i]));
+	}
+}
+
+bool KeyInput::isDown(int vKey)
+{
+	return this.bs_[this.indexFromVirtualKey(vKey)].isDown();
+}
+
+bool KeyInput::isPress(int vKey)
+{
+	return this.bs_[this.indexFromVirtualKey(vKey)].isPress();
+}
+
+bool KeyInput::isPressWithRepeat(int vKey)
+{
+	return this.rep_[this.indexFromVirtualKey(vKey)].isPress();
+}
+
+int KeyInput::indexFromVirtualKey(int vKey)
+{
+	return this.monitoringKey_.Find(0, this.monitoringKey_.Numof(), vKey);
+}
+

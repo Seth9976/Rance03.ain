@@ -1,0 +1,48 @@
+_CSystemSound::_CSystemSound()
+{
+	this.m_ch[0]._SetChannel(14);
+	this.m_ch[1]._SetChannel(15);
+	this.m_ch[2]._SetChannel(16);
+	this.m_ch[3]._SetChannel(17);
+	this.m_ch[4]._SetChannel(18);
+	this.m_ch[5]._SetChannel(19);
+	this.m_index = 0;
+}
+
+void _CSystemSound::_Play(string _snd)
+{
+	if (!KiwiSoundEngine.IsExistFile(_snd))
+	{
+		SYS_ERROR("効果音[%s]ロード失敗\n" % _snd, 0);
+		return;
+	}
+	this.m_ch[this.m_index]._Prepare(_snd);
+	this.m_ch[this.m_index]._Play();
+	if (++this.m_index >= this.m_ch.Numof())
+	{
+		this.m_index = 0;
+	}
+}
+
+void _CSystemSound::_ClearCache()
+{
+	int _i;
+	for (_i = 0; _i < this.m_ch.Numof(); ++_i)
+	{
+		this.m_ch[_i]._Unprepare();
+	}
+}
+
+bool _CSystemSound::IsPlay()
+{
+	int n;
+	for (n = 0; n < this.m_ch.Numof(); n++)
+	{
+		if (this.m_ch[n].IsPlay())
+		{
+			return true;
+		}
+	}
+	return false;
+}
+

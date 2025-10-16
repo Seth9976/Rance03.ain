@@ -1,0 +1,159 @@
+void Ｐ＿リストボックス＿サイズ設定(int パーツ番号, int 幅, int 高さ)
+{
+	PartsEngine.SetListBoxSize(パーツ番号, 幅, 高さ);
+}
+
+void Ｐ＿リストボックス＿行高さ設定(int パーツ番号, int 高さ)
+{
+	PartsEngine.SetListBoxLineHeight(パーツ番号, 高さ);
+}
+
+int Ｐ＿リストボックス＿行高さ取得(int パーツ番号)
+{
+	return PartsEngine.GetListBoxLineHeight(パーツ番号);
+}
+
+void Ｐ＿リストボックス＿行マージン設定(int パーツ番号, int 幅, int 高さ)
+{
+	PartsEngine.SetListBoxMargin(パーツ番号, 幅, 高さ);
+}
+
+int Ｐ＿リストボックス＿行マージン幅取得(int パーツ番号)
+{
+	return PartsEngine.GetListBoxWidthMargin(パーツ番号);
+}
+
+int Ｐ＿リストボックス＿行マージン高さ取得(int パーツ番号)
+{
+	return PartsEngine.GetListBoxHeightMargin(パーツ番号);
+}
+
+void Ｐ＿リストボックス＿ＣＧ名設定(int パーツ番号, string ＣＧ名)
+{
+	PartsEngine.SetListBoxCGName(パーツ番号, ＣＧ名);
+}
+
+string Ｐ＿リストボックス＿ＣＧ名取得(int パーツ番号)
+{
+	string Name;
+	PartsEngine.GetListBoxCGName(パーツ番号, Name);
+	return Name;
+}
+
+void Ｐ＿リストボックス＿スクロール位置設定(int パーツ番号, int 位置)
+{
+	PartsEngine.SetListBoxScrollPos(パーツ番号, 位置);
+}
+
+int Ｐ＿リストボックス＿スクロール位置取得(int パーツ番号)
+{
+	return PartsEngine.GetListBoxScrollPos(パーツ番号);
+}
+
+void Ｐ＿リストボックス＿アイテム追加(int パーツ番号, string テキスト)
+{
+	PartsEngine.AddListBoxItem(パーツ番号, テキスト);
+}
+
+void Ｐ＿リストボックス＿アイテムリスト追加(int パーツ番号, ref array@string テキストリスト)
+{
+	if (テキストリスト === NULL)
+	{
+		return;
+	}
+	int Index;
+	for (Index = 0; Index < テキストリスト.Numof(); ++Index)
+	{
+		PartsEngine.AddListBoxItem(パーツ番号, テキストリスト[Index]);
+	}
+}
+
+void Ｐ＿リストボックス＿アイテム挿入(int パーツ番号, int インデックス, string テキスト)
+{
+	PartsEngine.InsertListBoxItem(パーツ番号, インデックス, テキスト);
+}
+
+void Ｐ＿リストボックス＿アイテム設定(int パーツ番号, int インデックス, string テキスト)
+{
+	PartsEngine.SetListBoxItem(パーツ番号, インデックス, テキスト);
+}
+
+int Ｐ＿リストボックス＿アイテム数取得(int パーツ番号)
+{
+	return PartsEngine.GetListBoxItemCount(パーツ番号);
+}
+
+string Ｐ＿リストボックス＿アイテム取得(int パーツ番号, int インデックス)
+{
+	string Text;
+	PartsEngine.GetListBoxItem(パーツ番号, インデックス, Text);
+	return Text;
+}
+
+void Ｐ＿リストボックス＿アイテム全取得(int パーツ番号, ref array@string テキストリスト)
+{
+	if (テキストリスト === NULL)
+	{
+		return;
+	}
+	テキストリスト.Free();
+	int Index;
+	int Size = Ｐ＿リストボックス＿アイテム数取得(パーツ番号);
+	for (Index = 0; Index < Size; ++Index)
+	{
+		テキストリスト.PushBack(Ｐ＿リストボックス＿アイテム取得(パーツ番号, Index));
+	}
+}
+
+void Ｐ＿リストボックス＿アイテム削除(int パーツ番号, int インデックス)
+{
+	PartsEngine.EraseListBoxItem(パーツ番号, インデックス);
+}
+
+void Ｐ＿リストボックス＿アイテム全削除(int パーツ番号)
+{
+	PartsEngine.ClearListBoxItem(パーツ番号);
+}
+
+int Ｐ＿リストボックス＿オンカーソルアイテムインデックス取得(int パーツ番号)
+{
+	return PartsEngine.GetListBoxOnCursorItemIndex(パーツ番号);
+}
+
+string Ｐ＿リストボックス＿オンカーソルアイテム取得(int パーツ番号)
+{
+	string Text;
+	PartsEngine.GetListBoxOnCursorItem(パーツ番号, Text);
+	return Text;
+}
+
+void Ｐ＿リストボックス＿フォント設定(int パーツ番号, int 種類, int サイズ, int 赤, int 緑, int 青, float 太字幅, int 縁取り赤, int 縁取り緑, int 縁取り青, float 縁取り幅)
+{
+	PartsEngine.SetListBoxFontProperty(パーツ番号, 種類, サイズ, 赤, 緑, 青, 太字幅, 縁取り赤, 縁取り緑, 縁取り青, 縁取り幅);
+}
+
+void Ｐ＿リストボックス＿フォント取得(int パーツ番号, ref int 種類, ref int サイズ, ref int 赤, ref int 緑, ref int 青, ref float 太字幅, ref int 縁取り赤, ref int 縁取り緑, ref int 縁取り青, ref float 縁取り幅)
+{
+	PartsEngine.GetListBoxFontProperty(パーツ番号, 種類, サイズ, 赤, 緑, 青, 太字幅, 縁取り赤, 縁取り緑, 縁取り青, 縁取り幅);
+}
+
+void Ｐ＿リストボックス＿選択位置設定(int パーツ番号, int 位置)
+{
+	PartsEngine.SetListBoxSelectIndex(パーツ番号, 位置);
+}
+
+int Ｐ＿リストボックス＿選択位置取得(int パーツ番号)
+{
+	return PartsEngine.GetListBoxSelectIndex(パーツ番号);
+}
+
+void Ｐ＿リストボックス＿文字間隔設定(int パーツ番号, int 間隔)
+{
+	PartsEngine.SetListBoxCharSpace(パーツ番号, 間隔);
+}
+
+int Ｐ＿リストボックス＿文字間隔取得(int パーツ番号)
+{
+	return PartsEngine.GetListBoxCharSpace(パーツ番号);
+}
+

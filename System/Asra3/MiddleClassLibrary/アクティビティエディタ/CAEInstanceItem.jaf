@@ -1,0 +1,1047 @@
+CAEInstanceItem::CAEInstanceItem()
+{
+	this.Release();
+}
+
+CAEInstanceItem::~CAEInstanceItem()
+{
+	this.Release();
+}
+
+void CAEInstanceItem::Init(int ComponentType, int LayerID, string Name, int Line1, int Line2, int Line3, int Line4)
+{
+	this.Release();
+	this.m_Name = Name;
+	int PrevActiveID = AFL_Parts_SetActiveLayer(LayerID);
+	this.m_ID = PARTS_GetFreeSystemPartsNumber();
+	this.SetType(ComponentType, 1);
+	AFL_Parts_SetActiveLayer(PrevActiveID);
+	this.m_Overlay = PARTS_GetFreeSystemPartsNumber();
+	this.m_Overlay1 = Line1;
+	this.m_Overlay2 = Line2;
+	this.m_Overlay3 = Line3;
+	this.m_Overlay4 = Line4;
+	Ｐ＿クリック可能設定(this.m_Overlay, true);
+	AFL_Parts_AddDragBeginEvent(this.m_Overlay, this.DragBeginEvent);
+	AFL_Parts_AddDragingEvent(this.m_Overlay, this.DragingEvent);
+	AFL_Parts_AddDragEndEvent(this.m_Overlay, this.DragEndEvent);
+	AFL_Parts_AddMouseLClickEvent(this.m_Overlay, this.MouseClickEvent);
+	this.SetPos(0.0, 0.0);
+	this.SetZ(0);
+	this.EditMode(true);
+	AFL_Parts_AddBeginUpdateEvent(this.UpdateOverlay);
+}
+
+void CAEInstanceItem::Set(int Number, string Name, int LayerID, int Line1, int Line2, int Line3, int Line4)
+{
+	this.Release();
+	this.m_Name = Name;
+	this.m_ID = Number;
+	this.m_Overlay = PARTS_GetFreeSystemPartsNumber();
+	this.m_Overlay1 = Line1;
+	this.m_Overlay2 = Line2;
+	this.m_Overlay3 = Line3;
+	this.m_Overlay4 = Line4;
+	Ｐ＿クリック可能設定(this.m_Overlay, true);
+	AFL_Parts_AddDragBeginEvent(this.m_Overlay, this.DragBeginEvent);
+	AFL_Parts_AddDragingEvent(this.m_Overlay, this.DragingEvent);
+	AFL_Parts_AddDragEndEvent(this.m_Overlay, this.DragEndEvent);
+	AFL_Parts_AddMouseLClickEvent(this.m_Overlay, this.MouseClickEvent);
+	this.EditMode(true);
+	AFL_Parts_AddBeginUpdateEvent(this.UpdateOverlay);
+}
+
+void CAEInstanceItem::Release()
+{
+	this.m_IntentType = 0;
+	this.m_Destination.Free();
+	PARTS_ReleaseWithInit(this.m_Overlay);
+	PARTS_ReleaseWithInit(this.m_ID);
+	this.m_Name = "";
+	this.m_Active = false;
+	this.m_Open = true;
+}
+
+void CAEInstanceItem::EditMode(bool Mode)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	PARTS_SetLockInputState(this.m_ID, Mode);
+	Ｐ＿表示設定(this.m_Overlay, Mode);
+	if (Mode)
+	{
+		AFL_Parts_AddBeginUpdateEvent(this.UpdateOverlay);
+	}
+	else
+	{
+		AFL_Parts_EraseBeginUpdateEvent(this.UpdateOverlay);
+	}
+}
+
+bool CAEInstanceItem::IsCreated()
+{
+	return this.m_ID != 0;
+}
+
+void CAEInstanceItem::SetOpen(bool Open)
+{
+	this.m_Open = Open;
+}
+
+bool CAEInstanceItem::IsOpen()
+{
+	return this.m_Open;
+}
+
+void CAEInstanceItem::SetName(string Name)
+{
+	this.m_Name = Name;
+}
+
+string CAEInstanceItem::GetName()
+{
+	return this.m_Name;
+}
+
+void CAEInstanceItem::DragBeginEvent(int ID)
+{
+	this.m_DragStartPartsX = this.GetX();
+	this.m_DragStartPartsY = this.GetY();
+}
+
+void CAEInstanceItem::DragingEvent(int ID, int BeginMouseX, int BeginMouseY, int MouseX, int MouseY)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	float PosX = MouseX - BeginMouseX;
+	float PosY = MouseY - BeginMouseY;
+	if (Ｐ＿座標レート設定取得(this.m_ID))
+	{
+		PosX = PosX / AFL_View_GetWidth();
+		PosY = PosY / AFL_View_GetHeight();
+	}
+	PosX += this.m_DragStartPartsX;
+	PosY += this.m_DragStartPartsY;
+	this.SetPos(PosX, PosY);
+	this.m_dgMoveEvent(ID);
+}
+
+void CAEInstanceItem::DragEndEvent(int ID)
+{
+	this.m_DragStartPartsX = 0.0;
+	this.m_DragStartPartsY = 0.0;
+}
+
+void CAEInstanceItem::MouseClickEvent(int ID, int MouseX, int MouseY)
+{
+	this.Active(true);
+}
+
+void CAEInstanceItem::SetType(int ComponentType, int State)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	PARTS_SetComponentType(this.m_ID, ComponentType, State);
+}
+
+int CAEInstanceItem::GetType(int State)
+{
+	if (!this.IsCreated())
+	{
+		return -1;
+	}
+	return PARTS_GetComponentType(this.m_ID, State);
+}
+
+int CAEInstanceItem::GetID()
+{
+	return this.m_ID;
+}
+
+void CAEInstanceItem::SetPos(float X, float Y)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	if (Ｐ＿Ｘ座標取得(this.m_ID) == X && Ｐ＿Ｙ座標取得(this.m_ID) == Y)
+	{
+		return;
+	}
+	Ｐ＿座標設定(this.m_ID, X, Y);
+}
+
+void CAEInstanceItem::SetZ(int Z)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	if (Ｐ＿Ｚ座標取得(this.m_ID) == Z)
+	{
+		return;
+	}
+	Ｐ＿Ｚ座標設定(this.m_ID, Z);
+}
+
+float CAEInstanceItem::GetX()
+{
+	if (!this.IsCreated())
+	{
+		return 0.0;
+	}
+	return Ｐ＿Ｘ座標取得(this.m_ID);
+}
+
+float CAEInstanceItem::GetY()
+{
+	if (!this.IsCreated())
+	{
+		return 0.0;
+	}
+	return Ｐ＿Ｙ座標取得(this.m_ID);
+}
+
+int CAEInstanceItem::GetZ()
+{
+	if (!this.IsCreated())
+	{
+		return 0;
+	}
+	return Ｐ＿Ｚ座標取得(this.m_ID) / 2;
+}
+
+void CAEInstanceItem::SetOriginPosMode(int Mode)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	if (Ｐ＿原点座標取得(this.m_ID) == Mode)
+	{
+		return;
+	}
+	Ｐ＿原点座標設定(this.m_ID, Mode);
+}
+
+int CAEInstanceItem::GetOriginPosMode()
+{
+	if (!this.IsCreated())
+	{
+		return 1;
+	}
+	return Ｐ＿原点座標取得(this.m_ID);
+}
+
+void CAEInstanceItem::UpdateOverlay(int PassedTime)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	float X1;
+	float Y1;
+	float X2;
+	float Y2;
+	float X3;
+	float Y3;
+	float X4;
+	float Y4;
+	PartsEngine.GetComponentAbsolutePos(this.m_ID, X1, Y1, X2, Y2, X3, Y3, X4, Y4, AFL_Parts_GetStatus(this.m_ID));
+	int AbsoluteZPos = PARTS_GetAbsoluteZ(this.m_ID);
+	if (this.IsActive())
+	{
+		this.CreateActiveLine(this.m_Overlay1, X1, Y1, X2, Y2);
+		this.CreateActiveLine(this.m_Overlay2, X2, Y2, X4, Y4);
+		this.CreateActiveLine(this.m_Overlay3, X4, Y4, X3, Y3);
+		this.CreateActiveLine(this.m_Overlay4, X3, Y3, X1, Y1);
+		Ｐ＿Ｚ座標設定(this.m_Overlay1, AbsoluteZPos);
+		Ｐ＿Ｚ座標設定(this.m_Overlay2, AbsoluteZPos);
+		Ｐ＿Ｚ座標設定(this.m_Overlay3, AbsoluteZPos);
+		Ｐ＿Ｚ座標設定(this.m_Overlay4, AbsoluteZPos);
+	}
+	int MinX = Math.Min(Math.Min(X1, X2), Math.Min(X3, X4));
+	int MinY = Math.Min(Math.Min(Y1, Y2), Math.Min(Y3, Y4));
+	Ｐ＿矩形判定ポイント設定(this.m_Overlay, X1 - MinX, Y1 - MinY, X2 - MinX, Y2 - MinY, X3 - MinX, Y3 - MinY, X4 - MinX, Y4 - MinY);
+	Ｐ＿座標設定(this.m_Overlay, MinX, MinY);
+	Ｐ＿Ｚ座標設定(this.m_Overlay, AbsoluteZPos + 1);
+	bool PrevDraggable = Ｐ＿ドラッグ可能設定取得(this.m_Overlay);
+	bool Draggable = this.m_Active && this.IsDraggableOverlay();
+	Ｐ＿ドラッグ可能設定(this.m_Overlay, Draggable);
+	if (PrevDraggable != Draggable)
+	{
+		this.m_dgDraggableInsntace(Draggable);
+	}
+}
+
+bool CAEInstanceItem::IsDraggableOverlay()
+{
+	int Parent = this.GetParentNumber();
+	if (Parent == 0)
+	{
+		return false;
+	}
+	if (PARTS_GetComponentType(Parent, 1) != 8)
+	{
+		return true;
+	}
+	if (Ｐ＿レイアウトボックス＿レイアウトタイプ取得(Parent) == 0)
+	{
+		return true;
+	}
+	return false;
+}
+
+void CAEInstanceItem::CreateActiveLine(int ID, float Pos1X, float Pos1Y, float Pos2X, float Pos2Y)
+{
+	float VecX = Pos2X - Pos1X;
+	float VecY = Pos2Y - Pos1Y;
+	float Width = 2.0;
+	float Length = Math.Sqrt(VecX * VecX + VecY * VecY);
+	if (Length <= 0.0)
+	{
+		Ｐ＿表示設定(ID, false);
+		return;
+	}
+	Ｐ＿表示設定(ID, true);
+	bool DraggableOverlay = this.IsDraggableOverlay();
+	int Red = DraggableOverlay ? 0 : 255;
+	int Green;
+	int Blue = DraggableOverlay ? 255 : 0;
+	Length += Width / 2.0;
+	Ｐ＿構築手順＿作成(ID, 32, Width, 1);
+	Ｐ＿構築手順＿色塗り(ID, 0, 0, 32, Width, Red, Green, Blue, 255, 1);
+	Ｐ＿構築ビルド(ID, 1);
+	Ｐ＿Ｘ拡大率設定(ID, Length / 32.0);
+	Ｐ＿座標設定(ID, Pos1X, Pos1Y);
+	Ｐ＿原点座標設定(ID, 4);
+	if (VecY == 0.0 && 0 < VecX)
+	{
+		Ｐ＿Ｚ回転角度設定(ID, 0.0);
+		return;
+	}
+	float Angle = Math.Atan2(VecY, VecX);
+	Ｐ＿Ｚ回転角度設定(ID, Angle * 57.295776);
+}
+
+int CAEInstanceItem::GetWidth()
+{
+	if (!this.IsCreated())
+	{
+		return 0;
+	}
+	return AFL_Parts_GetWidth(this.m_ID, AFL_Parts_GetStatus(this.m_ID));
+}
+
+int CAEInstanceItem::GetHeight()
+{
+	if (!this.IsCreated())
+	{
+		return 0;
+	}
+	return AFL_Parts_GetHeight(this.m_ID, AFL_Parts_GetStatus(this.m_ID));
+}
+
+void CAEInstanceItem::SetShow(bool Show)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	Ｐ＿表示設定(this.m_ID, Show);
+}
+
+bool CAEInstanceItem::IsShow()
+{
+	if (!this.IsCreated())
+	{
+		return false;
+	}
+	return Ｐ＿表示設定取得(this.m_ID);
+}
+
+void CAEInstanceItem::SetMessageWindowShowLink(bool Link)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	Ｐ＿メッセージウィンドウ表示連動設定(this.m_ID, Link);
+}
+
+bool CAEInstanceItem::IsMessageWindowShowLink()
+{
+	if (!this.IsCreated())
+	{
+		return false;
+	}
+	return Ｐ＿メッセージウィンドウ表示連動設定取得(this.m_ID);
+}
+
+void CAEInstanceItem::SetAlpha(int Alpha)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	Ｐ＿アルファ値設定(this.m_ID, Alpha);
+}
+
+int CAEInstanceItem::GetAlpha()
+{
+	if (!this.IsCreated())
+	{
+		return 0;
+	}
+	return Ｐ＿アルファ値取得(this.m_ID);
+}
+
+void CAEInstanceItem::SetAddColorR(int Color)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	PartsEngine.SetComponentAddColor(this.m_ID, Color, this.GetAddColorG(), this.GetAddColorB());
+}
+
+void CAEInstanceItem::SetAddColorG(int Color)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	PartsEngine.SetComponentAddColor(this.m_ID, this.GetAddColorR(), Color, this.GetAddColorB());
+}
+
+void CAEInstanceItem::SetAddColorB(int Color)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	PartsEngine.SetComponentAddColor(this.m_ID, this.GetAddColorR(), this.GetAddColorG(), Color);
+}
+
+int CAEInstanceItem::GetAddColorR()
+{
+	if (!this.IsCreated())
+	{
+		return 0;
+	}
+	return PartsEngine.GetComponentAddColorR(this.m_ID);
+}
+
+int CAEInstanceItem::GetAddColorG()
+{
+	if (!this.IsCreated())
+	{
+		return 0;
+	}
+	return PartsEngine.GetComponentAddColorG(this.m_ID);
+}
+
+int CAEInstanceItem::GetAddColorB()
+{
+	if (!this.IsCreated())
+	{
+		return 0;
+	}
+	return PartsEngine.GetComponentAddColorB(this.m_ID);
+}
+
+void CAEInstanceItem::SetMulColorR(int Color)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	PartsEngine.SetComponentMulColor(this.m_ID, Color, this.GetMulColorG(), this.GetMulColorB());
+}
+
+void CAEInstanceItem::SetMulColorG(int Color)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	PartsEngine.SetComponentMulColor(this.m_ID, this.GetMulColorR(), Color, this.GetMulColorB());
+}
+
+void CAEInstanceItem::SetMulColorB(int Color)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	PartsEngine.SetComponentMulColor(this.m_ID, this.GetMulColorR(), this.GetMulColorG(), Color);
+}
+
+int CAEInstanceItem::GetMulColorR()
+{
+	if (!this.IsCreated())
+	{
+		return 0;
+	}
+	return PartsEngine.GetComponentMulColorR(this.m_ID);
+}
+
+int CAEInstanceItem::GetMulColorG()
+{
+	if (!this.IsCreated())
+	{
+		return 0;
+	}
+	return PartsEngine.GetComponentMulColorG(this.m_ID);
+}
+
+int CAEInstanceItem::GetMulColorB()
+{
+	if (!this.IsCreated())
+	{
+		return 0;
+	}
+	return PartsEngine.GetComponentMulColorB(this.m_ID);
+}
+
+void CAEInstanceItem::SetDrawFilter(int Type)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	Ｐ＿描画フィルタ設定(this.m_ID, Type);
+}
+
+int CAEInstanceItem::GetDrawFilter()
+{
+	if (!this.IsCreated())
+	{
+		return 0;
+	}
+	return Ｐ＿描画フィルタ取得(this.m_ID);
+}
+
+void CAEInstanceItem::SetMagX(float Mag)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	if (Ｐ＿Ｘ拡大率取得(this.m_ID) == Mag)
+	{
+		return;
+	}
+	Ｐ＿Ｘ拡大率設定(this.m_ID, Mag);
+}
+
+void CAEInstanceItem::SetMagY(float Mag)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	if (Ｐ＿Ｙ拡大率取得(this.m_ID) == Mag)
+	{
+		return;
+	}
+	Ｐ＿Ｙ拡大率設定(this.m_ID, Mag);
+}
+
+float CAEInstanceItem::GetMagX()
+{
+	if (!this.IsCreated())
+	{
+		return 0.0;
+	}
+	return Ｐ＿Ｘ拡大率取得(this.m_ID);
+}
+
+float CAEInstanceItem::GetMagY()
+{
+	if (!this.IsCreated())
+	{
+		return 0.0;
+	}
+	return Ｐ＿Ｙ拡大率取得(this.m_ID);
+}
+
+void CAEInstanceItem::SetRotateX(float Angle)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	if (Ｐ＿Ｘ回転角度取得(this.m_ID) == Angle)
+	{
+		return;
+	}
+	Ｐ＿Ｘ回転角度設定(this.m_ID, Angle);
+}
+
+void CAEInstanceItem::SetRotateY(float Angle)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	if (Ｐ＿Ｙ回転角度取得(this.m_ID) == Angle)
+	{
+		return;
+	}
+	Ｐ＿Ｙ回転角度設定(this.m_ID, Angle);
+}
+
+void CAEInstanceItem::SetRotateZ(float Angle)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	if (Ｐ＿Ｚ回転角度取得(this.m_ID) == Angle)
+	{
+		return;
+	}
+	Ｐ＿Ｚ回転角度設定(this.m_ID, Angle);
+}
+
+float CAEInstanceItem::GetRotateX()
+{
+	if (!this.IsCreated())
+	{
+		return 0.0;
+	}
+	return Ｐ＿Ｘ回転角度取得(this.m_ID);
+}
+
+float CAEInstanceItem::GetRotateY()
+{
+	if (!this.IsCreated())
+	{
+		return 0.0;
+	}
+	return Ｐ＿Ｙ回転角度取得(this.m_ID);
+}
+
+float CAEInstanceItem::GetRotateZ()
+{
+	if (!this.IsCreated())
+	{
+		return 0.0;
+	}
+	return Ｐ＿Ｚ回転角度取得(this.m_ID);
+}
+
+void CAEInstanceItem::SetMarginTop(int Size)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	if (Ｐ＿上マージン取得(this.m_ID) == Size)
+	{
+		return;
+	}
+	Ｐ＿マージン設定(this.m_ID, Size, Ｐ＿下マージン取得(this.m_ID), Ｐ＿左マージン取得(this.m_ID), Ｐ＿右マージン取得(this.m_ID));
+}
+
+void CAEInstanceItem::SetMarginBottom(int Size)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	if (Ｐ＿下マージン取得(this.m_ID) == Size)
+	{
+		return;
+	}
+	Ｐ＿マージン設定(this.m_ID, Ｐ＿上マージン取得(this.m_ID), Size, Ｐ＿左マージン取得(this.m_ID), Ｐ＿右マージン取得(this.m_ID));
+}
+
+void CAEInstanceItem::SetMarginLeft(int Size)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	if (Ｐ＿左マージン取得(this.m_ID) == Size)
+	{
+		return;
+	}
+	Ｐ＿マージン設定(this.m_ID, Ｐ＿上マージン取得(this.m_ID), Ｐ＿下マージン取得(this.m_ID), Size, Ｐ＿右マージン取得(this.m_ID));
+}
+
+void CAEInstanceItem::SetMarginRight(int Size)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	if (Ｐ＿右マージン取得(this.m_ID) == Size)
+	{
+		return;
+	}
+	Ｐ＿マージン設定(this.m_ID, Ｐ＿上マージン取得(this.m_ID), Ｐ＿下マージン取得(this.m_ID), Ｐ＿左マージン取得(this.m_ID), Size);
+}
+
+int CAEInstanceItem::GetMarginTop()
+{
+	if (!this.IsCreated())
+	{
+		return 0;
+	}
+	return Ｐ＿上マージン取得(this.m_ID);
+}
+
+int CAEInstanceItem::GetMarginBottom()
+{
+	if (!this.IsCreated())
+	{
+		return 0;
+	}
+	return Ｐ＿下マージン取得(this.m_ID);
+}
+
+int CAEInstanceItem::GetMarginLeft()
+{
+	if (!this.IsCreated())
+	{
+		return 0;
+	}
+	return Ｐ＿左マージン取得(this.m_ID);
+}
+
+int CAEInstanceItem::GetMarginRight()
+{
+	if (!this.IsCreated())
+	{
+		return 0;
+	}
+	return Ｐ＿右マージン取得(this.m_ID);
+}
+
+void CAEInstanceItem::SetAlphaClipper(int Number)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	Ｐ＿アルファクリッパー設定(this.m_ID, Number);
+}
+
+int CAEInstanceItem::GetAlphaClipper()
+{
+	if (!this.IsCreated())
+	{
+		return 0;
+	}
+	return Ｐ＿アルファクリッパー取得(this.m_ID);
+}
+
+void CAEInstanceItem::SetOnCursorShowLink(int Number)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	Ｐ＿オンカーソル表示連動設定(this.m_ID, Number);
+}
+
+int CAEInstanceItem::GetOnCursorShowLink()
+{
+	if (!this.IsCreated())
+	{
+		return 0;
+	}
+	return Ｐ＿オンカーソル表示連動設定取得(this.m_ID);
+}
+
+void CAEInstanceItem::SetScrollPosXLink(int Number)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	PARTS_SetScrollPosXLink(this.m_ID, Number);
+}
+
+void CAEInstanceItem::SetScrollPosYLink(int Number)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	PARTS_SetScrollPosYLink(this.m_ID, Number);
+}
+
+int CAEInstanceItem::GetScrollPosXLink()
+{
+	if (!this.IsCreated())
+	{
+		return 0;
+	}
+	return PARTS_GetScrollPosXLink(this.m_ID);
+}
+
+int CAEInstanceItem::GetScrollPosYLink()
+{
+	if (!this.IsCreated())
+	{
+		return 0;
+	}
+	return PARTS_GetScrollPosYLink(this.m_ID);
+}
+
+void CAEInstanceItem::SetScrollAlphaLink(int Number)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	PARTS_SetScrollAlphaLink(this.m_ID, Number);
+}
+
+int CAEInstanceItem::GetScrollAlphaLink()
+{
+	if (!this.IsCreated())
+	{
+		return 0;
+	}
+	return PARTS_GetScrollAlphaLink(this.m_ID);
+}
+
+void CAEInstanceItem::SetCheckBoxShowLink(int Number)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	PARTS_SetCheckBoxShowLinkNumber(this.m_ID, Number);
+}
+
+int CAEInstanceItem::GetCheckBoxShowLink()
+{
+	if (!this.IsCreated())
+	{
+		return 0;
+	}
+	return PARTS_GetCheckBoxShowLinkNumber(this.m_ID);
+}
+
+void CAEInstanceItem::SetTextureFilter(int Type)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	Ｐ＿テクスチャフィルタ設定(this.m_ID, Type);
+}
+
+int CAEInstanceItem::GetTextureFilter()
+{
+	if (!this.IsCreated())
+	{
+		return 0;
+	}
+	return Ｐ＿テクスチャフィルタ取得(this.m_ID);
+}
+
+void CAEInstanceItem::SetMipmap(bool Mipmap)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	Ｐ＿ミップマップ設定(this.m_ID, Mipmap);
+}
+
+bool CAEInstanceItem::IsMipmap()
+{
+	if (!this.IsCreated())
+	{
+		return false;
+	}
+	return Ｐ＿ミップマップ設定取得(this.m_ID);
+}
+
+void CAEInstanceItem::SetSpeedup(bool Speedup)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	Ｐ＿高速再生設定(this.m_ID, Speedup);
+}
+
+bool CAEInstanceItem::IsSpeedup()
+{
+	if (!this.IsCreated())
+	{
+		return false;
+	}
+	return Ｐ＿高速再生設定取得(this.m_ID);
+}
+
+void CAEInstanceItem::SetParentNumber(int Number)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	if (Ｐ＿親設定取得(this.m_ID) == Number)
+	{
+		return;
+	}
+	Ｐ＿親設定(this.m_ID, Number);
+}
+
+int CAEInstanceItem::GetParentNumber()
+{
+	if (!this.IsCreated())
+	{
+		return 0;
+	}
+	return Ｐ＿親設定取得(this.m_ID);
+}
+
+void CAEInstanceItem::SetParentMessageWindowNumber(int Number)
+{
+	if (!this.IsCreated())
+	{
+		return;
+	}
+	if (Ｐ＿親メッセージウィンドウ設定取得(this.m_ID) == Number)
+	{
+		return;
+	}
+	Ｐ＿親メッセージウィンドウ設定(this.m_ID, Number);
+}
+
+int CAEInstanceItem::GetParentMessageWindowNumber()
+{
+	if (!this.IsCreated())
+	{
+		return 0;
+	}
+	return Ｐ＿親メッセージウィンドウ設定取得(this.m_ID);
+}
+
+void CAEInstanceItem::AddSelectEvent(DG_InstanceItem_SelectHandler DelegateObject)
+{
+	this.m_dgSelectEvent += DelegateObject;
+}
+
+void CAEInstanceItem::EraseSelectEvent(DG_InstanceItem_SelectHandler DelegateObject)
+{
+	this.m_dgSelectEvent -= DelegateObject;
+}
+
+void CAEInstanceItem::SetMoveEvent(DG_ChangedHandler DelegateObject)
+{
+	this.m_dgMoveEvent.Clear();
+	this.m_dgMoveEvent += DelegateObject;
+}
+
+void CAEInstanceItem::SetDraggableInstanceEvent(DG_InstanceItem_SetDraggableInstance DelegateObject)
+{
+	this.m_dgDraggableInsntace.Clear();
+	this.m_dgDraggableInsntace += DelegateObject;
+}
+
+void CAEInstanceItem::Active(bool Flg)
+{
+	if (!Flg)
+	{
+		this.SetState(1);
+	}
+	bool PrevActive = this.m_Active;
+	this.m_Active = Flg;
+	if (!PrevActive && Flg)
+	{
+		this.m_dgSelectEvent(this);
+	}
+	Ｐ＿ドラッグ可能設定(this.m_Overlay, this.m_Active && this.IsDraggableOverlay());
+}
+
+bool CAEInstanceItem::IsActive()
+{
+	return this.m_Active;
+}
+
+void CAEInstanceItem::SetState(int State)
+{
+	if (AFL_Parts_GetStatus(this.GetID()) == State)
+	{
+		return;
+	}
+	bool Lock = PARTS_IsLockInputState(this.GetID());
+	PARTS_SetLockInputState(this.GetID(), false);
+	AFL_Parts_SetStatus(this.GetID(), State);
+	PARTS_SetLockInputState(this.GetID(), Lock);
+}
+
+int CAEInstanceItem::GetState()
+{
+	return AFL_Parts_GetStatus(this.GetID());
+}
+
+void CAEInstanceItem::SetDestination(string ActivityName)
+{
+	this.m_Destination.Free();
+	if (ActivityName.Empty())
+	{
+		return;
+	}
+	this.m_Destination.PushBack(ActivityName);
+}
+
+void CAEInstanceItem::SetDestinationList(ref array@string List)
+{
+	this.m_Destination.Free();
+	int Index;
+	for (Index = 0; Index < List.Numof(); ++Index)
+	{
+		if (List[Index].Empty())
+		{
+			continue;
+		}
+		this.m_Destination.PushBack(List[Index]);
+	}
+}
+
+string CAEInstanceItem::GetDestinationFirst()
+{
+	if (this.m_Destination.Empty())
+	{
+		return "";
+	}
+	return this.m_Destination[0];
+}
+
+void CAEInstanceItem::GetDestination(ref array@string List)
+{
+	List.Realloc(this.m_Destination.Numof());
+	List.Copy(0, this.m_Destination, 0, this.m_Destination.Numof());
+}
+
+void CAEInstanceItem::SetIntentType(int Type)
+{
+	this.m_IntentType = Type;
+}
+
+int CAEInstanceItem::GetIntentType()
+{
+	return this.m_IntentType;
+}
+
+bool CAEInstanceItem::IsExistIntentData()
+{
+	return this.m_IntentType != 0 || !this.m_Destination.Empty();
+}
+

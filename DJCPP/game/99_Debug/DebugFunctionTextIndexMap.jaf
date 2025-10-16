@@ -1,0 +1,60 @@
+string DebugFunctionTextIndexMap::getIndexName()
+{
+	return this.indexText_;
+}
+
+string DebugFunctionTextIndexMap::getSplitter()
+{
+	return this.splitter_;
+}
+
+void DebugFunctionTextIndexMap::init(string index, string functionName, string functionParam, string splitter)
+{
+	this.indexText_ = index;
+	this.funcName_ = functionName;
+	this.splitter_ = splitter;
+	this.funcParam_ = functionParam;
+	splitToken(this.categoryList_, this.indexText_, this.splitter_);
+}
+
+string DebugFunctionTextIndexMap::getCategory(int level)
+{
+	if (0 <= level && level < this.categoryList_.Numof())
+	{
+		return this.categoryList_[level];
+	}
+	return "ERROR";
+}
+
+int DebugFunctionTextIndexMap::getCategoryDepth()
+{
+	return this.categoryList_.Numof();
+}
+
+string DebugFunctionTextIndexMap::getFunctionName()
+{
+	return this.funcName_;
+}
+
+bool DebugFunctionTextIndexMap::isMatchCategory(ref array@string category)
+{
+	if (category.Numof() > this.categoryList_.Numof())
+	{
+		return false;
+	}
+	int i;
+	for (i = 0; i < category.Numof(); ++i)
+	{
+		if (category[i] != this.categoryList_[i])
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+string DebugFunctionTextIndexMap::getFunctionParam()
+{
+	return this.funcParam_;
+}
+

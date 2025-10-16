@@ -1,0 +1,65 @@
+DebugFlag::DebugFlag()
+{
+	this.isSkipBattle_ = false;
+	this.isSkipDungeonEvent_ = false;
+	this.isSkipDungeonClosedCard_ = false;
+	this.isSkipWorldMapEncount_ = false;
+	this.isUseAutoSelect_ = false;
+	this.isAutoLevelUp_ = false;
+}
+
+bool DebugFlag::isSkipBattle()
+{
+	return false;
+}
+
+bool DebugFlag::isSkipDungeonEvent()
+{
+	return false;
+}
+
+bool DebugFlag::isSkipDungeonClosedCard()
+{
+	return false;
+}
+
+bool DebugFlag::isSkipWorldMapEncount()
+{
+	return false;
+}
+
+bool DebugFlag::isAutoLevelUp()
+{
+	return false;
+}
+
+void DebugFlag::setSkipBattle(bool val)
+{
+	this.isSkipBattle_ = val;
+	共有セーブ();
+}
+
+void DebugFlag::setSkipDungeonEvent(bool val)
+{
+	this.isSkipDungeonEvent_ = val;
+	共有セーブ();
+}
+
+void DebugFlag::setSkipDungeonClosedCard(bool val)
+{
+	this.isSkipDungeonClosedCard_ = val;
+	共有セーブ();
+}
+
+void DebugFlag::setSkipWorldMapEncount(bool val)
+{
+	this.isSkipWorldMapEncount_ = val;
+	共有セーブ();
+}
+
+void DebugFlag::setAutoLevelUp(bool val)
+{
+	this.isAutoLevelUp_ = val;
+	共有セーブ();
+}
+

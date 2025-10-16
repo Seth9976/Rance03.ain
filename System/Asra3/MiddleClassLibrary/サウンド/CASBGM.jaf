@@ -1,0 +1,304 @@
+CASBGM::CASBGM()
+{
+	this.m_Volume = 1.0;
+	this.m_TransitionType = 3;
+	this.m_TransitionTotalTime = 500;
+	this.m_Pause = false;
+	this.ClearReserveInfo();
+}
+
+void CASBGM::InitChannel(int Channel1, int Channel2)
+{
+	this.m_ChannelList.Alloc(2);
+	this.m_ChannelList[0] = Channel1;
+	this.m_ChannelList[1] = Channel2;
+}
+
+void CASBGM::SwapChannel()
+{
+	this.m_CurrentChannel = 1 - this.m_CurrentChannel;
+}
+
+void CASBGM::SetSoundName(string SoundName)
+{
+	this.m_SoundName = SoundName;
+}
+
+string CASBGM::GetSoundName()
+{
+	return this.m_SoundName;
+}
+
+string CASBGM::GetSoundNameStable()
+{
+	if (this.m_Reserve)
+	{
+		return this.m_Reserve_BGMName;
+	}
+	return this.GetSoundName();
+}
+
+void CASBGM::SetVolume(float Volume)
+{
+	this.m_Volume = Volume;
+}
+
+float CASBGM::GetVolume()
+{
+	return this.m_Volume;
+}
+
+float CASBGM::GetVolumeStable()
+{
+	if (this.m_Reserve)
+	{
+		return this.m_Reserve_Volume;
+	}
+	return this.GetVolume();
+}
+
+int CASBGM::GetTransitionType()
+{
+	return this.m_TransitionType;
+}
+
+int CASBGM::GetTransitionTotalTime()
+{
+	return this.m_TransitionTotalTime;
+}
+
+void CASBGM::SetLoopCount(int LoopCount)
+{
+	this.m_LoopCount = LoopCount;
+}
+
+int CASBGM::GetLoopCount()
+{
+	return this.m_LoopCount;
+}
+
+void CASBGM::ReserveNext(string 音楽名, int LoopCount, int 効果時間, float Volume, int FadeType)
+{
+	this.m_Reserve = true;
+	this.m_Reserve_BGMName = 音楽名;
+	this.m_Reserve_LoopCount = LoopCount;
+	this.m_Reserve_Time = 効果時間;
+	this.m_Reserve_Volume = Volume;
+	this.m_Reserve_FadeType = FadeType;
+}
+
+void CASBGM::UpdateReserve()
+{
+	if (!this.m_Reserve)
+	{
+		return;
+	}
+	if (this.IsPlay())
+	{
+		return;
+	}
+	this.UpdateReserveForce();
+}
+
+void CASBGM::UpdateReserveForce()
+{
+	if (!this.m_Reserve)
+	{
+		return;
+	}
+	this.PlayNext(this.m_Reserve_BGMName, this.m_Reserve_LoopCount, this.m_Reserve_Time, this.m_Reserve_Volume, this.m_Reserve_FadeType);
+	this.ClearReserveInfo();
+}
+
+void CASBGM::ClearReserveInfo()
+{
+	this.m_Reserve = false;
+	this.m_Reserve_BGMName = "";
+	this.m_Reserve_LoopCount = 0;
+	this.m_Reserve_Time = 0;
+	this.m_Reserve_Volume = 0.0;
+	this.m_Reserve_FadeType = -1;
+}
+
+void CASBGM::PlayNext(string 音楽名, int LoopCount, int 効果時間, float Volume, int FadeType)
+{
+	this.SwapChannel();
+	this.SetVolume(Volume);
+	if (!音楽名.Empty())
+	{
+		this.Prepare(音楽名);
+		this.Fade(0, 0.0, false, -1);
+		this.FadeWithVolumeCap(効果時間, g_BGMVolumeCapManager.GetCurrentBGMVolumeCapRate(), FadeType);
+		this.SetLoopCount(LoopCount);
+		this.Play();
+	}
+	else
+	{
+		this.Stop();
+	}
+	PassRegister.RegistText(2, 音楽名);
+	this.SetSoundName(音楽名);
+}
+
+void CASBGM::PlayBGM(string 音楽名, int LoopCount, int 効果タイプ, int 効果時間, float Volume)
+{
+	if (!音楽名.Empty() && !KiwiSoundEngine.IsExistFile(音楽名))
+	{
+		SYS_ERROR("音楽[%s]ロード失敗\n" % 音楽名, 0);
+		音楽名 = "";
+	}
+	if (効果タイプ == -1)
+	{
+		効果タイプ = this.GetTransitionType();
+	}
+	if (効果時間 == -1)
+	{
+		効果時間 = this.GetTransitionTotalTime();
+	}
+	if (効果タイプ == 0)
+	{
+		効果時間 = 0;
+	}
+	this.UpdateReserveForce();
+	if (this.GetSoundNameStable() == 音楽名 && !音楽名.Empty())
+	{
+		if (this.GetVolume() != Volume)
+		{
+			this.SetVolume(Volume);
+			this.FadeWithVolumeCap(効果時間, g_BGMVolumeCapManager.GetCurrentBGMVolumeCapRate(), 0);
+		}
+		return;
+	}
+	g_BGMVolumeCapManager.ResetBGM();
+	switch (効果タイプ)
+	{
+	case 0:
+		this.Stop();
+		break;
+	case 1:
+		if (音楽名.Empty())
+		{
+			this.Fade(効果時間, 0.0, true, 3);
+		}
+		else
+		{
+			this.Fade(効果時間 * 1.7, 0.0, true, 3);
+		}
+		break;
+	case 2:
+	case 3:
+		this.Fade(効果時間, 0.0, true, 3);
+		break;
+	}
+	switch (効果タイプ)
+	{
+	case 0:
+		this.PlayNext(音楽名, LoopCount, 0, Volume, -1);
+		break;
+	case 1:
+		if (this.m_SoundName == "")
+		{
+			this.PlayNext(音楽名, LoopCount, 効果時間, Volume, 5);
+		}
+		else
+		{
+			this.PlayNext(音楽名, LoopCount, 効果時間, Volume, 4);
+		}
+		break;
+	case 2:
+		this.ReserveNext(音楽名, LoopCount, 効果時間, Volume, 4);
+		break;
+	case 3:
+		this.ReserveNext(音楽名, LoopCount, 0, Volume, -1);
+		break;
+	}
+}
+
+bool CASBGM::IsPause()
+{
+	return this.m_Pause;
+}
+
+void CASBGM::Prepare(string SoundName)
+{
+	if (!KiwiSoundEngine.Prepare(this.m_ChannelList[this.m_CurrentChannel], SoundName, true))
+	{
+		system.Output("音楽【 %s 】の準備に失敗しました\n" % SoundName);
+	}
+}
+
+void CASBGM::Play()
+{
+	KiwiSoundEngine.SetLoopCount(this.m_ChannelList[this.m_CurrentChannel], this.m_LoopCount);
+	KiwiSoundEngine.Play(this.m_ChannelList[this.m_CurrentChannel]);
+	this.m_Pause = false;
+}
+
+void CASBGM::Stop()
+{
+	KiwiSoundEngine.Stop(this.m_ChannelList[this.m_CurrentChannel]);
+	this.m_Pause = false;
+}
+
+void CASBGM::Fade(int Time, float Volume, bool StopAfterEnd, int FadeType)
+{
+	KiwiSoundEngine.Fade(this.m_ChannelList[this.m_CurrentChannel], Time, Volume, StopAfterEnd, FadeType);
+}
+
+void CASBGM::FadeWithVolumeCap(int Time, float VolumeCapRate, int FadeType)
+{
+	float Volume = g_BGM.GetVolume() * VolumeCapRate;
+	this.Fade(Time, Volume, false, FadeType);
+}
+
+bool CASBGM::IsPlay()
+{
+	return KiwiSoundEngine.IsPlay(this.m_ChannelList[this.m_CurrentChannel]);
+}
+
+void CASBGM::Pause()
+{
+	KiwiSoundEngine.Pause(this.m_ChannelList[this.m_CurrentChannel]);
+	this.m_Pause = true;
+}
+
+void CASBGM::Restart()
+{
+	KiwiSoundEngine.Restart(this.m_ChannelList[this.m_CurrentChannel]);
+	this.m_Pause = false;
+}
+
+bool CASBGM::IsPausing()
+{
+	return KiwiSoundEngine.IsPause(this.m_ChannelList[this.m_CurrentChannel]);
+}
+
+int CASBGM::GetLength()
+{
+	return KiwiSoundEngine.GetLength(this.m_ChannelList[this.m_CurrentChannel]);
+}
+
+int CASBGM::GetPos()
+{
+	return KiwiSoundEngine.GetPos(this.m_ChannelList[this.m_CurrentChannel]);
+}
+
+int CASBGM::Seek(int MilliSecond)
+{
+	return KiwiSoundEngine.Seek(this.m_ChannelList[this.m_CurrentChannel], MilliSecond);
+}
+
+void CASBGM::SetLoop(bool Loop)
+{
+	this.m_LoopCount = Loop ? 0 : 1;
+	if (this.m_Reserve)
+	{
+		this.m_Reserve_LoopCount = Loop ? 0 : 1;
+	}
+	int n;
+	for (n = 0; n < this.m_ChannelList.Numof(); n++)
+	{
+		KiwiSoundEngine.SetLoopCount(this.m_ChannelList[n], Loop ? 0 : 1);
+	}
+}
+

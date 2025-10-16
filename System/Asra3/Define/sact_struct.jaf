@@ -1,0 +1,17 @@
+sact_text_metrics_t::sact_text_metrics_t()
+{
+	this.nColorR = 255;
+	this.nColorG = 255;
+	this.nColorB = 255;
+	this.nSize = 16;
+	this.nWeight = 0;
+	this.nFace = 0;
+	this.nShadowPixelL = 0;
+	this.nShadowPixelU = 0;
+	this.nShadowPixelR = 0;
+	this.nShadowPixelD = 0;
+	this.nShadowColorR = 0;
+	this.nShadowColorG = 0;
+	this.nShadowColorB = 0;
+}
+

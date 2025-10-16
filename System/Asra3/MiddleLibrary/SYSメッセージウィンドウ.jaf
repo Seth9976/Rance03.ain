@@ -1,0 +1,864 @@
+void SYS_Message(int nMsgNum, string szText)
+{
+	if (!g_MessageWindowStatusManager.IsExistActiveMessageWindow())
+	{
+		system.Output("【警告】message関数：字枠が設定されていないので字枠(1)を使用します。\n　　　　'%s'\n" % szText);
+		字枠セット(1, -2147483648);
+	}
+	g_MessageTextModel.AddMessageText(nMsgNum, szText, g_MessageWindowStatusManager.GetActiveMessageWindowNumber());
+	SYS_既読メッセージフラグ更新(nMsgNum);
+	if (SYS_デフォルトセーブコメント要更新())
+	{
+		SYS_デフォルトセーブコメント設定(szText);
+	}
+	AnteaterADVEngine.ADVLogList_AddText(szText, g_MessageWindowStatusManager.GetActiveMessageWindowNumber());
+}
+
+void SYS_VOICE(string Voice)
+{
+	_g_最終音声名 = Voice;
+	if (!Voice.Empty() && !KiwiSoundEngine.IsExistFile(Voice))
+	{
+		SYS_ERROR("VOICE[%s]ロード失敗" % Voice, 0);
+		Voice = "";
+	}
+	g_MessageTextModel.AddVoice(Voice, g_MessageWindowStatusManager.GetActiveMessageWindowNumber());
+	AnteaterADVEngine.ADVLogList_AddVoice(Voice);
+	if (system.IsDebugMode() && !Voice.Empty())
+	{
+		string DebugOutputText = "[%s]" % Voice;
+		AnteaterADVEngine.ADVLogList_AddText(DebugOutputText, g_MessageWindowStatusManager.GetActiveMessageWindowNumber());
+	}
+}
+
+void SYS_R()
+{
+	if (!g_MessageWindowStatusManager.IsExistActiveMessageWindow())
+	{
+		system.Output("【警告】R関数：字枠が設定されていないので字枠(1)を使用します。\n");
+		字枠セット(1, -2147483648);
+	}
+	g_MessageTextModel.AddNewLine(g_MessageWindowStatusManager.GetActiveMessageWindowNumber());
+	AnteaterADVEngine.ADVLogList_AddNewLine();
+}
+
+void SYS_A()
+{
+	SYS_メッセージ表示();
+	SYS_メッセージキー待ち(false);
+	SYS_メッセージスキップ待ち();
+	PARTS_EndMotionFociby();
+	SYS_バックシーン登録();
+	g_MessageTextModel.SetMessageReadFlag();
+	SYS_Ｍ消去(g_MessageWindowStatusManager.GetActiveMessageWindowNumber());
+	AnteaterADVEngine.ADVLogList_AddNewPage();
+	SYS_StopVoiceBySkipMessage();
+	SYS_StopUncontinuedSE();
+	_g_最終音声名 = "";
+}
+
+void SYS_AA()
+{
+	SYS_メッセージ表示();
+	SYS_メッセージキー待ち(true);
+	PARTS_EndMotionFociby();
+	SYS_バックシーン登録();
+	g_MessageTextModel.SetMessageReadFlag();
+	SYS_Ｍ消去(g_MessageWindowStatusManager.GetActiveMessageWindowNumber());
+	AnteaterADVEngine.ADVLogList_AddNewPage();
+	SYS_StopVoiceBySkipMessage();
+	SYS_StopUncontinuedSE();
+	_g_最終音声名 = "";
+}
+
+void SYS_B()
+{
+	SYS_メッセージ表示();
+	PARTS_EndMotionFociby();
+	g_MessageTextModel.SetMessageReadFlag();
+	g_MessageTextModel.AddC(g_MessageWindowStatusManager.GetActiveMessageWindowNumber());
+	_g_最終音声名 = "";
+}
+
+void SYS_C()
+{
+	SYS_メッセージ表示();
+	SYS_メッセージキー待ち(false);
+	SYS_メッセージスキップ待ち();
+	PARTS_EndMotionFociby();
+	SYS_バックシーン登録();
+	g_MessageTextModel.SetMessageReadFlag();
+	g_MessageTextModel.AddC(g_MessageWindowStatusManager.GetActiveMessageWindowNumber());
+	SYS_StopVoiceBySkipMessage();
+	SYS_StopUncontinuedSE();
+	_g_最終音声名 = "";
+}
+
+void SYS_D()
+{
+	SYS_メッセージ表示();
+	SYS_メッセージキー待ち(false);
+	SYS_メッセージスキップ待ち();
+	PARTS_EndMotionFociby();
+	SYS_バックシーン登録();
+	g_MessageTextModel.SetMessageReadFlag();
+	g_MessageTextModel.AddNewLine(g_MessageWindowStatusManager.GetActiveMessageWindowNumber());
+	g_MessageTextModel.AddNewLine(g_MessageWindowStatusManager.GetActiveMessageWindowNumber());
+}
+
+void SYS_字枠セット(int Ｍ番号, int 動作)
+{
+	if (動作 == -2147483648)
+	{
+		動作 = 2;
+	}
+	if (Ｍ番号 == 0)
+	{
+		g_SystemButtonViewList.Clear();
+		g_SystemButtonViewList.Update();
+		g_MessageTextModel.Clear();
+		g_MessageWindowStatusManager.Clear();
+		g_MessageWindowManager.Update(g_MessageWindowStatusManager);
+		return;
+	}
+	if (g_MessageWindowStatusManager.GetActiveMessageWindowNumber() == Ｍ番号 && 動作 == 0)
+	{
+		g_SystemButtonViewList.Clear();
+		g_SystemButtonViewList.Update();
+	}
+	else if (動作 != 0)
+	{
+		g_SystemButtonViewList.SetMessageWindowNumber(Ｍ番号);
+		g_SystemButtonViewList.Update();
+	}
+	switch (動作)
+	{
+	case 0:
+		g_MessageWindowStatusManager.HideMessageWindow(Ｍ番号);
+		g_MessageWindowManager.Update(g_MessageWindowStatusManager);
+		SYS_Ｍ消去(Ｍ番号);
+		break;
+	case 1:
+		SYS_字枠表示(Ｍ番号, false);
+		SYS_Ｍ消去(Ｍ番号);
+		break;
+	case 2:
+		if (g_MessageWindowStatusManager.GetActiveMessageWindowNumber() != Ｍ番号)
+		{
+			SYS_Ｍ消去(g_MessageWindowStatusManager.GetActiveMessageWindowNumber());
+		}
+		SYS_字枠表示(Ｍ番号, true);
+		SYS_Ｍ消去(Ｍ番号);
+		break;
+	case 3:
+		SYS_字枠表示(Ｍ番号, false);
+		break;
+	default:
+		system.Error("未対応のメッセージウィンドウの切り替え設定がおこなわれました %d" % 動作);
+	}
+	g_MessageTextView.UpdateZByMessageWindowZChanged();
+	SYS_スキップモードマーク表示更新();
+	SYS_オートモードマーク表示更新();
+}
+
+void SYS_字枠表示(int Ｍ番号, bool ClearPrevMessageWindow)
+{
+	SYS_ASSERTE_AREA_ID(Ｍ番号);
+	if (g_MessageWindowStatusManager.GetActiveMessageWindowNumber() != Ｍ番号)
+	{
+		if (ClearPrevMessageWindow)
+		{
+			g_MessageWindowStatusManager.HideMessageWindow(g_MessageWindowStatusManager.GetActiveMessageWindowNumber());
+		}
+		g_MessageWindowStatusManager.ShowMessageWindow(Ｍ番号);
+	}
+	g_MessageWindowManager.Update(g_MessageWindowStatusManager);
+}
+
+void SYS_メッセージウィンドウ非表示()
+{
+	g_MessageWindowManager.HideAll();
+	CASClick LButtonClick;
+	CASClick RButtonClick;
+	CASClick ReturnKeyClick;
+	CASClick ZKeyClick;
+	CASClick SpaceKeyClick;
+	LButtonClick.Init(1, true);
+	RButtonClick.Init(2, true);
+	ReturnKeyClick.Init(13, true);
+	ZKeyClick.Init(90, true);
+	SpaceKeyClick.Init(32, true);
+	CASJoyClickAssignedKey m_OKJoyClick;
+	CASJoyClickAssignedKey m_CancelJoyClick;
+	CASJoyClickAssignedKey m_HideMessageWindowJoyClick;
+	m_OKJoyClick.Init(4, true);
+	m_CancelJoyClick.Init(5, true);
+	m_HideMessageWindowJoyClick.Init(6, true);
+	bool bPrev既読スキップモードマーク表示許可 = SYS_スキップモードマーク表示許可フラグ取得();
+	bool bPrevオートモードマーク表示許可 = SYS_オートモードマーク表示許可フラグ取得();
+	既読スキップモードマーク表示許可設定(false);
+	オートモードマーク表示許可設定(false);
+	for (; ; )
+	{
+		if (LButtonClick.IsClick(-2147483648))
+		{
+			break;
+		}
+		if (RButtonClick.IsClick(-2147483648))
+		{
+			break;
+		}
+		if (ReturnKeyClick.IsClick(-2147483648))
+		{
+			break;
+		}
+		if (ZKeyClick.IsClick(-2147483648))
+		{
+			break;
+		}
+		if (SpaceKeyClick.IsClick(-2147483648))
+		{
+			break;
+		}
+		if (m_OKJoyClick.IsClick(-2147483648))
+		{
+			break;
+		}
+		if (m_CancelJoyClick.IsClick(-2147483648))
+		{
+			break;
+		}
+		if (m_HideMessageWindowJoyClick.IsClick(-2147483648))
+		{
+			break;
+		}
+		AFL_View_Update(true);
+	}
+	既読スキップモードマーク表示許可設定(bPrev既読スキップモードマーク表示許可);
+	オートモードマーク表示許可設定(bPrevオートモードマーク表示許可);
+	g_MessageWindowManager.ShowAll();
+	AFL_View_Update(true);
+}
+
+void SYS_CallShowMessageWindowCallbackFuncList(bool bShow)
+{
+	g_ShowMessageWindowCallbackFuncList(bShow);
+}
+
+void SYS_Ｍ消去(int MessageWindowNumber)
+{
+	SYS_デフォルトセーブコメント更新フラグセット();
+	g_MessageTextModel.ClearMessageText(MessageWindowNumber);
+	g_MessageTextView.DrawAll(g_MessageTextModel);
+}
+
+void SYS_メッセージ表示()
+{
+	if (AFL_Config_IsAnimateMessageWindow())
+	{
+		g_MessageWindowManager.WaitShowFlat();
+	}
+	else
+	{
+		g_MessageWindowManager.StepAllFlatFinalFrame();
+	}
+	if (SYS_バックログオープン確認())
+	{
+		SYS_RunCommandMouseWheelForward();
+	}
+	g_MessageTextView.Draw(g_MessageTextModel);
+}
+
+void SYS_メッセージ全表示()
+{
+	g_MessageTextView.DrawAll(g_MessageTextModel);
+	AFL_View_Update(true);
+}
+
+void SYS_SetMessageWindowPos(int MessageWindowNumber, int X, int Y)
+{
+	SYS_ASSERTE_AREA_ID(MessageWindowNumber);
+	g_MessageWindowModelManager.GetMessageWindow(MessageWindowNumber).SetX(X);
+	g_MessageWindowModelManager.GetMessageWindow(MessageWindowNumber).SetY(Y);
+}
+
+void SYS_InitMessageWindow()
+{
+	int MessageWindowNumber;
+	for (MessageWindowNumber = 1; MessageWindowNumber < 40; ++MessageWindowNumber)
+	{
+		string EXBaseName = "Ｅ＿メッセージウィンドウ.全体.座標";
+		string EXName = "Ｅ＿メッセージウィンドウ.%D番.座標" % MessageWindowNumber;
+		if (EX_IsExist(EXName + ".Ｘ") && EX_IsExist(EXName + ".Ｙ"))
+		{
+			SYS_SetMessageWindowPos(MessageWindowNumber, EX_Int(EXName + ".Ｘ", 0), EX_Int(EXName + ".Ｙ", 0));
+		}
+		else if (EX_IsExist(EXBaseName + ".Ｘ") && EX_IsExist(EXBaseName + ".Ｙ"))
+		{
+			SYS_SetMessageWindowPos(MessageWindowNumber, EX_Int(EXBaseName + ".Ｘ", 0), EX_Int(EXBaseName + ".Ｙ", 0));
+		}
+	}
+}
+
+float SYS_GetMessageWindowDefaultAlphaRate()
+{
+	return EX_Float("Ｅ＿メッセージウィンドウ.透明率初期値", 1.0);
+}
+
+float SYS_GetMessageWindowDefaultMulColorRate()
+{
+	return EX_Float("Ｅ＿メッセージウィンドウ.明るさ初期値", 1.0);
+}
+
+void SYS_メッセージエリア(int Ｍ番号, int Ｘ, int Ｙ, int Ｚ, string ＣＧ名)
+{
+	if (Ｘ != -2147483648)
+	{
+		g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).SetX(Ｘ);
+	}
+	if (Ｙ != -2147483648)
+	{
+		g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).SetY(Ｙ);
+	}
+	if (Ｚ != -2147483648)
+	{
+		if (g_MessageWindowModelManager.GetZ() == 0 || Ｚ < g_MessageWindowModelManager.GetZ())
+		{
+			Ａ＿メッセージウィンドウＺ座標設定(Ｚ);
+		}
+	}
+	if (!ＣＧ名.Empty())
+	{
+		g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).SetCGName(ＣＧ名);
+	}
+}
+
+void SYS_メッセージエリア余白(int Ｍ番号, int t, int r, int b, int l)
+{
+	CASRect TextAreaRect;
+	TextAreaRect = g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).GetTextAreaRect();
+	if (l != -2147483648)
+	{
+		TextAreaRect.Set(l, TextAreaRect.GetY(), TextAreaRect.GetWidth(), TextAreaRect.GetHeight());
+	}
+	if (t != -2147483648)
+	{
+		TextAreaRect.Set(TextAreaRect.GetX(), t, TextAreaRect.GetWidth(), TextAreaRect.GetHeight());
+	}
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).SetTextAreaRect(TextAreaRect);
+}
+
+void SYS_字間隔(int Ｍ番号, int 字間, int 行間)
+{
+	if (字間 != -2147483648)
+	{
+		g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).字間 = 字間;
+	}
+	if (行間 != -2147483648)
+	{
+		g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).行間 = 行間;
+	}
+}
+
+void SYS_キー待ちマーク(int Ｍ番号, string 基準ＣＧ名, int 開始番号, int ＣＧ枚数, int 時間)
+{
+	ref CMessageWindowModel MessageWindowModel = g_MessageWindowModelManager.GetMessageWindow(Ｍ番号);
+	if (!基準ＣＧ名.Empty())
+	{
+		MessageWindowModel.基準ＣＧ名 = 基準ＣＧ名;
+	}
+	if (開始番号 != -2147483648)
+	{
+		MessageWindowModel.開始番号 = 開始番号;
+	}
+	if (ＣＧ枚数 != -2147483648)
+	{
+		MessageWindowModel.マーク枚数 = ＣＧ枚数;
+	}
+	if (時間 != -2147483648)
+	{
+		MessageWindowModel.マーク速度 = 時間;
+	}
+}
+
+void SYS_キー待ちマークフラット設定(int メッセージウィンドウ番号, string フラットファイル名)
+{
+	ref CMessageWindowModel MessageWindowModel = g_MessageWindowModelManager.GetMessageWindow(メッセージウィンドウ番号);
+	MessageWindowModel.SetKeyWaitMarkFlatName(フラットファイル名);
+}
+
+void SYS_キー待ちマーク位置(int Ｍ番号, int Ｘ, int Ｙ)
+{
+	if (Ｘ != -2147483648)
+	{
+		g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).マークＸ = Ｘ;
+	}
+	if (Ｙ != -2147483648)
+	{
+		g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).マークＹ = Ｙ;
+	}
+}
+
+bool SYS_キー待ちマーク表示状態取得()
+{
+	return _g_MsgKeyWaitAnime.IsShow();
+}
+
+void SYS_キー待ちマーク表示設定(bool bShow)
+{
+	_g_MsgKeyWaitAnime._SetShow(bShow);
+}
+
+void SYS_オートモードマーク＿ＣＧ設定(int Ｍ番号, string ＣＧ名)
+{
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).オートモードマーク＿ＣＧ基準名 = ＣＧ名;
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).オートモードマーク＿フラット名 = "";
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).オートモードマーク＿ＣＧ開始番号 = 0;
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).オートモードマーク＿ＣＧ枚数 = 0;
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).オートモードマーク＿ＣＧ切り替え時間 = 0;
+}
+
+void SYS_オートモードマーク＿ループＣＧ設定(int Ｍ番号, string ＣＧ名, int 開始番号, int 枚数, int 切り替え時間)
+{
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).オートモードマーク＿ＣＧ基準名 = ＣＧ名;
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).オートモードマーク＿フラット名 = "";
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).オートモードマーク＿ＣＧ開始番号 = 開始番号;
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).オートモードマーク＿ＣＧ枚数 = 枚数;
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).オートモードマーク＿ＣＧ切り替え時間 = 切り替え時間;
+}
+
+void SYS_オートモードマーク＿フラット設定(int Ｍ番号, string フラット名)
+{
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).オートモードマーク＿ＣＧ基準名 = "";
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).オートモードマーク＿フラット名 = フラット名;
+}
+
+void SYS_オートモードマーク表示位置(int Ｍ番号, int Ｘ, int Ｙ, int Ｚ)
+{
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).オートモードマーク＿Ｘ = Ｘ;
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).オートモードマーク＿Ｙ = Ｙ;
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).オートモードマーク＿Ｚ = Ｚ;
+}
+
+void SYS_スキップモードマーク＿ＣＧ設定(int Ｍ番号, string ＣＧ名)
+{
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).スキップモードマーク＿ＣＧ基準名 = ＣＧ名;
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).スキップモードマーク＿フラット名 = "";
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).スキップモードマーク＿ＣＧ開始番号 = 0;
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).スキップモードマーク＿ＣＧ枚数 = 0;
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).スキップモードマーク＿ＣＧ切り替え時間 = 0;
+}
+
+void SYS_スキップモードマーク＿ループＣＧ設定(int Ｍ番号, string ＣＧ名, int 開始番号, int 枚数, int 切り替え時間)
+{
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).スキップモードマーク＿ＣＧ基準名 = ＣＧ名;
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).スキップモードマーク＿フラット名 = "";
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).スキップモードマーク＿ＣＧ開始番号 = 開始番号;
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).スキップモードマーク＿ＣＧ枚数 = 枚数;
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).スキップモードマーク＿ＣＧ切り替え時間 = 切り替え時間;
+}
+
+void SYS_スキップモードマーク＿フラット設定(int Ｍ番号, string フラット名)
+{
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).スキップモードマーク＿ＣＧ基準名 = "";
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).スキップモードマーク＿フラット名 = フラット名;
+}
+
+void SYS_スキップモードマーク表示位置(int Ｍ番号, int Ｘ, int Ｙ, int Ｚ)
+{
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).スキップモードマーク＿Ｘ = Ｘ;
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).スキップモードマーク＿Ｙ = Ｙ;
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).スキップモードマーク＿Ｚ = Ｚ;
+}
+
+void SYS_字初期値(int Ｍ番号, int フォント)
+{
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).フォント = フォント;
+}
+
+void SYS_字サイズ初期値(int Ｍ番号, int サイズ)
+{
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).SetFontSize(サイズ);
+}
+
+void SYS_字太初期値(int Ｍ番号, int _太さ)
+{
+	g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).SetFontWeight(_太さ);
+}
+
+void SYS_字色初期値(int Ｍ番号, int Ｒ, int Ｇ, int Ｂ)
+{
+	ref CMessageWindowModel MessageWindowModel = g_MessageWindowModelManager.GetMessageWindow(Ｍ番号);
+	MessageWindowModel.文字Ｒ = Ｒ;
+	MessageWindowModel.文字Ｇ = Ｇ;
+	MessageWindowModel.文字Ｂ = Ｂ;
+}
+
+void SYS_字速度初期値(int Ｍ番号, int 時間)
+{
+	if (時間 == 0)
+	{
+		g_MessageWindowModelManager.GetMessageWindow(Ｍ番号).文字速度 = 時間;
+	}
+}
+
+void SYS_字飾り初期値(int Ｍ番号, float EdgeWeight, int pＲ, int pＧ, int pＢ)
+{
+	ref CMessageWindowModel MessageWindowModel = g_MessageWindowModelManager.GetMessageWindow(Ｍ番号);
+	MessageWindowModel.SetEdgeWeight(EdgeWeight);
+	MessageWindowModel.SetEdgeColor(pＲ, pＧ, pＢ);
+}
+
+void SYS_メッセージキー待ち(bool _ignore_read_skip_mode)
+{
+	if (!SYS_全文スキップ中確認() || _ignore_read_skip_mode)
+	{
+		_g_MsgKeyWait._Execute(_ignore_read_skip_mode);
+	}
+	SYS_文字表示後画面揺らしクリア();
+}
+
+float SYS_メッセージ速度比率()
+{
+	if (g_fMessageSpeedRate >= 0.5)
+	{
+		return (1.0 - g_fMessageSpeedRate) * 2.0;
+	}
+	return (0.5 - g_fMessageSpeedRate) * 6.0 + 1.0;
+}
+
+int SYS_既読メッセージスキップ待ち時間比率()
+{
+	return 150.0 - g_fReadMessageSkipWaitTimeRate * 150.0;
+}
+
+int SYS_全文スキップ待ち時間比率()
+{
+	return SYS_既読メッセージスキップ待ち時間比率();
+}
+
+void SYS_メッセージスキップ待ち()
+{
+	if (SYS_IsFrameSkipMode())
+	{
+		return;
+	}
+	int 待ち時間;
+	if (SYS_全文スキップ中確認())
+	{
+		待ち時間 = SYS_全文スキップ待ち時間比率();
+	}
+	else if (SYS_スキップ中確認())
+	{
+		if (AFL_Config_GetSkipAllMessage())
+		{
+			待ち時間 = SYS_全文スキップ待ち時間比率();
+		}
+		else
+		{
+			待ち時間 = SYS_既読メッセージスキップ待ち時間比率();
+		}
+	}
+	if (待ち時間 < 1)
+	{
+		return;
+	}
+	CASClick LButtonClick;
+	CASClick ReturnKeyClick;
+	CASClick DownKeyClick;
+	LButtonClick.Init(1, !SYS_IsClickModeCancel());
+	ReturnKeyClick.Init(13, !SYS_IsClickModeCancel());
+	DownKeyClick.Init(40, !SYS_IsClickModeCancel());
+	CASJoyClickAssignedKey JoyOkClick;
+	JoyOkClick.Init(4, true);
+	int t = system.GetTime();
+	while (system.GetTime() - t < 待ち時間)
+	{
+		if (SYS_ホイールフォア即確認())
+		{
+			SYS_RunCommandMouseWheelForward();
+			break;
+		}
+		if (SYS_ホイールバック確認())
+		{
+			break;
+		}
+		if (LButtonClick.IsClick(-2147483648) || ReturnKeyClick.IsClick(-2147483648) || DownKeyClick.IsClick(-2147483648) || JoyOkClick.IsClick(-2147483648))
+		{
+			SYS_ReleaseModeByClickCancel();
+			break;
+		}
+		AFL_View_Update(true);
+	}
+}
+
+int SYS_オートモード待機時間計算(int TextLength)
+{
+	float fRate = (1.0 - g_fAutoModeWaitTimeRate) * 2.0 - 1.0;
+	int WaitMessageLength = TextLength + 5;
+	int TotalTime = WaitMessageLength * (100 + 100 * fRate);
+	return TotalTime;
+}
+
+bool SYS_IsClickModeCancel()
+{
+	if (AFL_Config_GetReleaseSkipModeByClick() && SYS_スキップ中確認())
+	{
+		return true;
+	}
+	if (AFL_Config_GetReleaseAutoModeByClick() && Ａ＿オートモード中確認())
+	{
+		return true;
+	}
+	return false;
+}
+
+void SYS_ReleaseModeByClickCancel()
+{
+	if (AFL_Config_GetReleaseSkipModeByClick())
+	{
+		SYS_スキップモード設定(false);
+	}
+	if (AFL_Config_GetReleaseAutoModeByClick())
+	{
+		SYS_オート設定(false);
+	}
+}
+
+void SYS_メッセージモード更新()
+{
+	SYS_スキップ中フラグ更新();
+}
+
+void SYS_スキップモードマーク表示許可設定(bool Flag)
+{
+	if (g_bスキップモードマーク表示許可 == Flag)
+	{
+		return;
+	}
+	g_bスキップモードマーク表示許可 = Flag;
+	SYS_スキップモードマーク表示更新();
+}
+
+bool SYS_スキップモードマーク表示許可フラグ取得()
+{
+	return g_bスキップモードマーク表示許可;
+}
+
+void SYS_スキップモードマーク表示更新()
+{
+	if (g_bスキップモードマーク表示許可 && SYS_スキップモード確認())
+	{
+		if (g_MessageWindowStatusManager.IsExistActiveMessageWindow())
+		{
+			SYS_スキップモードマーク作成(g_MessageWindowModelManager.GetMessageWindow(g_MessageWindowStatusManager.GetActiveMessageWindowNumber()));
+			_g_MsgSkipModeCGList.SetShow(true);
+		}
+	}
+	else
+	{
+		SYS_スキップモードマーク非表示();
+	}
+}
+
+void SYS_スキップモードマーク作成(ref CMessageWindowModel _a)
+{
+	CModeCGModel Info;
+	Info.SetCG(_a.スキップモードマーク＿ＣＧ基準名);
+	Info.SetFlatName(_a.スキップモードマーク＿フラット名);
+	Info.SetX(_a.スキップモードマーク＿Ｘ);
+	Info.SetY(_a.スキップモードマーク＿Ｙ);
+	Info.SetZ(_a.スキップモードマーク＿Ｚ);
+	Info.SetShow(true);
+	Info.SetCGBeginNumber(_a.スキップモードマーク＿ＣＧ開始番号);
+	Info.SetCGCount(_a.スキップモードマーク＿ＣＧ枚数);
+	Info.SetCGSwitchTime(_a.スキップモードマーク＿ＣＧ切り替え時間);
+	_g_MsgSkipModeCGList.Create(Info);
+}
+
+void SYS_スキップモードマーク非表示()
+{
+	_g_MsgSkipModeCGList.SetShow(false);
+}
+
+void SYS_オートモードマーク表示許可設定(bool Flag)
+{
+	if (g_bオートモードマーク表示許可 == Flag)
+	{
+		return;
+	}
+	g_bオートモードマーク表示許可 = Flag;
+	SYS_オートモードマーク表示更新();
+}
+
+bool SYS_オートモードマーク表示許可フラグ取得()
+{
+	return g_bオートモードマーク表示許可;
+}
+
+void SYS_オートモードマーク表示更新()
+{
+	if (g_bオートモードマーク表示許可 && Ａ＿オートモード中確認())
+	{
+		if (g_MessageWindowStatusManager.IsExistActiveMessageWindow())
+		{
+			SYS_オートモードマーク作成(g_MessageWindowModelManager.GetMessageWindow(g_MessageWindowStatusManager.GetActiveMessageWindowNumber()));
+			_g_AutoModeCGList.SetShow(true);
+		}
+	}
+	else
+	{
+		SYS_オートモードマーク非表示();
+	}
+}
+
+void SYS_オートモードマーク作成(ref CMessageWindowModel _a)
+{
+	CModeCGModel Info;
+	Info.SetCG(_a.オートモードマーク＿ＣＧ基準名);
+	Info.SetFlatName(_a.オートモードマーク＿フラット名);
+	Info.SetX(_a.オートモードマーク＿Ｘ);
+	Info.SetY(_a.オートモードマーク＿Ｙ);
+	Info.SetZ(_a.オートモードマーク＿Ｚ);
+	Info.SetShow(true);
+	Info.SetCGBeginNumber(_a.オートモードマーク＿ＣＧ開始番号);
+	Info.SetCGCount(_a.オートモードマーク＿ＣＧ枚数);
+	Info.SetCGSwitchTime(_a.オートモードマーク＿ＣＧ切り替え時間);
+	_g_AutoModeCGList.Create(Info);
+}
+
+void SYS_オートモードマーク非表示()
+{
+	_g_AutoModeCGList.SetShow(false);
+}
+
+bool SYS_スキップ中確認()
+{
+	if (!SYS_IsMessageSkipPermission())
+	{
+		return false;
+	}
+	return g_bスキップ中;
+}
+
+bool SYS_全文スキップ中確認()
+{
+	if (!SYS_IsMessageSkipPermission())
+	{
+		return false;
+	}
+	if (AFL_IsKeyDown(17))
+	{
+		return true;
+	}
+	if (system.IsDebugMode() && g_SkipKeyWait)
+	{
+		return true;
+	}
+	if (AFL_Joystick_IsKeyDown(0, AFL_Joystick_GetButtonAssignment(7)))
+	{
+		return true;
+	}
+	return false;
+}
+
+void SYS_SetMessageSkipPermission(bool MessageSkipPermission)
+{
+	g_MessageSkipPermission = MessageSkipPermission;
+}
+
+bool SYS_IsMessageSkipPermission()
+{
+	return g_MessageSkipPermission;
+}
+
+bool SYS_スキップモード確認()
+{
+	return g_MessageSkipMode;
+}
+
+void SYS_スキップモード設定(bool _on)
+{
+	if (g_MessageSkipMode == _on)
+	{
+		return;
+	}
+	if (_on)
+	{
+		g_Ｍスキップタイマー.Reset();
+	}
+	g_MessageSkipMode = _on;
+	SYS_スキップモードマーク表示更新();
+}
+
+void SYS_スキップモード反転()
+{
+	if (AFL_Config_GetReleaseSkipModeByReadMessage() && !g_既読メッセージ)
+	{
+		SYS_スキップモード設定(false);
+		return;
+	}
+	SYS_スキップモード設定(!SYS_スキップモード確認());
+}
+
+void SYS_オート設定(bool _on)
+{
+	if (g_オートモード == _on)
+	{
+		return;
+	}
+	if (_on)
+	{
+		g_Ｍオートタイマー.Reset();
+	}
+	g_オートモード = _on;
+	SYS_オートモードマーク表示更新();
+}
+
+void SYS_スキップ中フラグ更新()
+{
+	g_bスキップ中 = SYS_スキップモード確認() && g_既読メッセージ | AFL_Config_GetSkipAllMessage();
+}
+
+void SYS_スキップ中フラグクリア()
+{
+	g_既読メッセージ = false;
+	g_bスキップ中 = false;
+}
+
+void SYS_既読メッセージフラグ更新(int MessageNumber)
+{
+	if (MessageNumber != 0)
+	{
+		g_既読メッセージ = MsgSkip.GetFlag(MessageNumber) != 0;
+	}
+	if (AFL_Config_GetReleaseSkipModeByReadMessage() && !g_既読メッセージ)
+	{
+		SYS_スキップモード設定(false);
+	}
+}
+
+void SYS_既読メッセージフラグクリア()
+{
+	g_既読メッセージ = false;
+}
+
+string SYS_MessageText_Replace(string BaseText)
+{
+	int i;
+	for (i = 0; i < g_ReplacePair.Numof(); ++i)
+	{
+		string Src = g_ReplacePair[i].GetSrc();
+		int Index = BaseText.Find(Src);
+		if (Index == -1)
+		{
+			continue;
+		}
+		string Dest = BaseText.GetPart(0, Index);
+		Dest += g_ReplacePair[i].GetDest();
+		Dest += BaseText.GetPart(Index + Src.Length(), BaseText.Length());
+		BaseText = Dest;
+	}
+	return BaseText;
+}
+

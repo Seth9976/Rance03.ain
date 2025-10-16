@@ -1,0 +1,137 @@
+bool AFL_AFA_IsExist(string ArchiveName)
+{
+	return AFAFactory.IsExistArchive(ArchiveName);
+}
+
+bool AFL_AFA_CG_Add(string ArchiveName)
+{
+	return AFAFactory.LoadArchive(2, ArchiveName);
+}
+
+bool AFL_AFA_Flat_Add(string ArchiveName)
+{
+	return AFAFactory.LoadArchive(3, ArchiveName);
+}
+
+bool AFL_AFA_Sound_Add(string ArchiveName)
+{
+	return AFAFactory.LoadArchive(5, ArchiveName);
+}
+
+int AFL_AFA_CG_Numof()
+{
+	return AFAFactory.GetCountOfData(2);
+}
+
+int AFL_AFA_Flat_Numof()
+{
+	return AFAFactory.GetCountOfData(3);
+}
+
+int AFL_AFA_Sound_Numof()
+{
+	return AFAFactory.GetCountOfData(5);
+}
+
+string AFL_AFA_CG_GetTitle(int Index)
+{
+	string Title;
+	AFAFactory.GetTitleByIndex(2, Index, Title);
+	return Title;
+}
+
+string AFL_AFA_Flat_GetTitle(int Index)
+{
+	string Title;
+	AFAFactory.GetTitleByIndex(3, Index, Title);
+	return Title;
+}
+
+string AFL_AFA_Sound_GetTitle(int Index)
+{
+	string Title;
+	AFAFactory.GetTitleByIndex(5, Index, Title);
+	return Title;
+}
+
+int AFL_AFA_CG_SearchTitle(string Title)
+{
+	return AFAFactory.SearchTitle(2, Title);
+}
+
+int AFL_AFA_Flat_SearchTitle(string Title)
+{
+	return AFAFactory.SearchTitle(3, Title);
+}
+
+int AFL_AFA_Sound_SearchTitle(string Title)
+{
+	return AFAFactory.SearchTitle(5, Title);
+}
+
+int AFL_AFA_CG_PrefixSearchTitle(string Title)
+{
+	return AFAFactory.PrefixSearchTitle(2, Title);
+}
+
+int AFL_AFA_Flat_PrefixSearchTitle(string Title)
+{
+	return AFAFactory.PrefixSearchTitle(3, Title);
+}
+
+int AFL_AFA_Sound_PrefixSearchTitle(string Title)
+{
+	return AFAFactory.PrefixSearchTitle(5, Title);
+}
+
+int AFL_AFA_CG_SuffixSearchTitle(string Title)
+{
+	return AFAFactory.SuffixSearchTitle(2, Title);
+}
+
+int AFL_AFA_Flat_SuffixSearchTitle(string Title)
+{
+	return AFAFactory.SuffixSearchTitle(3, Title);
+}
+
+int AFL_AFA_Sound_SuffixSearchTitle(string Title)
+{
+	return AFAFactory.SuffixSearchTitle(5, Title);
+}
+
+int AFL_AFA_CG_GetCountOfSearchData()
+{
+	return AFAFactory.GetCountOfSearchData(2);
+}
+
+int AFL_AFA_Flat_GetCountOfSearchData()
+{
+	return AFAFactory.GetCountOfSearchData(3);
+}
+
+int AFL_AFA_Sound_GetCountOfSearchData()
+{
+	return AFAFactory.GetCountOfSearchData(5);
+}
+
+string AFL_AFA_CG_GetSearchTitleByIndex(int Index)
+{
+	string Title;
+	AFAFactory.GetSearchTitleByIndex(2, Index, Title);
+	return Title;
+}
+
+string AFL_AFA_Flat_GetSearchTitleByIndex(int Index)
+{
+	string Title;
+	AFAFactory.GetSearchTitleByIndex(3, Index, Title);
+	return Title;
+}
+
+string AFL_AFA_Sound_GetSearchTitleByIndex(int Index)
+{
+	string Title;
+	AFAFactory.GetSearchTitleByIndex(5, Index, Title);
+	return Title;
+}
+

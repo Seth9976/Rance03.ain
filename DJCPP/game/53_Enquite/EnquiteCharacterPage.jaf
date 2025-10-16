@@ -1,0 +1,99 @@
+void EnquiteCharacterPage::init(string activityFileName, string activityName)
+{
+	this.activityFileName_ = activityFileName;
+	this.activityName_ = activityName;
+	this.clickedButton_ = -1;
+	this.initCheckBox();
+	this.initCg();
+	AFL_Parts_AddWholeMouseWheelEvent(this.onWheel);
+	this.btn_[0].init(this.activityName_, "SYS_タイトル画面に戻る", 0);
+	this.btn_[1].init(this.activityName_, "前へボタン", 1);
+	this.btn_[2].init(this.activityName_, "次へボタン", 2);
+	this.btn_[0].setOnClickCallback(this.onClickButton);
+	this.btn_[1].setOnClickCallback(this.onClickButton);
+	this.btn_[2].setOnClickCallback(this.onClickButton);
+}
+
+void EnquiteCharacterPage::onClickButton(int id)
+{
+	this.clickedButton_ = id;
+}
+
+void EnquiteCharacterPage::initCheckBox()
+{
+	array@string names;
+	getPartsNameByGUIType(names, this.activityName_, 1);
+	this.checkBox_.Alloc(names.Numof());
+	this.btnCharacter_.Alloc(names.Numof());
+	int i;
+	for (i = 0; i < this.checkBox_.Numof(); ++i)
+	{
+		string shortName = names[i].GetPart(9, names[i].Length() - 9);
+		ref EnquiteSelection sel = getEnquiteSelectionFromName(names[i]);
+		this.checkBox_[i].init(this.activityName_, names[i]);
+		this.checkBox_[i].setCheck(sel.isChecked());
+		this.checkBox_[i].setOnCheckCallback(this.onCheck);
+		this.btnCharacter_[i].init(this.activityName_, shortName, 0);
+		if (!ＣＧモード確認(sel.getEnableCheckCgName()))
+		{
+			this.checkBox_[i].setEnable(false);
+			this.btnCharacter_[i].setEnable(false);
+		}
+	}
+}
+
+void EnquiteCharacterPage::initCg()
+{
+	array@string names;
+	getPartsNameByGUIType(names, this.activityName_, 11);
+	int i;
+	while (i < names.Numof())
+	{
+		if (names[i].GetPart(0, 3) != "ＣＧ＿")
+		{
+			names.Erase(i);
+		}
+		else
+		{
+			++i;
+		}
+	}
+	for (i = 0; i < names.Numof(); ++i)
+	{
+		string shortName = names[i].GetPart(3, names[i].Length() - 3);
+		ref EnquiteSelection sel = getEnquiteSelectionFromName("チェックボックス＿" + shortName);
+		pass("asdf:%s" % sel.getEnableCheckCgName());
+		if (!ＣＧモード確認(sel.getEnableCheckCgName()))
+		{
+			int pn = AFL_Activity_GetPartsNumber(this.activityName_, names[i]);
+			Ｐ＿ＣＧ設定(pn, "システム／アンケート／顔／%s／無効" % shortName, 1);
+		}
+	}
+}
+
+bool EnquiteCharacterPage::isCharacterKnown(string shortName)
+{
+	return ＣＧモード確認("システム／名札／%s" % shortName);
+}
+
+void EnquiteCharacterPage::onCheck(string partsName, bool isChecked)
+{
+	getEnquiteSelectionFromName(partsName).setChecked(isChecked);
+	pass("%s %d" % partsName % getEnquiteSelectionFromName(partsName).isChecked());
+}
+
+void EnquiteCharacterPage::onWheel(int partsNumber, int forward, int back)
+{
+	int p = AFL_Activity_GetPartsNumber(this.activityName_, "SYS_縦スクロールバー");
+	if (p != 0)
+	{
+		int current = Ｐ＿縦スクロールバー＿スクロール位置取得(p);
+		Ｐ＿縦スクロールバー＿スクロール位置設定(p, (current + back * 100) - forward * 100);
+	}
+}
+
+int EnquiteCharacterPage::getClickedButton()
+{
+	return this.clickedButton_;
+}
+

@@ -1,0 +1,60 @@
+GlobalGameTimer::GlobalGameTimer()
+{
+	this.timer_.Reset();
+	this.scaling_ = 1.0;
+}
+
+void GlobalGameTimer::update()
+{
+	int elapsed = this.timer_.Get();
+	if (elapsed == 0)
+	{
+		return;
+	}
+	this.timer_.Reset();
+	if (elapsed > 48)
+	{
+		elapsed = 16;
+	}
+	this.gameLocalTime_ += Math.Min(48, elapsed) * this.getTotalScaling();
+}
+
+int GlobalGameTimer::getTime()
+{
+	return this.gameLocalTime_;
+}
+
+float GlobalGameTimer::getTotalScaling()
+{
+	float v = g_common_configTimerScaling * this.scaling_;
+	if (this.skipFunc_.Numof() != 0)
+	{
+		if (this.skipFunc_())
+		{
+			v = g_common_configTimerScaling * this.scaling_ * 3.0;
+		}
+	}
+	return Math.MinF(v, 4.0);
+}
+
+void GlobalGameTimer::setScaling(float val)
+{
+	this.scaling_ = val;
+}
+
+float GlobalGameTimer::getScaling()
+{
+	return this.scaling_;
+}
+
+void GlobalGameTimer::setSkipFunction(string skipFunc)
+{
+	this.skipFunc_.Clear();
+	this.skipFunc_.Add(skipFunc);
+}
+
+float GlobalGameTimer::getEffectiveScalingValue()
+{
+	return 1.0 / this.getTotalScaling();
+}
+

@@ -1,0 +1,65 @@
+void ReplayInfo::init(int index)
+{
+	this.load(index);
+}
+
+void ReplayInfo::load(int index)
+{
+	string key = "回想モード情報";
+	this.thumbnail_ = EX_RA2String(key, index, "thumbnail", "");
+	int i;
+	for (i = 0; i < 10; ++i)
+	{
+		string n1 = EX_RA2String(key, index, "event%d" % (i + 1), "");
+		string n2 = EX_RA2String(key, index, "name%d" % (i + 1), "");
+		if (n1 != "")
+		{
+			this.event_.PushBack("ＥＶ／" + n1);
+			this.name_.PushBack(n2);
+		}
+	}
+}
+
+string ReplayInfo::getThumbnailCg()
+{
+	return this.thumbnail_;
+}
+
+void ReplayInfo::getAvailableEventList(ref array@string functionList, ref array@string nameList)
+{
+	functionList.Free();
+	int i;
+	for (i = 0; i < this.event_.Numof(); ++i)
+	{
+		if (g_replayEvent.Find(0, g_replayEvent.Numof(), this.event_[i]) != -1)
+		{
+			functionList.PushBack(this.event_[i]);
+			nameList.PushBack(this.name_[i]);
+		}
+	}
+}
+
+bool ReplayInfo::isAvailable()
+{
+	int i;
+	for (i = 0; i < this.event_.Numof(); ++i)
+	{
+		if (g_replayEvent.Find(0, g_replayEvent.Numof(), this.event_[i]) != -1)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool ReplayInfo::isEventExist(string funcName)
+{
+	return this.event_.Find(0, this.event_.Numof(), funcName) != -1;
+}
+
+void ReplayInfo::getFunctionList(ref array@string functionList)
+{
+	functionList.Alloc(this.event_.Numof());
+	functionList.Copy(0, this.event_, 0, this.event_.Numof());
+}
+

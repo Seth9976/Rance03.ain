@@ -1,0 +1,96 @@
+void test_ExLoading_Monster()
+{
+	int i;
+	for (i = 0; i < g_monster.Numof(); ++i)
+	{
+		string n = "id[%s] name[%s] imageName[%s] hp[%d] exp[%d] gold[%d] attr[%s]" % g_monster[i].getId() % g_monster[i].getName() % g_monster[i].getImageName() % g_monster[i].getHp() % g_monster[i].getExp() % g_monster[i].getGold() % g_monster[i].getMonsterAttributeId();
+		array@string m[3];
+		int j;
+		for (j = 0; j < 3; ++j)
+		{
+			MonsterAttack atk;
+			atk = g_monster[i].getAttack(j, 100);
+			m[j] = "| attr[%s] type[%d] param[%d] buffId[%s]" % atk.getAttributeId() % atk.getTargetType() % atk.getParam() % atk.getBuffId();
+		}
+		pass(n + m[0] + m[1] + m[2]);
+	}
+}
+
+void test_ExLoading_MonsterAttackAttribute()
+{
+	int i;
+	for (i = 0; i < g_monsterAttackAttribute.Numof(); ++i)
+	{
+		string n = "id:%s name:%s image:%s execute:%d" % g_monsterAttackAttribute[i].getId() % g_monsterAttackAttribute[i].getName() % g_monsterAttackAttribute[i].getImageName() % g_monsterAttackAttribute[i].getType();
+		pass(n);
+	}
+}
+
+void test_Battle_MonsterView()
+{
+	array@MonsterView view[3];
+	array@MonsterInstance instance[3];
+	int i;
+	for (i = 0; i < instance.Numof(); ++i)
+	{
+		instance[i].init(g_monster[0].getId(), i, 0, 0);
+		view[i].init(instance[i], g_battleBackgroundInfomation[0].getId(), 0);
+		view[i].getIn();
+	}
+	int t;
+	while (!g_mouse.isClick(1))
+	{
+		if (g_mouse.isClick(0))
+		{
+			int i;
+			for (i = 0; i < instance.Numof(); ++i)
+			{
+				view[i].setTurn(t);
+				instance[i].setPosition((instance[i].getPosition() + 2) % 3);
+			}
+			++t;
+		}
+		if (g_keyboard.isPress(90))
+		{
+			int i;
+			for (i = 0; i < instance.Numof(); ++i)
+			{
+				int v = RAND(100);
+				instance[i].setHp(instance[i].getHp() - v);
+				view[i].setDamage(v, "", true, 0, 0, NULL);
+			}
+		}
+		if (g_keyboard.isPress(88))
+		{
+			int i;
+			for (i = 0; i < instance.Numof(); ++i)
+			{
+				int v = RAND(100);
+				instance[i].setHp(instance[i].getHp() + v);
+				view[i].setDamage(v, "", false, 0, 0, NULL);
+			}
+		}
+		if (g_keyboard.isPress(67))
+		{
+			int i;
+			for (i = 0; i < instance.Numof(); ++i)
+			{
+				int index = RAND(g_monsterBuff.Numof()) - 1;
+				instance[i].addBuff(g_monsterBuff[index].getId());
+			}
+		}
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+}
+
+void test_ExLoading_MonsterBuff()
+{
+	int i;
+	for (i = 0; i < g_monsterBuff.Numof(); ++i)
+	{
+		string s = "id_:[%s] name_:[%s] imageName_:[%s] type_:[%d]" % g_monsterBuff[i].getId() % g_monsterBuff[i].getName() % g_monsterBuff[i].getImageName() % g_monsterBuff[i].getType();
+		pass(s);
+	}
+}
+

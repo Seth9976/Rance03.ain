@@ -1,0 +1,49 @@
+PhotonEmittor::PhotonEmittor()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void PhotonEmittor::init(int count)
+{
+	this.parts_.Alloc(count);
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].init("システム／エフェクト／フォトン", 0);
+		this.parts_[i].setOrigin(5);
+		this.parts_[i].setScaling(RAND(50) + 50);
+		this.parts_[i].setZ(30000.0);
+	}
+}
+
+void PhotonEmittor::setPos(int x, int y)
+{
+	this.x_ = x;
+	this.y_ = y;
+}
+
+void PhotonEmittor::run()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		int rot = RAND(360);
+		int len = RAND(400) + 100;
+		int tx = Math.Cos(rot) * len;
+		int ty = Math.Sin(rot) * len;
+		array@PartsMotion m[2];
+		m[0].setMove(this.x_, this.y_, this.x_ + tx * 0.8, this.y_ + ty * 0.8, 0);
+		m[0].setTime(100 + RAND(100));
+		m[0].setAlpha(128, 255, 0);
+		m[1].setMove(this.x_ + tx * 0.8, this.y_ + ty * 0.8, this.x_ + tx, this.y_ + ty, 0);
+		m[1].setTime(RAND(400) + 200);
+		m[1].setAlpha(255, 0, 0);
+		this.parts_[i].setShow(true);
+		this.parts_[i].runMotionArray(m, NULL);
+	}
+}
+
+void PhotonEmittor::update()
+{
+}
+

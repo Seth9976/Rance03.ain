@@ -1,0 +1,54 @@
+void Ｐ＿ＣＧ設定(int パーツ番号, string ＣＧ名, int 状態)
+{
+	if (!PartsEngine.Parts_SetPartsCG(パーツ番号, ＣＧ名, 0, 状態))
+	{
+		PARTS_Warning("Ｐ＿ＣＧ名(パーツ番号 = %d, ＣＧ名 = %s, 状態 = %d)\n" % パーツ番号 % ＣＧ名 % 状態);
+	}
+	ＣＧモード登録(ＣＧ名);
+}
+
+void Ｐ＿左右反転ＣＧ設定(int パーツ番号, string ＣＧ名, int 状態)
+{
+	if (!PartsEngine.Parts_SetPartsCG(パーツ番号, ＣＧ名, 1, 状態))
+	{
+		PARTS_Warning("Ｐ＿左右反転ＣＧ設定(パーツ番号 = %d, ＣＧ名 = %s, 状態 = %d)\n" % パーツ番号 % ＣＧ名 % 状態);
+	}
+	ＣＧモード登録(ＣＧ名);
+}
+
+void Ｐ＿上下反転ＣＧ設定(int パーツ番号, string ＣＧ名, int 状態)
+{
+	if (!PartsEngine.Parts_SetPartsCG(パーツ番号, ＣＧ名, 2, 状態))
+	{
+		PARTS_Warning("Ｐ＿上下反転ＣＧ設定(パーツ番号 = %d, ＣＧ名 = %s, 状態 = %d)\n" % パーツ番号 % ＣＧ名 % 状態);
+	}
+	ＣＧモード登録(ＣＧ名);
+}
+
+string Ｐ＿ＣＧ名取得(int パーツ番号, int 状態)
+{
+	string CGName;
+	PartsEngine.Parts_GetPartsCGName(パーツ番号, CGName, 状態);
+	return CGName;
+}
+
+bool Ｐ＿左右反転確認(int パーツ番号, int 状態)
+{
+	return PartsEngine.Parts_GetPartsCGDeform(パーツ番号, 状態) == 1;
+}
+
+bool Ｐ＿上下反転確認(int パーツ番号, int 状態)
+{
+	return PartsEngine.Parts_GetPartsCGDeform(パーツ番号, 状態) == 2;
+}
+
+void Ｐ＿ＣＧ表示範囲設定(int パーツ番号, int Ｘ, int Ｙ, int 幅, int 高さ, int 状態)
+{
+	PartsEngine.Parts_SetPartsCGSurfaceArea(パーツ番号, Ｘ, Ｙ, 幅, 高さ, 状態);
+}
+
+void Ｐ＿ＣＧ表示範囲取得(int パーツ番号, ref int Ｘ, ref int Ｙ, ref int 幅, ref int 高さ, int 状態)
+{
+	PartsEngine.GetPartsCGSurfaceArea(パーツ番号, Ｘ, Ｙ, 幅, 高さ, 状態);
+}
+

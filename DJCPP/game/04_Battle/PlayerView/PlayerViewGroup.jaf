@@ -1,0 +1,232 @@
+PlayerViewGroup::PlayerViewGroup()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void PlayerViewGroup::init()
+{
+	array@string pId;
+	g_party.getPlayerIdList(pId);
+	this.view_.Alloc(pId.Numof());
+	int i;
+	for (i = 0; i < this.view_.Numof(); ++i)
+	{
+		this.view_[i].val <- new PlayerView;
+		this.view_[i].val.init(pId[i]);
+	}
+}
+
+void PlayerViewGroup::update()
+{
+}
+
+void PlayerViewGroup::joinDeadMotion()
+{
+	while (true)
+	{
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+		bool isMotion = false;
+		int i;
+		for (i = 0; i < this.playerViewDead_.Numof(); ++i)
+		{
+			isMotion = isMotion || this.playerViewDead_[i].val.isMotion();
+		}
+		if (!isMotion)
+		{
+			break;
+		}
+	}
+	this.playerViewDead_.Free();
+}
+
+void PlayerViewGroup::setFocus(string id)
+{
+	int i;
+	for (i = 0; i < this.view_.Numof(); ++i)
+	{
+		this.view_[i].val.setFocus(this.view_[i].val.getId() == id);
+	}
+}
+
+void PlayerViewGroup::fadeIn(bool val)
+{
+	int i;
+	for (i = 0; i < this.view_.Numof(); ++i)
+	{
+		this.view_[i].val.fadeIn(val);
+	}
+}
+
+void PlayerViewGroup::updateHp()
+{
+	int i;
+	for (i = 0; i < this.view_.Numof(); ++i)
+	{
+		this.view_[i].val.updateHp();
+	}
+}
+
+int PlayerViewGroup::getPlayerViewIndexFromId(string playerId)
+{
+	int i;
+	for (i = 0; i < this.view_.Numof(); ++i)
+	{
+		if (this.view_[i].val.getId() == playerId)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+void PlayerViewGroup::showPopupMessage(string id, string msg, DG_GeneralCallback cb)
+{
+	int index = this.getPlayerViewIndexFromId(id);
+	this.view_[index].val.popupMessage(msg, cb);
+}
+
+bool PlayerViewGroup::eraseDead()
+{
+	bool isErase = false;
+	int i;
+	while (i < this.view_.Numof())
+	{
+		string id = this.view_[i].val.getId();
+		if (getPlayerFromId(id).getHp() == 0)
+		{
+			isErase = true;
+			this.playerViewDead_.PushBack(this.view_[i]);
+			this.view_.Erase(i);
+		}
+		else
+		{
+			++i;
+		}
+	}
+	for (i = 0; i < this.playerViewDead_.Numof(); ++i)
+	{
+		this.playerViewDead_[i].val.showDeadMotion();
+	}
+	return isErase;
+}
+
+void PlayerViewGroup::onFinishEraseDead()
+{
+	this.playerViewDead_.Free();
+	this.onFinishEraseDead_();
+	this.onFinishEraseDead_.Clear();
+}
+
+void PlayerViewGroup::resetPos()
+{
+	int i;
+	for (i = 0; i < this.view_.Numof(); ++i)
+	{
+		this.view_[i].val.resetPos();
+	}
+}
+
+void PlayerViewGroup::addHelper()
+{
+	array@string pIds;
+	g_party.getPlayerIdList(pIds);
+	int i;
+	for (i = 0; i < pIds.Numof(); ++i)
+	{
+		if (this.getPlayerViewIndexFromId(pIds[i]) == -1)
+		{
+			this.view_.Realloc(this.view_.Numof() + 1);
+			int index = this.view_.Numof() - 1;
+			this.view_[index].val <- new PlayerView;
+			this.view_[index].val.init(pIds[i]);
+			this.view_[index].val.fadeIn(true);
+		}
+	}
+}
+
+void PlayerViewGroup::showDamage(ref array@TargetInfomation targets, string ef, DG_GeneralCallback cb)
+{
+	this.onFinishShowDamage_ = cb;
+	this.updateBuffView();
+	int i;
+	for (i = 0; i < targets.Numof(); ++i)
+	{
+		int index = this.getPlayerViewIndexFromId(targets[i].getTargetId());
+		int dmg = targets[i].getDamage();
+		int delay = i * 20;
+		if (i == targets.Numof() - 1)
+		{
+			this.view_[index].val.setDamage(dmg, ef, true, delay, this.onFinishShowDamage);
+		}
+		else
+		{
+			this.view_[index].val.setDamage(dmg, ef, true, delay, NULL);
+		}
+	}
+}
+
+void PlayerViewGroup::onFinishShowDamage()
+{
+	this.eraseDead();
+	this.onFinishShowDamage_();
+}
+
+void PlayerViewGroup::showHeal(ref array@TargetInfomation targets, DG_GeneralCallback cb)
+{
+	int i;
+	for (i = 0; i < targets.Numof(); ++i)
+	{
+		int index = this.getPlayerViewIndexFromId(targets[i].getTargetId());
+		int dmg = targets[i].getDamage();
+		string effectName = this.getEffectName(targets[0].getPlayerSkillId());
+		if (i == 0)
+		{
+			this.view_[index].val.setDamage(dmg, effectName, false, 0, cb);
+		}
+		else
+		{
+			this.view_[index].val.setDamage(dmg, effectName, false, 0, NULL);
+		}
+	}
+}
+
+void PlayerViewGroup::showBuffEffect(ref array@TargetInfomation targets, DG_GeneralCallback onFinish)
+{
+	this.timer_.setTimer(1000, onFinish);
+	this.updateBuffView();
+	int i;
+	for (i = 0; i < targets.Numof(); ++i)
+	{
+		int index = this.getPlayerViewIndexFromId(targets[i].getTargetId());
+		string effectName = this.getEffectName(targets[0].getPlayerSkillId());
+		this.view_[index].val.showEffect(effectName);
+	}
+}
+
+string PlayerViewGroup::getEffectName(string skillId)
+{
+	string name;
+	ref PlayerSkill s = getPlayerSkillFromId(skillId);
+	if (s.getFlatName() != "")
+	{
+		name = s.getFlatName();
+	}
+	else
+	{
+		PlayerSkillAttribute attr;
+		attr = getPlayerSkillAttributeFromId(s.getAttributeId());
+		name = attr.getFlatName();
+	}
+	return "戦闘エフェクト/" + name;
+}
+
+void PlayerViewGroup::updateBuffView()
+{
+	int i;
+	for (i = 0; i < this.view_.Numof(); ++i)
+	{
+		this.view_[i].val.updateBuffView();
+	}
+}
+

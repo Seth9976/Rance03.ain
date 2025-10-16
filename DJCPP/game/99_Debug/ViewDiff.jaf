@@ -1,0 +1,14 @@
+void debugViewDiffCGFile()
+{
+	int count = AFL_AFA_CG_Numof();
+	int i;
+	for (i = 0; i < count; ++i)
+	{
+		string n = AFL_AFA_CG_GetTitle(i);
+		if (!ＣＧモード確認(n))
+		{
+			pass("使ってないCG:%s" % n);
+		}
+	}
+}
+

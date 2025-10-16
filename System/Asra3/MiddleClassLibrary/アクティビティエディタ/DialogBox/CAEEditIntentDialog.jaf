@@ -1,0 +1,337 @@
+CAEEditIntentDialog::CAEEditIntentDialog()
+{
+}
+
+CAEEditIntentDialog::~CAEEditIntentDialog()
+{
+	this.Release();
+}
+
+void CAEEditIntentDialog::CreateParts(string Message, int PosX, int PosY, array@string DestinationList, int IntentType)
+{
+	this.CreateRootLayoutBox();
+	this.CreateMessage(Message);
+	this.CreateDestinationLayoutBox();
+	this.CreateDestinationText();
+	this.CreateDestinationListBox(DestinationList);
+	this.CreateDestinationButtonLayout();
+	this.CreateDestinationAddButton();
+	this.CreateDestinationRemoveButton();
+	this.CreateDestinationUpButton();
+	this.CreateDestinationDownButton();
+	this.CreateIntentTypeLayoutBox();
+	this.CreateIntentTypeText();
+	this.CreateIntentTypeComboBox(IntentType);
+	this.CreateButtonLayout();
+	this.CreateOkButton();
+	this.CreateCancelButton();
+	this.CreateBG(PosX, PosY);
+	Ｐ＿フォーカス設定(this.m_DestinationText);
+}
+
+void CAEEditIntentDialog::CreateRootLayoutBox()
+{
+	this.m_RootLayout = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿パディング設定(this.m_RootLayout, 6, 6, 6, 6);
+	Ｐ＿レイアウトボックス＿配置設定(this.m_RootLayout, 3);
+}
+
+void CAEEditIntentDialog::CreateMessage(string Message)
+{
+	this.m_Message = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿フォント設定(this.m_Message, 0, 14, 0, 0, 0, 0.0, 0, 0, 0, 0.0, 1);
+	Ｐ＿テキスト設定(this.m_Message, Message, 1);
+	Ｐ＿マージン設定(this.m_Message, 3, 3, 3, 3);
+	Ｐ＿レイアウトボックス＿追加(this.m_RootLayout, this.m_Message);
+}
+
+void CAEEditIntentDialog::CreateDestinationLayoutBox()
+{
+	this.m_DestinationLayout = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿追加(this.m_RootLayout, this.m_DestinationLayout);
+	Ｐ＿レイアウトボックス＿レイアウトタイプ設定(this.m_DestinationLayout, 2);
+}
+
+void CAEEditIntentDialog::CreateDestinationText()
+{
+	this.m_DestinationText = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿フォント設定(this.m_DestinationText, 0, 14, 0, 0, 0, 0.0, 0, 0, 0, 0.0, 1);
+	Ｐ＿テキスト設定(this.m_DestinationText, "遷移先", 1);
+	Ｐ＿マージン設定(this.m_DestinationText, 3, 3, 3, 3);
+	Ｐ＿レイアウトボックス＿追加(this.m_DestinationLayout, this.m_DestinationText);
+	AFL_Parts_AddDragEndEvent(this.m_DestinationText, this.DragEndEvent);
+}
+
+void CAEEditIntentDialog::CreateDestinationListBox(array@string DestinationList)
+{
+	this.m_DestinationListBox = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿リストボックス＿サイズ設定(this.m_DestinationListBox, 234, 108);
+	Ｐ＿リストボックス＿行高さ設定(this.m_DestinationListBox, 18);
+	Ｐ＿マージン設定(this.m_DestinationListBox, 3, 3, 3, 3);
+	Ｐ＿レイアウトボックス＿追加(this.m_DestinationLayout, this.m_DestinationListBox);
+	if (!DestinationList.Empty())
+	{
+		Ｐ＿リストボックス＿アイテム全削除(this.m_DestinationListBox);
+		Ｐ＿リストボックス＿アイテムリスト追加(this.m_DestinationListBox, DestinationList);
+	}
+}
+
+void CAEEditIntentDialog::CreateDestinationButtonLayout()
+{
+	this.m_DestinationButtonLayout = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿追加(this.m_DestinationLayout, this.m_DestinationButtonLayout);
+}
+
+void CAEEditIntentDialog::CreateDestinationAddButton()
+{
+	this.m_DestinationAddButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(this.m_DestinationAddButton, "追加");
+	Ｐ＿ボタン＿サイズ設定(this.m_DestinationAddButton, 44, 22);
+	Ｐ＿マージン設定(this.m_DestinationAddButton, 3, 3, 0, 0);
+	Ｐ＿レイアウトボックス＿追加(this.m_DestinationButtonLayout, this.m_DestinationAddButton);
+	AFL_Parts_AddMouseLClickEvent(this.m_DestinationAddButton, this.ClickAddButtonEvent);
+}
+
+void CAEEditIntentDialog::CreateDestinationRemoveButton()
+{
+	this.m_DestinationRemoveButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(this.m_DestinationRemoveButton, "削除");
+	Ｐ＿ボタン＿サイズ設定(this.m_DestinationRemoveButton, 44, 22);
+	Ｐ＿マージン設定(this.m_DestinationRemoveButton, 3, 3, 0, 0);
+	Ｐ＿レイアウトボックス＿追加(this.m_DestinationButtonLayout, this.m_DestinationRemoveButton);
+	AFL_Parts_AddMouseLClickEvent(this.m_DestinationRemoveButton, this.ClickRemoveButtonEvent);
+}
+
+void CAEEditIntentDialog::CreateDestinationUpButton()
+{
+	this.m_DestinationUpButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(this.m_DestinationUpButton, "↑");
+	Ｐ＿ボタン＿サイズ設定(this.m_DestinationUpButton, 44, 22);
+	Ｐ＿マージン設定(this.m_DestinationUpButton, 3, 3, 0, 0);
+	Ｐ＿レイアウトボックス＿追加(this.m_DestinationButtonLayout, this.m_DestinationUpButton);
+	AFL_Parts_AddMouseLClickEvent(this.m_DestinationUpButton, this.ClickUpButtonEvent);
+}
+
+void CAEEditIntentDialog::CreateDestinationDownButton()
+{
+	this.m_DestinationDownButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(this.m_DestinationDownButton, "↓");
+	Ｐ＿ボタン＿サイズ設定(this.m_DestinationDownButton, 44, 22);
+	Ｐ＿マージン設定(this.m_DestinationDownButton, 3, 3, 0, 0);
+	Ｐ＿レイアウトボックス＿追加(this.m_DestinationButtonLayout, this.m_DestinationDownButton);
+	AFL_Parts_AddMouseLClickEvent(this.m_DestinationDownButton, this.ClickDownButtonEvent);
+}
+
+void CAEEditIntentDialog::CreateIntentTypeLayoutBox()
+{
+	this.m_IntentTypeLayout = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿追加(this.m_RootLayout, this.m_IntentTypeLayout);
+	Ｐ＿レイアウトボックス＿レイアウトタイプ設定(this.m_IntentTypeLayout, 2);
+}
+
+void CAEEditIntentDialog::CreateIntentTypeText()
+{
+	this.m_IntentTypeText = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿フォント設定(this.m_IntentTypeText, 0, 14, 0, 0, 0, 0.0, 0, 0, 0, 0.0, 1);
+	Ｐ＿テキスト設定(this.m_IntentTypeText, "遷移方法", 1);
+	Ｐ＿マージン設定(this.m_IntentTypeText, 3, 3, 3, 3);
+	Ｐ＿レイアウトボックス＿追加(this.m_IntentTypeLayout, this.m_IntentTypeText);
+	AFL_Parts_AddDragEndEvent(this.m_IntentTypeText, this.DragEndEvent);
+}
+
+void CAEEditIntentDialog::CreateIntentTypeComboBox(int IntentType)
+{
+	this.m_IntentTypeComboBox.Create();
+	this.m_IntentTypeComboBox.SetSize(250, 20);
+	this.m_IntentTypeComboBox.SetLineHeight(20);
+	this.m_IntentTypeComboBox.SetBoxHeight(72);
+	this.m_IntentTypeComboBox.SetMarginForBox(3, 3);
+	this.m_IntentTypeComboBox.SetMarginForList(3, 3);
+	Ｐ＿マージン設定(this.m_IntentTypeComboBox.GetPartsNumber(), 3, 3, 3, 30);
+	this.m_IntentTypeComboBox.ClearItem();
+	this.m_IntentTypeComboBox.AddItem("なし");
+	this.m_IntentTypeComboBox.AddItem("自分を削除");
+	this.m_IntentTypeComboBox.AddItem("すべてを削除");
+	this.m_IntentTypeComboBox.Select(IntentType);
+	Ｐ＿レイアウトボックス＿追加(this.m_IntentTypeLayout, this.m_IntentTypeComboBox.GetPartsNumber());
+	this.m_IntentTypeComboBox.AddSelectedEvent(this.SelectedIntentType);
+}
+
+void CAEEditIntentDialog::CreateButtonLayout()
+{
+	this.m_ButtonLayout = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿レイアウトタイプ設定(this.m_ButtonLayout, 2);
+	Ｐ＿レイアウトボックス＿パディング設定(this.m_ButtonLayout, 3, 3, 3, 3);
+	Ｐ＿レイアウトボックス＿追加(this.m_RootLayout, this.m_ButtonLayout);
+}
+
+void CAEEditIntentDialog::CreateOkButton()
+{
+	this.m_OKButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(this.m_OKButton, "決定");
+	Ｐ＿ボタン＿サイズ設定(this.m_OKButton, 65, 22);
+	Ｐ＿マージン設定(this.m_OKButton, 0, 0, 3, 0);
+	Ｐ＿レイアウトボックス＿追加(this.m_ButtonLayout, this.m_OKButton);
+	AFL_Parts_AddMouseLClickEvent(this.m_OKButton, this.ClickOKButtonEvent);
+}
+
+void CAEEditIntentDialog::CreateCancelButton()
+{
+	this.m_CancelButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(this.m_CancelButton, "キャンセル");
+	Ｐ＿ボタン＿サイズ設定(this.m_CancelButton, 100, 22);
+	Ｐ＿マージン設定(this.m_CancelButton, 0, 0, 3, 0);
+	Ｐ＿レイアウトボックス＿追加(this.m_ButtonLayout, this.m_CancelButton);
+	AFL_Parts_AddMouseLClickEvent(this.m_CancelButton, this.ClickCancelButtonEvent);
+}
+
+void CAEEditIntentDialog::CreateBG(int PosX, int PosY)
+{
+	int Width = AFL_Parts_GetWidth(this.m_RootLayout, 1);
+	int Height = AFL_Parts_GetHeight(this.m_RootLayout, 1);
+	this.m_BG = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿構築手順＿ピクセル作成(this.m_BG, Width, Height, 1);
+	Ｐ＿構築手順＿色塗り(this.m_BG, 0, 0, Width, Height, 200, 200, 200, -1, 1);
+	Ｐ＿構築ビルド(this.m_BG, 1);
+	Ｐ＿親設定(this.m_RootLayout, this.m_BG);
+	PosX = Math.Max(0, Math.Min(AFL_View_GetWidth() - Width, PosX));
+	PosY = Math.Max(0, Math.Min(AFL_View_GetHeight() - Height, PosY));
+	Ｐ＿座標設定(this.m_BG, PosX, PosY);
+	Ｐ＿ドラッグ可能設定(this.m_BG, true);
+	AFL_Parts_AddDragEndEvent(this.m_BG, this.DragEndEvent);
+}
+
+void CAEEditIntentDialog::Release()
+{
+	this.m_dgSelectInstanceEvent.Clear();
+	PARTS_ReleaseWithInit(this.m_BG);
+	PARTS_ReleaseWithInit(this.m_CancelButton);
+	PARTS_ReleaseWithInit(this.m_OKButton);
+	PARTS_ReleaseWithInit(this.m_ButtonLayout);
+	PARTS_ReleaseWithInit(this.m_IntentTypeText);
+	PARTS_ReleaseWithInit(this.m_IntentTypeLayout);
+	PARTS_ReleaseWithInit(this.m_DestinationDownButton);
+	PARTS_ReleaseWithInit(this.m_DestinationUpButton);
+	PARTS_ReleaseWithInit(this.m_DestinationRemoveButton);
+	PARTS_ReleaseWithInit(this.m_DestinationAddButton);
+	PARTS_ReleaseWithInit(this.m_DestinationButtonLayout);
+	PARTS_ReleaseWithInit(this.m_DestinationListBox);
+	PARTS_ReleaseWithInit(this.m_DestinationText);
+	PARTS_ReleaseWithInit(this.m_DestinationLayout);
+	PARTS_ReleaseWithInit(this.m_Message);
+	PARTS_ReleaseWithInit(this.m_RootLayout);
+	this.m_IntentTypeComboBox.Release();
+}
+
+void CAEEditIntentDialog::Show(int ID, string Message, int PosX, int PosY, array@string DestinationList, int IntentType, DG_SelectIntentHandler dgObject)
+{
+	AFL_Parts_AddLayer(-1);
+	this.m_dgSelectInstanceEvent = dgObject;
+	this.m_ParentID = ID;
+	this.CreateParts(Message, PosX, PosY, DestinationList, IntentType);
+	this.m_Cancel = false;
+	Ｐ＿クリック実行(false);
+	if (this.m_Cancel)
+	{
+		string Destination;
+		dgObject(ID, DestinationList, IntentType);
+	}
+	this.Release();
+	AFL_Parts_EraseLayer(-1);
+}
+
+void CAEEditIntentDialog::ClickOKButtonEvent(int ID, int MouseX, int MouseY)
+{
+	AFL_Parts_EndWaitForClick(0);
+}
+
+void CAEEditIntentDialog::ClickCancelButtonEvent(int ID, int MouseX, int MouseY)
+{
+	this.m_Cancel = true;
+	AFL_Parts_EndWaitForClick(0);
+}
+
+void CAEEditIntentDialog::ClickAddButtonEvent(int ID, int MouseX, int MouseY)
+{
+	string SelectActivityPath;
+	if (!SYS_Activity_SelectFile(SelectActivityPath))
+	{
+		return;
+	}
+	if (!SelectActivityPath.Empty() && !this.IsExistDestination(SelectActivityPath))
+	{
+		Ｐ＿リストボックス＿アイテム追加(this.m_DestinationListBox, SelectActivityPath);
+		this.NotifyDestinationdata();
+	}
+}
+
+void CAEEditIntentDialog::ClickRemoveButtonEvent(int ID, int MouseX, int MouseY)
+{
+	int SelectIndex = Ｐ＿リストボックス＿選択位置取得(this.m_DestinationListBox);
+	if (SelectIndex == -1)
+	{
+		return;
+	}
+	Ｐ＿リストボックス＿アイテム削除(this.m_DestinationListBox, SelectIndex);
+	this.NotifyDestinationdata();
+}
+
+void CAEEditIntentDialog::ClickUpButtonEvent(int ID, int MouseX, int MouseY)
+{
+	int ActiveIndex = Ｐ＿リストボックス＿選択位置取得(this.m_DestinationListBox);
+	if (ActiveIndex <= 0)
+	{
+		return;
+	}
+	string Item = Ｐ＿リストボックス＿アイテム取得(this.m_DestinationListBox, ActiveIndex);
+	Ｐ＿リストボックス＿アイテム削除(this.m_DestinationListBox, ActiveIndex);
+	Ｐ＿リストボックス＿アイテム挿入(this.m_DestinationListBox, ActiveIndex - 1, Item);
+	Ｐ＿リストボックス＿選択位置設定(this.m_DestinationListBox, ActiveIndex - 1);
+	this.NotifyDestinationdata();
+}
+
+void CAEEditIntentDialog::ClickDownButtonEvent(int ID, int MouseX, int MouseY)
+{
+	int ActiveIndex = Ｐ＿リストボックス＿選択位置取得(this.m_DestinationListBox);
+	if (ActiveIndex == -1 || ActiveIndex + 1 == Ｐ＿リストボックス＿アイテム数取得(this.m_DestinationListBox))
+	{
+		return;
+	}
+	string Item = Ｐ＿リストボックス＿アイテム取得(this.m_DestinationListBox, ActiveIndex);
+	Ｐ＿リストボックス＿アイテム削除(this.m_DestinationListBox, ActiveIndex);
+	Ｐ＿リストボックス＿アイテム挿入(this.m_DestinationListBox, ActiveIndex + 1, Item);
+	Ｐ＿リストボックス＿選択位置設定(this.m_DestinationListBox, ActiveIndex + 1);
+	this.NotifyDestinationdata();
+}
+
+bool CAEEditIntentDialog::IsExistDestination(string Destination)
+{
+	array@string List;
+	Ｐ＿リストボックス＿アイテム全取得(this.m_DestinationListBox, List);
+	return List.Find(0, List.Numof(), Destination) != -1;
+}
+
+void CAEEditIntentDialog::DragEndEvent(int ID)
+{
+	int PosX = Ｐ＿Ｘ座標取得(ID);
+	int PosY = Ｐ＿Ｙ座標取得(ID);
+	int Width = AFL_Parts_GetWidth(ID, 1);
+	int Height = AFL_Parts_GetHeight(ID, 1);
+	PosX = Math.Max(0, Math.Min(AFL_View_GetWidth() - Width, PosX));
+	PosY = Math.Max(0, Math.Min(AFL_View_GetHeight() - Height, PosY));
+	Ｐ＿座標設定(ID, PosX, PosY);
+}
+
+void CAEEditIntentDialog::SelectedIntentType(int Number, int Selected)
+{
+	this.NotifyDestinationdata();
+}
+
+void CAEEditIntentDialog::NotifyDestinationdata()
+{
+	array@string DestinationList;
+	Ｐ＿リストボックス＿アイテム全取得(this.m_DestinationListBox, DestinationList);
+	int IntentType = Math.Max(0, this.m_IntentTypeComboBox.SelectedIndex());
+	this.m_dgSelectInstanceEvent(this.m_ParentID, DestinationList, IntentType);
+}
+

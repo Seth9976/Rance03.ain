@@ -1,0 +1,860 @@
+void 制御／罠／落とし穴()
+{
+	制御／罠／ダメージ("落とし穴", 75.0);
+}
+
+void 制御／罠／深い落とし穴()
+{
+	制御／罠／ダメージ("深い落とし穴", 300.0);
+}
+
+void 制御／罠／炎の鼻息()
+{
+	制御／罠／ダメージ("炎の鼻息", 100.0);
+}
+
+void 制御／罠／崩れる柱()
+{
+	制御／罠／ダメージ("崩れる柱", 250.0);
+}
+
+void 制御／罠／崩れる柱Ｂ()
+{
+	制御／罠／ダメージ("崩れる柱", 750.0);
+}
+
+void 制御／罠／粉塵爆発()
+{
+	制御／罠／ダメージ("粉塵爆発", 125.0);
+}
+
+void 制御／罠／破裂玉()
+{
+	制御／罠／ダメージ("破裂玉", 240.0);
+}
+
+void 制御／罠／筋力天井()
+{
+	制御／罠／ダメージ("筋力天井", 300.0);
+}
+
+void 制御／罠／筋力天井Ｂ()
+{
+	制御／罠／ダメージ("筋力天井", 900.0);
+}
+
+void 制御／罠／魔力真空()
+{
+	制御／罠／ダメージ("魔力真空", 200.0);
+}
+
+void 制御／罠／魔力真空Ｂ()
+{
+	制御／罠／ダメージ("魔力真空", 600.0);
+}
+
+void 制御／罠／激臭()
+{
+	制御／罠／ダメージ("激臭", 200.0);
+}
+
+void 制御／罠／激臭Ｂ()
+{
+	制御／罠／ダメージ("激臭", 600.0);
+}
+
+void 制御／罠／マグマ()
+{
+	制御／罠／ダメージ("マグマ", 1000.0);
+}
+
+void 制御／罠／仕掛け矢()
+{
+	制御／罠／ダメージ／単体("仕掛け矢", 250.0);
+}
+
+void 制御／罠／仕掛け矢Ｂ()
+{
+	制御／罠／ダメージ／単体("仕掛け矢", 750.0);
+}
+
+void 制御／罠／警備レーザー()
+{
+	制御／罠／ダメージ／単体("警備レーザー", 300.0);
+}
+
+void 制御／罠／警備レーザーＢ()
+{
+	制御／罠／ダメージ／単体("警備レーザー", 900.0);
+}
+
+void 制御／罠／煮えたぎった油()
+{
+	制御／罠／ダメージ／単体("煮えたぎった油", 400.0);
+}
+
+void 制御／罠／煮えたぎった油Ｂ()
+{
+	制御／罠／ダメージ／単体("煮えたぎった油", 1200.0);
+}
+
+void 制御／罠／ジル()
+{
+	if (getPlayerFromId("ランス").getHp() < getPlayerFromId("ランス").getMaxHp() / 3)
+	{
+		制御／罠／ダメージ／単体("ジル", 100.0);
+	}
+	else
+	{
+		制御／罠／ダメージ／単体("ジル", 150.0);
+	}
+}
+
+void 制御／罠／ジルＢ()
+{
+	if (getPlayerFromId("ランス").getHp() < getPlayerFromId("ランス").getMaxHp() / 3)
+	{
+		制御／罠／ダメージ／単体("ジルB", 50.0);
+	}
+	else
+	{
+		制御／罠／ダメージ／単体("ジルB", 100.0);
+	}
+}
+
+void 制御／罠／ジルＣ()
+{
+	if (getPlayerFromId("ランス").getHp() < getPlayerFromId("ランス").getMaxHp() / 3)
+	{
+		制御／罠／ダメージ／単体("ジルC", 75.0);
+	}
+	else
+	{
+		制御／罠／ダメージ／単体("ジルC", 125.0);
+	}
+}
+
+void 制御／罠／ジルＤ()
+{
+	if (getPlayerFromId("ランス").getHp() < getPlayerFromId("ランス").getMaxHp() / 3)
+	{
+		制御／罠／ダメージ／単体("ジルD", 25.0);
+	}
+	else
+	{
+		制御／罠／ダメージ／単体("ジルD", 75.0);
+	}
+}
+
+void 制御／罠／転落()
+{
+	制御／罠／ダメージ("転落", 275.0);
+	制御／シーン設定／ダンジョン("地上灯台最下層", 0, 10);
+}
+
+void 制御／罠／タクシー()
+{
+	openFlat("ダンジョン/システム／エフェクト／罠");
+	int val = 35;
+	float fluctuation = (val * (RAND(16) - 1)) / 100;
+	val += fluctuation;
+	int beforeHp;
+	int afterHp;
+	beforeHp = getPlayerFromId("フェリス").getHp();
+	afterHp = getPlayerFromId("フェリス").getHp() - val;
+	if (afterHp < 0)
+	{
+		afterHp = 0;
+	}
+	getPlayerFromId("フェリス").setHp(afterHp);
+	DialogInfomation info;
+	info.setCaption("飛行！そして疲労！");
+	info.setMessage("ふらふら頼りないが快適だ！|フェリスは疲労で%dのダメージ！|フェリスのHP:%d → %d" % val % beforeHp % afterHp);
+	info.setPictureImageName("システム／ダイアログ／写真／タクシー");
+	openDialog(info);
+	if (getPlayerFromId("フェリス").getHp() == 0)
+	{
+		DialogInfomation info2;
+		info2.setCaption("墜落！そして激突！");
+		info2.setMessage("フェリスが力尽きて墜落！|という事は全員墜落！");
+		info2.setPictureImageName("システム／ダイアログ／写真／転落");
+		openDialog(info2);
+		制御／シーン設定／ダンジョン("地上灯台最下層", 0, 10);
+	}
+}
+
+void 制御／罠／パチル()
+{
+	openFlat("ダンジョン/システム／エフェクト／罠");
+	int val;
+	float base;
+	float fluctuation;
+	base = 制御／所持金確認() * 0.05;
+	fluctuation = (base * (RAND(16) - 1)) / 100.0;
+	val = base + fluctuation;
+	g_playerCommonParam.addGold(val * -1);
+	DialogInfomation info;
+	info.setCaption("パチルが襲ってきた！");
+	info.setMessage("鮮やかなお手並みで、|%dGOLDパチられた！" % val);
+	info.setPictureImageName("システム／ダイアログ／写真／パチル");
+	openDialog(info);
+}
+
+void 制御／罠／こぼれいくら()
+{
+	openFlat("ダンジョン/システム／エフェクト／罠");
+	int rank;
+	int val;
+	rank = 制御／罠／回避／レイラ();
+	val = 13 - rank;
+	string resist;
+	if (rank != 0)
+	{
+		resist = "|レイラの変調抵抗でターンは軽減！";
+	}
+	g_playerCommonParam.addBadCondition("痛風", val);
+	DialogInfomation info;
+	info.setCaption("いくらをもりもり食べた！");
+	info.setMessage("さっそく痛風にかかった！|歩くだけで激しく痛い！%s" % resist);
+	info.setPictureImageName("システム／ダイアログ／写真／痛風");
+	openDialog(info);
+}
+
+void 制御／罠／フリードリンク()
+{
+	openFlat("ダンジョン/システム／エフェクト／罠");
+	int rank;
+	int val;
+	rank = 制御／罠／回避／レイラ();
+	val = 13 - rank;
+	string resist;
+	if (rank != 0)
+	{
+		resist = "|レイラの変調抵抗でターンは軽減！";
+	}
+	g_playerCommonParam.addBadCondition("内股", val);
+	DialogInfomation info;
+	info.setCaption("ドリンクをがぶ飲みした！");
+	info.setMessage("ぱんぱんでもれそうだ！|内股で進むしかない！%s" % resist);
+	info.setPictureImageName("システム／ダイアログ／写真／フリードリンク");
+	openDialog(info);
+}
+
+void 制御／罠／坑内放送()
+{
+	openFlat("ダンジョン/システム／エフェクト／罠");
+	int rank;
+	int val;
+	rank = 制御／罠／回避／レイラ();
+	val = 13 - rank;
+	string resist;
+	if (rank != 0)
+	{
+		resist = "|レイラの変調抵抗でターンは軽減！";
+	}
+	g_playerCommonParam.addBadCondition("幻聴", val);
+	DialogInfomation info;
+	info.setCaption("坑内放送のスイッチを入れた！");
+	info.setMessage("脳に響く不快な曲が流れる！|リクエストしたのはどこのどいつだ！%s" % resist);
+	info.setPictureImageName("システム／ダイアログ／写真／幻聴");
+	openDialog(info);
+}
+
+void 制御／罠／森の演奏会()
+{
+	openFlat("ダンジョン/システム／エフェクト／罠");
+	int rank;
+	int val;
+	rank = 制御／罠／回避／レイラ();
+	val = 13 - rank;
+	string resist;
+	if (rank != 0)
+	{
+		resist = "|レイラの変調抵抗でターンは軽減！";
+	}
+	g_playerCommonParam.addBadCondition("幻聴", val);
+	DialogInfomation info;
+	info.setCaption("森の演奏会が開かれた！");
+	info.setMessage("脳に響く不快な曲が流れる！|指揮者はどこのどいつだ！%s" % resist);
+	info.setPictureImageName("システム／ダイアログ／写真／幻聴");
+	openDialog(info);
+}
+
+void 制御／罠／有線放送()
+{
+	openFlat("ダンジョン/システム／エフェクト／罠");
+	int rank;
+	int val;
+	rank = 制御／罠／回避／レイラ();
+	val = 13 - rank;
+	string resist;
+	if (rank != 0)
+	{
+		resist = "|レイラの変調抵抗でターンは軽減！";
+	}
+	g_playerCommonParam.addBadCondition("幻聴", val);
+	DialogInfomation info;
+	info.setCaption("有線放送のスイッチを入れた！");
+	info.setMessage("脳に響く不快な曲が流れる！|リクエストしたのはどこのどいつだ！%s" % resist);
+	info.setPictureImageName("システム／ダイアログ／写真／幻聴");
+	openDialog(info);
+}
+
+void 制御／罠／前衛的めがね()
+{
+	openFlat("ダンジョン/システム／エフェクト／罠");
+	int rank;
+	int val;
+	rank = 制御／罠／回避／レイラ();
+	val = 13 - rank;
+	string resist;
+	if (rank != 0)
+	{
+		resist = "|レイラの変調抵抗でターンは軽減！";
+	}
+	g_playerCommonParam.addBadCondition("乱視", val);
+	DialogInfomation info;
+	info.setCaption("拾っためがねを装着した！");
+	info.setMessage("視界がおかしくなった！|うまく狙いをつけにくくなった！%s" % resist);
+	info.setPictureImageName("システム／ダイアログ／写真／乱視");
+	openDialog(info);
+}
+
+void 制御／罠／黒牛乳()
+{
+	openFlat("ダンジョン/システム／エフェクト／罠");
+	int rank;
+	int val;
+	rank = 制御／罠／回避／レイラ();
+	val = 13 - rank;
+	string resist;
+	if (rank != 0)
+	{
+		resist = "|レイラの変調抵抗でターンは軽減！";
+	}
+	g_playerCommonParam.addBadCondition("骨粗", val);
+	DialogInfomation info;
+	info.setCaption("黒牛乳を飲んだ！");
+	info.setMessage("みるみる骨が弱くなった！|余計にダメージを喰らいそうだ！%s" % resist);
+	info.setPictureImageName("システム／ダイアログ／写真／骨粗");
+	openDialog(info);
+}
+
+void 制御／罠／極秘書類()
+{
+	openFlat("ダンジョン/システム／エフェクト／罠");
+	int rank;
+	int val;
+	rank = 制御／罠／回避／レイラ();
+	val = 13 - rank;
+	string resist;
+	if (rank != 0)
+	{
+		resist = "|レイラの変調抵抗でターンは軽減！";
+	}
+	g_playerCommonParam.addBadCondition("動揺", val);
+	DialogInfomation info;
+	info.setCaption("秘密書類を見た！");
+	info.setMessage("頭がおかしくなった！|見えないものが見えはじめた！%s" % resist);
+	info.setPictureImageName("システム／ダイアログ／写真／動揺");
+	openDialog(info);
+}
+
+void 制御／罠／真理の書()
+{
+	openFlat("ダンジョン/システム／エフェクト／罠");
+	int rank;
+	int val;
+	rank = 制御／罠／回避／レイラ();
+	val = 13 - rank;
+	string resist;
+	if (rank != 0)
+	{
+		resist = "|レイラの変調抵抗でターンは軽減！";
+	}
+	g_playerCommonParam.addBadCondition("動揺", val);
+	DialogInfomation info;
+	info.setCaption("真理の書を読んだ！");
+	info.setMessage("世界の真理を知って発狂！|見えないものが見えはじめた！%s" % resist);
+	info.setPictureImageName("システム／ダイアログ／写真／動揺");
+	openDialog(info);
+}
+
+void 制御／罠／閉店()
+{
+	openFlat("ダンジョン/システム／エフェクト／罠");
+	int rank;
+	int val;
+	rank = 制御／罠／回避／レイラ();
+	val = 13 - rank;
+	string resist;
+	if (rank != 0)
+	{
+		resist = "|レイラの変調抵抗でターンは軽減！";
+	}
+	g_playerCommonParam.addBadCondition("閉店", val);
+	DialogInfomation info;
+	info.setCaption("閉店！");
+	info.setMessage("なぜかこの場所が閉店して、|問答無用で照明が落とされた！%s" % resist);
+	info.setPictureImageName("システム／ダイアログ／写真／閉店");
+	openDialog(info);
+}
+
+void 制御／罠／濁流()
+{
+	openFlat("ダンジョン/システム／エフェクト／罠");
+	制御／帰り木設定(false);
+	DialogInfomation info;
+	info.setCaption("横穴から濁流！");
+	info.setMessage("帰り木が濡れて使えない！|自力で外に出るはめになった！");
+	info.setPictureImageName("システム／ダイアログ／写真／湿気");
+	openDialog(info);
+}
+
+void 制御／罠／警報()
+{
+	if (!EV("ＥＶ／牢獄／警報／初回", -2147483648) && !EV("ＥＶ／牢獄／リア／二回目／Ｈ後", -2147483648))
+	{
+		ＥＶ／牢獄／警報／初回();
+	}
+	else if (!EV("ＥＶ／牢獄／警報／汎用", -2147483648) && !EV("ＥＶ／牢獄／リア／二回目／Ｈ後", -2147483648))
+	{
+		ＥＶ／牢獄／警報／汎用();
+	}
+	else
+	{
+		DialogInfomation info;
+		info.setCaption("警報を踏んだ！");
+		info.setMessage("鳴り響く音を聞きつけて、|何者かが近づいてくる……");
+		info.setPictureImageName("システム／ダイアログ／写真／警報");
+		openDialog(info);
+	}
+	if (!EV("ＥＶ／居館／一階／入口／初回", -2147483648))
+	{
+		制御／モンスター／牢獄／ヘルマン歩兵();
+	}
+	else
+	{
+		switch (RAND(6))
+		{
+		case 1:
+			制御／モンスター／牢獄／コンテ();
+			break;
+		case 2:
+		case 3:
+			制御／モンスター／牢獄／フルパワーゴリラＺＩＩ();
+			break;
+		case 4:
+		case 5:
+		case 6:
+			制御／モンスター／牢獄／ライカンスロープ();
+			break;
+		}
+	}
+	if (!EV("ＥＶ／牢獄／リア／二回目／Ｈ後", -2147483648))
+	{
+		if (!EV("ＥＶ／牢獄／警報／初回／戦闘後", -2147483648))
+		{
+			ＥＶ／牢獄／警報／初回／戦闘後();
+		}
+		else if (!EV("ＥＶ／牢獄／警報／汎用／戦闘後", -2147483648))
+		{
+			ＥＶ／牢獄／警報／汎用／戦闘後();
+		}
+	}
+}
+
+void 制御／罠／忘れた草()
+{
+	openFlat("ダンジョン/システム／エフェクト／罠");
+	int rank;
+	int val;
+	rank = 制御／罠／回避／レイラ();
+	val = 13 - rank;
+	string resist;
+	if (rank != 0)
+	{
+		resist = "|レイラの変調抵抗でターンは軽減！";
+	}
+	else
+	{
+		resist = "|思い出すまでしばらくかかりそうだ";
+	}
+	array@string skills;
+	array@string activeSkills;
+	g_party.getSkillIdList(skills);
+	int i;
+	for (i = 0; i < skills.Numof(); ++i)
+	{
+		string tempPlayerId;
+		tempPlayerId = getPlayerSkillFromId(skills[i]).getPlayerId();
+		if (getPlayerFromId(tempPlayerId).getHp() != 0)
+		{
+			activeSkills.PushBack(skills[i]);
+		}
+	}
+	string targetSkillId;
+	string targetPlayerId;
+	targetSkillId = activeSkills[RAND(activeSkills.Numof()) - 1];
+	targetPlayerId = getPlayerSkillFromId(targetSkillId).getPlayerId();
+	getPlayerFromId(targetPlayerId).setOverCoolTime(targetSkillId, val);
+	string skillName;
+	string playerName;
+	skillName = getPlayerSkillFromId(targetSkillId).getName();
+	playerName = getPlayerFromId(targetPlayerId).getShortName();
+	DialogInfomation info;
+	info.setCaption("忘れた草に触れた！");
+	info.setMessage("%sは、|%sのやり方を忘れた！%s" % playerName % skillName % resist);
+	info.setPictureImageName("システム／ダイアログ／写真／忘れた草");
+	openDialog(info);
+}
+
+void 制御／罠／ダメージ(string type, float base)
+{
+	openFlat("ダンジョン/システム／エフェクト／罠");
+	if (type != "痛風")
+	{
+		if (制御／罠／回避／スー())
+		{
+			return;
+		}
+	}
+	int val;
+	int minDamage;
+	int maxDamage;
+	int beforeHp;
+	int afterHp;
+	float fluctuation;
+	float dexAdjust;
+	float critAdjust;
+	minDamage = 16777216;
+	array@string players;
+	g_party.getPlayerIdList(players);
+	int i;
+	for (i = 0; i < players.Numof(); ++i)
+	{
+		string pId;
+		pId = players[i];
+		if (getPlayerFromId(pId).getHp() != 0)
+		{
+			if ((getPlayerFromId(pId).getId() == "フェリス" || getPlayerFromId(pId).getId() == "ユラン") && (type == "落とし穴" || type == "深い落とし穴"))
+			{
+				critAdjust = 0.0;
+			}
+			else if (type == "筋力天井")
+			{
+				if (RAND(512) <= getPlayerFromId(pId).getStrength())
+				{
+					critAdjust = 0.2;
+				}
+				else if (RAND(256) <= getPlayerFromId(pId).getStrength())
+				{
+					critAdjust = 0.4;
+				}
+				else if (RAND(128) <= getPlayerFromId(pId).getStrength())
+				{
+					critAdjust = 0.6;
+				}
+				else if (RAND(64) <= getPlayerFromId(pId).getStrength())
+				{
+					critAdjust = 0.8;
+				}
+				else
+				{
+					critAdjust = 1.0;
+				}
+			}
+			else if (type == "魔力真空")
+			{
+				if (RAND(512) <= getPlayerFromId(pId).getMind())
+				{
+					critAdjust = 0.2;
+				}
+				else if (RAND(256) <= getPlayerFromId(pId).getMind())
+				{
+					critAdjust = 0.4;
+				}
+				else if (RAND(128) <= getPlayerFromId(pId).getMind())
+				{
+					critAdjust = 0.6;
+				}
+				else if (RAND(64) <= getPlayerFromId(pId).getMind())
+				{
+					critAdjust = 0.8;
+				}
+				else
+				{
+					critAdjust = 1.0;
+				}
+			}
+			else if (type != "痛風")
+			{
+				if (RAND(512) <= getPlayerFromId(pId).getDexterity())
+				{
+					critAdjust = 0.2;
+				}
+				else if (RAND(256) <= getPlayerFromId(pId).getDexterity())
+				{
+					critAdjust = 0.4;
+				}
+				else if (RAND(128) <= getPlayerFromId(pId).getDexterity())
+				{
+					critAdjust = 0.6;
+				}
+				else if (RAND(64) <= getPlayerFromId(pId).getDexterity())
+				{
+					critAdjust = 0.8;
+				}
+				else
+				{
+					critAdjust = 1.0;
+				}
+			}
+			else
+			{
+				critAdjust = 1.0;
+			}
+			fluctuation = (base * (RAND(16) - 1)) / 100.0;
+			val = (base + fluctuation) * critAdjust;
+			if (val < 0)
+			{
+				val = 0;
+			}
+			if (val < minDamage)
+			{
+				minDamage = val;
+			}
+			if (val > maxDamage)
+			{
+				maxDamage = val;
+			}
+			pass("被害者:%s ダメージ:%d" % getPlayerFromId(pId).getShortName() % val);
+			beforeHp = getPlayerFromId(pId).getHp();
+			afterHp = getPlayerFromId(pId).getHp() - val;
+			getPlayerFromId(pId).setHp(afterHp);
+		}
+	}
+	DialogInfomation info;
+	switch (type)
+	{
+	case "落とし穴":
+		info.setCaption("落とし穴に落ちた！");
+		info.setMessage("3メートルも掘りやがって！|編成パーティはそれぞれ、|%d～%dのダメージ！" % minDamage % maxDamage);
+		info.setPictureImageName("システム／ダイアログ／写真／落とし穴");
+		break;
+	case "深い落とし穴":
+		info.setCaption("深い落とし穴に落ちた！");
+		info.setMessage("18メートルも掘りやがって！|編成パーティはそれぞれ、|%d～%dのダメージ！" % minDamage % maxDamage);
+		info.setPictureImageName("システム／ダイアログ／写真／落とし穴");
+		break;
+	case "炎の鼻息":
+		info.setCaption("燃える鼻息で焼かれた！");
+		info.setMessage("熱いプラス不愉快！|編成パーティはそれぞれ、|%d～%dのダメージ！" % minDamage % maxDamage);
+		info.setPictureImageName("システム／ダイアログ／写真／炎の鼻息");
+		break;
+	case "崩れる柱":
+		info.setCaption("瓦礫の下敷きになった！");
+		info.setMessage("有無を言わさぬ質量！|編成パーティはそれぞれ、|%d～%dのダメージ！" % minDamage % maxDamage);
+		info.setPictureImageName("システム／ダイアログ／写真／崩れる柱");
+		break;
+	case "転落":
+		info.setCaption("転落！そして激突！");
+		info.setMessage("足を滑らせて大惨事だ！|編成パーティはそれぞれ、|%d～%dのダメージ！" % minDamage % maxDamage);
+		info.setPictureImageName("システム／ダイアログ／写真／落とし穴");
+		break;
+	case "粉塵爆発":
+		info.setCaption("目の前でいきなり爆発！");
+		info.setMessage("反応する間もなかった！|編成パーティはそれぞれ、|%d～%dのダメージ！" % minDamage % maxDamage);
+		info.setPictureImageName("システム／ダイアログ／写真／粉塵爆発");
+		break;
+	case "破裂玉":
+		info.setCaption("車体が爆発で揺れた！");
+		info.setMessage("何か踏んだか！？|３号は%dのダメージ！" % maxDamage);
+		info.setPictureImageName("システム／ダイアログ／写真／破裂玉");
+		break;
+	case "筋力天井":
+		info.setCaption("天井が落ちてきた！");
+		info.setMessage("筋力勝負で持ち堪えろ！|編成パーティはそれぞれ、|%d～%dのダメージ！" % minDamage % maxDamage);
+		info.setPictureImageName("システム／ダイアログ／写真／崩れる柱");
+		break;
+	case "魔力真空":
+		info.setCaption("辺りが真空になった！");
+		info.setMessage("魔力勝負で持ち堪えろ！|編成パーティはそれぞれ、|%d～%dのダメージ！" % minDamage % maxDamage);
+		info.setPictureImageName("システム／ダイアログ／写真／罠");
+		break;
+	case "マグマ":
+		info.setCaption("マグマに突入！");
+		info.setMessage("噴き上がる溶岩！自然の驚異！|編成パーティはそれぞれ、|%d～%dのダメージ！" % minDamage % maxDamage);
+		info.setPictureImageName("システム／ダイアログ／写真／マグマ");
+		break;
+	case "激臭":
+		info.setCaption("くさい！");
+		info.setMessage("気を失うほどの威力！|編成パーティはそれぞれ、|%d～%dのダメージ！" % minDamage % maxDamage);
+		info.setPictureImageName("システム／ダイアログ／写真／激臭");
+		break;
+	case "痛風":
+		info.setCaption("痛風の激痛が走った！");
+		info.setMessage("ぎゃーー！|編成パーティはそれぞれ、|%d～%dのダメージ！" % minDamage % maxDamage);
+		info.setPictureImageName("システム／ダイアログ／写真／痛風");
+		break;
+	}
+	openDialog(info);
+}
+
+void 制御／罠／ダメージ／単体(string type, float base)
+{
+	switch (type)
+	{
+	case "ジル":
+		openFlat("ダンジョン/システム／エフェクト／罠／落雷");
+		break;
+	case "ジルB":
+		openFlat("ダンジョン/システム／エフェクト／罠／炎");
+		break;
+	case "ジルC":
+		openFlat("ダンジョン/システム／エフェクト／罠／ひっかき");
+		break;
+	case "ジルD":
+		openFlat("ダンジョン/システム／エフェクト／罠／噛みつき");
+		break;
+	default:
+		openFlat("ダンジョン/システム／エフェクト／罠");
+		break;
+	}
+	if (制御／罠／回避／スー())
+	{
+		return;
+	}
+	int val;
+	int beforeHp;
+	int afterHp;
+	float fluctuation;
+	float dexAdjust;
+	float critAdjust;
+	array@string players;
+	g_party.getPlayerIdList(players);
+	string pId;
+	pId = players[RAND(players.Numof()) - 1];
+	if (RAND(512) <= getPlayerFromId(pId).getDexterity())
+	{
+		critAdjust = 0.2;
+	}
+	else if (RAND(256) <= getPlayerFromId(pId).getDexterity())
+	{
+		critAdjust = 0.4;
+	}
+	else if (RAND(128) <= getPlayerFromId(pId).getDexterity())
+	{
+		critAdjust = 0.6;
+	}
+	else if (RAND(64) <= getPlayerFromId(pId).getDexterity())
+	{
+		critAdjust = 0.8;
+	}
+	else
+	{
+		critAdjust = 1.0;
+	}
+	fluctuation = (base * (RAND(16) - 1)) / 100.0;
+	val = (base + fluctuation) * critAdjust;
+	if (val < 0)
+	{
+		val = 0;
+	}
+	pass("被害者:%s ダメージ:%d" % getPlayerFromId(pId).getShortName() % val);
+	beforeHp = getPlayerFromId(pId).getHp();
+	afterHp = getPlayerFromId(pId).getHp() - val;
+	getPlayerFromId(pId).setHp(afterHp);
+	if (afterHp < 0)
+	{
+		afterHp = 0;
+	}
+	if (type != "ジル" && type != "ジルB" && type != "ジルC" && type != "ジルD")
+	{
+		DialogInfomation info;
+		switch (type)
+		{
+		case "仕掛け矢":
+			info.setCaption("仕掛け矢が刺さった！");
+			info.setMessage("もれなく痛い箇所を狙われた！|%sは%dのダメージ！|HP:%d → %d" % getPlayerFromId(pId).getShortName() % val % beforeHp % afterHp);
+			info.setPictureImageName("システム／ダイアログ／写真／仕掛け矢");
+			break;
+		case "警備レーザー":
+			info.setCaption("警備レーザーに撃たれた！");
+			info.setMessage("ジュッ|%sは%dのダメージ！|HP:%d → %d" % getPlayerFromId(pId).getShortName() % val % beforeHp % afterHp);
+			info.setPictureImageName("システム／ダイアログ／写真／警備レーザー");
+			break;
+		case "煮えたぎった油":
+			info.setCaption("煮えたぎった油をかぶった！");
+			info.setMessage("溶ける！溶けた！|%sは%dのダメージ！|HP:%d → %d" % getPlayerFromId(pId).getShortName() % val % beforeHp % afterHp);
+			info.setPictureImageName("システム／ダイアログ／写真／煮えたぎった油");
+			break;
+		}
+		openDialog(info);
+	}
+}
+
+bool 制御／罠／回避／スー()
+{
+	if (制御／パーティ／ゼロスリースキル確認("スー"))
+	{
+		int consecutive;
+		int rank;
+		consecutive = getPlayerFromId("スー").getConsecutiveBattleCount();
+		if (consecutive >= 10)
+		{
+			rank = 7;
+		}
+		else if (consecutive >= 5)
+		{
+			rank = 4;
+		}
+		else if (consecutive >= 1)
+		{
+			rank = 2;
+		}
+		else
+		{
+			rank = 1;
+		}
+		if (RAND(10) <= rank)
+		{
+			DialogInfomation info;
+			info.setCaption("スーのワイルドセンス！");
+			info.setMessage("野生を発揮して危険を回避した！");
+			info.setPictureImageName("システム／ダイアログ／写真／スー");
+			openDialog(info);
+			return true;
+		}
+	}
+	return false;
+}
+
+int 制御／罠／回避／レイラ()
+{
+	if (制御／パーティ／ゼロスリースキル確認("レイラ"))
+	{
+		int consecutive;
+		int rank;
+		consecutive = getPlayerFromId("レイラ").getConsecutiveBattleCount();
+		if (consecutive >= 10)
+		{
+			rank = 7;
+		}
+		else if (consecutive >= 5)
+		{
+			rank = 4;
+		}
+		else if (consecutive >= 1)
+		{
+			rank = 2;
+		}
+		else
+		{
+			rank = 1;
+		}
+		return rank;
+	}
+	return 0;
+}
+

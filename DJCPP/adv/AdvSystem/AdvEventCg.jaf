@@ -1,0 +1,35 @@
+void AdvEventCg::show(string cgName, int asraTransitionCommand, int time)
+{
+	this.partsCg_.init(cgName, 0);
+	this.partsCg_.setShow(true);
+	this.partsCg_.setPos(0.0, 0.0);
+	this.partsCg_.setZ(3300.0);
+	if (asraTransitionCommand != -1 && time > 0)
+	{
+		全表示(asraTransitionCommand, time * g_globalTimer.getEffectiveScalingValue());
+	}
+}
+
+void AdvEventCg::hide(int asraTransitionCommand, int time)
+{
+	if (!this.partsCg_.isShow())
+	{
+		return;
+	}
+	this.release();
+	if (asraTransitionCommand != -1 && time > 0)
+	{
+		全表示(asraTransitionCommand, time * g_globalTimer.getEffectiveScalingValue());
+	}
+}
+
+void AdvEventCg::release()
+{
+	this.partsCg_.release();
+}
+
+bool AdvEventCg::isShow()
+{
+	return this.partsCg_.isInitialized();
+}
+

@@ -1,0 +1,58 @@
+DungeonCenterCursor::DungeonCenterCursor()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void DungeonCenterCursor::init()
+{
+	this.initParts();
+}
+
+void DungeonCenterCursor::initParts()
+{
+	this.parts_[0].init("システム／ダンジョン／選択／左", 0);
+	this.parts_[1].init("システム／ダンジョン／選択／右", 0);
+	createPartsGroup(this.parent_, this.parts_, 1800);
+	this.setPartsShow();
+	this.setPartsPos();
+}
+
+void DungeonCenterCursor::fadeIn(bool val)
+{
+	this.parent_.setShow(true);
+	PartsMotion m;
+	m.setTime(200);
+	if (val)
+	{
+		m.setAlpha(0, 255, 0);
+	}
+	else
+	{
+		m.setAlpha(255, 0, 0);
+	}
+	this.parent_.runMotion(m, NULL);
+}
+
+void DungeonCenterCursor::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+}
+
+void DungeonCenterCursor::setPartsPos()
+{
+	this.parts_[0].setPos(512 + -260, 211.0);
+	this.parts_[1].setPos(684.0, 211.0);
+	this.parts_[0].changeOrigin(6);
+	this.parts_[1].changeOrigin(4);
+}
+
+void DungeonCenterCursor::update()
+{
+	float r = Math.Sin((this.timer_.getTime() / 2000.0) * 360.0) + 0.5;
+	this.parent_.setAddColorValue(r * 100.0, r * 100.0, r * 100.0);
+}
+

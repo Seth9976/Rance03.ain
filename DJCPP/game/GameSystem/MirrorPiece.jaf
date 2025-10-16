@@ -1,0 +1,105 @@
+void MirrorPiece::init(string id)
+{
+	int count = EX_Int("鏡の破片枚数", 0);
+	this.isOpen_.Alloc(count);
+	this.isOpen_.Fill(0, this.isOpen_.Numof(), false);
+	this.isShownAtViewer_ = true;
+	this.baseCgName_ = id;
+	this.loadParam();
+}
+
+int MirrorPiece::open()
+{
+	if (this.isComplete())
+	{
+		return -1;
+	}
+	this.isShownAtViewer_ = false;
+	array@int indexes;
+	int i;
+	for (i = 0; i < this.isOpen_.Numof(); ++i)
+	{
+		if (!this.isOpen_[i])
+		{
+			indexes.PushBack(i);
+		}
+	}
+	int openIndex = indexes[RAND(indexes.Numof()) - 1];
+	this.isOpen_[openIndex] = true;
+	return openIndex;
+}
+
+void MirrorPiece::setShownAtViewer(bool val)
+{
+	this.isShownAtViewer_ = val;
+}
+
+bool MirrorPiece::isComplete()
+{
+	int i;
+	for (i = 0; i < this.isOpen_.Numof(); ++i)
+	{
+		if (!this.isOpen_[i])
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+void MirrorPiece::loadParam()
+{
+	this.completeCgName_ = EX_SA2String("鏡の破片情報", this.baseCgName_, "completeCgName", "");
+	this.advFunctionName_ = EX_SA2String("鏡の破片情報", this.baseCgName_, "advFunctionName", "");
+	this.bgCgName_ = EX_SA2String("鏡の破片情報", this.baseCgName_, "bgCgName", "");
+}
+
+string MirrorPiece::getCgName(int index)
+{
+	return "%s%02D" % this.baseCgName_ % (index + 1);
+}
+
+string MirrorPiece::getCompleteCgName()
+{
+	return this.completeCgName_;
+}
+
+string MirrorPiece::getAdvFunctionName()
+{
+	return this.advFunctionName_;
+}
+
+bool MirrorPiece::isPieceOpen(int index)
+{
+	return this.isOpen_[index];
+}
+
+int MirrorPiece::getPieceCount()
+{
+	return this.isOpen_.Numof();
+}
+
+string MirrorPiece::getBgCgName()
+{
+	return this.bgCgName_;
+}
+
+bool MirrorPiece::isShownAtViewer()
+{
+	return this.isShownAtViewer_;
+}
+
+int MirrorPiece::getCount()
+{
+	int n;
+	int i;
+	for (i = 0; i < this.isOpen_.Numof(); ++i)
+	{
+		if (this.isOpen_[i])
+		{
+			++n;
+		}
+	}
+	return n;
+}
+

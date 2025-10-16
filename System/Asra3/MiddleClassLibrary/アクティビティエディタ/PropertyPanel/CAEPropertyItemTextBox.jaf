@@ -1,0 +1,176 @@
+CAEPropertyItemTextBox::CAEPropertyItemTextBox()
+{
+}
+
+CAEPropertyItemTextBox::~CAEPropertyItemTextBox()
+{
+	this.Release();
+}
+
+int CAEPropertyItemTextBox::Init(string Name, int LabelWidth, int TextBoxWidth, ref CAEPropertyToolTip ToolTip, bool OpenIMEGainFocus)
+{
+	this.Release();
+	this.m_OpenIMEGainFocus = OpenIMEGainFocus;
+	this.m_LayoutID = PARTS_GetFreeSystemPartsNumber();
+	this.m_Label = PARTS_GetFreeSystemPartsNumber();
+	this.m_TextBox = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿レイアウトタイプ設定(this.m_LayoutID, 2);
+	Ｐ＿レイアウトボックス＿配置設定(this.m_LayoutID, 4);
+	Ｐ＿マージン設定(this.m_LayoutID, 1, 1, 3, 3);
+	Ｐ＿フォント設定(this.m_Label, 0, 14, 0, 0, 0, 0.0, 0, 0, 0, 0.0, 1);
+	Ｐ＿テキスト設定(this.m_Label, Name, 1);
+	Ｐ＿オンカーソル透過設定(this.m_Label, true);
+	Ｐ＿マージン設定(this.m_Label, 0, 0, 0, LabelWidth - AFL_Parts_GetWidth(this.m_Label, 1));
+	Ｐ＿レイアウトボックス＿追加(this.m_LayoutID, this.m_Label);
+	Ｐ＿テキストボックス＿サイズ設定(this.m_TextBox, TextBoxWidth, 18);
+	Ｐ＿レイアウトボックス＿追加(this.m_LayoutID, this.m_TextBox);
+	Ｐ＿ドラッグ可能設定(this.m_Label, true);
+	AFL_Parts_AddDragBeginEvent(this.m_Label, this.DragBeginEvent);
+	AFL_Parts_AddDragingEvent(this.m_Label, this.DragingEvent);
+	AFL_Parts_AddKeyDownEvent(this.m_LayoutID, this.KeyDownEvent);
+	AFL_Parts_AddKeyDownEvent(this.m_Label, this.KeyDownEvent);
+	AFL_Parts_AddKeyDownEvent(this.m_TextBox, this.KeyDownEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_LayoutID, this.MouseWheelEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_Label, this.MouseWheelEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_TextBox, this.MouseWheelEvent);
+	AFL_Parts_AddFixedEvent(this.m_TextBox, this.ChangeTextEvent);
+	AFL_Parts_AddFocusEvent(this.m_TextBox, this.FocusEvent);
+	if (ToolTip !== NULL)
+	{
+		ToolTip.AddParts(this.m_TextBox);
+	}
+	return this.m_LayoutID;
+}
+
+void CAEPropertyItemTextBox::Release()
+{
+	this.m_dgChangeTextEvent.Clear();
+	this.m_dgMouseWheelEvent.Clear();
+	this.m_dgKeyDownEvent.Clear();
+	PARTS_ReleaseWithInit(this.m_TextBox);
+	PARTS_ReleaseWithInit(this.m_Label);
+	PARTS_ReleaseWithInit(this.m_LayoutID);
+	this.m_OpenIMEGainFocus = false;
+}
+
+int CAEPropertyItemTextBox::GetID()
+{
+	return this.m_LayoutID;
+}
+
+int CAEPropertyItemTextBox::GetTextBoxID()
+{
+	return this.m_TextBox;
+}
+
+void CAEPropertyItemTextBox::SetReadOnly(bool Flg)
+{
+	Ｐ＿テキストボックス＿読み取り専用設定(this.m_TextBox, Flg);
+}
+
+string CAEPropertyItemTextBox::GetLabel()
+{
+	return Ｐ＿テキスト取得(this.m_Label, 1);
+}
+
+void CAEPropertyItemTextBox::SetText(string Text)
+{
+	Ｐ＿テキストボックス＿テキスト設定(this.m_TextBox, Text);
+	this.m_dgChangeTextEvent(this.m_LayoutID);
+}
+
+string CAEPropertyItemTextBox::GetText()
+{
+	return Ｐ＿テキストボックス＿テキスト取得(this.m_TextBox);
+}
+
+int CAEPropertyItemTextBox::GetInt()
+{
+	return Ｐ＿テキストボックス＿テキスト取得(this.m_TextBox).Int();
+}
+
+float CAEPropertyItemTextBox::GetFloat()
+{
+	float Value;
+	if (!SystemService.ScanFloat(this.GetText(), Value))
+	{
+		return 0.0;
+	}
+	return Value;
+}
+
+string CAEPropertyItemTextBox::GetToolTipText()
+{
+	return this.GetText();
+}
+
+void CAEPropertyItemTextBox::AddParts(int Number)
+{
+	Ｐ＿レイアウトボックス＿追加(this.m_LayoutID, Number);
+}
+
+void CAEPropertyItemTextBox::KeyDownEvent(int ID, int KeyID)
+{
+	this.m_dgKeyDownEvent(ID, KeyID);
+}
+
+void CAEPropertyItemTextBox::MouseWheelEvent(int ID, int Forward, int Back)
+{
+	this.m_dgMouseWheelEvent(ID, Forward, Back);
+}
+
+void CAEPropertyItemTextBox::ChangeTextEvent(int ID)
+{
+	this.m_dgChangeTextEvent(this.m_LayoutID);
+}
+
+void CAEPropertyItemTextBox::FocusEvent(int ID)
+{
+	if (this.m_OpenIMEGainFocus)
+	{
+		Ｐ＿テキストボックス＿全角入力(this.m_TextBox);
+	}
+	else
+	{
+		Ｐ＿テキストボックス＿半角入力(this.m_TextBox);
+	}
+}
+
+void CAEPropertyItemTextBox::DragBeginEvent(int PartsNumber)
+{
+}
+
+void CAEPropertyItemTextBox::DragingEvent(int PartsNumber, int BeginMouseX, int BeginMouseY, int MouseX, int MouseY)
+{
+}
+
+void CAEPropertyItemTextBox::AddKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent += DelegateObject;
+}
+
+void CAEPropertyItemTextBox::EraseKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent -= DelegateObject;
+}
+
+void CAEPropertyItemTextBox::AddMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent += DelegateObject;
+}
+
+void CAEPropertyItemTextBox::EraseMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent -= DelegateObject;
+}
+
+void CAEPropertyItemTextBox::AddChangeTextEvent(DG_ChangedHandler DelegateObject)
+{
+	this.m_dgChangeTextEvent += DelegateObject;
+}
+
+void CAEPropertyItemTextBox::EraseChangeTextEvent(DG_ChangedHandler DelegateObject)
+{
+	this.m_dgChangeTextEvent -= DelegateObject;
+}
+

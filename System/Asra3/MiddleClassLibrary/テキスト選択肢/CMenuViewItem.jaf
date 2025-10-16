@@ -1,0 +1,202 @@
+bool CMenuViewItem::_IsEnableSel()
+{
+	return this.m_bEnableSel;
+}
+
+CMenuViewItem::CMenuViewItem()
+{
+}
+
+CMenuViewItem::~CMenuViewItem()
+{
+	this.Release();
+}
+
+void CMenuViewItem::Release()
+{
+	this.m_CursorParts.Release();
+	this.m_SeparatorParts.Release();
+	this.m_SelectedTextParts.Release();
+	this.m_TextParts.Release();
+	this.m_nX = 0;
+	this.m_nY = 0;
+	this.m_nAreaWidth = 0;
+	this.m_nAreaHeight = 0;
+}
+
+void CMenuViewItem::SetShow(bool bShow)
+{
+	if (this.m_TextParts.IsExist())
+	{
+		this.m_TextParts.SetShow(bShow);
+	}
+	if (this.m_SelectedTextParts.IsExist())
+	{
+		this.m_SelectedTextParts.SetShow(false);
+	}
+	if (this.m_SeparatorParts.IsExist())
+	{
+		this.m_SeparatorParts.SetShow(bShow);
+	}
+	if (this.m_CursorParts.IsExist())
+	{
+		this.m_CursorParts.SetShow(bShow);
+	}
+}
+
+bool CMenuViewItem::_IsMousePtIn()
+{
+	int nCursorX;
+	int nCursorY;
+	if (!AFL_Mouse_GetPos(nCursorX, nCursorY))
+	{
+		return false;
+	}
+	if (nCursorX < this.m_nX || nCursorX >= this.m_nX + this.m_nAreaWidth || nCursorY < this.m_nY || nCursorY >= this.m_nY + this.m_nAreaHeight)
+	{
+		return false;
+	}
+	return true;
+}
+
+void CMenuViewItem::SetSelectedState(bool bSelected)
+{
+	if (bSelected)
+	{
+		if (this.m_TextParts.IsExist())
+		{
+			this.m_TextParts.SetShow(false);
+		}
+		if (this.m_SelectedTextParts.IsExist())
+		{
+			this.m_SelectedTextParts.SetShow(true);
+		}
+	}
+	else
+	{
+		if (this.m_TextParts.IsExist())
+		{
+			this.m_TextParts.SetShow(true);
+		}
+		if (this.m_SelectedTextParts.IsExist())
+		{
+			this.m_SelectedTextParts.SetShow(false);
+		}
+	}
+	if (this.m_SeparatorParts.IsExist())
+	{
+		this.m_SeparatorParts.SetShow(true);
+	}
+	this.m_CursorParts.SetShow(bSelected);
+}
+
+void CMenuViewItem::_Create(ref 選択肢_t _data, ref sact_text_metrics_t tm1, ref sact_text_metrics_t tm2, ref sact_text_metrics_t tm3, float fBoldWeight, float fSelectedBoldWeight, float fUnselectableBoldWeight, int nCharSpace, int nSelectedCharSpace, int nUnselectableCharSpace, int _z, int _BaseZ, int _x, int _y, int _w)
+{
+	this.m_bEnableSel = _data.番号 != -2147483648;
+	int nAreaWidth = Math.Max((_w - _選択エリア[_選択枠].余白左 - _選択エリア[_選択枠].余白右) + 2, 1);
+	int nAreaHeight = Math.Max(_選択エリア[_選択枠].文字サイズ + 2, 1);
+	this.CreateTextParts(_x, _y, _z, _BaseZ, nAreaWidth, nAreaHeight, _data, tm1, tm2, tm3, fBoldWeight, fSelectedBoldWeight, fUnselectableBoldWeight, nCharSpace, nSelectedCharSpace, nUnselectableCharSpace, this.m_bEnableSel);
+	if (!this.m_bEnableSel && _data.テキスト.Empty())
+	{
+		this.CreateSeparator(_x, _y, _z, _BaseZ, nAreaWidth, nAreaHeight, tm1.nColorR, tm1.nColorG, tm1.nColorB);
+	}
+	this.CreateCursor(_x, _y, _z, _BaseZ, nAreaWidth, nAreaHeight, _選択エリア[_選択枠].カーソルタイプ, _選択エリア[_選択枠].カーソルＲ, _選択エリア[_選択枠].カーソルＧ, _選択エリア[_選択枠].カーソルＢ, _選択エリア[_選択枠].カーソル率);
+	this.m_nX = _x;
+	this.m_nY = _y;
+	this.m_nAreaWidth = nAreaWidth;
+	this.m_nAreaHeight = nAreaHeight;
+}
+
+void CMenuViewItem::CreateTextParts(int nX, int nY, int nZ, int nBaseZ, int nWidth, int nHeight, ref 選択肢_t MenuInfo, ref sact_text_metrics_t TextMetrics, ref sact_text_metrics_t SelectedTextMetrics, ref sact_text_metrics_t UnselectableTextMetrics, float fBoldWeight, float fSelectedBoldWeight, float fUnselectableBoldWeight, int nCharSpace, int nSelectedCharSpace, int nUnselectableCharSpace, bool bEnableSel)
+{
+	if (bEnableSel)
+	{
+		this.CreateTextPartsItem(this.m_TextParts, nX, nY, nZ, nBaseZ, nWidth, nHeight, MenuInfo, TextMetrics, fBoldWeight, nCharSpace);
+		this.CreateTextPartsItem(this.m_SelectedTextParts, nX, nY, nZ, nBaseZ, nWidth, nHeight, MenuInfo, SelectedTextMetrics, fSelectedBoldWeight, nSelectedCharSpace);
+	}
+	else if (MenuInfo.テキスト.Empty())
+	{
+	}
+	else
+	{
+		this.CreateTextPartsItem(this.m_TextParts, nX, nY, nZ, nBaseZ, nWidth, nHeight, MenuInfo, UnselectableTextMetrics, fUnselectableBoldWeight, nUnselectableCharSpace);
+	}
+}
+
+void CMenuViewItem::CreateTextPartsItem(ref CASParts TextParts, int nX, int nY, int nZ, int nBaseZ, int nWidth, int nHeight, ref 選択肢_t MenuInfo, ref sact_text_metrics_t TextMetrics, float fBoldWeight, int nCharSpace)
+{
+	CASCharSpriteProperty CharSpriteProperty;
+	CharSpriteProperty = SYS_TransCharSpriteProperty(TextMetrics);
+	CharSpriteProperty.SetBoldWeight(fBoldWeight);
+	TextParts.Create();
+	TextParts.SetFontProperty(CharSpriteProperty, 1);
+	TextParts.SetText(MenuInfo.テキスト, 1);
+	TextParts.SetFontCharSpace(nCharSpace, 1);
+	switch (_選択エリア[_選択枠].文字配置)
+	{
+	case 1:
+		TextParts.SetPos(nX + 1, nY + 1);
+		break;
+	case 2:
+		TextParts.SetPos(nX + 1 + (nWidth - TextParts.GetWidth(1)) / 2, nY + 1);
+		break;
+	case 3:
+		TextParts.SetPos((nX + nWidth) - TextParts.GetWidth(1) - 1, nY + 1);
+		break;
+	}
+	TextParts.SetZByBaseZ(nZ, nBaseZ);
+	TextParts.SetShow(false);
+}
+
+void CMenuViewItem::CreateSeparator(int nX, int nY, int nZ, int nBaseZ, int nWidth, int nHeight, int nR, int nG, int nB)
+{
+	int nSpriteWidth = Math.Max(nWidth - 2, 1);
+	int nSpriteHeight = 1;
+	this.m_SeparatorParts.Create();
+	Ｐ＿構築手順＿初期化(this.m_SeparatorParts.GetPartsNumber(), 1);
+	Ｐ＿構築手順＿作成(this.m_SeparatorParts.GetPartsNumber(), nSpriteWidth, nSpriteHeight, 1);
+	Ｐ＿構築手順＿色塗り(this.m_SeparatorParts.GetPartsNumber(), 0, 0, nSpriteWidth, nSpriteHeight, nR, nG, nB, 255, 1);
+	Ｐ＿構築ビルド(this.m_SeparatorParts.GetPartsNumber(), 1);
+	this.m_SeparatorParts.SetPos(nX + 1, nY + nHeight / 2);
+	this.m_SeparatorParts.SetZByBaseZ(nZ + 1, nBaseZ);
+	this.m_SeparatorParts.SetShow(true);
+}
+
+void CMenuViewItem::CreateCursor(int nX, int nY, int nZ, int nBaseZ, int nWidth, int nHeight, int nCursorType, int nCursorR, int nCursorG, int nCursorB, int nCursorA)
+{
+	this.m_CursorParts.Create();
+	Ｐ＿構築手順＿初期化(this.m_CursorParts.GetPartsNumber(), 1);
+	Ｐ＿構築手順＿作成(this.m_CursorParts.GetPartsNumber(), nWidth, nHeight, 1);
+	switch (nCursorType)
+	{
+	case 0:
+		Ｐ＿構築手順＿色塗り(this.m_CursorParts.GetPartsNumber(), 0, 0, nWidth, nHeight, nCursorR, nCursorG, nCursorB, 0, 1);
+		break;
+	case 1:
+		Ｐ＿構築手順＿色塗り(this.m_CursorParts.GetPartsNumber(), 0, 0, nWidth, nHeight, nCursorR, nCursorG, nCursorB, nCursorA, 1);
+		Ｐ＿構築手順＿アルファ塗り(this.m_CursorParts.GetPartsNumber(), 0, 0, nWidth, nHeight - 1, 0, 1);
+		break;
+	case 2:
+		Ｐ＿構築手順＿色塗り(this.m_CursorParts.GetPartsNumber(), 0, 0, nWidth, nHeight, nCursorR, nCursorG, nCursorB, nCursorA, 1);
+		Ｐ＿構築手順＿アルファ塗り(this.m_CursorParts.GetPartsNumber(), 1, 1, nWidth - 2, nHeight - 2, 0, 1);
+		break;
+	case 3:
+		Ｐ＿構築手順＿色塗り(this.m_CursorParts.GetPartsNumber(), 0, 0, nWidth, nHeight, nCursorR, nCursorG, nCursorB, nCursorA, 1);
+		break;
+	}
+	Ｐ＿構築ビルド(this.m_CursorParts.GetPartsNumber(), 1);
+	this.m_CursorParts.SetPos(nX, nY);
+	this.m_CursorParts.SetZByBaseZ(nZ, nBaseZ);
+	this.m_CursorParts.SetShow(false);
+}
+
+int CMenuViewItem::GetX()
+{
+	return this.m_nX;
+}
+
+int CMenuViewItem::GetY()
+{
+	return this.m_nY;
+}
+

@@ -1,0 +1,103 @@
+void _CMsgKeyWaitAnime::_Init(ref CMessageWindowModel _area_data)
+{
+	this.m_MessageWindowModel = _area_data;
+	this._m_show = true;
+	this._Create();
+	this._UpdatePos();
+	this._SetShow(false);
+}
+
+void _CMsgKeyWaitAnime::_Create()
+{
+	if (this._IsIdentity())
+	{
+		return;
+	}
+	this.m_Parts.Release();
+	string FlatName = this.m_MessageWindowModel.GetKeyWaitMarkFlatName();
+	if (!FlatName.Empty())
+	{
+		this.m_Parts.Create();
+		this.m_Parts.SetFlat(FlatName);
+	}
+	else if (this.m_MessageWindowModel.マーク枚数 != 0)
+	{
+		this.m_Parts.Create();
+		this.m_Parts.SetLoopCG(this.m_MessageWindowModel.基準ＣＧ名, this.m_MessageWindowModel.開始番号, this.m_MessageWindowModel.マーク枚数, this.m_MessageWindowModel.マーク速度, 1);
+	}
+	this._m_n_created_基準ＣＧ名 = this.m_MessageWindowModel.基準ＣＧ名;
+	this._m_n_created_開始番号 = this.m_MessageWindowModel.開始番号;
+	this._m_n_created_マーク枚数 = this.m_MessageWindowModel.マーク枚数;
+	this.m_CreatedFlatName = this.m_MessageWindowModel.GetKeyWaitMarkFlatName();
+}
+
+bool _CMsgKeyWaitAnime::_IsIdentity()
+{
+	if (this._m_n_created_基準ＣＧ名 != this.m_MessageWindowModel.基準ＣＧ名)
+	{
+		return false;
+	}
+	if (this._m_n_created_開始番号 != this.m_MessageWindowModel.開始番号)
+	{
+		return false;
+	}
+	if (this._m_n_created_マーク枚数 != this.m_MessageWindowModel.マーク枚数)
+	{
+		return false;
+	}
+	if (this.m_CreatedFlatName != this.m_MessageWindowModel.GetKeyWaitMarkFlatName())
+	{
+		return false;
+	}
+	return true;
+}
+
+void _CMsgKeyWaitAnime::_UpdatePos()
+{
+	int x = this.m_MessageWindowModel.GetX();
+	int y = this.m_MessageWindowModel.GetY();
+	x += this.m_MessageWindowModel.マークＸ;
+	y += this.m_MessageWindowModel.マークＹ;
+	int z = g_MessageWindowModelManager.GetZ() + g_MessageWindowManager.GetShowingMaxOffsetZ() + g_MessageWindowModelManager.GetIncZ();
+	if (this.m_Parts.IsExist())
+	{
+		this.m_Parts.SetPos(x, y);
+		this.m_Parts.SetZ(z);
+	}
+}
+
+void _CMsgKeyWaitAnime::_SetShow(bool _show)
+{
+	bool IsShowParts = _show && !SYS_スキップ中確認() && !Ａ＿オートモード中確認();
+	if (this.m_Parts.IsExist() && !this.m_Parts.IsShow() && IsShowParts)
+	{
+		if (!this.m_CreatedFlatName.Empty())
+		{
+			this.m_Parts.BackFlatBeginFrame();
+		}
+		else if (this.m_MessageWindowModel.マーク枚数 != 0)
+		{
+			this.m_Parts.SetLoopCG(this.m_MessageWindowModel.基準ＣＧ名, this.m_MessageWindowModel.開始番号, this.m_MessageWindowModel.マーク枚数, this.m_MessageWindowModel.マーク速度, 1);
+		}
+	}
+	this._m_show = _show;
+	if (this.m_Parts.IsExist())
+	{
+		this.m_Parts.SetShow(IsShowParts);
+	}
+}
+
+bool _CMsgKeyWaitAnime::IsShow()
+{
+	return this._m_show;
+}
+
+void _CMsgKeyWaitAnime::SetPartsLayer(int ID)
+{
+	if (!this.m_Parts.IsExist())
+	{
+		return;
+	}
+	Ｐ＿親設定(this.m_Parts.GetPartsNumber(), ID);
+}
+

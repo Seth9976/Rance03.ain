@@ -1,0 +1,59 @@
+void debugPlayerLevelUp()
+{
+	int i;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		while (true)
+		{
+			g_player[i].setExp(1000000);
+			if (!g_player[i].levelUp())
+			{
+				break;
+			}
+		}
+	}
+}
+
+void debugPlayerJoinAll()
+{
+	int i;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		g_player[i].setJoin(true);
+	}
+}
+
+void debugPlayerSkillLevelMax()
+{
+	int i;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		int j;
+		for (j = 0; j < g_attackSkill.Numof(); ++j)
+		{
+			if (g_player[i].isAttackSkillUpgradable(g_attackSkill[j].getId()))
+			{
+				g_player[i].upgradeSkill(g_attackSkill[j].getId());
+			}
+		}
+	}
+}
+
+void debugPlayerHpRecovery()
+{
+	int i;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		g_player[i].setHp(g_player[i].getMaxHp());
+	}
+}
+
+void debugPlayerZeroThreeSkillOpen()
+{
+	int i;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		g_player[i].setZeroThreeSkillOpened(true);
+	}
+}
+

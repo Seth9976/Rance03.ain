@@ -1,0 +1,88 @@
+PlayerMapIcon::PlayerMapIcon()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void PlayerMapIcon::init(int type, int parentPartsNumber, string placeId)
+{
+	this.placeId_ = placeId;
+	if (type == 0)
+	{
+		this.parts_[0].init("システム／マップ／ランス", 0);
+		this.parts_[1].init("システム／マップ／ランス", 2);
+	}
+	else
+	{
+		this.parts_[0].init("システム／マップ／かなみ", 0);
+		this.parts_[1].init("システム／マップ／かなみ", 2);
+	}
+	this.w_ = this.parts_[0].getWidth() / 4;
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setOrigin(2);
+	}
+	createPartsGroup(this.parent_, this.parts_, 50);
+	this.parent_.setParent(parentPartsNumber);
+	this.setDirection(true);
+	this.setCurrentPlacePos();
+}
+
+void PlayerMapIcon::update()
+{
+	int t = (this.t_.getTime() / 300) % 4;
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setCgRange(t * this.w_, 0, this.w_, this.parts_[i].getHeight());
+	}
+}
+
+void PlayerMapIcon::setCurrentPlacePos()
+{
+	ref MapPlace m = getMapPlaceFromId(this.placeId_);
+	this.parent_.setPos(m.getX(), m.getY());
+}
+
+void PlayerMapIcon::fadeIn(bool val)
+{
+	PartsMotion m;
+	m = getStandardMotion(val ? 0 : 1);
+	this.parent_.setShow(true);
+	this.parent_.runMotion(m, this.onFadeInFinish);
+}
+
+void PlayerMapIcon::moveTo(int fx, int fy, int tx, int ty, DG_GeneralCallback onFinishMoveCallback)
+{
+	this.onFinishMoveCallback_ = onFinishMoveCallback;
+	PartsMotion m;
+	m.setMove(fx, fy, tx, ty, 0);
+	m.setTime(getDest(fx, fy, tx, ty) * 4.0);
+	this.setDirection(fx > tx);
+	this.parent_.runMotion(m, this.onFinishMove);
+	this.state_ = 3;
+}
+
+void PlayerMapIcon::setDirection(bool isLeft)
+{
+	this.parts_[0].setShow(isLeft);
+	this.parts_[1].setShow(!isLeft);
+}
+
+void PlayerMapIcon::onFadeInFinish()
+{
+	this.state_ = 2;
+}
+
+void PlayerMapIcon::onFinishMove()
+{
+	this.onFinishMoveCallback_();
+	this.state_ = 2;
+}
+
+void PlayerMapIcon::getCurrentPos(ref int x, ref int y)
+{
+	x = this.parent_.getX();
+	y = this.parent_.getY();
+}
+

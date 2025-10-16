@@ -1,0 +1,400 @@
+void test_Battle_DamageNumber()
+{
+	DamageNumber n;
+	int p = 16;
+	array@string ef;
+	ef.PushBack("戦闘エフェクト／物理攻撃");
+	ef.PushBack("戦闘エフェクト／魔法攻撃");
+	ef.PushBack("戦闘エフェクト／爆裂攻撃");
+	ef.PushBack("戦闘エフェクト／急所攻撃");
+	ef.PushBack("戦闘エフェクト／性的攻撃");
+	n.init(RAND(1000), "戦闘エフェクト/%s" % ef[(p - 16) % 5], p & 16, p & 8, p & 4, p & 3);
+	n.setPos(512, 384, 0, 0);
+	n.run(0, NULL);
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		if (g_mouse.isClick(0))
+		{
+			++p;
+			int m = p & 3;
+			if (m == 3)
+			{
+				++p;
+			}
+			n.init(RAND(1000), "戦闘エフェクト/%s" % ef[(p - 16) % 5], p & 16, p & 8, p & 4, p & 3);
+			n.run(0, NULL);
+		}
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+}
+
+void test_Battle_DamageNumberCallback()
+{
+	g_testFinishFlag = true;
+}
+
+void test_HpBar()
+{
+	array@HpBar bar[2];
+	MonsterInstance inst;
+	inst.init(g_monster[0].getId(), 0, 0, 0);
+	bar[0].initAsPlayer(g_player[0]);
+	bar[1].init(0, 100, false, "システム／ＨＰ／下地／敵");
+	bar[0].setPos(100, 100);
+	bar[1].setPos(100, 200);
+	int i;
+	for (i = 0; i < bar.Numof(); ++i)
+	{
+		bar[i].fadeIn(true, NULL);
+	}
+	while (!g_mouse.isClick(1))
+	{
+		if (g_mouse.isClick(0))
+		{
+			if (RAND(2) == 1)
+			{
+				int val = RAND(g_player[0].getMaxHp());
+				g_player[0].setHp(val);
+			}
+			else
+			{
+				bar[1].changeValue(RAND(100), NULL);
+			}
+		}
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+}
+
+void test_Battle_PlayerView()
+{
+	PlayerView v;
+	v.init("ランス");
+	while (!g_mouse.isClick(1))
+	{
+		if (g_mouse.isClick(0))
+		{
+			int val = RAND(100);
+			if (RAND(2) == 1)
+			{
+				val = -val;
+			}
+			v.setDamage(val, "", val >= 0, 0, NULL);
+		}
+		if (g_keyboard.isPress(90))
+		{
+			if (RAND(2) == 1)
+			{
+				int index = RAND(g_playerBuff.Numof()) - 1;
+				pass("%s" % g_playerBuff[index].getId());
+				g_player[0].addBuff(g_playerBuff[index].getId());
+			}
+			else
+			{
+				int index = RAND(g_playerBuff.Numof()) - 1;
+				g_player[0].eraseBuff(g_playerBuff[index].getId());
+			}
+		}
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+}
+
+void test_Battle_SkillSelectorGroup()
+{
+	test_Player_Init();
+	test_Party_Organize();
+	g_player[1].setHp(0);
+	SkillSelectorGroup sel;
+	sel.init();
+	sel.fadeIn(true);
+	while (!g_mouse.isClick(1))
+	{
+		if (g_keyboard.isPress(90))
+		{
+			array@string n;
+			sel.getSelectedIdList(n);
+			int i;
+			for (i = 0; i < g_player.Numof(); ++i)
+			{
+				g_player[i].decCoolTime();
+			}
+			for (i = 0; i < n.Numof(); ++i)
+			{
+				pass(n[i]);
+				string cId = getPlayerSkillFromId(n[i]).getPlayerId();
+				getPlayerFromId(cId).setCoolTime(n[i]);
+			}
+			sel.clearOrder();
+			sel.updateCoolTime();
+		}
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+}
+
+void test_Battle_MonsterAttackView()
+{
+	MonsterAttackView v;
+	Parts p;
+	p.initAsDummy();
+	p.setShow(true);
+	int n;
+	ref Monster m = g_monster[1];
+	v.init(p.getPartsNumber());
+	v.reset(m.getAttack(n, 100), 1);
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		if (g_mouse.isClick(0))
+		{
+			n = (n + 1) % 3;
+			v.reset(m.getAttack(n, 100), 1);
+		}
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+}
+
+void test_Scene_Battle()
+{
+	test_Player_Init();
+	test_Party_Organize();
+	BattleInfomation info;
+	int r = RAND(5);
+	int i;
+	for (i = 0; i < r; ++i)
+	{
+		info.addMonster(g_monster[i].getId());
+	}
+	info.setItem("", 0);
+	string id = g_battleBackgroundInfomation[RAND(g_battleBackgroundInfomation.Numof()) - 1].getId();
+	info.setExtraBattleFlag(1);
+	info.setBattleBackGroundId(id);
+	bool isWin = openBattle2(info);
+	pass("win:%d" % isWin);
+}
+
+void test_Battle_Log()
+{
+	BattleLogView view;
+	view.init();
+	view.fadeIn(true);
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		if (g_mouse.isClick(0))
+		{
+			g_battleLog.add("テスト%d" % RAND(100), 0);
+		}
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+}
+
+void test_SkillSelector()
+{
+	g_sel.Alloc(8);
+	int i;
+	for (i = 0; i < g_sel.Numof(); ++i)
+	{
+		g_sel[i].init(g_attackSkill[0].getId(), g_player[0].getId(), i, false);
+		g_sel[i].setOnClickCallback("test_SkillSelector_Callback");
+	}
+	for (i = 0; i < g_sel.Numof(); ++i)
+	{
+		g_sel[i].fadeIn(true, false);
+	}
+	Parts p;
+	p.initAsFlat("システム／戦闘／フレーム／開始");
+	p.setShow(true);
+	p.startFlat(false, 1.0);
+	g_frameManager.updateFrame();
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		if (g_keyboard.isPress(90))
+		{
+			int index = RAND(8) - 1;
+			g_sel[index].setCoolTime(RAND(10) - 1);
+		}
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+	g_sel.Free();
+}
+
+void test_SkillSelector_Callback(int index)
+{
+	pass("");
+	if (g_sel[index].getSelected() == -1)
+	{
+		g_sel[index].setSelected(0);
+	}
+	else
+	{
+		g_sel[index].setSelected(-1);
+	}
+}
+
+void test_Battle_Background()
+{
+	BattleBackground bg;
+	bg.init("平野", "");
+	bg.fadeIn(true);
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		if (g_keyboard.isPress(90))
+		{
+			bg.fadeIn(true);
+		}
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+}
+
+void test_ExLoading_MonsterAttribute()
+{
+	int i;
+	for (i = 0; i < g_monsterAttribute.Numof(); ++i)
+	{
+		string n = "id[%s] name[%s] imageName[%s]" % g_monsterAttribute[i].getId() % g_monsterAttribute[i].getName() % g_monsterAttribute[i].getImageName();
+		pass(n);
+	}
+}
+
+void test_TreasureBoxParam()
+{
+	TreasureBoxParam p;
+	p.init("テストアイテム");
+	p.setParam(100);
+	g_frameManager.updateFrame();
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		if (g_mouse.isClick(0))
+		{
+			p.setParam(RAND(100));
+		}
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+}
+
+void test_ExLoading_BattleBackGround()
+{
+	int i;
+	for (i = 0; i < g_monsterAttribute.Numof(); ++i)
+	{
+		string n = "id[%s] imageName[%s] [%d,%d,%d (%d)] [%d,%d,%d]" % g_battleBackgroundInfomation[i].getId() % g_battleBackgroundInfomation[i].getImageName() % g_battleBackgroundInfomation[i].getAmbientR() % g_battleBackgroundInfomation[i].getAmbientG() % g_battleBackgroundInfomation[i].getAmbientB() % g_battleBackgroundInfomation[i].getAmbientMaxAlpha() % g_battleBackgroundInfomation[i].getUnfocusShadowR() % g_battleBackgroundInfomation[i].getUnfocusShadowG() % g_battleBackgroundInfomation[i].getUnfocusShadowB();
+		pass(n);
+	}
+}
+
+void test_FixedBattle_Nosu()
+{
+	test_LevelMaxAndPartyOrganize();
+	getMonsterFromId("ノスt3左腕").setFixedPosition(true, 1);
+	getMonsterFromId("ノスt3右腕").setFixedPosition(true, 1);
+	getMonsterFromId("ノスt3").setFixedPosition(true, 2);
+	getMonsterFromId("ノスt3左腕").setPosition(758, -96, 751, 323, 908, 281);
+	getMonsterFromId("ノスt3右腕").setPosition(-80, 7, 201, 326, 191, 284);
+	getMonsterFromId("ノスt3").setPosition(-50, -50, 550, 260, 658, 222);
+	BattleInfomation info;
+	info.addMonster("ノスt3左腕");
+	info.addMonster("ノスt3右腕");
+	info.addMonster("ノスt3");
+	info.setEffectFlat("システム／戦闘／ノス戦");
+	openBattle2(info);
+}
+
+void test_FixedBattle_Sisters()
+{
+	test_LevelMaxAndPartyOrganize();
+	getMonsterFromId("ガーネットj").setFixedPosition(true, 0);
+	getMonsterFromId("サファイアj2").setFixedPosition(true, 0);
+	getMonsterFromId("トパーズj").setFixedPosition(true, 0);
+	getMonsterFromId("ガーネットj").setPosition(175, 52, 430, 320, 384, 256);
+	getMonsterFromId("サファイアj2").setPosition(574, -7, 767, 288, 845, 196);
+	getMonsterFromId("トパーズj").setPosition(364, -50, 576, 237, 608, 157);
+	BattleInfomation info;
+	info.addMonster("ガーネットj");
+	info.addMonster("サファイアj2");
+	info.addMonster("トパーズj");
+	openBattle2(info);
+}
+
+void test_FixedBattle_Jiru()
+{
+	test_LevelMaxAndPartyOrganize();
+	g_monsterStrengthShifter.setLocalHpRatio(0.01);
+	getMonsterFromId("ジル").setFixedPosition(true, 2);
+	getMonsterFromId("ジル").setPosition(-50, -50, 664, 342, 585, 272);
+	BattleInfomation info;
+	info.addMonster("ジル");
+	info.setEffectFlat("システム／戦闘／ジル戦");
+	openBattle2(info);
+}
+
+void test_ExplosionEffect()
+{
+	FullScreenDeadEffect ef;
+	ef.init();
+	ef.run(NULL);
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		if (ef.isFinish())
+		{
+			break;
+		}
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+}
+
+void test_Telop()
+{
+	Parts p;
+	p.initAsPlaneImage(600, 100, 255, 0, 0, 255);
+	p.setPos(0.0, 300.0);
+	p.setShow(true);
+	p.setAlpha(128.0);
+	BattleInfoTelop telop;
+	telop.init("テストメッセージですほげほげふがふがテストメッセージテストメッセージですほげほげふがふがですほげほげふがふが", 600, 300, 0, 400);
+	telop.fadeIn(true, NULL);
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+}
+

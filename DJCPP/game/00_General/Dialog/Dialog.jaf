@@ -1,0 +1,192 @@
+Dialog::Dialog()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void Dialog::init(DialogInfomation info)
+{
+	this.isGetItem_ = false;
+	this.initParts(info);
+	this.initButton(info);
+}
+
+void Dialog::initButton(ref DialogInfomation info)
+{
+	if (info.isYesNo())
+	{
+		this.btn_.Alloc(2);
+		this.btn_[0].init("システム／ボタン／幅１２８", "はい", "", true);
+		this.btn_[1].init("システム／ボタン／幅１２８", "いいえ", "", true);
+		this.btn_[0].setPos(468, 424);
+		this.btn_[0].setZ(8550);
+		this.btn_[1].setPos(616, 424);
+		this.btn_[1].setZ(8550);
+	}
+	else
+	{
+		this.btn_.Alloc(1);
+		this.btn_[0].init("システム／ボタン／幅１２８", "OK", "", true);
+		this.btn_[0].setPos(542, 424);
+		this.btn_[0].setZ(8550);
+	}
+}
+
+void Dialog::fadeButton(bool val)
+{
+	int i;
+	for (i = 0; i < this.btn_.Numof(); ++i)
+	{
+		this.btn_[i].fadeIn(val);
+	}
+}
+
+void Dialog::initParts(ref DialogInfomation info)
+{
+	array@string msg;
+	info.getMessage(msg);
+	this.messageLines_ = msg.Numof();
+	this.parts_[0].init("システム／ダイアログ／写真／下地", 0);
+	this.parts_[3].initAsText(info.getCaption(), 40, false, 256, 128, 16, 30);
+	if (this.parts_[3].getWidth() > 340)
+	{
+		this.parts_[3].setXScaling((float(340) / float(this.parts_[3].getWidth())) * 100.0);
+	}
+	this.pictureImageName_ = info.getPictureImageName();
+	if (this.pictureImageName_ != "")
+	{
+		this.parts_[1].initAsFlat("システム／ダイアログ／写真");
+		this.parts_[1].changeFlatCg("写真.png", this.pictureImageName_);
+	}
+	if (info.getItemId() != "")
+	{
+		this.isGetItem_ = true;
+		this.parts_[2].initAsFlat("システム／ダイアログ／アイテム");
+		ref Item item = getItemFromId(info.getItemId());
+		if (item !== NULL)
+		{
+			this.parts_[2].changeFlatCg("アイテム／世色癌.png", item.getIconImageName());
+		}
+	}
+	int i;
+	for (i = 0; i < msg.Numof(); ++i)
+	{
+		this.parts_[4 + i].initAsText(msg[i], 26, false, 256, 58, 18, 18);
+	}
+	createPartsGroup(this.parent_, this.parts_, 8500);
+	this.setPartsPos();
+}
+
+void Dialog::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void Dialog::setPartsPos()
+{
+	this.parts_[0].setPos(0.0, 0.0);
+	this.parts_[3].setPos(264.0, 247.0);
+	this.parts_[1].setPos(-183.0, 0.0);
+	this.parts_[2].setPos(-183.0, 0.0);
+	int h = this.parts_[4].getHeight();
+	int span = -2;
+	int totalHeight = (h + span) * this.messageLines_ - span;
+	int i;
+	for (i = 0; i < this.messageLines_; ++i)
+	{
+		this.parts_[4 + i].setOrigin(7);
+		this.parts_[4 + i].setPos(264.0, 290 + (h + span) * i);
+	}
+	this.parent_.setPos(183.0, 21.0);
+}
+
+void Dialog::update()
+{
+}
+
+void Dialog::fadeIn(bool val)
+{
+	this.setPartsShow();
+	if (val)
+	{
+		this.playSound();
+		this.parent_.runMotion(getStandardMotion(0), NULL);
+		this.parts_[1].startFlat(false, 1.0);
+		this.parts_[2].startFlat(false, 1.0);
+	}
+	else
+	{
+		this.parent_.runMotion(getStandardMotion(1), this.onFinishCallback_);
+	}
+	this.fadeButton(val);
+}
+
+void Dialog::playSound()
+{
+	if (this.isGetItem_)
+	{
+		g_sysSound.play(6, "効果音／ダイアログ／アイテム取得");
+	}
+	switch (this.pictureImageName_)
+	{
+	case "システム／ダイアログ／写真／マグマ":
+	case "システム／ダイアログ／写真／炎の鼻息":
+	case "システム／ダイアログ／写真／警備レーザー":
+	case "システム／ダイアログ／写真／激臭":
+	case "システム／ダイアログ／写真／破裂玉":
+	case "システム／ダイアログ／写真／粉塵爆発":
+	case "システム／ダイアログ／写真／転落":
+	case "システム／ダイアログ／写真／仕掛け矢":
+	case "システム／ダイアログ／写真／煮えたぎった油":
+	case "システム／ダイアログ／写真／罠":
+	case "システム／ダイアログ／写真／崩れる柱":
+	case "システム／ダイアログ／写真／落とし穴":
+	case "システム／ダイアログ／写真／フリードリンク":
+	case "システム／ダイアログ／写真／閉店":
+	case "システム／ダイアログ／写真／動揺":
+	case "システム／ダイアログ／写真／痛風":
+	case "システム／ダイアログ／写真／乱視":
+	case "システム／ダイアログ／写真／幻聴":
+	case "システム／ダイアログ／写真／骨粗":
+	case "システム／ダイアログ／写真／湿気":
+	case "システム／ダイアログ／写真／忘れた草":
+		g_sysSound.play(6, "効果音／ダイアログ／ダメージ");
+		break;
+	case "システム／ダイアログ／写真／天然足湯":
+	case "システム／ダイアログ／写真／混浴温泉":
+	case "システム／ダイアログ／写真／回復":
+	case "システム／ダイアログ／写真／珍味":
+	case "システム／ダイアログ／写真／寝る":
+		g_sysSound.play(6, "効果音／ダイアログ／回復");
+		break;
+	case "システム／ダイアログ／写真／パチル":
+	case "システム／ダイアログ／写真／金減少":
+		g_sysSound.play(6, "効果音／ダイアログ／金減少");
+		break;
+	case "システム／ダイアログ／写真／金増加":
+		g_sysSound.play(6, "効果音／ダイアログ／金増加");
+		break;
+	default:
+		g_sysSound.play(6, "効果音／ダイアログ／一般情報");
+		break;
+	}
+}
+
+void Dialog::setOnFinishCallback(DG_GeneralCallback onFinish)
+{
+	this.onFinishCallback_ = onFinish;
+}
+
+void Dialog::setOnClickCallback(DG_ButtonClickCallback onClick)
+{
+	int i;
+	for (i = 0; i < this.btn_.Numof(); ++i)
+	{
+		this.btn_[i].setClickCallback(onClick, i);
+	}
+}
+

@@ -1,0 +1,506 @@
+int 制御／戦闘／バフ／プレイヤー(array@string playerBuffIdList, array@string monsterBuffIdList, int type)
+{
+	int i;
+	int val;
+	for (i = 0; i < playerBuffIdList.Numof(); ++i)
+	{
+		if (getPlayerBuffFromId(playerBuffIdList[i]).getType() == type)
+		{
+			string skillId = getSkillIdFromBuffId(playerBuffIdList[i]);
+			string playerId = getPlayerSkillFromId(skillId).getPlayerId();
+			float param = getPlayerSkillFromId(skillId).getParam();
+			int power;
+			switch (getPlayerBuffFromId(playerBuffIdList[i]).getCalcType())
+			{
+			case 0:
+				power = getPlayerFromId(playerId).getStrength();
+				break;
+			case 1:
+				power = getPlayerFromId(playerId).getMind();
+				break;
+			case 2:
+				power = getPlayerFromId(playerId).getDexterity();
+				break;
+			}
+			float fluctuation;
+			fluctuation = (power * param * (RAND(16) - 1)) / 100.0;
+			val += power * param + fluctuation;
+		}
+	}
+	int j;
+	for (j = 0; j < monsterBuffIdList.Numof(); ++j)
+	{
+		float monsterPalam;
+		if (type == 0)
+		{
+			switch (monsterBuffIdList[j])
+			{
+			case "物理防御上昇1":
+				monsterPalam = 40.0;
+				break;
+			case "物理防御上昇2":
+				monsterPalam = 120.0;
+				break;
+			case "物理防御上昇3":
+				monsterPalam = 360.0;
+				break;
+			case "物理防御上昇4":
+				monsterPalam = 1080.0;
+				break;
+			case "物理防御上昇5":
+				monsterPalam = 1944.0;
+				break;
+			case "物理防御上昇6":
+				monsterPalam = 5400.0;
+				break;
+			}
+		}
+		else
+		{
+			switch (monsterBuffIdList[j])
+			{
+			case "魔法防御上昇1":
+				monsterPalam = 40.0;
+				break;
+			case "魔法防御上昇2":
+				monsterPalam = 120.0;
+				break;
+			case "魔法防御上昇3":
+				monsterPalam = 360.0;
+				break;
+			case "魔法防御上昇4":
+				monsterPalam = 1080.0;
+				break;
+			case "魔法防御上昇5":
+				monsterPalam = 1944.0;
+				break;
+			case "魔法防御上昇6":
+				monsterPalam = 5400.0;
+				break;
+			}
+		}
+		float monsterFluctuation;
+		monsterFluctuation = (monsterPalam * (RAND(16) - 1)) / 100.0;
+		val -= monsterPalam + monsterFluctuation;
+		pass("val ato %d" % val);
+	}
+	return val;
+}
+
+int 制御／戦闘／バフ／モンスター(array@string monsterBuffIdList, array@string playerBuffIdList, int type)
+{
+	int j;
+	int val;
+	for (j = 0; j < monsterBuffIdList.Numof(); ++j)
+	{
+		float monsterPalam;
+		if (type == 0)
+		{
+			switch (monsterBuffIdList[j])
+			{
+			case "物理攻撃上昇1":
+				monsterPalam = 35.0;
+				break;
+			case "物理攻撃上昇2":
+				monsterPalam = 55.0;
+				break;
+			case "物理攻撃上昇3":
+				monsterPalam = 75.0;
+				break;
+			case "物理攻撃上昇4":
+				monsterPalam = 95.0;
+				break;
+			case "物理攻撃上昇5":
+				monsterPalam = 125.0;
+				break;
+			case "物理攻撃上昇6":
+				monsterPalam = 155.0;
+				break;
+			}
+		}
+		else
+		{
+			switch (monsterBuffIdList[j])
+			{
+			case "魔法攻撃上昇1":
+				monsterPalam = 35.0;
+				break;
+			case "魔法攻撃上昇2":
+				monsterPalam = 55.0;
+				break;
+			case "魔法攻撃上昇3":
+				monsterPalam = 75.0;
+				break;
+			case "魔法攻撃上昇4":
+				monsterPalam = 95.0;
+				break;
+			case "魔法攻撃上昇5":
+				monsterPalam = 125.0;
+				break;
+			case "魔法攻撃上昇6":
+				monsterPalam = 1200.0;
+				break;
+			}
+		}
+		if (g_monsterStrengthShifter.getLocalExpRatio() == 9.0)
+		{
+			monsterPalam = monsterPalam * 2.0;
+		}
+		float monsterFluctuation;
+		monsterFluctuation = (monsterPalam * (RAND(16) - 1)) / 100.0;
+		val += monsterPalam + monsterFluctuation;
+	}
+	int i;
+	int playerType;
+	if (type == 0)
+	{
+		type = 100;
+	}
+	else
+	{
+		type = 101;
+	}
+	for (i = 0; i < playerBuffIdList.Numof(); ++i)
+	{
+		if (getPlayerBuffFromId(playerBuffIdList[i]).getType() == type)
+		{
+			string skillId = getSkillIdFromBuffId(playerBuffIdList[i]);
+			string playerId = getPlayerSkillFromId(skillId).getPlayerId();
+			float param = getPlayerSkillFromId(skillId).getParam();
+			int power;
+			switch (getPlayerBuffFromId(playerBuffIdList[i]).getCalcType())
+			{
+			case 0:
+				power = getPlayerFromId(playerId).getStrength();
+				break;
+			case 1:
+				power = getPlayerFromId(playerId).getMind();
+				break;
+			case 2:
+				power = getPlayerFromId(playerId).getDexterity();
+				break;
+			}
+			float fluctuation;
+			fluctuation = (power * param * (RAND(16) - 1)) / 100.0;
+			val -= power * param + fluctuation;
+		}
+	}
+	return val;
+}
+
+bool 制御／戦闘／バフ／プレイヤー／確認(string checkGroup, array@string playerBuffIdList)
+{
+	string skillGroup;
+	int i;
+	for (i = 0; i < playerBuffIdList.Numof(); ++i)
+	{
+		switch (playerBuffIdList[i])
+		{
+		case "ランスチャージ1":
+		case "ランスチャージ2":
+		case "ランスチャージ3":
+		case "ランスチャージ4":
+		case "ランスチャージ5":
+		case "ランスチャージ6":
+			skillGroup = "ランスチャージ";
+			break;
+		case "魔想1":
+		case "魔想2":
+		case "魔想3":
+		case "魔想4":
+		case "魔想5":
+		case "魔想6":
+			skillGroup = "魔想";
+			break;
+		case "斬り返し1":
+		case "斬り返し2":
+		case "斬り返し3":
+		case "斬り返し4":
+		case "斬り返し5":
+		case "斬り返し6":
+			skillGroup = "斬り返し";
+			break;
+		case "黒金砕き1":
+		case "黒金砕き2":
+		case "黒金砕き3":
+		case "黒金砕き4":
+		case "黒金砕き5":
+		case "黒金砕き6":
+			skillGroup = "黒金砕き";
+			break;
+		case "死神無双1":
+		case "死神無双2":
+		case "死神無双3":
+		case "死神無双4":
+		case "死神無双5":
+		case "死神無双6":
+			skillGroup = "死神無双";
+			break;
+		case "ハイスラスト1":
+		case "ハイスラスト2":
+		case "ハイスラスト3":
+		case "ハイスラスト4":
+		case "ハイスラスト5":
+		case "ハイスラスト6":
+			skillGroup = "ハイスラスト";
+			break;
+		case "ハイブースト1":
+		case "ハイブースト2":
+		case "ハイブースト3":
+		case "ハイブースト4":
+		case "ハイブースト5":
+		case "ハイブースト6":
+			skillGroup = "ハイブースト";
+			break;
+		case "ハイマヌーバ1":
+		case "ハイマヌーバ2":
+		case "ハイマヌーバ3":
+		case "ハイマヌーバ4":
+		case "ハイマヌーバ5":
+		case "ハイマヌーバ6":
+			skillGroup = "ハイマヌーバ";
+			break;
+		case "無現軌道1":
+		case "無現軌道2":
+		case "無現軌道3":
+		case "無現軌道4":
+		case "無現軌道5":
+		case "無現軌道6":
+			skillGroup = "無現軌道";
+			break;
+		}
+		if (checkGroup == skillGroup)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void 制御／戦闘／バフ／プレイヤー／ログ(string skillId, string sourceId, string targetId)
+{
+	string attribute;
+	switch (getPlayerSkillFromId(skillId).getAttributeId())
+	{
+	case "物理攻撃上昇":
+		attribute = "物理攻撃";
+		break;
+	case "物理防御上昇":
+		attribute = "物理防御";
+		break;
+	case "魔法攻撃上昇":
+		attribute = "魔法攻撃";
+		break;
+	case "魔法防御上昇":
+		attribute = "魔法防御";
+		break;
+	}
+	g_battleLog.add("%sの%s！%sは%sが上昇！" % getPlayerFromId(sourceId).getShortName() % getPlayerSkillFromId(skillId).getName() % getPlayerFromId(targetId).getShortName() % attribute, 4);
+}
+
+void 制御／戦闘／バフ／モンスター／ログ(string buffId, string sourceId, string targetId)
+{
+	string attribute;
+	string action;
+	action = "援護";
+	switch (buffId)
+	{
+	case "物理攻撃上昇1":
+	case "物理攻撃上昇2":
+	case "物理攻撃上昇3":
+	case "物理攻撃上昇4":
+	case "物理攻撃上昇5":
+	case "物理攻撃上昇6":
+		attribute = "物理攻撃";
+		break;
+	case "物理防御上昇1":
+	case "物理防御上昇2":
+	case "物理防御上昇3":
+	case "物理防御上昇4":
+	case "物理防御上昇5":
+	case "物理防御上昇6":
+		attribute = "物理防御";
+		break;
+	case "魔法攻撃上昇1":
+	case "魔法攻撃上昇2":
+	case "魔法攻撃上昇3":
+	case "魔法攻撃上昇4":
+	case "魔法攻撃上昇5":
+	case "魔法攻撃上昇6":
+		attribute = "魔法攻撃";
+		break;
+	case "魔法防御上昇1":
+	case "魔法防御上昇2":
+	case "魔法防御上昇3":
+	case "魔法防御上昇4":
+	case "魔法防御上昇5":
+	case "魔法防御上昇6":
+		attribute = "魔法防御";
+		break;
+	}
+	switch (sourceId)
+	{
+	case "くずの悪魔群":
+	case "くずの悪魔":
+		action = "お世辞";
+		break;
+	case "ちょーちん":
+		action = "がんばれ発光";
+		break;
+	case "ゴールデンハニー頭部":
+		action = "ハニーチャージ";
+		break;
+	case "ミミミック":
+	case "ミミック":
+		action = "デススマイル";
+		break;
+	case "サファイアj2":
+	case "サファイアd":
+	case "サファイアj1":
+	case "サファイアr":
+		action = "フィジカルバリア";
+		break;
+	case "ヒトラー":
+	case "マーダー":
+		action = "聖骸詠唱";
+		break;
+	case "金魚使い":
+		action = "がんばれ号笛";
+		break;
+	case "カナリアンe2":
+	case "カナリアンe4":
+		action = "低い唸り声";
+		break;
+	case "ヘルマン工兵f":
+	case "ヘルマン工兵j":
+	case "ヘルマン工兵q":
+	case "住民":
+	case "はぐれヘルマン兵j":
+	case "はぐれヘルマン兵t":
+		action = "陣地構築";
+		break;
+	case "ヘルマン士官f":
+	case "ヘルマン士官j":
+	case "ヘルマン士官q":
+		action = "鼓舞";
+		break;
+	case "ヘルマン操兵f":
+	case "ヘルマン操兵j":
+	case "ヘルマン操兵q":
+		action = "愛の鞭";
+		break;
+	case "フレッチャー":
+		action = "封龍の構え";
+		break;
+	case "レイラ":
+		action = "風柳の構え";
+		break;
+	case "わんわん群":
+		action = "遠吠え";
+		break;
+	case "フルパワーゴリラZII":
+	case "パワーゴリラ":
+	case "パワーゴリラZ":
+		action = "ドラミング";
+		break;
+	case "スー":
+		action = "猿飛び";
+		break;
+	case "うしドバーン":
+		action = "振りかぶり";
+		break;
+	case "シーザーh1":
+	case "シーザーh2":
+	case "シーザーh3":
+		action = "仁王立ち";
+		break;
+	case "トパーズj":
+	case "トパーズr":
+		action = "マジカルリライト";
+		break;
+	case "カースA":
+		action = "卑猥な身悶え";
+		break;
+	case "古介D":
+		action = "アニマルシフト";
+		break;
+	case "れんれんB":
+		action = "サイコパワー";
+		break;
+	case "トーマ":
+		action = "雄叫び";
+		break;
+	case "ミネバ":
+		action = "冷笑";
+		break;
+	case "廃課金戦士":
+	case "廃課金戦士群":
+		action = "課金ブースタ";
+		break;
+	case "人食いX68":
+		action = "満開製作";
+		break;
+	case "人食いTOWNS":
+		action = "ハイパーメディア";
+		break;
+	case "れんれんC":
+		action = "丸まり";
+		break;
+	case "大王イカマン":
+	case "大王イカマン群":
+		action = "イカ舞い踊り";
+		break;
+	case "ワープアー":
+		action = "ため息";
+		break;
+	case "コンテ":
+		action = "位相シフト";
+		break;
+	case "ゆみみみっく":
+		action = "わはースマイル";
+		break;
+	case "デカントマムル":
+		action = "デカントーン";
+		break;
+	case "アカナリアンt1":
+		action = "耳障りな囀り";
+		break;
+	case "ワー志津香":
+		action = "魔想";
+		break;
+	case "ノスt3":
+	case "ノスt1":
+	case "ノスt2":
+		action = "膨張硬化";
+		break;
+	case "ジル":
+		action = "オルケスタ共振";
+		break;
+	case "ピンキー":
+		action = "燃え盛り";
+		break;
+	case "ハニーキング":
+		action = "キングゲイン";
+		break;
+	case "ウルンセル":
+	case "ウルンセル緑":
+	case "ウルンセル青":
+		action = "うねり";
+		break;
+	}
+	g_battleLog.add("%sの%s！%sは%sが上昇！" % getMonsterFromId(sourceId).getName() % action % getMonsterFromId(targetId).getName() % attribute, 2);
+}
+
+string getSkillIdFromBuffId(string buffId)
+{
+	int i;
+	for (i = 0; i < g_attackSkill.Numof(); ++i)
+	{
+		if (buffId == g_attackSkill[i].getBuffId())
+		{
+			return g_attackSkill[i].getId();
+		}
+	}
+	return "";
+}
+

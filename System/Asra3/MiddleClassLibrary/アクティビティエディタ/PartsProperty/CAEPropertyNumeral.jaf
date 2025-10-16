@@ -1,0 +1,296 @@
+CAEPropertyNumeral::CAEPropertyNumeral()
+{
+	this.Release();
+}
+
+CAEPropertyNumeral::~CAEPropertyNumeral()
+{
+	this.Release();
+}
+
+void CAEPropertyNumeral::Init(int LayoutID, ref CAEInstanceItem Item, int State)
+{
+	this.Release();
+	if (Item === NULL)
+	{
+		return;
+	}
+	this.m_Item <- Item;
+	this.m_PartsState = State;
+	this.m_TypeList.Free();
+	this.m_TypeList.PushBack("通常");
+	this.m_TypeList.PushBack("連結");
+	this.m_TypeList.PushBack("フォント");
+	this.m_Panel.Init(LayoutID);
+	this.m_Panel.AddKeyDownEvent(this.KeyDownEvent);
+	this.m_Panel.AddMouseWheelEvent(this.MouseWheelEvent);
+	this.m_Panel.AddChangeTextEvent(this.ChangeTextEvent);
+	this.m_Panel.AddMouseClickEvent(this.MouseLClickEvent);
+	this.m_Panel.AddSelectedEvent(this.SelectedComboBoxEvent);
+	this.m_Panel.AddChangedCheckBoxEvent(this.ChangedCheckBoxEvent);
+	int ID = this.m_Item.GetID();
+	this.m_ShowType = Ｐ＿数字表示タイプ取得(ID, State);
+	int X;
+	int Y;
+	int Width;
+	int Height;
+	Ｐ＿数字表示範囲取得(ID, X, Y, Width, Height, State);
+	float 太字幅;
+	float 縁取り幅;
+	int 種類;
+	int サイズ;
+	int 赤;
+	int 緑;
+	int 青;
+	int 縁取り赤;
+	int 縁取り緑;
+	int 縁取り青;
+	Ｐ＿数字フォント取得(ID, 種類, サイズ, 赤, 緑, 青, 太字幅, 縁取り赤, 縁取り緑, 縁取り青, 縁取り幅, State);
+	this.m_Panel.AddComboBoxItem("表示タイプ", this.m_TypeList, this.m_ShowType);
+	this.m_Panel.AddTextBoxItem("ＣＧ名", Ｐ＿数字ＣＧ名取得(ID, State), true);
+	this.m_Panel.AddButtonItem("連結幅", "編集");
+	this.m_Panel.AddButtonItem("フォント", "%s, サイズ[%d]" % PARTS_GetFontName(種類) % サイズ);
+	this.m_Panel.AddCheckBoxItem("全角フォント", Ｐ＿数字フォント全角設定取得(ID, State));
+	this.m_Panel.AddTextBoxItem("数字", string(Ｐ＿数字取得(ID, State)), false);
+	this.m_Panel.AddCheckBoxItem("コンマ表示", Ｐ＿数字コンマ表示設定取得(ID, State));
+	this.m_Panel.AddTextBoxItem("字間隔", string(Ｐ＿数字字間隔取得(ID, State)), false);
+	this.m_Panel.AddTextBoxItem("表示桁数", string(Ｐ＿数字桁取得(ID, State)), false);
+	this.m_Panel.AddCheckBoxItem("パディング表示", Ｐ＿数字パディング表示設定取得(ID, State));
+	this.m_Panel.AddTextBoxItem("表示範囲／Ｘ", string(X), false);
+	this.m_Panel.AddTextBoxItem("表示範囲／Ｙ", string(Y), false);
+	this.m_Panel.AddTextBoxItem("表示範囲／幅", string(Width), false);
+	this.m_Panel.AddTextBoxItem("表示範囲／高さ", string(Height), false);
+}
+
+void CAEPropertyNumeral::Release()
+{
+	this.m_dgMouseWheelEvent.Clear();
+	this.m_dgKeyDownEvent.Clear();
+	this.m_Item <- NULL;
+	this.m_Panel.Release();
+}
+
+void CAEPropertyNumeral::KeyDownEvent(int ID, int KeyID)
+{
+	this.m_dgKeyDownEvent(ID, KeyID);
+}
+
+void CAEPropertyNumeral::MouseWheelEvent(int ID, int Forward, int Back)
+{
+	this.m_dgMouseWheelEvent(ID, Forward, Back);
+}
+
+void CAEPropertyNumeral::ChangeTextEvent(int ID)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	int X;
+	int Y;
+	int Width;
+	int Height;
+	Ｐ＿数字表示範囲取得(PartsID, X, Y, Width, Height, this.m_PartsState);
+	if (Item.GetLabel() == "ＣＧ名")
+	{
+		Ｐ＿数字ＣＧ設定(PartsID, Item.GetTextBoxText(), this.m_PartsState);
+	}
+	else if (Item.GetLabel() == "数字")
+	{
+		Ｐ＿数字設定(PartsID, Item.GetTextBoxInt(), this.m_PartsState);
+	}
+	else if (Item.GetLabel() == "字間隔")
+	{
+		Ｐ＿数字字間隔設定(PartsID, Item.GetTextBoxInt(), this.m_PartsState);
+	}
+	else if (Item.GetLabel() == "表示桁数")
+	{
+		Ｐ＿数字桁設定(PartsID, Item.GetTextBoxInt(), this.m_PartsState);
+	}
+	else if (Item.GetLabel() == "表示範囲／Ｘ")
+	{
+		Ｐ＿数字表示範囲設定(PartsID, Item.GetTextBoxInt(), Y, Width, Height, this.m_PartsState);
+	}
+	else if (Item.GetLabel() == "表示範囲／Ｙ")
+	{
+		Ｐ＿数字表示範囲設定(PartsID, X, Item.GetTextBoxInt(), Width, Height, this.m_PartsState);
+	}
+	else if (Item.GetLabel() == "表示範囲／幅")
+	{
+		Ｐ＿数字表示範囲設定(PartsID, X, Y, Item.GetTextBoxInt(), Height, this.m_PartsState);
+	}
+	else if (Item.GetLabel() == "表示範囲／高さ")
+	{
+		Ｐ＿数字表示範囲設定(PartsID, X, Y, Width, Item.GetTextBoxInt(), this.m_PartsState);
+	}
+	Ｐ＿数字表示タイプ設定(PartsID, this.m_ShowType, this.m_PartsState);
+}
+
+void CAEPropertyNumeral::MouseLClickEvent(int ID, int MouseX, int MouseY)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	if (Item.GetLabel() == "連結幅")
+	{
+		int 幅０;
+		int 幅１;
+		int 幅２;
+		int 幅３;
+		int 幅４;
+		int 幅５;
+		int 幅６;
+		int 幅７;
+		int 幅８;
+		int 幅９;
+		int 幅マイナス;
+		int 幅コンマ;
+		Ｐ＿数字連結幅取得(PartsID, 幅０, 幅１, 幅２, 幅３, 幅４, 幅５, 幅６, 幅７, 幅８, 幅９, 幅マイナス, 幅コンマ, this.m_PartsState);
+		array@SGUIStringPair List[13];
+		List[0].Set("統一", "");
+		List[1].Set("０", string(幅０));
+		List[2].Set("１", string(幅１));
+		List[3].Set("２", string(幅２));
+		List[4].Set("３", string(幅３));
+		List[5].Set("４", string(幅４));
+		List[6].Set("５", string(幅５));
+		List[7].Set("６", string(幅６));
+		List[8].Set("７", string(幅７));
+		List[9].Set("８", string(幅８));
+		List[10].Set("９", string(幅９));
+		List[11].Set("マイナス", string(幅マイナス));
+		List[12].Set("コンマ", string(幅コンマ));
+		CAEEditStringPairDialog Form;
+		Form.Show(ID, MouseX, MouseY, List, this.ChangedListEvent);
+	}
+	else if (Item.GetLabel() == "フォント")
+	{
+		float 太字幅;
+		float 縁取り幅;
+		int 種類;
+		int サイズ;
+		int 赤;
+		int 緑;
+		int 青;
+		int 縁取り赤;
+		int 縁取り緑;
+		int 縁取り青;
+		Ｐ＿数字フォント取得(PartsID, 種類, サイズ, 赤, 緑, 青, 太字幅, 縁取り赤, 縁取り緑, 縁取り青, 縁取り幅, this.m_PartsState);
+		CASCharSpriteProperty Font;
+		Font.SetType(種類);
+		Font.SetSize(サイズ);
+		Font.SetColor(CF_CASColor(赤, 緑, 青, 255));
+		Font.SetBoldWeight(太字幅);
+		Font.SetEdgeWeight(縁取り幅);
+		Font.SetEdgeColor(CF_CASColor(縁取り赤, 縁取り緑, 縁取り青, 255));
+		CAESelectFontDialog Form;
+		Form.Show(ID, MouseX, MouseY, Font, this.ChangedFontEvent);
+	}
+	Ｐ＿数字表示タイプ設定(PartsID, this.m_ShowType, this.m_PartsState);
+}
+
+void CAEPropertyNumeral::ChangedListEvent(int ID, ref array@SGUIStringPair List)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	if (Item.GetLabel() == "連結幅")
+	{
+		if (!List[0].m_Second.Empty())
+		{
+			int Index;
+			for (Index = 1; Index < List.Numof(); ++Index)
+			{
+				List[Index].m_Second = List[0].m_Second;
+			}
+			List[0].m_Second = "";
+		}
+		Ｐ＿数字連結ＣＧ設定(PartsID, Ｐ＿数字ＣＧ名取得(PartsID, this.m_PartsState), List[1].m_Second.Int(), List[2].m_Second.Int(), List[3].m_Second.Int(), List[4].m_Second.Int(), List[5].m_Second.Int(), List[6].m_Second.Int(), List[7].m_Second.Int(), List[8].m_Second.Int(), List[9].m_Second.Int(), List[10].m_Second.Int(), List[11].m_Second.Int(), List[12].m_Second.Int(), this.m_PartsState);
+	}
+}
+
+void CAEPropertyNumeral::ChangedFontEvent(int ID, ref CASCharSpriteProperty Font)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	CASColor Color;
+	Color = Font.GetColor();
+	CASColor EdgeColor;
+	EdgeColor = Font.GetEdgeColor();
+	if (Item.GetLabel() == "フォント")
+	{
+		Ｐ＿数字フォント設定(PartsID, Font.GetType(), Font.GetSize(), Color.GetR(), Color.GetG(), Color.GetB(), Font.GetBoldWeight(), EdgeColor.GetR(), EdgeColor.GetG(), EdgeColor.GetB(), Font.GetEdgeWeight(), this.m_PartsState);
+		Item.SetButtonText("%s, サイズ[%d]" % PARTS_GetFontName(Font.GetType()) % Font.GetSize());
+	}
+}
+
+void CAEPropertyNumeral::SelectedComboBoxEvent(int ID, int Index)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	if (Item.GetLabel() == "表示タイプ")
+	{
+		Ｐ＿数字表示タイプ設定(PartsID, Index, this.m_PartsState);
+		this.m_ShowType = Index;
+	}
+}
+
+void CAEPropertyNumeral::ChangedCheckBoxEvent(int ID, bool Check)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int PartsID = this.m_Item.GetID();
+	if (Item.GetLabel() == "全角フォント")
+	{
+		Ｐ＿数字フォント全角設定(PartsID, Item.GetFlg(), this.m_PartsState);
+	}
+	else if (Item.GetLabel() == "コンマ表示")
+	{
+		Ｐ＿数字コンマ表示設定(PartsID, Item.GetFlg(), this.m_PartsState);
+	}
+	else if (Item.GetLabel() == "パディング表示")
+	{
+		Ｐ＿数字パディング表示設定(PartsID, Item.GetFlg(), this.m_PartsState);
+	}
+	Ｐ＿数字表示タイプ設定(PartsID, this.m_ShowType, this.m_PartsState);
+}
+
+void CAEPropertyNumeral::AddKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent += DelegateObject;
+}
+
+void CAEPropertyNumeral::EraseKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent -= DelegateObject;
+}
+
+void CAEPropertyNumeral::AddMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent += DelegateObject;
+}
+
+void CAEPropertyNumeral::EraseMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent -= DelegateObject;
+}
+

@@ -1,0 +1,37 @@
+void SYS_バックシーン登録()
+{
+	if (!g_bバックシーン登録可能)
+	{
+		return;
+	}
+	CASParts BG;
+	if (Ａ＿ＣＧ存在確認(g_BackSceneBGName))
+	{
+		BG.Create();
+		BG.SetCG(g_BackSceneBGName, 1);
+		Ｐ＿親設定(BG.GetPartsNumber(), AFL_Parts_GetLayerID(0));
+	}
+	ADVSceneData ADVScene;
+	SYS_SaveBackSceneData(ADVScene);
+	if (g_ADVSceneList.Numof() >= 500)
+	{
+		g_ADVSceneList.Erase(0);
+	}
+	g_ADVSceneList.PushBack(ADVScene);
+}
+
+int SYS_GetNumofADVScene()
+{
+	return g_ADVSceneList.Numof();
+}
+
+bool SYS_GetADVScene(int nIndex, ref ADVSceneData ADVScene)
+{
+	if (nIndex < 0 || nIndex >= g_ADVSceneList.Numof())
+	{
+		return false;
+	}
+	ADVScene = g_ADVSceneList[nIndex];
+	return true;
+}
+

@@ -1,0 +1,12 @@
+string SYS_ShowSelectFuncNameForm(string DefaultText, int PosX, int PosY, DG_IsSelectableFuncName DelegateObject)
+{
+	array@string List;
+	SYS_GetFuncNameList(List, DelegateObject);
+	CAESelectTextDialog Form;
+	if (!Form.Show(0, "", PosX, PosY, List, DefaultText, NULL))
+	{
+		return Form.GetText();
+	}
+	return Form.GetText();
+}
+

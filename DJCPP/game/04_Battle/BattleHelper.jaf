@@ -1,0 +1,202 @@
+string getMinHpPlayer(ref array@string playerId)
+{
+	int i;
+	int index;
+	int hp = getPlayerFromId(playerId[0]).getHp();
+	for (i = 0; i < playerId.Numof(); ++i)
+	{
+		ref Player p = getPlayerFromId(playerId[i]);
+		if (hp > p.getHp())
+		{
+			hp = p.getHp();
+			index = i;
+		}
+	}
+	return playerId[index];
+}
+
+string getMostDamagedPlayer(ref array@string playerId)
+{
+	int i;
+	int index;
+	float minRate = float(getPlayerFromId(playerId[0]).getHp()) / float(getPlayerFromId(playerId[0]).getMaxHp());
+	for (i = 1; i < playerId.Numof(); ++i)
+	{
+		ref Player p = getPlayerFromId(playerId[i]);
+		float rate = float(p.getHp()) / float(p.getMaxHp());
+		if (rate < minRate)
+		{
+			minRate = rate;
+			index = i;
+		}
+	}
+	return playerId[index];
+}
+
+int getMonsterInstanceIndexMinHp(ref array@MonsterInstance instance)
+{
+	int minHp = instance[0].getHp();
+	int minIndex;
+	int i;
+	for (i = 0; i < instance.Numof(); ++i)
+	{
+		if (instance[i].getHp() < minHp)
+		{
+			minHp = instance[i].getHp();
+			minIndex = i;
+		}
+	}
+	return minIndex;
+}
+
+int getMonsterInstanceIndexMostDamaged(ref array@int indexes, ref array@MonsterInstance instance)
+{
+	int topDamage = instance[indexes[0]].getMaxHp() - instance[indexes[0]].getHp();
+	int minIndex;
+	int i;
+	for (i = 1; i < indexes.Numof(); ++i)
+	{
+		int nd = instance[indexes[i]].getMaxHp() - instance[indexes[i]].getHp();
+		if (topDamage < nd)
+		{
+			topDamage = nd;
+			minIndex = i;
+		}
+	}
+	return indexes[minIndex];
+}
+
+void getExceptBuffPlayerIndexes(ref array@int indexes, int sourceIndex, ref array@MonsterInstance monsterInstance, string buffId)
+{
+	int i;
+	while (i < indexes.Numof())
+	{
+		if (monsterInstance[indexes[i]].isExistBuff(buffId) || indexes[i] == sourceIndex)
+		{
+			indexes.Erase(i);
+		}
+		else
+		{
+			++i;
+		}
+	}
+}
+
+bool isSkillSelectable(string skillId)
+{
+	ref Player p = getPlayerFromId(getPlayerSkillFromId(skillId).getPlayerId());
+	return p.getCoolTime(skillId) == 0 && p.getHp() > 0;
+}
+
+void getBattlePlayerViewPosition(string playerId, ref int x, ref int y)
+{
+	int min;
+	int max;
+	g_party.getPlayerSkillIndexMinMax(min, max, playerId);
+	int left = 15 + min * 113;
+	int right = 15 + max * 113 + 160;
+	x = (left + right) / 2.0;
+	y = (463 + ((min + max) / 2.0) * 14.0) - 200.0;
+}
+
+void getPlayerRandomTarget(ref array@string result, int count)
+{
+	array@string id;
+	int i;
+	for (i = 0; i < g_party.getCount(); ++i)
+	{
+		string sId = g_party.getAttackSkillId(i);
+		string pId = getPlayerSkillFromId(sId).getPlayerId();
+		ref Player p = getPlayerFromId(pId);
+		if (p.getHp() > 0)
+		{
+			id.PushBack(pId);
+		}
+	}
+	if (id.Empty())
+	{
+		return;
+	}
+	int unique;
+	unique = 1;
+	int i;
+	for (i = 1; i < id.Numof(); ++i)
+	{
+		if (id[i] != id[i - 1])
+		{
+			++unique;
+		}
+	}
+	count = Math.Min(unique, count);
+	for (i = 0; i < count; ++i)
+	{
+		int index = RAND(id.Numof()) - 1;
+		result.PushBack(id[index]);
+		string n = id[index];
+		while (true)
+		{
+			int index = id.Find(0, id.Numof(), n);
+			if (index < 0)
+			{
+				break;
+			}
+			id.Erase(index);
+		}
+	}
+	result.Sort();
+}
+
+void getAlivePlayerList(ref array@string result)
+{
+	g_party.getPlayerIdList(result);
+	int i;
+	while (i < result.Numof())
+	{
+		if (getPlayerFromId(result[i]).getHp() > 0)
+		{
+			++i;
+		}
+		else
+		{
+			result.Erase(i);
+		}
+	}
+}
+
+void getUnOrganizedPlayer(ref array@string result)
+{
+	array@string pId;
+	g_party.getPlayerIdList(pId);
+	result.Free();
+	int i;
+	for (i = 0; i < g_player.Numof(); ++i)
+	{
+		string id = g_player[i].getId();
+		if (pId.Find(0, pId.Numof(), id) < 0)
+		{
+			ref Player p = getPlayerFromId(id);
+			if (p.getHp() > 0 && p.isJoin())
+			{
+				result.PushBack(id);
+			}
+		}
+	}
+}
+
+void getExceptBuffPlayerList(ref array@string playerId, string sourceId, string buffId)
+{
+	int i;
+	while (i < playerId.Numof())
+	{
+		ref Player p = getPlayerFromId(playerId[i]);
+		if (p.isExistBuff(buffId) || p.getId() == sourceId)
+		{
+			playerId.Erase(i);
+		}
+		else
+		{
+			++i;
+		}
+	}
+}
+

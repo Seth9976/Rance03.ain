@@ -1,0 +1,70 @@
+void SceneSave::init()
+{
+	this.partsRecoveryOverlay_.initAsPlaneImage(1024, 768, 0, 0, 0, 255);
+	this.partsRecoveryOverlay_.setZ(30000.0);
+	this.isFinish_ = false;
+	this.list_.init(false);
+	this.list_.setOnClickCallback(this.onClick);
+	this.btnExit_.init("システム／ボタン／幅１７０", "閉じる", "", true);
+	this.btnExit_.setPos(839, 691);
+	this.btnExit_.setClickCallback(this.onClickButtonExit, 0);
+}
+
+void SceneSave::run()
+{
+	this.fadeIn(true, NULL);
+}
+
+void SceneSave::onClickButtonExit(int id)
+{
+	this.fadeIn(false, this.onFinishFadeOut);
+}
+
+bool SceneSave::update()
+{
+	if (!this.timerCb_.isRunning() && g_mouse.isClick(1))
+	{
+		playCancel();
+		this.fadeIn(false, this.onFinishFadeOut);
+	}
+	return !this.isFinish_;
+}
+
+void SceneSave::fadeIn(bool val, DG_GeneralCallback cb)
+{
+	this.list_.fadeIn(val);
+	this.btnExit_.fadeIn(val);
+	if (cb.Numof() != 0)
+	{
+		this.timerCb_.setTimer(300, cb);
+	}
+}
+
+void SceneSave::onClick(int index)
+{
+	if (AFL_Config_GetSaveConfirm())
+	{
+		DialogInfomation info;
+		info.setCaption("セーブします");
+		info.setMessage("既にセーブデータがある場合は、|上書きされます");
+		info.setPictureImageName("システム／ダイアログ／写真／情報");
+		info.setAnswerTypeYesNo(true);
+		if (openDialog(info) == 1)
+		{
+			return;
+		}
+	}
+	g_sysSound.play(6, "効果音／セーブ");
+	if (!g_saveDataManager.save(index))
+	{
+		this.partsRecoveryOverlay_.setShow(true);
+		this.isFinish_ = true;
+	}
+	this.list_.reset();
+}
+
+void SceneSave::onFinishFadeOut()
+{
+	this.isFinish_ = true;
+}
+

@@ -1,0 +1,639 @@
+Player::Player()
+{
+	this.id_ = "CHARACTER_TEST_ID1";
+	this.name_ = "ななしさん";
+	this.shortName_ = "";
+	this.hp_ = 100;
+	this.imageName_ = "立ち絵／シィル／基本";
+	this.maxHp_ = 150;
+	this.level_ = 1;
+	this.exp_ = 20;
+	this.zeroThreeSkillId_ = "";
+	this.strength_ = 10;
+	this.mind_ = 10;
+	this.isJoin_ = false;
+	this.isZeroThreeSkillOpened_ = false;
+}
+
+void Player::init(string id)
+{
+	this.id_ = id;
+	this.loadParam();
+}
+
+void Player::loadParam()
+{
+	string key = "プレイヤー情報";
+	this.name_ = EX_SA2String(key, this.id_, "name", "");
+	this.shortName_ = EX_SA2String(key, this.id_, "shortName", "");
+	this.imageName_ = EX_SA2String(key, this.id_, "imageName", "");
+	this.zeroThreeSkillId_ = EX_SA2String(key, this.id_, "zeroThreeSkillId", "");
+	this.upHp_ = EX_SA2Int(key, this.id_, "upHp", 0);
+	this.upStrength_ = EX_SA2Int(key, this.id_, "upStrength", 0);
+	this.upMind_ = EX_SA2Int(key, this.id_, "upMind", 0);
+	this.upDexterity_ = EX_SA2Int(key, this.id_, "upDexterity", 0);
+	this.maxLevel_ = EX_SA2Int(key, this.id_, "maxLevel", 0);
+	this.formationPriority_ = EX_SA2Int(key, this.id_, "formationPriority", 0);
+	this.partyNamePlateCgName_ = "システム／編成／名札／%s" % this.shortName_;
+	int i;
+	for (i = 0; i < this.helperSkillProbability_.Numof(); ++i)
+	{
+		this.helperSkillProbability_[i] = EX_SA2Int(key, this.id_, "helpProb%d" % (i + 1), 1);
+	}
+}
+
+int Player::getFormationPriority()
+{
+	return this.formationPriority_;
+}
+
+void Player::initSkill()
+{
+	this.openSkill(0);
+}
+
+string Player::getId()
+{
+	return this.id_;
+}
+
+string Player::getName()
+{
+	return this.name_;
+}
+
+string Player::getShortName()
+{
+	return this.shortName_;
+}
+
+string Player::getImageName()
+{
+	return this.imageName_;
+}
+
+int Player::setHp(int val)
+{
+	int lost;
+	if (this.maxHp_ < val)
+	{
+		lost = val - this.maxHp_;
+	}
+	else if (val < 0)
+	{
+		lost = -val;
+	}
+	this.hp_ = Math.Max(0, Math.Min(this.maxHp_, val));
+	this.hpCallback_(this.hp_);
+	return lost;
+}
+
+void Player::setMaxHp(int val)
+{
+	this.maxHp_ = val;
+}
+
+void Player::setLevel(int val)
+{
+	this.level_ = val;
+}
+
+void Player::setExp(int val)
+{
+	this.exp_ = val;
+}
+
+void Player::setJoin(bool val)
+{
+	this.isJoin_ = val;
+}
+
+void Player::setAttackSkillId(int index, string id)
+{
+	if (0 <= index && index < this.attackSkillId_.Numof())
+	{
+		this.attackSkillId_[index] = id;
+	}
+}
+
+int Player::getHp()
+{
+	return this.hp_;
+}
+
+int Player::getMaxHp()
+{
+	return this.maxHp_;
+}
+
+int Player::getLevel()
+{
+	return this.level_;
+}
+
+int Player::getExp()
+{
+	return this.exp_;
+}
+
+bool Player::isJoin()
+{
+	return this.isJoin_;
+}
+
+string Player::getZeroThreeSkillId()
+{
+	return this.zeroThreeSkillId_;
+}
+
+string Player::getAttackSkillId(int index)
+{
+	if (0 <= index && index < this.attackSkillId_.Numof())
+	{
+		return this.attackSkillId_[index];
+	}
+	return "";
+}
+
+void Player::getAttackSkillIdList(ref array@string s)
+{
+	s.Free();
+	int i;
+	for (i = 0; i < this.attackSkillId_.Numof(); ++i)
+	{
+		if (this.attackSkillId_[i] != "")
+		{
+			s.PushBack(this.attackSkillId_[i]);
+		}
+	}
+}
+
+bool Player::isAttackSkillUpgradable(string attackSkillId)
+{
+	ref PlayerSkill atkTo = getPlayerSkillFromId(attackSkillId);
+	int index = this.findSameGroupIdAttackSkill(atkTo.getGroupId());
+	if (index >= 0)
+	{
+		ref PlayerSkill atkFrom = getPlayerSkillFromId(this.attackSkillId_[index]);
+		if (atkFrom.getGroupRank() < atkTo.getGroupRank())
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+string Player::upgradeSkill(string attackSkillId)
+{
+	ref PlayerSkill atkTo = getPlayerSkillFromId(attackSkillId);
+	int index = this.findSameGroupIdAttackSkill(atkTo.getGroupId());
+	if (index < 0)
+	{
+		return "";
+	}
+	string old = this.attackSkillId_[index];
+	this.attackSkillId_[index] = attackSkillId;
+	this.coolTime_[index] = 0;
+	g_party.replace(old, attackSkillId);
+	return old;
+}
+
+int Player::findSameGroupIdAttackSkill(string attackSkillGroupId)
+{
+	int i;
+	for (i = 0; i < this.attackSkillId_.Numof(); ++i)
+	{
+		if (this.attackSkillId_[i] != "")
+		{
+			string g = getPlayerSkillFromId(this.attackSkillId_[i]).getGroupId();
+			if (g == attackSkillGroupId)
+			{
+				return i;
+			}
+		}
+	}
+	return -1;
+}
+
+int Player::getStrength()
+{
+	return this.strength_;
+}
+
+int Player::getMind()
+{
+	return this.mind_;
+}
+
+void Player::setDexterity(int val)
+{
+	this.dexterity_ = val;
+}
+
+int Player::getDexterity()
+{
+	return this.dexterity_;
+}
+
+void Player::setStrength(int val)
+{
+	this.strength_ = val;
+}
+
+void Player::setMind(int val)
+{
+	this.mind_ = val;
+}
+
+void Player::addBuff(string buffId)
+{
+	if (!this.isExistBuff(buffId) && this.isAvailableBuffId(buffId))
+	{
+		this.buffIdList_.PushBack(buffId);
+		this.addBuffCallback_(buffId);
+	}
+}
+
+bool Player::isExistBuff(string buffId)
+{
+	return this.buffIdList_.Find(0, this.buffIdList_.Numof(), buffId) >= 0;
+}
+
+void Player::eraseBuff(string id)
+{
+	if (id == "")
+	{
+		this.buffIdList_.Free();
+	}
+	else if (this.isExistBuff(id))
+	{
+		int index = this.buffIdList_.Find(0, this.buffIdList_.Numof(), id);
+		this.buffIdList_.Erase(index);
+		this.eraseBuffCallback_(id);
+	}
+}
+
+bool Player::isAvailableBuffId(string id)
+{
+	ref PlayerBuff b = getPlayerBuffFromId(id);
+	return b !== NULL;
+}
+
+void Player::setBuffCallback(DG_OnChangeBuff onAdd, DG_OnChangeBuff onErase)
+{
+	this.addBuffCallback_ = onAdd;
+	this.eraseBuffCallback_ = onErase;
+}
+
+void Player::getBuffIdList(ref array@string result, int type)
+{
+	result.Free();
+	if (this.buffIdList_.Empty())
+	{
+		return;
+	}
+	if (type == -1)
+	{
+		result.Alloc(this.buffIdList_.Numof());
+		result.Copy(0, this.buffIdList_, 0, this.buffIdList_.Numof());
+	}
+	else
+	{
+		int i;
+		for (i = 0; i < this.buffIdList_.Numof(); ++i)
+		{
+			if (getPlayerBuffFromId(this.buffIdList_[i]).getType() == type)
+			{
+				result.PushBack(this.buffIdList_[i]);
+			}
+		}
+	}
+}
+
+void Player::setOnChangeHpCallback(DG_OnChangeHp hpCallback)
+{
+	this.hpCallback_ = hpCallback;
+}
+
+string Player::getBattleImageName()
+{
+	return "システム／戦闘／背中／%s" % this.shortName_;
+}
+
+void Player::setCoolTime(string id)
+{
+	int index = this.attackSkillId_.Find(0, this.attackSkillId_.Numof(), id);
+	if (index < 0)
+	{
+		return;
+	}
+	this.coolTime_[index] = getPlayerSkillFromId(id).getCoolTime();
+}
+
+void Player::setOverCoolTime(string id, int val)
+{
+	int index = this.attackSkillId_.Find(0, this.attackSkillId_.Numof(), id);
+	if (index < 0)
+	{
+		return;
+	}
+	this.coolTime_[index] = val;
+}
+
+void Player::decCoolTime()
+{
+	if (this.hp_ == 0)
+	{
+		return;
+	}
+	int i;
+	for (i = 0; i < this.coolTime_.Numof(); ++i)
+	{
+		this.coolTime_[i] = Math.Max(0, this.coolTime_[i] - 1);
+	}
+}
+
+void Player::clearCoolTime(string id)
+{
+	int i;
+	for (i = 0; i < this.coolTime_.Numof(); ++i)
+	{
+		if (this.attackSkillId_[i] == id || id == "")
+		{
+			this.coolTime_[i] = 0;
+		}
+	}
+}
+
+int Player::getCoolTime(string id)
+{
+	int index = this.attackSkillId_.Find(0, this.attackSkillId_.Numof(), id);
+	if (index < 0)
+	{
+		return 0;
+	}
+	return this.coolTime_[index];
+}
+
+void Player::eraseAttackBuff()
+{
+	int i;
+	while (i < this.buffIdList_.Numof())
+	{
+		string id = this.buffIdList_[i];
+		if (getPlayerBuffFromId(id).isAttackBuff())
+		{
+			this.buffIdList_.Erase(i);
+			this.eraseBuffCallback_(id);
+		}
+		else
+		{
+			++i;
+		}
+	}
+}
+
+void Player::eraseDeffenceBuff()
+{
+	int i;
+	while (i < this.buffIdList_.Numof())
+	{
+		string id = this.buffIdList_[i];
+		if (!getPlayerBuffFromId(id).isAttackBuff())
+		{
+			this.buffIdList_.Erase(i);
+			this.eraseBuffCallback_(id);
+		}
+		else
+		{
+			++i;
+		}
+	}
+}
+
+void Player::clearBuff()
+{
+	this.buffIdList_.Free();
+}
+
+void Player::setZeroThreeSkillOpened(bool val)
+{
+	this.isZeroThreeSkillOpened_ = val;
+}
+
+bool Player::isZeroThreeSkillOpened()
+{
+	return this.isZeroThreeSkillOpened_;
+}
+
+int Player::getUpHp()
+{
+	return this.upHp_;
+}
+
+int Player::getUpStrength()
+{
+	return this.upStrength_;
+}
+
+int Player::getUpMind()
+{
+	return this.upMind_;
+}
+
+int Player::getUpDexterity()
+{
+	return this.upDexterity_;
+}
+
+int Player::getMaxLevel()
+{
+	return this.maxLevel_;
+}
+
+void Player::setMaxLevel(int val)
+{
+	if (this.maxLevel_ > val)
+	{
+		return;
+	}
+	this.maxLevel_ = val;
+}
+
+bool Player::levelUp()
+{
+	if (!this.isLevelUpEnable())
+	{
+		return false;
+	}
+	int exp = this.getNextExp();
+	this.level_++;
+	this.exp_ -= exp;
+	this.maxHp_ += this.upHp_;
+	this.strength_ += this.upStrength_;
+	this.mind_ += this.upMind_;
+	this.dexterity_ += this.upDexterity_;
+	this.hp_ = this.maxHp_;
+	this.openSkill(this.level_);
+	return true;
+}
+
+bool Player::isLevelUpEnable()
+{
+	return this.level_ != this.maxLevel_ && this.exp_ >= this.getNextExp();
+}
+
+int Player::getNextExp()
+{
+	if (this.level_ == this.maxLevel_)
+	{
+		return 0;
+	}
+	DG_ExpFunction fn;
+	fn = EX_String("必要経験値取得関数", "");
+	return fn(this.level_ + 1);
+}
+
+int testGetExpTable(int nextLevel)
+{
+	return nextLevel * 100;
+}
+
+void Player::openSkill(int level)
+{
+	int i;
+	for (i = 0; i < g_playerSkillOpenLevel.Numof(); ++i)
+	{
+		ref PlayerSkillOpenLevel ol = g_playerSkillOpenLevel[i];
+		if (ol.getPlayerId() == this.id_ && ol.getOpenLevel() == level)
+		{
+			this.setAttackSkillId(ol.getIndex(), ol.getSkillId());
+		}
+	}
+}
+
+string Player::getCurrentLevelNewSkillId()
+{
+	int i;
+	for (i = 0; i < g_playerSkillOpenLevel.Numof(); ++i)
+	{
+		ref PlayerSkillOpenLevel ol = g_playerSkillOpenLevel[i];
+		if (ol.getPlayerId() == this.id_ && ol.getOpenLevel() == this.level_)
+		{
+			return ol.getSkillId();
+		}
+	}
+	return "";
+}
+
+void Player::getNextSkillId(ref string skillId, ref int level)
+{
+	string minSkill;
+	int minLevel = -1;
+	int i;
+	for (i = 0; i < g_playerSkillOpenLevel.Numof(); ++i)
+	{
+		ref PlayerSkillOpenLevel ol = g_playerSkillOpenLevel[i];
+		if (ol.getPlayerId() == this.id_)
+		{
+			int lv = ol.getOpenLevel();
+			if (this.level_ < lv)
+			{
+				if (minLevel == -1 || lv < minLevel)
+				{
+					minLevel = lv;
+					minSkill = ol.getSkillId();
+				}
+			}
+		}
+	}
+	skillId = minSkill;
+	level = minLevel;
+}
+
+int Player::getSkillIndexFromId(string attackSkillId)
+{
+	int i;
+	for (i = 0; i < this.attackSkillId_.Numof(); ++i)
+	{
+		if (this.attackSkillId_[i] == attackSkillId)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+void Player::addExp(int val)
+{
+	this.exp_ += val;
+	this.exp_ = Math.Max(0, this.exp_);
+}
+
+void Player::addTotalBattleCount()
+{
+	++this.totalBattleCount_;
+}
+
+int Player::getTotalBattleCount()
+{
+	return this.totalBattleCount_;
+}
+
+void Player::addConsecutiveBattleCount()
+{
+	++this.consecutiveBattleCount_;
+}
+
+void Player::clearConsecutiveBattleCount()
+{
+	this.consecutiveBattleCount_ = 0;
+}
+
+int Player::getConsecutiveBattleCount()
+{
+	return this.consecutiveBattleCount_;
+}
+
+void Player::setCoolTimeCancelSkillId(string id)
+{
+	this.coolTimeCancelSkillId_ = id;
+}
+
+string Player::getCoolTimeCancelSkillId()
+{
+	return this.coolTimeCancelSkillId_;
+}
+
+int Player::getHelperSkillProbability(int index)
+{
+	if (0 <= index && index < this.helperSkillProbability_.Numof())
+	{
+		return this.helperSkillProbability_[index];
+	}
+	return 0;
+}
+
+int Player::getHelperSkillProbabilityById(string id)
+{
+	int i;
+	for (i = 0; i < this.attackSkillId_.Numof(); ++i)
+	{
+		if (this.attackSkillId_[i] == id)
+		{
+			return this.getHelperSkillProbability(i);
+		}
+	}
+	return 0;
+}
+
+string Player::getPartyNamePlateCgName()
+{
+	return this.partyNamePlateCgName_;
+}
+
+void Player::setPartyNamePlateCgName(string cgName)
+{
+	this.partyNamePlateCgName_ = cgName;
+}
+

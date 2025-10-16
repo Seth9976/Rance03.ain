@@ -1,0 +1,108 @@
+void game_main()
+{
+	if (g_common_configTimerScaling == 0.0)
+	{
+		g_common_configTimerScaling = 1.0;
+	}
+	AFL_Config_SetEndEvent("共有セーブ");
+	g_battleCalcMode = false;
+	initLibrary();
+	initAdv();
+	initGameSystem();
+	initConfigSetting();
+	g_hallucination <- new Hallucination;
+	g_hallucination.init();
+	gameEntryPoint();
+}
+
+void gameEntryPoint()
+{
+	initGameMode();
+	setGameMode(true);
+	if (!再起動後確認())
+	{
+		checkNetworkConnection();
+		openLogo();
+	}
+	openTitle();
+	restoreGameMode();
+	checkVoiceSetting();
+	gameMain();
+}
+
+void gameMain()
+{
+	g_gameSceneManager.setCurrentPos("アイス");
+	g_gameSceneManager.init(EX_String("プロローグ関数", ""));
+	g_gameSceneManager.run();
+	system.Reset();
+}
+
+void checkVoiceSetting()
+{
+	string key = "ゲーム開始回数";
+	string voiceKey = "ボイス設定確認";
+	g_globalGameFlag.setInt(key, g_globalGameFlag.getInt(key) + 1);
+	if (g_globalGameFlag.getInt(key) == 1)
+	{
+		if (!isOffConfigVoiceSetting())
+		{
+			DialogInfomation info;
+			info.setCaption("音声を再生しますか");
+			info.setMessage("“はい”を選択すると、|ゲーム中で音声が再生されます");
+			info.setPictureImageName("システム／ダイアログ／写真／情報");
+			info.setAnswerTypeYesNo(true);
+			if (openDialog(info) == 0)
+			{
+				AFL_Config_SetMute(3, false);
+				g_globalGameFlag.setInt(voiceKey, 2);
+			}
+			else
+			{
+				AFL_Config_SetMute(3, true);
+				g_globalGameFlag.setInt(voiceKey, 3);
+			}
+			DialogInfomation info;
+			info.setCaption("音声再生について");
+			info.setMessage("音声の再生設定は|コンフィグのサウンドタブで|いつでも変更できます");
+			info.setPictureImageName("システム／ダイアログ／写真／情報");
+			openDialog(info);
+		}
+		else
+		{
+			g_globalGameFlag.setInt(voiceKey, 1);
+		}
+	}
+}
+
+bool isOffConfigVoiceSetting()
+{
+	if (AFL_Config_GetMute(3))
+	{
+		return true;
+	}
+	if (AFL_Config_GetMute(6) && AFL_Config_GetMute(7))
+	{
+		return true;
+	}
+	if (AFL_Config_GetVolume(3) == 0)
+	{
+		return true;
+	}
+	if (AFL_Config_GetVolume(6) == 0 && AFL_Config_GetVolume(7) == 0)
+	{
+		return true;
+	}
+	return false;
+}
+
+void checkNetworkConnection()
+{
+	string key = "ネットワーク接続設定";
+	if (g_globalGameFlag.getInt(key) == 0)
+	{
+		g_globalGameFlag.setInt(key, 1);
+		openNetworkConnection();
+	}
+}
+

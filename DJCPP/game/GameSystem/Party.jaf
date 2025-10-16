@@ -1,0 +1,186 @@
+Party::Party()
+{
+	this.max_ = 4;
+}
+
+void Party::clear()
+{
+	this.skillId_.Free();
+}
+
+void Party::getPlayerSkillIndexMinMax(ref int min, ref int max, string targetPlayerId)
+{
+	min = 10;
+	max = 0;
+	int i;
+	for (i = 0; i < g_party.getCount(); ++i)
+	{
+		string atkId = g_party.getAttackSkillId(i);
+		string chrId = getPlayerSkillFromId(atkId).getPlayerId();
+		if (chrId == targetPlayerId)
+		{
+			min = Math.Min(min, i);
+			max = Math.Max(max, i);
+		}
+	}
+}
+
+bool Party::isAddable()
+{
+	return this.skillId_.Numof() < this.max_;
+}
+
+bool Party::add(string attackSkillId)
+{
+	if (!this.isAddable())
+	{
+		return false;
+	}
+	if (this.isExist(attackSkillId))
+	{
+		return false;
+	}
+	this.skillId_.PushBack(attackSkillId);
+	this.sort();
+	this.cbOnPartyChanged_();
+	return true;
+}
+
+bool Party::isExist(string attackSkillId)
+{
+	return this.skillId_.Find(0, this.skillId_.Numof(), attackSkillId) >= 0;
+}
+
+void Party::erase(int index)
+{
+	if (0 <= index && index < this.skillId_.Numof())
+	{
+		this.skillId_.Erase(index);
+		this.cbOnPartyChanged_();
+	}
+}
+
+string Party::getAttackSkillId(int index)
+{
+	if (0 <= index && index < this.skillId_.Numof())
+	{
+		return this.skillId_[index];
+	}
+	return "";
+}
+
+string Party::getPlayerId(int index)
+{
+	if (0 <= index && index < this.skillId_.Numof())
+	{
+		ref PlayerSkill skill = getPlayerSkillFromId(this.skillId_[index]);
+		return skill.getPlayerId();
+	}
+	return "";
+}
+
+void Party::sort()
+{
+	this.skillId_.Sort(&sortFuncAttackSkillId);
+}
+
+int sortFuncAttackSkillId(string lhs, string rhs)
+{
+	ref PlayerSkill l = getPlayerSkillFromId(lhs);
+	ref PlayerSkill r = getPlayerSkillFromId(rhs);
+	int lhsIndex = getPlayerIndexFromId(l.getPlayerId());
+	int rhsIndex = getPlayerIndexFromId(r.getPlayerId());
+	if (lhsIndex < rhsIndex)
+	{
+		return -1;
+	}
+	if (lhsIndex > rhsIndex)
+	{
+		return 1;
+	}
+	int lIndex = getPlayerFromId(l.getPlayerId()).getSkillIndexFromId(l.getId());
+	int rIndex = getPlayerFromId(r.getPlayerId()).getSkillIndexFromId(r.getId());
+	if (lIndex < rIndex)
+	{
+		return -1;
+	}
+	if (lIndex > rIndex)
+	{
+		return 1;
+	}
+	return 0;
+}
+
+int Party::getCount()
+{
+	return this.skillId_.Numof();
+}
+
+void Party::addOnUpdateCallback(DG_GeneralCallback cb)
+{
+	this.cbOnPartyChanged_ += cb;
+}
+
+void Party::replace(string oldId, string newId)
+{
+	int i;
+	for (i = 0; i < this.skillId_.Numof(); ++i)
+	{
+		if (this.skillId_[i] == oldId)
+		{
+			this.skillId_[i] = newId;
+			this.cbOnPartyChanged_();
+		}
+	}
+}
+
+void Party::getPlayerIdList(ref array@string pIdList)
+{
+	pIdList.Free();
+	int i;
+	for (i = 0; i < g_party.getCount(); ++i)
+	{
+		string sId = g_party.getAttackSkillId(i);
+		string pId = getPlayerSkillFromId(sId).getPlayerId();
+		if (pIdList.Empty() || pIdList[pIdList.Numof() - 1] != pId)
+		{
+			pIdList.PushBack(pId);
+		}
+	}
+}
+
+void Party::setMaxCount(int value)
+{
+	this.max_ = Math.Max(1, value);
+}
+
+int Party::getMaxCount()
+{
+	return this.max_;
+}
+
+int Party::getIndexFromId(string skillId)
+{
+	int i;
+	for (i = 0; i < this.skillId_.Numof(); ++i)
+	{
+		if (this.skillId_[i] == skillId)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+bool Party::empty()
+{
+	return this.skillId_.Empty();
+}
+
+void Party::getSkillIdList(ref array@string list)
+{
+	list.Free();
+	list.Alloc(this.skillId_.Numof());
+	list.Copy(0, this.skillId_, 0, this.skillId_.Numof());
+}
+

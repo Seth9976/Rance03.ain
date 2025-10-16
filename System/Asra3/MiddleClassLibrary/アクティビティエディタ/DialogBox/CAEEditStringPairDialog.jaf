@@ -1,0 +1,126 @@
+void SGUIStringPair::Set(string First, string Second)
+{
+	this.m_First = First;
+	this.m_Second = Second;
+}
+
+CAEEditStringPairDialog::CAEEditStringPairDialog()
+{
+}
+
+void CAEEditStringPairDialog::Show(int ID, int PosX, int PosY, array@SGUIStringPair List, DG_ChangedStringPairList dgChangedIntList)
+{
+	AFL_Parts_AddLayer(-1);
+	this.m_dgChangedIntList = dgChangedIntList;
+	this.m_List.Realloc(List.Numof());
+	this.m_List.Copy(0, List, 0, List.Numof());
+	this.m_ParentID = ID;
+	int LayoutBox = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿パディング設定(LayoutBox, 6, 6, 6, 6);
+	Ｐ＿レイアウトボックス＿配置設定(LayoutBox, 3);
+	this.m_Panel.Init(LayoutBox);
+	this.m_Panel.AddChangeTextEvent(this.ChangeTextEvent);
+	int Index;
+	for (Index = 0; Index < List.Numof(); ++Index)
+	{
+		this.m_Panel.AddTextBoxItem(List[Index].m_First, 155, List[Index].m_Second, 80, false);
+	}
+	int ButtonLayout = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿レイアウトタイプ設定(ButtonLayout, 2);
+	Ｐ＿レイアウトボックス＿パディング設定(ButtonLayout, 3, 3, 3, 3);
+	Ｐ＿レイアウトボックス＿追加(LayoutBox, ButtonLayout);
+	int OKButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(OKButton, "決定");
+	Ｐ＿ボタン＿サイズ設定(OKButton, 65, 22);
+	Ｐ＿マージン設定(OKButton, 0, 0, 3, 0);
+	Ｐ＿レイアウトボックス＿追加(ButtonLayout, OKButton);
+	AFL_Parts_AddMouseLClickEvent(OKButton, this.ClickOKButtonEvent);
+	int CancelButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(CancelButton, "キャンセル");
+	Ｐ＿ボタン＿サイズ設定(CancelButton, 100, 22);
+	Ｐ＿マージン設定(CancelButton, 0, 0, 3, 0);
+	Ｐ＿レイアウトボックス＿追加(ButtonLayout, CancelButton);
+	AFL_Parts_AddMouseLClickEvent(CancelButton, this.ClickCancelButtonEvent);
+	int Width = AFL_Parts_GetWidth(LayoutBox, 1);
+	int Height = AFL_Parts_GetHeight(LayoutBox, 1);
+	int BG = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿構築手順＿ピクセル作成(BG, Width, Height, 1);
+	Ｐ＿構築手順＿色塗り(BG, 0, 0, Width, Height, 200, 200, 200, -1, 1);
+	Ｐ＿構築ビルド(BG, 1);
+	Ｐ＿ドラッグ可能設定(BG, true);
+	Ｐ＿親設定(LayoutBox, BG);
+	PosX = Math.Max(0, Math.Min(AFL_View_GetWidth() - Width, PosX));
+	PosY = Math.Max(0, Math.Min(AFL_View_GetHeight() - Height, PosY));
+	Ｐ＿座標設定(BG, PosX, PosY);
+	AFL_Parts_AddDragEndEvent(BG, this.DragEndEvent);
+	this.m_OK = false;
+	this.m_Cancel = false;
+	PARTS_BeginInput();
+	for (; ; )
+	{
+		AFL_View_Update(true);
+		if (this.m_OK)
+		{
+			break;
+		}
+		if (this.m_Cancel)
+		{
+			dgChangedIntList(ID, List);
+			break;
+		}
+	}
+	PARTS_EndInput();
+	this.m_Panel.Release();
+	PARTS_ReleaseWithInit(LayoutBox);
+	PARTS_ReleaseWithInit(CancelButton);
+	PARTS_ReleaseWithInit(OKButton);
+	PARTS_ReleaseWithInit(ButtonLayout);
+	PARTS_ReleaseWithInit(BG);
+	AFL_Parts_EraseLayer(-1);
+}
+
+void CAEEditStringPairDialog::ChangeTextEvent(int ID)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	int Index;
+	for (Index = 0; Index < this.m_List.Numof(); ++Index)
+	{
+		if (this.m_List[Index].m_First != Item.GetLabel())
+		{
+			continue;
+		}
+		this.m_List[Index].m_Second = Item.GetTextBoxText();
+		break;
+	}
+	this.m_dgChangedIntList(this.m_ParentID, this.m_List);
+	for (Index = 0; Index < this.m_List.Numof(); ++Index)
+	{
+		this.m_Panel.GetItemByLabel(this.m_List[Index].m_First).SetTextBoxText(this.m_List[Index].m_Second);
+	}
+}
+
+void CAEEditStringPairDialog::ClickOKButtonEvent(int ID, int MouseX, int MouseY)
+{
+	this.m_OK = true;
+}
+
+void CAEEditStringPairDialog::ClickCancelButtonEvent(int ID, int MouseX, int MouseY)
+{
+	this.m_Cancel = true;
+}
+
+void CAEEditStringPairDialog::DragEndEvent(int ID)
+{
+	int PosX = Ｐ＿Ｘ座標取得(ID);
+	int PosY = Ｐ＿Ｙ座標取得(ID);
+	int Width = AFL_Parts_GetWidth(ID, 1);
+	int Height = AFL_Parts_GetHeight(ID, 1);
+	PosX = Math.Max(0, Math.Min(AFL_View_GetWidth() - Width, PosX));
+	PosY = Math.Max(0, Math.Min(AFL_View_GetHeight() - Height, PosY));
+	Ｐ＿座標設定(ID, PosX, PosY);
+}
+

@@ -1,0 +1,82 @@
+OmakeModeTab::OmakeModeTab()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void OmakeModeTab::init(int count, bool isMirrorPieceMode)
+{
+	this.tab_.Alloc(count);
+	int i;
+	for (i = 0; i < this.tab_.Numof(); ++i)
+	{
+		string n;
+		if (isMirrorPieceMode)
+		{
+			array@string p;
+			p.PushBack("Ａ");
+			p.PushBack("Ｂ");
+			p.PushBack("Ｃ");
+			n = "システム／タブ／%s" % p[i];
+		}
+		else
+		{
+			n = "システム／タブ／%D" % (i + 1);
+		}
+		this.tab_[i].init(n, "", "", false);
+		this.tab_[i].setPos(15 + i * 125, 36);
+		this.tab_[i].setClickCallback(this.onClick, i);
+	}
+}
+
+void OmakeModeTab::setOnClickCallback(DG_OnClickOmakeModeTab cb)
+{
+	this.cb_ = cb;
+}
+
+void OmakeModeTab::update()
+{
+}
+
+void OmakeModeTab::fadeIn(bool val, unknown_delegate onFinish)
+{
+	this.setPartsShow();
+	int i;
+	for (i = 0; i < this.tab_.Numof(); ++i)
+	{
+		this.tab_[i].fadeIn(val);
+	}
+}
+
+void OmakeModeTab::initParts()
+{
+	this.setPartsPos();
+}
+
+void OmakeModeTab::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parent_.setShow(true);
+}
+
+void OmakeModeTab::setPartsPos()
+{
+}
+
+void OmakeModeTab::onClick(int index)
+{
+	this.cb_(index);
+}
+
+void OmakeModeTab::setCurrentPage(int page)
+{
+	int i;
+	for (i = 0; i < this.tab_.Numof(); ++i)
+	{
+		this.tab_[i].setEnable(page != i);
+	}
+}
+

@@ -1,0 +1,24 @@
+bool isMonsterAttackAvailable(ref MonsterAttack atk, int position)
+{
+	if (position == 0)
+	{
+		return true;
+	}
+	return atk.getTargetType() >= 11;
+}
+
+void getAliveOrganizedPlayerId(ref array@string result)
+{
+	array@string temp;
+	g_party.getPlayerIdList(temp);
+	result.Free();
+	int i;
+	for (i = 0; i < temp.Numof(); ++i)
+	{
+		if (getPlayerFromId(temp[i]).getHp() > 0)
+		{
+			result.PushBack(temp[i]);
+		}
+	}
+}
+

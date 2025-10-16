@@ -1,0 +1,48 @@
+void MultilineTextParts::setMax(int val)
+{
+	Ｐ＿マルチラインテキストボックス＿最大文字数設定(this.partsNumber_, val);
+}
+
+bool MultilineTextParts::init(string activityName, string partsName)
+{
+	this.release();
+	this.activityName_ = activityName;
+	this.partsName_ = partsName;
+	this.partsNumber_ = AFL_Activity_GetPartsNumber(this.activityName_, partsName);
+	if (this.partsNumber_ != 0)
+	{
+		AFL_Parts_AddChangedEvent(this.partsNumber_, this.onChange);
+		return true;
+	}
+	return false;
+}
+
+void MultilineTextParts::release()
+{
+	if (this.partsNumber_ != 0)
+	{
+	}
+	this.partsNumber_ = 0;
+}
+
+void MultilineTextParts::addOnChangeTextCallback(DG_GeneralCallback cb)
+{
+	this.cb_ = cb;
+}
+
+void MultilineTextParts::onChange(int pn)
+{
+	pass("onChange");
+	this.cb_();
+}
+
+void MultilineTextParts::setText(string text)
+{
+	Ｐ＿マルチラインテキストボックス＿テキスト設定(this.partsNumber_, text);
+}
+
+string MultilineTextParts::getText()
+{
+	return Ｐ＿マルチラインテキストボックス＿テキスト取得(this.partsNumber_);
+}
+

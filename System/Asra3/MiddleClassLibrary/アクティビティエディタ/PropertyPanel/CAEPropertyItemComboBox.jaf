@@ -1,0 +1,141 @@
+CAEPropertyItemComboBox::CAEPropertyItemComboBox()
+{
+}
+
+CAEPropertyItemComboBox::~CAEPropertyItemComboBox()
+{
+	this.Release();
+}
+
+int CAEPropertyItemComboBox::Init(string Name, int LabelWidth, int ComboBoxWidth, int ComboBoxHeight, ref CAEPropertyToolTip ToolTip)
+{
+	this.Release();
+	this.m_LayoutID = PARTS_GetFreeSystemPartsNumber();
+	this.m_Label = PARTS_GetFreeSystemPartsNumber();
+	this.m_ComboBox.Create();
+	this.m_ComboBox.SetSize(ComboBoxWidth, 14);
+	this.m_ComboBox.SetLineHeight(12);
+	this.m_ComboBox.SetBoxHeight(ComboBoxHeight);
+	Ｐ＿レイアウトボックス＿レイアウトタイプ設定(this.m_LayoutID, 2);
+	Ｐ＿レイアウトボックス＿配置設定(this.m_LayoutID, 4);
+	Ｐ＿マージン設定(this.m_LayoutID, 1, 1, 3, 3);
+	Ｐ＿フォント設定(this.m_Label, 0, 14, 0, 0, 0, 0.0, 0, 0, 0, 0.0, 1);
+	Ｐ＿テキスト設定(this.m_Label, Name, 1);
+	Ｐ＿オンカーソル透過設定(this.m_Label, true);
+	Ｐ＿マージン設定(this.m_Label, 0, 0, 0, LabelWidth - AFL_Parts_GetWidth(this.m_Label, 1));
+	Ｐ＿レイアウトボックス＿追加(this.m_LayoutID, this.m_Label);
+	Ｐ＿レイアウトボックス＿追加(this.m_LayoutID, this.m_ComboBox.GetPartsNumber());
+	AFL_Parts_AddKeyDownEvent(this.m_LayoutID, this.KeyDownEvent);
+	AFL_Parts_AddKeyDownEvent(this.m_Label, this.KeyDownEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_LayoutID, this.MouseWheelEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_Label, this.MouseWheelEvent);
+	this.m_ComboBox.AddKeyDownEvent(this.KeyDownEvent);
+	this.m_ComboBox.AddSelectedEvent(this.SelectedEvent);
+	return this.m_LayoutID;
+}
+
+void CAEPropertyItemComboBox::Release()
+{
+	this.m_dgSelectedEvent.Clear();
+	this.m_dgMouseWheelEvent.Clear();
+	this.m_dgKeyDownEvent.Clear();
+	PARTS_ReleaseWithInit(this.m_Label);
+	PARTS_ReleaseWithInit(this.m_LayoutID);
+	this.m_ComboBox.Release();
+}
+
+int CAEPropertyItemComboBox::GetID()
+{
+	return this.m_LayoutID;
+}
+
+string CAEPropertyItemComboBox::GetLabel()
+{
+	return Ｐ＿テキスト取得(this.m_Label, 1);
+}
+
+void CAEPropertyItemComboBox::SetItemList(array@string ItemList)
+{
+	this.m_ComboBox.ClearItem();
+	int Index;
+	for (Index = 0; Index < ItemList.Numof(); ++Index)
+	{
+		this.m_ComboBox.AddItem(ItemList[Index]);
+	}
+}
+
+void CAEPropertyItemComboBox::GetItemList(ref array@string ItemList)
+{
+	ItemList.Free();
+	int Index;
+	for (Index = 0; Index < this.m_ComboBox.Numof(); ++Index)
+	{
+		ItemList.PushBack(this.m_ComboBox.GetItem(Index));
+	}
+}
+
+void CAEPropertyItemComboBox::SetIndex(int Index)
+{
+	this.m_ComboBox.Select(Index);
+}
+
+int CAEPropertyItemComboBox::GetIndex()
+{
+	return this.m_ComboBox.SelectedIndex();
+}
+
+string CAEPropertyItemComboBox::GetToolTipText()
+{
+	return "";
+}
+
+void CAEPropertyItemComboBox::AddParts(int Number)
+{
+	Ｐ＿レイアウトボックス＿追加(this.m_LayoutID, Number);
+}
+
+void CAEPropertyItemComboBox::SelectedEvent(int ID, int Index)
+{
+	this.m_dgSelectedEvent(ID, Index);
+}
+
+void CAEPropertyItemComboBox::KeyDownEvent(int ID, int KeyID)
+{
+	this.m_dgKeyDownEvent(ID, KeyID);
+}
+
+void CAEPropertyItemComboBox::MouseWheelEvent(int ID, int Forward, int Back)
+{
+	this.m_dgMouseWheelEvent(ID, Forward, Back);
+}
+
+void CAEPropertyItemComboBox::AddKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent += DelegateObject;
+}
+
+void CAEPropertyItemComboBox::EraseKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent -= DelegateObject;
+}
+
+void CAEPropertyItemComboBox::AddMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent += DelegateObject;
+}
+
+void CAEPropertyItemComboBox::EraseMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent -= DelegateObject;
+}
+
+void CAEPropertyItemComboBox::AddSelectedEvent(DG_SelectedHandler DelegateObject)
+{
+	this.m_dgSelectedEvent += DelegateObject;
+}
+
+void CAEPropertyItemComboBox::EraseSelectedEvent(DG_SelectedHandler DelegateObject)
+{
+	this.m_dgSelectedEvent -= DelegateObject;
+}
+

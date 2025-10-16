@@ -1,0 +1,51 @@
+TutorialView::TutorialView()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void TutorialView::init(int skillCount)
+{
+	if (skillCount == 1)
+	{
+		string key = "戦闘チュートリアル１";
+		if (g_globalGameFlag.getInt(key) == 0)
+		{
+			this.parts_.init("システム／チュートリアル０１", 0);
+			this.parts_.setZ(3150.0);
+			g_globalGameFlag.setInt(key, 1);
+		}
+	}
+	else
+	{
+		string key = "戦闘チュートリアル２";
+		if (g_globalGameFlag.getInt(key) == 0)
+		{
+			this.parts_.init("システム／チュートリアル０２", 0);
+			this.parts_.setZ(3150.0);
+			g_globalGameFlag.setInt(key, 1);
+		}
+	}
+}
+
+void TutorialView::update()
+{
+}
+
+void TutorialView::fadeIn(bool val)
+{
+	if (!this.parts_.isInitialized())
+	{
+		return;
+	}
+	this.parts_.setShow(true);
+	if (!val)
+	{
+		this.parts_.runMotion(getStandardMotion(val ? 0 : 1), this.onFinishFadeOut);
+	}
+}
+
+void TutorialView::onFinishFadeOut()
+{
+	this.parts_.release();
+}
+

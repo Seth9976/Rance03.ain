@@ -1,0 +1,481 @@
+CPartsPanel::CPartsPanel()
+{
+}
+
+CPartsPanel::~CPartsPanel()
+{
+	this.Release();
+}
+
+void CPartsPanel::CreateBG()
+{
+	this.m_Base = PARTS_GetFreeSystemPartsNumber();
+	this.m_BG = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿親設定(this.m_BG, this.m_Base);
+	Ｐ＿座標設定(this.m_BG, this.m_FrameSize, this.m_FrameSize + this.m_CaptionHeight);
+	Ｐ＿オンカーソル透過設定(this.m_BG, true);
+	this.UpdateBG();
+}
+
+void CPartsPanel::CreateCaption()
+{
+	this.m_Caption = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿親設定(this.m_Caption, this.m_Base);
+	Ｐ＿座標設定(this.m_Caption, this.m_FrameSize, this.m_FrameSize);
+	this.m_CaptionText = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿親設定(this.m_CaptionText, this.m_Base);
+	Ｐ＿座標設定(this.m_CaptionText, this.m_FrameSize + this.m_CaptionHeight * 0.5, this.m_FrameSize + this.m_CaptionHeight * 0.1);
+	Ｐ＿フォント設定(this.m_CaptionText, 0, this.m_CaptionHeight * 0.8, 0, 0, 0, 0.0, 0, 0, 0, 0.0, 1);
+	this.m_CaptionMask = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿親設定(this.m_CaptionMask, this.m_Base);
+	Ｐ＿ドラッグ可能設定(this.m_CaptionMask, true);
+	AFL_Parts_AddDragBeginEvent(this.m_CaptionMask, this.CaptionDragBeginEvent);
+	AFL_Parts_AddDragingEvent(this.m_CaptionMask, this.CaptionDragingEvent);
+	AFL_Parts_AddDragEndEvent(this.m_CaptionMask, this.CaptionDragEndEvent);
+	this.m_CloseButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿親設定(this.m_CloseButton, this.m_Base);
+	Ｐ＿原点座標設定(this.m_CloseButton, 3);
+	Ｐ＿ボタン＿サイズ設定(this.m_CloseButton, this.m_CaptionHeight * 0.8, this.m_CaptionHeight * 0.8);
+	Ｐ＿ボタン＿フォント設定(this.m_CloseButton, 0, this.m_CaptionHeight * 0.7, 0, 0, 0, 0.0, 0, 0, 0, 0.0);
+	Ｐ＿ボタン＿テキスト設定(this.m_CloseButton, this.GetCloseButtonText());
+	AFL_Parts_AddMouseLClickEvent(this.m_CloseButton, this.CloseButtonClickEvent);
+	this.UpdateCaption();
+}
+
+void CPartsPanel::UpdateBG()
+{
+	if (this.m_Base)
+	{
+		int BaseWidth = this.m_FrameSize * 2 + this.m_Width;
+		int BaseHeight = this.m_FrameSize * 2 + this.m_CaptionHeight + (this.IsClosed() ? 0 : this.m_Height);
+		Ｐ＿構築手順＿作成(this.m_Base, BaseWidth, BaseHeight, 1);
+		Ｐ＿構築手順＿色塗り(this.m_Base, 0, 0, BaseWidth, BaseHeight, 100, 100, 100, 255, 1);
+		Ｐ＿構築ビルド(this.m_Base, 1);
+	}
+	if (this.m_BG)
+	{
+		int BGWidth = this.m_Width;
+		int BGHeight = this.m_Height;
+		Ｐ＿構築手順＿作成(this.m_BG, BGWidth, BGHeight, 1);
+		Ｐ＿構築手順＿色塗り(this.m_BG, 0, 0, BGWidth, BGHeight, 255, 255, 255, 255, 1);
+		Ｐ＿構築ビルド(this.m_BG, 1);
+		Ｐ＿乗算色設定(this.m_BG, 240, 235, 235);
+		Ｐ＿オンカーソル透過設定(this.m_BG, true);
+		Ｐ＿表示設定(this.m_BG, !this.IsClosed());
+	}
+}
+
+void CPartsPanel::UpdateCaption()
+{
+	int CaptionWidth = this.m_Width;
+	if (this.m_Caption)
+	{
+		Ｐ＿構築手順＿作成(this.m_Caption, CaptionWidth, this.m_CaptionHeight, 1);
+		Ｐ＿構築手順＿色塗り(this.m_Caption, 0, 0, CaptionWidth, this.m_CaptionHeight, 255, 255, 255, 255, 1);
+		Ｐ＿構築ビルド(this.m_Caption, 1);
+	}
+	if (this.m_CaptionText)
+	{
+		Ｐ＿テキスト表示範囲設定(this.m_CaptionText, 0, 0, CaptionWidth, this.m_CaptionHeight, 1);
+	}
+	if (this.m_CaptionMask)
+	{
+		Ｐ＿矩形判定設定(this.m_CaptionMask, 0, 0, this.m_Width + this.m_FrameSize * 2, this.m_CaptionHeight + this.m_FrameSize);
+	}
+	if (this.m_CloseButton)
+	{
+		Ｐ＿座標設定(this.m_CloseButton, (this.m_Width + this.m_FrameSize) - this.m_CaptionHeight * 0.1, this.m_FrameSize + this.m_CaptionHeight * 0.1);
+		Ｐ＿ボタン＿テキスト設定(this.m_CloseButton, this.GetCloseButtonText());
+	}
+}
+
+string CPartsPanel::GetCloseButtonText()
+{
+	if (!this.IsMinimizable())
+	{
+		return "×";
+	}
+	if (this.IsClosed())
+	{
+		return "＋";
+	}
+	return "－";
+}
+
+void CPartsPanel::BeginUpdateEvent(int PassedTime)
+{
+	if (this.IsTranslucent())
+	{
+		Ｐ＿アルファ値設定(this.m_Base, Ｐ＿オンカーソル判定(this.m_Base, 1) ? 255 : 128);
+	}
+	if (!this.IsActive())
+	{
+		int Number;
+		for (Number = PartsEngine.GetActiveParts(); Number != 0; Number = Ｐ＿親設定取得(Number))
+		{
+			if (Number == this.m_Base)
+			{
+				this.SetActive(true);
+				return;
+			}
+		}
+	}
+}
+
+void CPartsPanel::CaptionDragBeginEvent(int PartsNumber)
+{
+	this.m_dgCaptionDragBeginEvent(this.GetBaseParts());
+}
+
+void CPartsPanel::CaptionDragingEvent(int PartsNumber, int BeginMouseX, int BeginMouseY, int MouseX, int MouseY)
+{
+	float X = this.m_X;
+	float Y = this.m_Y;
+	this.SetPos((this.m_X + MouseX) - BeginMouseX, (this.m_Y + MouseY) - BeginMouseY);
+	Ｐ＿座標設定(this.m_CaptionMask, 0.0, 0.0);
+	this.m_X = X;
+	this.m_Y = Y;
+	this.m_dgCaptionDragingEvent(this.GetBaseParts(), BeginMouseX, BeginMouseY, MouseX, MouseY);
+}
+
+void CPartsPanel::CaptionDragEndEvent(int PartsNumber)
+{
+	this.m_X = AFL_Parts_GetUpperLeftPosX(this.m_Base, 1);
+	this.m_Y = AFL_Parts_GetUpperLeftPosY(this.m_Base, 1);
+	this.m_dgCaptionDragEndEvent(this.GetBaseParts());
+}
+
+void CPartsPanel::CloseButtonClickEvent(int PartsNumber, int MouseX, int MouseY)
+{
+	if (this.IsClosed())
+	{
+		this.Open();
+	}
+	else
+	{
+		this.Close();
+	}
+}
+
+void CPartsPanel::Create()
+{
+	this.Reset(PARTS_GetFreeSystemPartsNumber());
+}
+
+void CPartsPanel::Reset(int Number)
+{
+	this.Release();
+	this.CreateBG();
+	this.CreateCaption();
+	this.m_Layout = Number;
+	Ｐ＿親設定(this.m_Layout, this.m_Base);
+	Ｐ＿座標設定(this.m_Layout, this.m_FrameSize, this.m_FrameSize + this.m_CaptionHeight);
+	AFL_Parts_AddBeginUpdateEvent(this.BeginUpdateEvent);
+	this.Refresh();
+}
+
+void CPartsPanel::Release()
+{
+	PARTS_ReleaseWithInit(this.m_Base);
+	PARTS_ReleaseWithInit(this.m_Caption);
+	PARTS_ReleaseWithInit(this.m_CaptionText);
+	PARTS_ReleaseWithInit(this.m_CaptionMask);
+	PARTS_ReleaseWithInit(this.m_CloseButton);
+	PARTS_ReleaseWithInit(this.m_BG);
+	PARTS_ReleaseWithInit(this.m_Layout);
+	this.m_dgCaptionDragBeginEvent.Clear();
+	this.m_dgCaptionDragingEvent.Clear();
+	this.m_dgCaptionDragEndEvent.Clear();
+	this.m_dgUpdateSizeEvent.Clear();
+	this.m_dgChangedActiveFlgEvent.Clear();
+	this.m_dgChangedCloseFlgEvent.Clear();
+	this.m_X = 0.0;
+	this.m_Y = 0.0;
+	this.m_Z = 0;
+	this.m_CaptionHeight = 18;
+	this.m_FrameSize = 1;
+	this.m_Width = 420;
+	this.m_Height = 240;
+	this.m_CaptionColor.Set(255, 90, 90, 255);
+	this.m_CaptionLightColor.Set(255, 230, 230, 255);
+	this.m_Active = false;
+	this.m_Close = true;
+	this.m_Minimizable = false;
+	this.m_Translucent = false;
+	this.m_Title = "";
+}
+
+void CPartsPanel::Refresh()
+{
+	this.SetPos(this.m_X, this.m_Y);
+	this.SetZ(this.m_Z);
+	this.SetSize(this.m_Width, this.m_Height);
+	this.SetActive(this.m_Active);
+	this.SetTitle(this.m_Title);
+	this.SetCaptionColor(this.m_CaptionColor.GetR(), this.m_CaptionColor.GetG(), this.m_CaptionColor.GetB());
+	this.SetCaptionLightColor(this.m_CaptionLightColor.GetR(), this.m_CaptionLightColor.GetG(), this.m_CaptionLightColor.GetB());
+	if (this.IsMinimizable())
+	{
+		Ｐ＿表示設定(this.m_Base, true);
+	}
+	else
+	{
+		Ｐ＿表示設定(this.m_Base, !this.IsClosed());
+	}
+}
+
+int CPartsPanel::GetBaseParts()
+{
+	return this.m_Base;
+}
+
+int CPartsPanel::GetLayout()
+{
+	return this.m_Layout;
+}
+
+void CPartsPanel::SetMinimizable(bool Flg)
+{
+	if (this.m_Minimizable && Flg || !this.m_Minimizable && !Flg)
+	{
+		return;
+	}
+	this.m_Minimizable = Flg;
+	this.Refresh();
+}
+
+bool CPartsPanel::IsMinimizable()
+{
+	return this.m_Minimizable;
+}
+
+void CPartsPanel::SetTranslucent(bool Flg)
+{
+	if (this.m_Translucent && Flg || !this.m_Translucent && !Flg)
+	{
+		return;
+	}
+	this.m_Translucent = Flg;
+	this.Refresh();
+}
+
+bool CPartsPanel::IsTranslucent()
+{
+	return this.m_Translucent;
+}
+
+void CPartsPanel::SetActive(bool Flg)
+{
+	if (this.m_Caption)
+	{
+		if (Flg)
+		{
+			Ｐ＿乗算色設定(this.m_Caption, this.m_CaptionColor.GetR(), this.m_CaptionColor.GetG(), this.m_CaptionColor.GetB());
+		}
+		else
+		{
+			Ｐ＿乗算色設定(this.m_Caption, this.m_CaptionLightColor.GetR(), this.m_CaptionLightColor.GetG(), this.m_CaptionLightColor.GetB());
+		}
+	}
+	if (this.m_Active && !Flg || !this.m_Active && Flg)
+	{
+		this.m_Active = Flg;
+		this.m_dgChangedActiveFlgEvent(this.m_Base, this.m_Active);
+	}
+}
+
+bool CPartsPanel::IsActive()
+{
+	return this.m_Active;
+}
+
+void CPartsPanel::SetPos(float X, float Y)
+{
+	this.m_X = X;
+	this.m_Y = Y;
+	if (!this.m_Base)
+	{
+		return;
+	}
+	Ｐ＿座標設定(this.m_Base, this.m_X, this.m_Y);
+}
+
+void CPartsPanel::SetZ(int Z)
+{
+	this.m_Z = Z;
+	if (!this.m_Base)
+	{
+		return;
+	}
+	Ｐ＿Ｚ座標設定(this.m_Base, this.m_Z);
+	Ｐ＿Ｚ座標設定(this.m_Caption, 1);
+	Ｐ＿Ｚ座標設定(this.m_CaptionText, 2);
+	Ｐ＿Ｚ座標設定(this.m_CaptionMask, 3);
+	Ｐ＿Ｚ座標設定(this.m_CloseButton, 4);
+	Ｐ＿Ｚ座標設定(this.m_BG, 1);
+	Ｐ＿Ｚ座標設定(this.m_Layout, 2);
+}
+
+float CPartsPanel::GetX()
+{
+	return this.m_X;
+}
+
+float CPartsPanel::GetY()
+{
+	return this.m_Y;
+}
+
+int CPartsPanel::GetZ()
+{
+	return this.m_Z;
+}
+
+int CPartsPanel::GetLastZ()
+{
+	int Z;
+	this.m_dgGetLastZEvent(Z);
+	return Math.Max(Z, PARTS_GetAbsoluteMaxZ(this.m_Base));
+}
+
+void CPartsPanel::SetSize(int Width, int Height)
+{
+	this.m_Width = Width;
+	this.m_Height = Height;
+	this.UpdateBG();
+	this.UpdateCaption();
+	Ｐ＿表示設定(this.m_Layout, !this.IsClosed());
+	this.m_dgUpdateSizeEvent(this.m_Base, AFL_Parts_GetWidth(this.m_Base, 1), AFL_Parts_GetHeight(this.m_Base, 1));
+}
+
+int CPartsPanel::GetWidth()
+{
+	return this.m_Width;
+}
+
+int CPartsPanel::GetHeight()
+{
+	return this.m_Height;
+}
+
+void CPartsPanel::SetTitle(string Title)
+{
+	this.m_Title = Title;
+	if (this.m_CaptionText)
+	{
+		Ｐ＿テキスト設定(this.m_CaptionText, this.m_Title, 1);
+	}
+}
+
+string CPartsPanel::GetTitle()
+{
+	return this.m_Title;
+}
+
+void CPartsPanel::SetCaptionColor(int nR, int nG, int nB)
+{
+	this.m_CaptionColor.Set(nR, nG, nB, 255);
+	if (this.m_Active && this.m_Caption)
+	{
+		Ｐ＿乗算色設定(this.m_Caption, this.m_CaptionColor.GetR(), this.m_CaptionColor.GetG(), this.m_CaptionColor.GetB());
+	}
+}
+
+void CPartsPanel::SetCaptionLightColor(int nR, int nG, int nB)
+{
+	this.m_CaptionLightColor.Set(nR, nG, nB, 255);
+	if (!this.m_Active && this.m_Caption)
+	{
+		Ｐ＿乗算色設定(this.m_Caption, this.m_CaptionLightColor.GetR(), this.m_CaptionLightColor.GetG(), this.m_CaptionLightColor.GetB());
+	}
+}
+
+void CPartsPanel::Open()
+{
+	this.m_Close = false;
+	this.Refresh();
+	this.m_dgChangedCloseFlgEvent(this.m_Base, this.m_Close);
+}
+
+void CPartsPanel::Close()
+{
+	this.m_Close = true;
+	this.Refresh();
+	this.m_dgChangedCloseFlgEvent(this.m_Base, this.m_Close);
+}
+
+bool CPartsPanel::IsClosed()
+{
+	return this.m_Close;
+}
+
+void CPartsPanel::AddCaptionDragBeginEvent(DG_DragBeginHandler DelegateObject)
+{
+	this.m_dgCaptionDragBeginEvent += DelegateObject;
+}
+
+void CPartsPanel::EraseCaptionDragBeginEvent(DG_DragBeginHandler DelegateObject)
+{
+	this.m_dgCaptionDragBeginEvent -= DelegateObject;
+}
+
+void CPartsPanel::AddCaptionDragingEvent(DG_DragingHandler DelegateObject)
+{
+	this.m_dgCaptionDragingEvent += DelegateObject;
+}
+
+void CPartsPanel::EraseCaptionDragingEvent(DG_DragingHandler DelegateObject)
+{
+	this.m_dgCaptionDragingEvent -= DelegateObject;
+}
+
+void CPartsPanel::AddCaptionDragEndEvent(DG_DragEndHandler DelegateObject)
+{
+	this.m_dgCaptionDragEndEvent += DelegateObject;
+}
+
+void CPartsPanel::EraseCaptionDragEndEvent(DG_DragEndHandler DelegateObject)
+{
+	this.m_dgCaptionDragEndEvent -= DelegateObject;
+}
+
+void CPartsPanel::AddChangedActiveFlgEvent(DG_Panel_ChangedActiveFlgHandler DelegateObject)
+{
+	this.m_dgChangedActiveFlgEvent += DelegateObject;
+}
+
+void CPartsPanel::EraseChangedActiveFlgEvent(DG_Panel_ChangedActiveFlgHandler DelegateObject)
+{
+	this.m_dgChangedActiveFlgEvent -= DelegateObject;
+}
+
+void CPartsPanel::AddGetLastZEvent(DG_Panel_GetLastZHandler DelegateObject)
+{
+	this.m_dgGetLastZEvent += DelegateObject;
+}
+
+void CPartsPanel::EraseGetLastZEvent(DG_Panel_GetLastZHandler DelegateObject)
+{
+	this.m_dgGetLastZEvent -= DelegateObject;
+}
+
+void CPartsPanel::AddUpdateSizeEvent(DG_Panel_UpdateSizeHandler DelegateObject)
+{
+	this.m_dgUpdateSizeEvent += DelegateObject;
+}
+
+void CPartsPanel::EraseUpdateSizeEvent(DG_Panel_UpdateSizeHandler DelegateObject)
+{
+	this.m_dgUpdateSizeEvent -= DelegateObject;
+}
+
+void CPartsPanel::AddChangedCloseFlgEvent(DG_Panel_ChangedCloseFlgHandler DelegateObject)
+{
+	this.m_dgChangedCloseFlgEvent += DelegateObject;
+}
+
+void CPartsPanel::EraseChangedCloseFlgEvent(DG_Panel_ChangedCloseFlgHandler DelegateObject)
+{
+	this.m_dgChangedCloseFlgEvent -= DelegateObject;
+}
+

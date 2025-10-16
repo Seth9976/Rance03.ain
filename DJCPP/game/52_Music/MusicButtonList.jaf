@@ -1,0 +1,94 @@
+MusicButtonList::MusicButtonList()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void MusicButtonList::init()
+{
+	int pageCount = (g_musicInfo.Numof() + 23) / 24;
+	this.base_.init(pageCount, "システム／音楽鑑賞／下地", false);
+	this.partsPlaying_.init("システム／音楽鑑賞／再生中", 0);
+	this.partsPlaying_.setZ(5000.0);
+	this.partsPlaying_.setParent(this.base_.getPartsNumber());
+	this.btn_.Alloc(g_musicInfo.Numof());
+	int i;
+	for (i = 0; i < this.btn_.Numof(); ++i)
+	{
+		if (g_musicInfo[i].isPlayed())
+		{
+			this.btn_[i].init("システム／ボタン／幅２８２", g_musicInfo[i].getSongName(), "", true);
+		}
+		else
+		{
+			this.btn_[i].init("システム／ボタン／幅２８２", "？？？？？", "", true);
+			this.btn_[i].setEnable(false);
+		}
+		this.btn_[i].setParent(this.base_.getPartsNumber());
+		this.btn_[i].setClickCallback(this.onClick, i);
+		this.btn_[i].setZ(4500);
+	}
+	this.setButtonPos();
+}
+
+void MusicButtonList::setButtonPos()
+{
+	int i;
+	for (i = 0; i < this.btn_.Numof(); ++i)
+	{
+		int x;
+		int y;
+		this.getButtonPos(x, y, i);
+		this.btn_[i].setPos(x, y);
+	}
+}
+
+void MusicButtonList::getButtonPos(ref int x, ref int y, int index)
+{
+	int page = index / 24;
+	int px = index % 24 % 3;
+	int py = (index % 24) / 3;
+	x = 81 + px * 292 + page * 1024;
+	y = 128 + py * 56;
+}
+
+void MusicButtonList::update()
+{
+}
+
+void MusicButtonList::setOnClickCallback(DG_OnClickMusicButtonCallback cb)
+{
+	this.cb_ = cb;
+}
+
+void MusicButtonList::onClick(int index)
+{
+	this.cb_(index);
+}
+
+void MusicButtonList::fadeIn(bool val, unknown_delegate onFinish)
+{
+	int i;
+	for (i = 0; i < this.btn_.Numof(); ++i)
+	{
+		this.btn_[i].fadeIn(val);
+	}
+	this.base_.fadeIn(val, NULL);
+	this.partsPlaying_.runMotion(getStandardMotion(val ? 0 : 1), NULL);
+}
+
+void MusicButtonList::setPlaying(int index)
+{
+	if (index == -1)
+	{
+		this.partsPlaying_.setShow(false);
+	}
+	else
+	{
+		int x;
+		int y;
+		this.getButtonPos(x, y, index);
+		this.partsPlaying_.setShow(true);
+		this.partsPlaying_.setPos(x - 10, y + 7);
+	}
+}
+

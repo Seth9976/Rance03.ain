@@ -1,0 +1,719 @@
+_CMsgKeyWait::_CMsgKeyWait()
+{
+}
+
+void _CMsgKeyWait::_Execute(bool _ignore_skip_mode)
+{
+	this._Prepare(_ignore_skip_mode);
+	this._Loop(_ignore_skip_mode);
+	this._Cleanup();
+	IbisInputEngine.Mouse_HideByStepMessage();
+}
+
+void _CMsgKeyWait::_Prepare(bool _ignore_skip_mode)
+{
+	g_SystemButtonViewList.Update();
+	if (this._IsSetQuakeScreen())
+	{
+		this._ExecuteQuakeScreen();
+	}
+	_g_MsgKeyWaitAnime._Init(g_MessageWindowModelManager.GetMessageWindow(g_MessageWindowStatusManager.GetActiveMessageWindowNumber()));
+	this.m_bExistVoiceInMessage = g_MessageTextModel.IsExistVoice();
+	this.InitAutoModeTimer();
+	this._m_exit = false;
+	g_SystemButtonViewList.Update();
+	this._m_crsr_sys_btn = g_SystemButtonViewList.GetSelectedFunc();
+	this.CheckKeyThroughFlag();
+	this._ClearKeyDownFlag();
+	SYS_ホイール回転時刻クリア();
+	this.InitJoyClick(_ignore_skip_mode);
+	if (SYS_バックログオープン確認())
+	{
+		this._DoCommand(&SYS_RunCommandMouseWheelForward);
+	}
+}
+
+void _CMsgKeyWait::InitJoyClick(bool _ignore_skip_mode)
+{
+	bool FirstKeyDownCancel = _ignore_skip_mode || !SYS_スキップ中確認();
+	this.m_StepMessageJoyClick.Init(4, FirstKeyDownCancel);
+	this.m_HideMessageWindowJoyClick.Init(6, false);
+	this.m_OpenBackLog.Init(8, true);
+	this.m_OpenBackScene.Init(15, true);
+	this.m_JoyClickForCallbackList.Alloc(50);
+	int Index;
+	for (Index = 0; Index < this.m_JoyClickForCallbackList.Numof(); Index++)
+	{
+		if (g_InputJoypadCallbackList[Index].Empty())
+		{
+			continue;
+		}
+		this.m_JoyClickForCallbackList[Index].Init(Index, false);
+	}
+}
+
+void _CMsgKeyWait::_Loop(bool _ignore_skip_mode)
+{
+	while (!this._m_exit)
+	{
+		this._Update(_ignore_skip_mode);
+	}
+}
+
+void _CMsgKeyWait::_Update(bool _ignore_skip_mode)
+{
+	g_SystemButtonViewList.Update();
+	if (!_ignore_skip_mode && SYS_スキップ中確認())
+	{
+		this._OnReadSkipMode();
+	}
+	else if (!_ignore_skip_mode && Ａ＿オートモード中確認())
+	{
+		this._OnAutoMode();
+	}
+	else
+	{
+		this._OnPlainMode(_ignore_skip_mode);
+	}
+	if (!_ignore_skip_mode && SYS_スキップ中確認() && this._m_exit)
+	{
+		return;
+	}
+	SYS_キー待ちマーク表示設定(true);
+	PARTS_UpdateMotion(true);
+	AFL_View_Update(true);
+}
+
+void _CMsgKeyWait::_OnAutoMode()
+{
+	this._CheckSystemButtonOnCursor();
+	if (this.CheckKeyClick())
+	{
+		return;
+	}
+	if (this.CheckJoyClick())
+	{
+		return;
+	}
+	if (SYS_全文スキップ中確認())
+	{
+		SYS_StopSE();
+		this._m_exit = true;
+		return;
+	}
+	if (!this.IsAllKeyUp() || !this.IsAllJoyKeyUp())
+	{
+		return;
+	}
+	if (this._IsAutoModeTimeOut())
+	{
+		SYS_RestrainScreensaverWhileAutoMode();
+		this._m_exit = true;
+		return;
+	}
+}
+
+void _CMsgKeyWait::_OnReadSkipMode()
+{
+	this._CheckSystemButtonOnCursor();
+	if (this.CheckKeyClick())
+	{
+		return;
+	}
+	if (this.CheckJoyClick())
+	{
+		return;
+	}
+	if (SYS_全文スキップ中確認())
+	{
+		SYS_StopSE();
+		this._m_exit = true;
+		return;
+	}
+	if (!this.IsAllKeyUp() || !this.IsAllJoyKeyUp())
+	{
+		return;
+	}
+	this._m_exit = true;
+}
+
+void _CMsgKeyWait::_OnPlainMode(bool _ignore_skip_mode)
+{
+	this._CheckSystemButtonOnCursor();
+	if (this.CheckKeyClick())
+	{
+		return;
+	}
+	if (this.CheckJoyClick())
+	{
+		return;
+	}
+	if (!_ignore_skip_mode && SYS_全文スキップ中確認())
+	{
+		SYS_StopSE();
+		this._m_exit = true;
+		return;
+	}
+}
+
+bool _CMsgKeyWait::CheckReleaseModeByClick()
+{
+	if (AFL_Config_GetReleaseSkipModeByClick() && SYS_スキップ中確認() || AFL_Config_GetReleaseAutoModeByClick() && Ａ＿オートモード中確認())
+	{
+		SYS_ReleaseModeByClickCancel();
+		return true;
+	}
+	return false;
+}
+
+bool _CMsgKeyWait::CheckKeyClick()
+{
+	if (AFL_IsKeyDown(1))
+	{
+		if (!this.m_LButtonDown)
+		{
+			this.m_FirstKeyDownSystemButton = this._m_crsr_sys_btn;
+		}
+		this.m_LButtonDown = true;
+	}
+	else if (this.m_LButtonDown)
+	{
+		this.m_LButtonDown = false;
+		if (SYS_IsSame_sys_btn_fnc_t(this.m_FirstKeyDownSystemButton, this._m_crsr_sys_btn) && this._m_crsr_sys_btn.Numof() != 0)
+		{
+			if (this.CheckSystemButton())
+			{
+				return true;
+			}
+		}
+		this.m_LButtonThrough = this.m_LButtonThrough | this.m_FirstKeyDownSystemButton.Numof() != 0;
+		this.m_LButtonThrough = this.m_LButtonThrough | this._m_crsr_sys_btn.Numof() != 0;
+		if (this.CheckReleaseModeByClick())
+		{
+			return true;
+		}
+		if (this.m_LButtonThrough)
+		{
+			this.m_LButtonThrough = false;
+		}
+		else if (!SYS_スキップ中確認())
+		{
+			this._m_exit = true;
+			return true;
+		}
+	}
+	if (AFL_IsKeyDown(13))
+	{
+		this.m_ReturnKeyDown = true;
+	}
+	else if (this.m_ReturnKeyDown)
+	{
+		this.m_ReturnKeyDown = false;
+		if (this.CheckReleaseModeByClick())
+		{
+			return true;
+		}
+		if (this.m_ReturnKeyThrough)
+		{
+			this.m_ReturnKeyThrough = false;
+		}
+		else if (!SYS_スキップ中確認())
+		{
+			this._m_exit = true;
+			return true;
+		}
+	}
+	if (SYS_ホイールフォア即確認())
+	{
+		this._DoCommand(&SYS_RunCommandMouseWheelForward);
+		return true;
+	}
+	if (!SYS_スキップ中確認())
+	{
+		if (SYS_ホイールバック確認())
+		{
+			this._m_exit = true;
+			return true;
+		}
+	}
+	if (AFL_IsKeyDown(2))
+	{
+		this.m_RButtonDown = true;
+	}
+	else if (this.m_RButtonDown)
+	{
+		this.m_RButtonDown = false;
+		this._OnRButton();
+		return true;
+	}
+	if (AFL_IsKeyDown(27))
+	{
+		this.m_EscapeKeyDown = true;
+	}
+	else if (this.m_EscapeKeyDown)
+	{
+		this.m_EscapeKeyDown = false;
+		this._OnEscapeKey();
+		return true;
+	}
+	if (AFL_IsKeyDown(32))
+	{
+		this.m_SpaceKeyDown = true;
+	}
+	else if (this.m_SpaceKeyDown)
+	{
+		this.m_SpaceKeyDown = false;
+		this._OnSpaceKey();
+		return true;
+	}
+	if (AFL_IsKeyDown(65))
+	{
+		this.m_AKeyDown = true;
+	}
+	else if (this.m_AKeyDown)
+	{
+		this.m_AKeyDown = false;
+		this._DoCommand(&Ｓ＿オート);
+		return true;
+	}
+	if (AFL_IsKeyDown(83))
+	{
+		this.m_SKeyDown = true;
+	}
+	else if (this.m_SKeyDown)
+	{
+		this.m_SKeyDown = false;
+		this._DoCommand(&Ｓ＿既読スキップ);
+		return true;
+	}
+	if (AFL_IsKeyDown(4))
+	{
+		this.m_MButtonDown = true;
+	}
+	else if (this.m_MButtonDown)
+	{
+		this.m_MButtonDown = false;
+		this._DoCommand(&Ｓ＿既読スキップ);
+		return true;
+	}
+	if (AFL_IsKeyDown(90))
+	{
+		this.m_ZKeyDown = true;
+	}
+	else if (this.m_ZKeyDown)
+	{
+		this.m_ZKeyDown = false;
+		this._DoCommand(&SYS_メッセージウィンドウ非表示);
+		return true;
+	}
+	if (AFL_IsKeyDown(33))
+	{
+		this.m_PageUpKeyDown = true;
+	}
+	else if (this.m_PageUpKeyDown)
+	{
+		this.m_PageUpKeyDown = false;
+		this._DoCommand(&Ｓ＿バックログ);
+		return true;
+	}
+	if (AFL_IsKeyDown(36))
+	{
+		this.m_HomeKeyDown = true;
+	}
+	else if (this.m_HomeKeyDown)
+	{
+		this.m_HomeKeyDown = false;
+		this._DoCommand(&Ｓ＿バックシーン);
+		return true;
+	}
+	if (AFL_IsKeyDown(8))
+	{
+		this.m_BackspaceKeyDown = true;
+	}
+	else if (this.m_BackspaceKeyDown)
+	{
+		this.m_BackspaceKeyDown = false;
+		this._OnBackspaceKey();
+		return true;
+	}
+	if (system.IsDebugMode())
+	{
+		if (AFL_IsKeyDown(16) && AFL_IsKeyDown(67))
+		{
+			this.m_ShiftCKeyDown = true;
+		}
+		else if (this.m_ShiftCKeyDown)
+		{
+			this.m_ShiftCKeyDown = false;
+			this._ClearKeyDownFlag();
+			this.OnShiftCKeyClick();
+			return true;
+		}
+	}
+	if (AFL_IsKeyDown(38))
+	{
+		this.m_UpKeyDown = true;
+	}
+	else if (this.m_UpKeyDown)
+	{
+		this.m_UpKeyDown = false;
+		if (this.m_UpKeyThrough)
+		{
+			this.m_UpKeyThrough = false;
+		}
+		else
+		{
+			this._DoCommand(&SYS_RunCommandMouseWheelForward);
+			return true;
+		}
+	}
+	if (AFL_IsKeyDown(40))
+	{
+		this.m_DownKeyDown = true;
+	}
+	else if (this.m_DownKeyDown)
+	{
+		this.m_DownKeyDown = false;
+		if (this.CheckReleaseModeByClick())
+		{
+			return true;
+		}
+		if (this.m_DownKeyThrough)
+		{
+			this.m_DownKeyThrough = false;
+		}
+		else if (!SYS_スキップ中確認())
+		{
+			this._m_exit = true;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool _CMsgKeyWait::IsAllKeyUp()
+{
+	if (AFL_IsKeyDown(1))
+	{
+		return false;
+	}
+	if (AFL_IsKeyDown(2))
+	{
+		return false;
+	}
+	if (AFL_IsKeyDown(4))
+	{
+		return false;
+	}
+	if (AFL_IsKeyDown(13))
+	{
+		return false;
+	}
+	if (AFL_IsKeyDown(32))
+	{
+		return false;
+	}
+	if (AFL_IsKeyDown(27))
+	{
+		return false;
+	}
+	if (AFL_IsKeyDown(65))
+	{
+		return false;
+	}
+	if (AFL_IsKeyDown(83))
+	{
+		return false;
+	}
+	if (AFL_IsKeyDown(90))
+	{
+		return false;
+	}
+	if (AFL_IsKeyDown(33))
+	{
+		return false;
+	}
+	if (AFL_IsKeyDown(8))
+	{
+		return false;
+	}
+	if (AFL_IsKeyDown(36))
+	{
+		return false;
+	}
+	if (AFL_IsKeyDown(38))
+	{
+		return false;
+	}
+	if (AFL_IsKeyDown(40))
+	{
+		return false;
+	}
+	return true;
+}
+
+bool _CMsgKeyWait::CheckJoyClick()
+{
+	if (this.m_StepMessageJoyClick.IsClick(-2147483648))
+	{
+		if (this.CheckReleaseModeByClick())
+		{
+			return true;
+		}
+		if (!SYS_スキップ中確認())
+		{
+			this._m_exit = true;
+			return true;
+		}
+	}
+	if (this.m_HideMessageWindowJoyClick.IsClick(-2147483648))
+	{
+		this._DoCommand(&SYS_メッセージウィンドウ非表示);
+		return true;
+	}
+	if (this.m_OpenBackLog.IsClick(-2147483648))
+	{
+		this._DoCommand(&Ｓ＿バックログ);
+		return true;
+	}
+	if (this.m_OpenBackScene.IsClick(-2147483648))
+	{
+		this._DoCommand(&Ｓ＿バックシーン);
+	}
+	int Index;
+	for (Index = 0; Index < this.m_JoyClickForCallbackList.Numof(); Index++)
+	{
+		if (this.m_JoyClickForCallbackList[Index].IsClick(-2147483648))
+		{
+			this._DoCommand(g_InputJoypadCallbackList[Index].GetCallback());
+			return true;
+		}
+	}
+	return false;
+}
+
+bool _CMsgKeyWait::IsAllJoyKeyUp()
+{
+	int Key;
+	for (Key = 5; Key <= 20; Key++)
+	{
+		if (AFL_Joystick_IsKeyDown(0, Key))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+bool _CMsgKeyWait::CheckSystemButton()
+{
+	if (this._m_crsr_sys_btn.Numof() != 0)
+	{
+		if (this.m_LButtonThrough)
+		{
+			this.m_LButtonThrough = false;
+		}
+		if (!this._m_crsr_sys_btn.Exist(&Ｓ＿ボイスリプレイ))
+		{
+			g_SystemButtonViewList.PlayClickSound();
+		}
+		this._DoCommand(this._m_crsr_sys_btn);
+		this._m_crsr_sys_btn = g_SystemButtonViewList.GetSelectedFunc();
+		return true;
+	}
+	return false;
+}
+
+void _CMsgKeyWait::InitAutoModeTimer()
+{
+	this._ComputeAutoModeTimeLength();
+	this.m_AutoModeTimer.Reset();
+	if (this.m_bExistVoiceInMessage)
+	{
+		this._m_auto_mode_time_start = 0;
+	}
+	else
+	{
+		this._m_auto_mode_time_start = this.m_AutoModeTimer.Get();
+	}
+}
+
+bool _CMsgKeyWait::_IsAutoModeTimeOut()
+{
+	if (this.m_bExistVoiceInMessage)
+	{
+		if (KiwiSoundEngine.IsPlay(12))
+		{
+			return false;
+		}
+		if (this._m_auto_mode_time_start == 0)
+		{
+			this._m_auto_mode_time_start = this.m_AutoModeTimer.Get();
+		}
+		else
+		{
+			int nLapseTime = this.m_AutoModeTimer.Get() - this._m_auto_mode_time_start;
+			if (nLapseTime >= this._m_auto_mode_time_length)
+			{
+				return true;
+			}
+		}
+	}
+	else
+	{
+		int nLapseTime = this.m_AutoModeTimer.Get() - this._m_auto_mode_time_start;
+		if (nLapseTime >= this._m_auto_mode_time_length)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void _CMsgKeyWait::_ComputeAutoModeTimeLength()
+{
+	if (g_MessageTextModel.IsExistVoice())
+	{
+		this._m_auto_mode_time_length = 150;
+	}
+	else
+	{
+		this._m_auto_mode_time_length = SYS_オートモード待機時間計算(g_MessageTextModel.GetMessageTextLength());
+	}
+}
+
+void _CMsgKeyWait::_DoCommand(sys_btn_fnc_t _f)
+{
+	this._ClearKeyDownFlag();
+	SYS_キー待ちマーク表示設定(false);
+	PARTS_PauseMotion();
+	_f();
+	PARTS_PlayMotion();
+	g_SystemButtonViewList.Update();
+	this.InitAutoModeTimer();
+	SYS_キー待ちマーク表示設定(true);
+}
+
+void _CMsgKeyWait::_Cleanup()
+{
+	SYS_キー待ちマーク表示設定(false);
+}
+
+bool _CMsgKeyWait::_IsSetQuakeScreen()
+{
+	return _文字表示後画面揺らし時 > 0 && (_文字表示後画面揺らし横 > 0 || _文字表示後画面揺らし縦 > 0);
+}
+
+void _CMsgKeyWait::_ExecuteQuakeScreen()
+{
+	if (!SYS_全文スキップ中確認() && !SYS_スキップ中確認())
+	{
+		SYS_画面揺らし(_文字表示後画面揺らし横, _文字表示後画面揺らし縦, _文字表示後画面揺らし時);
+	}
+}
+
+void _CMsgKeyWait::_OnRButton()
+{
+	if (_g_rbutton_callback_fnc.Numof() != 0)
+	{
+		this._DoCommand(_g_rbutton_callback_fnc);
+	}
+	else
+	{
+		this._DoCommand(&SYS_メッセージウィンドウ非表示);
+	}
+}
+
+void _CMsgKeyWait::_OnSpaceKey()
+{
+	if (_g_spacekey_callback_fnc.Numof() != 0)
+	{
+		this._DoCommand(_g_spacekey_callback_fnc);
+	}
+	else
+	{
+		this._DoCommand(&SYS_メッセージウィンドウ非表示);
+	}
+}
+
+void _CMsgKeyWait::_OnBackspaceKey()
+{
+	Ｓ＿ボイスリプレイ();
+	this._ClearKeyDownFlag();
+}
+
+void _CMsgKeyWait::_OnEscapeKey()
+{
+	if (_g_escapekey_callback_fnc.Numof() != 0)
+	{
+		this._DoCommand(_g_escapekey_callback_fnc);
+	}
+	else
+	{
+		this._DoCommand(&Ｓ＿コンフィグ);
+	}
+}
+
+void _CMsgKeyWait::OnShiftCKeyClick()
+{
+	g_MessageTextModel.DebugOutputMessageText();
+	g_MessageTextModel.DebugMessageTextToClipboard();
+}
+
+void _CMsgKeyWait::_CheckSystemButtonOnCursor()
+{
+	sys_btn_fnc_t _sys_btn = g_SystemButtonViewList.GetSelectedFunc();
+	if (!SYS_IsSame_sys_btn_fnc_t(_sys_btn, this._m_crsr_sys_btn))
+	{
+		this._m_crsr_sys_btn = _sys_btn;
+		if (this._m_crsr_sys_btn.Numof() != 0)
+		{
+			g_SystemButtonViewList.PlayOnCursorSound();
+		}
+	}
+}
+
+void _CMsgKeyWait::_ClearKeyDownFlag()
+{
+	this.m_LButtonDown = false;
+	this.m_ReturnKeyDown = false;
+	this.m_RButtonDown = false;
+	this.m_EscapeKeyDown = false;
+	this.m_SpaceKeyDown = false;
+	this.m_AKeyDown = false;
+	this.m_SKeyDown = false;
+	this.m_MButtonDown = false;
+	this.m_ZKeyDown = false;
+	this.m_PageUpKeyDown = false;
+	this.m_HomeKeyDown = false;
+	this.m_BackspaceKeyDown = false;
+	this.m_ShiftCKeyDown = false;
+	this.m_UpKeyDown = false;
+	this.m_DownKeyDown = false;
+	this.m_StepMessageJoyClick.Reset(true);
+	this.m_HideMessageWindowJoyClick.Reset(true);
+	this.m_OpenBackLog.Reset(true);
+	this.m_OpenBackScene.Reset(true);
+	int Index;
+	for (Index = 0; Index < this.m_JoyClickForCallbackList.Numof(); Index++)
+	{
+		this.m_JoyClickForCallbackList[Index].Reset(true);
+	}
+}
+
+void _CMsgKeyWait::CheckKeyThroughFlag()
+{
+	this.m_LButtonThrough = AFL_IsKeyDown(1);
+	this.m_ReturnKeyThrough = AFL_IsKeyDown(13);
+	this.m_UpKeyThrough = AFL_IsKeyDown(38);
+	this.m_DownKeyThrough = AFL_IsKeyDown(40);
+}
+
+void _CMsgKeyWait::ClearKeyThroughFlag()
+{
+	this.m_LButtonThrough = false;
+	this.m_ReturnKeyThrough = false;
+	this.m_UpKeyThrough = false;
+	this.m_DownKeyThrough = false;
+}
+

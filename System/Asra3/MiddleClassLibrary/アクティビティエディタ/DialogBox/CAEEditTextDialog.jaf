@@ -1,0 +1,101 @@
+CAEEditTextDialog::CAEEditTextDialog()
+{
+}
+
+string CAEEditTextDialog::Show(int ID, int PosX, int PosY, string Text, DG_ChangeTextHandler dgChangeText)
+{
+	AFL_Parts_AddLayer(-1);
+	this.m_dgChangeTextEvent = dgChangeText;
+	this.m_ParentID = ID;
+	int LayoutBox = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿パディング設定(LayoutBox, 6, 6, 6, 6);
+	Ｐ＿レイアウトボックス＿配置設定(LayoutBox, 3);
+	this.m_MTextBox = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿マルチラインテキストボックス＿サイズ設定(this.m_MTextBox, 512, 512);
+	Ｐ＿マルチラインテキストボックス＿最大文字数設定(this.m_MTextBox, 2147483647);
+	Ｐ＿マルチラインテキストボックス＿テキスト設定(this.m_MTextBox, Text);
+	Ｐ＿レイアウトボックス＿追加(LayoutBox, this.m_MTextBox);
+	AFL_Parts_AddChangedEvent(this.m_MTextBox, this.ChangeTextEvent);
+	int ButtonLayout = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿レイアウトタイプ設定(ButtonLayout, 2);
+	Ｐ＿レイアウトボックス＿パディング設定(ButtonLayout, 3, 3, 3, 3);
+	Ｐ＿レイアウトボックス＿追加(LayoutBox, ButtonLayout);
+	int OKButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(OKButton, "決定");
+	Ｐ＿ボタン＿サイズ設定(OKButton, 65, 22);
+	Ｐ＿マージン設定(OKButton, 0, 0, 3, 0);
+	Ｐ＿レイアウトボックス＿追加(ButtonLayout, OKButton);
+	AFL_Parts_AddMouseLClickEvent(OKButton, this.ClickOKButtonEvent);
+	int CancelButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(CancelButton, "キャンセル");
+	Ｐ＿ボタン＿サイズ設定(CancelButton, 100, 22);
+	Ｐ＿マージン設定(CancelButton, 0, 0, 3, 0);
+	Ｐ＿レイアウトボックス＿追加(ButtonLayout, CancelButton);
+	AFL_Parts_AddMouseLClickEvent(CancelButton, this.ClickCancelButtonEvent);
+	int Width = AFL_Parts_GetWidth(LayoutBox, 1);
+	int Height = AFL_Parts_GetHeight(LayoutBox, 1);
+	int BG = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿構築手順＿ピクセル作成(BG, Width, Height, 1);
+	Ｐ＿構築手順＿色塗り(BG, 0, 0, Width, Height, 200, 200, 200, -1, 1);
+	Ｐ＿構築ビルド(BG, 1);
+	Ｐ＿ドラッグ可能設定(BG, true);
+	Ｐ＿親設定(LayoutBox, BG);
+	PosX = Math.Max(0, Math.Min(AFL_View_GetWidth() - Width, PosX));
+	PosY = Math.Max(0, Math.Min(AFL_View_GetHeight() - Height, PosY));
+	Ｐ＿座標設定(BG, PosX, PosY);
+	AFL_Parts_AddDragEndEvent(BG, this.DragEndEvent);
+	this.m_OK = false;
+	this.m_Cancel = false;
+	Ｐ＿フォーカス設定(this.m_MTextBox);
+	PARTS_BeginInput();
+	for (; ; )
+	{
+		AFL_View_Update(true);
+		if (this.m_OK)
+		{
+			break;
+		}
+		if (this.m_Cancel)
+		{
+			dgChangeText(ID, Text);
+			break;
+		}
+	}
+	string Result = this.m_Cancel ? Text : Ｐ＿マルチラインテキストボックス＿テキスト取得(this.m_MTextBox);
+	PARTS_EndInput();
+	PARTS_ReleaseWithInit(LayoutBox);
+	PARTS_ReleaseWithInit(this.m_MTextBox);
+	PARTS_ReleaseWithInit(CancelButton);
+	PARTS_ReleaseWithInit(OKButton);
+	PARTS_ReleaseWithInit(ButtonLayout);
+	PARTS_ReleaseWithInit(BG);
+	AFL_Parts_EraseLayer(-1);
+	return Result;
+}
+
+void CAEEditTextDialog::ChangeTextEvent(int ID)
+{
+	this.m_dgChangeTextEvent(this.m_ParentID, Ｐ＿マルチラインテキストボックス＿テキスト取得(this.m_MTextBox));
+}
+
+void CAEEditTextDialog::ClickOKButtonEvent(int ID, int MouseX, int MouseY)
+{
+	this.m_OK = true;
+}
+
+void CAEEditTextDialog::ClickCancelButtonEvent(int ID, int MouseX, int MouseY)
+{
+	this.m_Cancel = true;
+}
+
+void CAEEditTextDialog::DragEndEvent(int ID)
+{
+	int PosX = Ｐ＿Ｘ座標取得(ID);
+	int PosY = Ｐ＿Ｙ座標取得(ID);
+	int Width = AFL_Parts_GetWidth(ID, 1);
+	int Height = AFL_Parts_GetHeight(ID, 1);
+	PosX = Math.Max(0, Math.Min(AFL_View_GetWidth() - Width, PosX));
+	PosY = Math.Max(0, Math.Min(AFL_View_GetHeight() - Height, PosY));
+	Ｐ＿座標設定(ID, PosX, PosY);
+}
+

@@ -1,0 +1,79 @@
+CASDebugMemorySize::CASDebugMemorySize()
+{
+	this.m_Show = false;
+	this.m_Text.Create();
+	PARTS_SetWantSaveBackScene(this.m_Text.GetPartsNumber(), false);
+	this.SetFont(0, 12);
+}
+
+void CASDebugMemorySize::SetFont(int Type, int Size)
+{
+	this.m_TextProperty.SetType(Type);
+	this.m_TextProperty.SetSize(Size);
+	this.m_TextProperty.SetColor(CF_CASColor(255, 255, 255, 255));
+	this.m_TextProperty.SetEdgeWeight(1.0);
+	this.m_TextProperty.SetEdgeColor(CF_CASColor(0, 0, 0, 255));
+	this.m_Text.SetFontProperty(this.m_TextProperty, 1);
+}
+
+void CASDebugMemorySize::Reset()
+{
+	this.m_CurrentAllocatedMemorySize = 0;
+	this.m_MaxAllocatedMemorySize = 0;
+}
+
+void CASDebugMemorySize::SetShow(bool Show)
+{
+	if (!Show)
+	{
+		this.m_CurrentAllocatedMemorySize = 0;
+		this.m_MaxAllocatedMemorySize = 0;
+	}
+	this.m_Show = Show;
+}
+
+bool CASDebugMemorySize::GetShow()
+{
+	return this.m_Show;
+}
+
+void CASDebugMemorySize::Update(bool IsShowLeft, int PosY)
+{
+	Ｐ＿親設定(this.m_Text.GetPartsNumber(), PARTS_GetSystemOverlayLayer());
+	int PrevCurrentAllocatedMemorySize = this.m_CurrentAllocatedMemorySize;
+	int MaxAllocatedMemorySize = this.m_MaxAllocatedMemorySize;
+	this.m_CurrentAllocatedMemorySize = ChipmunkSpriteEngine.Debug_GetCurrentAllocatedMemorySize();
+	this.m_MaxAllocatedMemorySize = ChipmunkSpriteEngine.Debug_GetMaxAllocatedMemorySize();
+	if (this.IsCompulsorilyShow())
+	{
+		this.SetShow(true);
+	}
+	bool IsShow = this.GetShow() && !AFL_Config_GetDisavleDebugInfo();
+	this.m_Text.SetShow(IsShow);
+	this.m_Text.SetOriginPosMode(IsShowLeft ? 1 : 3);
+	this.m_Text.SetPos(IsShowLeft ? 0 : AFL_View_GetWidth(), PosY);
+	this.m_Text.SetZ(32767);
+	if (!IsShow)
+	{
+		return;
+	}
+	if (this.m_CurrentAllocatedMemorySize == PrevCurrentAllocatedMemorySize && this.m_MaxAllocatedMemorySize == MaxAllocatedMemorySize && this.m_Timer.Get() < 1000)
+	{
+		return;
+	}
+	this.m_Timer.Reset();
+	this.m_Text.SetFontProperty(this.m_TextProperty, 1);
+	this.m_Text.SetText("M:%4d/%4d" % this.m_CurrentAllocatedMemorySize % MaxAllocatedMemorySize, 1);
+}
+
+bool CASDebugMemorySize::IsCompulsorilyShow()
+{
+	return this.m_CurrentAllocatedMemorySize >= 384;
+}
+
+int CASDebugMemorySize::GetBottom()
+{
+	int Number = this.m_Text.GetPartsNumber();
+	return AFL_Parts_GetUpperLeftPosY(Number, 1) + AFL_Parts_GetHeight(Number, 1);
+}
+

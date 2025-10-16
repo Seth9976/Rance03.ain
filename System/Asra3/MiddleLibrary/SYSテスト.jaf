@@ -1,0 +1,124 @@
+void SYS_Test_CallAll()
+{
+	array@string FunctionNameList;
+	Sys43VM.GetFunctionNameList(FunctionNameList);
+	string Prefix = "TEST_";
+	int CallCount;
+	g_Test_NumofError = 0;
+	int n;
+	for (n = 0; n < FunctionNameList.Numof(); n++)
+	{
+		if (FunctionNameList[n].GetPart(0, Prefix.Length()) != Prefix)
+		{
+			continue;
+		}
+		FTTest Func;
+		Func = FunctionNameList[n];
+		if (Func.Numof() == 0)
+		{
+			system.Error("テスト関数【 %s 】の関数型がvoid xxx(void)ではありません" % FunctionNameList[n]);
+			Func.Clear();
+			continue;
+		}
+		Func();
+		CallCount++;
+		Func.Clear();
+	}
+	if (g_Test_NumofError > 0)
+	{
+		system.Output("テスト エラー / エラー個数 = %d, 全個数 = %d\n" % g_Test_NumofError % CallCount);
+	}
+	else
+	{
+		system.Output("テスト OK / 全個数 = %d\n" % CallCount);
+	}
+	g_Test_NumofError = 0;
+}
+
+void SYS_Test_Error(string Result)
+{
+	string FunctionName = system.GetFuncStackName(2);
+	system.Output("【 %s 】 %s\n" % FunctionName % Result);
+	g_Test_NumofError++;
+}
+
+void EXPECT_TRUE(bool Value)
+{
+	if (!Value)
+	{
+		SYS_Test_Error("EXPECT_TRUE エラー\n結果 : %b" % Value);
+	}
+}
+
+void EXPECT_FALSE(bool Value)
+{
+	if (Value)
+	{
+		SYS_Test_Error("EXPECT_FALSE エラー\n結果 : %b" % Value);
+	}
+}
+
+void EXPECT_INT_EQ(int Value1, int Value2)
+{
+	if (Value1 != Value2)
+	{
+		SYS_Test_Error("EXPECT_INT_EQ エラー\n結果 : %d != %d" % Value1 % Value2);
+	}
+}
+
+void EXPECT_INT_NE(int Value1, int Value2)
+{
+	if (Value1 == Value2)
+	{
+		SYS_Test_Error("EXPECT_INT_NE エラー\n結果 : %d == %d" % Value1 % Value2);
+	}
+}
+
+void EXPECT_INT_LT(int Value1, int Value2)
+{
+	if (Value1 >= Value2)
+	{
+		SYS_Test_Error("EXPECT_INT_LT エラー\n結果 : %d >= %d" % Value1 % Value2);
+	}
+}
+
+void EXPECT_INT_LE(int Value1, int Value2)
+{
+	if (Value1 > Value2)
+	{
+		SYS_Test_Error("EXPECT_INT_LE エラー\n結果 : %d > %d" % Value1 % Value2);
+	}
+}
+
+void EXPECT_INT_GT(int Value1, int Value2)
+{
+	if (Value1 <= Value2)
+	{
+		SYS_Test_Error("EXPECT_INT_GT エラー\n結果 : %d <= %d" % Value1 % Value2);
+	}
+}
+
+void EXPECT_INT_GE(int Value1, int Value2)
+{
+	if (Value1 < Value2)
+	{
+		SYS_Test_Error("EXPECT_INT_GE エラー\n結果 : %d < %d" % Value1 % Value2);
+	}
+}
+
+void EXPECT_STRING_EQ(string Value1, string Value2)
+{
+	if (Value1 != Value2)
+	{
+		SYS_Test_Error("EXPECT_STRING_EQ エラー\n結果 : \"%s\" != \"%s\"" % Value1 % Value2);
+	}
+}
+
+void EXPECT_STRING_NE(string Value1, string Value2)
+{
+	if (Value1 == Value2)
+	{
+		SYS_Test_Error("EXPECT_STRING_NE エラー\n結果 : \"%s\" == \"%s\"" % Value1 % Value2);
+	}
+}
+

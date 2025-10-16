@@ -1,0 +1,89 @@
+int testCalcPlayerAttackDamage(ref Player player, ref PlayerSkill skill, ref MonsterInstance monster, int count)
+{
+	string attrId = skill.getAttributeId();
+	int val;
+	if (attrId == "PATTR_ATK_P" || attrId == "PATTR_ATK_B")
+	{
+		val = (player.getStrength() * skill.getParam()) / count;
+	}
+	else
+	{
+		val = (player.getMind() * skill.getParam()) / count;
+	}
+	Monster m;
+	m = getMonsterFromId(monster.getId());
+	g_battleLog.add("%sの攻撃:%sに%dダメージ" % player.getName() % m.getName() % val, 0);
+	return val;
+}
+
+int testCalcPlayerHeal(ref Player healer, ref Player target, ref PlayerSkill skill, int count)
+{
+	string attrId = skill.getAttributeId();
+	int val;
+	if (attrId == "PATTR_HEAL_P")
+	{
+		val = (healer.getStrength() * skill.getParam()) / count;
+	}
+	else
+	{
+		val = (healer.getMind() * skill.getParam()) / count;
+	}
+	g_battleLog.add("%sの回復:%sは%d回復" % healer.getName() % target.getName() % val, 0);
+	return val;
+}
+
+int testCalcMonsterAttack(ref MonsterInstance monster, ref MonsterAttack atk, ref Player target, int count)
+{
+	MonsterAttackAttribute attr;
+	attr = getMonsterAttackAttributeFromId(atk.getAttributeId());
+	int val = atk.getParam() / count;
+	Monster m;
+	m = getMonsterFromId(monster.getId());
+	g_battleLog.add("%sの攻撃:%sに%dダメージ" % m.getName() % target.getName() % val, 0);
+	return val;
+}
+
+int testCalcMonsterHealMulti(ref Monster healer, ref Monster target, MonsterAttack atk, int count)
+{
+	int val = atk.getParam();
+	g_battleLog.add("%sの回復:%sは%d回復" % healer.getName() % target.getName() % val, 0);
+	return val;
+}
+
+void testUseItem(string itemId, ref Player target)
+{
+	switch (itemId)
+	{
+	case "ITEM_U_001":
+		target.setHp(target.getHp() + 10);
+		break;
+	case "ITEM_U_002":
+		int i;
+		for (i = 0; i < g_player.Numof(); ++i)
+		{
+			if (g_player[i].isJoin())
+			{
+				g_player[i].setHp(g_player[i].getHp() + 30);
+			}
+		}
+		break;
+	case "ITEM_U_003":
+		target.setHp(target.getHp() + 100);
+		break;
+	case "ITEM_U_004":
+		int i;
+		for (i = 0; i < g_player.Numof(); ++i)
+		{
+			if (g_player[i].isJoin())
+			{
+				g_player[i].setHp(g_player[i].getHp() + 100);
+			}
+		}
+		break;
+	case "ITEM_K_001":
+		break;
+	case "ITEM_K_002":
+		break;
+	}
+}
+

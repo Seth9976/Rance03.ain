@@ -1,0 +1,17 @@
+bool Ａ＿プレイングマニュアル存在確認()
+{
+	return SystemService.IsExistPlayingManual();
+}
+
+void Ａ＿プレイングマニュアル表示()
+{
+	SystemService.OpenPlayingManual();
+	++g_NumofOpenManual;
+	SYS_情報集計データセーブ();
+}
+
+int Ａ＿プレイングマニュアル表示回数取得()
+{
+	return g_NumofOpenManual;
+}
+

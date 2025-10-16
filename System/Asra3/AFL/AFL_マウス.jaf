@@ -1,0 +1,80 @@
+bool AFL_Mouse_GetPos(ref int X, ref int Y)
+{
+	return IbisInputEngine.Mouse_GetPos(X, Y);
+}
+
+void AFL_MouseWheel_ClearCount()
+{
+	IbisInputEngine.MouseWheel_ClearCount();
+}
+
+void AFL_MouseWheel_GetCount(ref int Forward, ref int Back)
+{
+	IbisInputEngine.MouseWheel_GetCount(Forward, Back);
+}
+
+void AFL_Mouse_SetShow(bool Show)
+{
+	IbisInputEngine.Mouse_HideCursorByGame(!Show);
+}
+
+bool AFL_Mouse_IsShow()
+{
+	return !IbisInputEngine.Mouse_IsHideCursorByGame();
+}
+
+void AFL_Mouse_MovePos(int DestX, int DestY, DG_MoveCursor_UpdateView Event)
+{
+	DestX = Math.Min(Math.Max(DestX, 0), AFL_View_GetWidth());
+	DestY = Math.Min(Math.Max(DestY, 0), AFL_View_GetHeight());
+	if (g_MoveMouseCursorSpeedID == 0)
+	{
+		return;
+	}
+	int MouseX;
+	int MouseY;
+	if (!AFL_Mouse_GetPos(MouseX, MouseY))
+	{
+		return;
+	}
+	float Width = DestX - MouseX;
+	float Height = DestY - MouseY;
+	float Length = Math.Sqrt(Width * Width + Height * Height);
+	float Theta = Math.Atan2(Height, Width) * 57.295776;
+	float Speed = -1.0;
+	switch (g_MoveMouseCursorSpeedID)
+	{
+	case 1:
+		Speed = 2.0;
+		break;
+	case 2:
+		Speed = 5.0;
+		break;
+	case 3:
+		Speed = 8.0;
+		break;
+	case 4:
+		Speed = 0.0;
+		break;
+	}
+	float EndTime = Length / Speed;
+	CASTimer Timer;
+	Timer.Reset();
+	for (; ; )
+	{
+		float Time = Timer.Get();
+		if (EndTime <= Time)
+		{
+			break;
+		}
+		float MoveRate = Time / EndTime;
+		float LengthByTime = Length * MoveRate;
+		float PosXByTime = Math.Cos(Theta) * LengthByTime;
+		float PosYByTime = Math.Sin(Theta) * LengthByTime;
+		IbisInputEngine.Mouse_MovePosImmediately(MouseX + PosXByTime, MouseY + PosYByTime);
+		Event();
+		AFL_View_Update(true);
+	}
+	IbisInputEngine.Mouse_MovePosImmediately(DestX, DestY);
+}
+

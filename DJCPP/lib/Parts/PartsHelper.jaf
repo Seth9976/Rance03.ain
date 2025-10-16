@@ -1,0 +1,52 @@
+int asraPartsOriginFromPartsOriginMode(int partsOriginMode)
+{
+	switch (partsOriginMode)
+	{
+	case 7:
+		return 1;
+	case 8:
+		return 2;
+	case 9:
+		return 3;
+	case 4:
+		return 4;
+	case 5:
+		return 5;
+	case 6:
+		return 6;
+	case 1:
+		return 7;
+	case 2:
+		return 8;
+	case 3:
+		return 9;
+	}
+	return 5;
+}
+
+void buildParts(ref Parts p, string name, int x, int y, int z, int origin)
+{
+	p.init(name, 0);
+	p.setPos(x, y);
+	p.setZ(z == -2147483648 ? 1 : z);
+	p.setOrigin(origin == -2147483648 ? 7 : origin);
+}
+
+void createPartsGroup(ref Parts parent, ref array@Parts list, int parentZ)
+{
+	parent.initAsDummy();
+	int i;
+	for (i = 0; i < list.Numof(); ++i)
+	{
+		if (list[i].isInitialized())
+		{
+			if (list[i].getZ() == 1)
+			{
+				list[i].setZ(i + 1);
+			}
+			list[i].setParent(parent.getPartsNumber());
+		}
+	}
+	parent.setZ(parentZ);
+}
+

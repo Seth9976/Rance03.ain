@@ -1,0 +1,57 @@
+Hallucination::Hallucination()
+{
+	this.gameObjectId_ = g_gameObjectManager.addIndependentObject(this.update);
+}
+
+void Hallucination::init()
+{
+	this.parts_.init("システム／動揺", 0);
+	this.parts_.setOrigin(5);
+	this.parts_.setZ(31000.0);
+	this.vx_ = (RAND(50) + 50) / 10.0;
+	this.vy_ = (RAND(50) + 50) / 10.0;
+	this.vRot_ = 5.0;
+}
+
+void Hallucination::update()
+{
+	if (!this.parts_.isInitialized())
+	{
+		return;
+	}
+	bool enable = g_playerCommonParam.getBadConditionTurn("動揺") > 0 && getGameMode();
+	this.parts_.setShow(enable);
+	this.x_ += this.vx_;
+	this.y_ += this.vy_;
+	this.rot_ += this.vRot_;
+	if (this.x_ > 1024.0 || this.x_ < 0.0)
+	{
+		this.vx_ = -this.vx_;
+	}
+	if (this.y_ > 768.0 || this.y_ < 0.0)
+	{
+		this.vy_ = -this.vy_;
+	}
+	this.parts_.setPos(this.x_, this.y_);
+	this.parts_.setXYRot(this.rot_);
+}
+
+void Hallucination::fadeIn(bool val, DG_GeneralCallback onFinish)
+{
+	this.setPartsShow();
+	this.parts_.runMotion(getStandardMotion(val ? 0 : 1), onFinish);
+}
+
+void Hallucination::initParts()
+{
+	this.setPartsPos();
+}
+
+void Hallucination::setPartsShow()
+{
+}
+
+void Hallucination::setPartsPos()
+{
+}
+

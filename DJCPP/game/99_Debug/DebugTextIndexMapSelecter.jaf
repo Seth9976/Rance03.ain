@@ -1,0 +1,216 @@
+DebugTextIndexMapSelecter::DebugTextIndexMapSelecter()
+{
+	this.groupingCount_ = 135;
+}
+
+void DebugTextIndexMapSelecter::setGroupingCount(int count)
+{
+	this.groupingCount_ = count;
+}
+
+void DebugTextIndexMapSelecter::setBaseCategory(string categoryName)
+{
+	this.baseCategory_ = categoryName;
+}
+
+void DebugTextIndexMapSelecter::run(array@DebugFunctionTextIndexMap textIndexMap, string selecterFunction, string executeFunction)
+{
+	this.map_.Free();
+	this.map_.Alloc(textIndexMap.Numof());
+	this.map_.Copy(0, textIndexMap, 0, textIndexMap.Numof());
+	this.selectedCategory_.Free();
+	this.splitter_ = this.map_[0].getSplitter();
+	if (!this.baseCategory_.Empty())
+	{
+		this.selectedCategory_.PushBack(this.baseCategory_);
+	}
+	if (selecterFunction == "")
+	{
+		this.selFn_ = this.defaultSelecter;
+	}
+	else
+	{
+		this.selFn_ = selecterFunction;
+	}
+	if (executeFunction == "")
+	{
+		this.exeFn_ = this.defaultExecuter;
+	}
+	else
+	{
+		this.exeFn_ = executeFunction;
+	}
+	while (true)
+	{
+		array@string indexList;
+		this.getTextIndexList(indexList);
+		if (indexList.Numof() <= this.groupingCount_)
+		{
+			string r = this.selFn_(indexList, "");
+			if (!r.Empty())
+			{
+				this.execute(r);
+			}
+			else
+			{
+				if (this.isRootCategory())
+				{
+					return;
+				}
+				this.selectedCategory_.PopBack();
+			}
+		}
+		else
+		{
+			array@string subCategory;
+			this.getSubCategoryList(subCategory);
+			string header = this.getCurrentHeader();
+			string r = this.selFn_(subCategory, header);
+			if (!r.Empty())
+			{
+				if (this.isExistIndexName(header + r))
+				{
+					this.execute(header + r);
+				}
+				else
+				{
+					this.selectedCategory_.PushBack(r);
+				}
+			}
+			else
+			{
+				if (this.isRootCategory())
+				{
+					return;
+				}
+				this.selectedCategory_.PopBack();
+			}
+		}
+	}
+}
+
+bool DebugTextIndexMapSelecter::isExistIndexName(string name)
+{
+	int i;
+	for (i = 0; i < this.map_.Numof(); ++i)
+	{
+		if (this.map_[i].getIndexName() == name)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool DebugTextIndexMapSelecter::isRootCategory()
+{
+	if (!this.baseCategory_.Empty())
+	{
+		return this.selectedCategory_.Numof() == 1;
+	}
+	return this.selectedCategory_.Empty();
+}
+
+void DebugTextIndexMapSelecter::execute(string indexText)
+{
+	int index = this.getIndexFromIndexName(indexText);
+	this.exeFn_(this.map_[index]);
+}
+
+string DebugTextIndexMapSelecter::defaultSelecter(ref array@string list, string head)
+{
+	int i;
+	for (i = 0; i < list.Numof(); ++i)
+	{
+		選択肢(i, head + list[i], 0);
+	}
+	int r = テスト選択();
+	if (r != -1)
+	{
+		return list[r];
+	}
+	return "";
+}
+
+void DebugTextIndexMapSelecter::defaultExecuter(ref DebugFunctionTextIndexMap map)
+{
+	DG_GeneralCallback fn;
+	fn = map.getFunctionName();
+	if (fn.Numof() != 0)
+	{
+		fn();
+		return;
+	}
+	DG_StringParamCallback fn2;
+	fn2 = map.getFunctionName();
+	if (fn2.Numof() != 0)
+	{
+		fn2(map.getFunctionParam());
+	}
+}
+
+int DebugTextIndexMapSelecter::getIndexFromIndexName(string functionName)
+{
+	int i;
+	for (i = 0; i < this.map_.Numof(); ++i)
+	{
+		if (this.map_[i].getIndexName() == functionName)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+string DebugTextIndexMapSelecter::getCurrentHeader()
+{
+	string result;
+	int i;
+	for (i = 0; i < this.selectedCategory_.Numof(); ++i)
+	{
+		result = result + this.selectedCategory_[i] + this.splitter_;
+	}
+	return result;
+}
+
+void DebugTextIndexMapSelecter::getTextIndexList(ref array@string resultFunc)
+{
+	resultFunc.Free();
+	int depth = this.selectedCategory_.Numof();
+	int i;
+	for (i = 0; i < this.map_.Numof(); ++i)
+	{
+		if (this.map_[i].isMatchCategory(this.selectedCategory_))
+		{
+			resultFunc.PushBack(this.map_[i].getIndexName());
+		}
+	}
+}
+
+void DebugTextIndexMapSelecter::getSubCategoryList(ref array@string resultCategory)
+{
+	resultCategory.Free();
+	int depth = this.selectedCategory_.Numof();
+	int i;
+	for (i = 0; i < this.map_.Numof(); ++i)
+	{
+		if (this.map_[i].isMatchCategory(this.selectedCategory_))
+		{
+			string ct = this.map_[i].getCategory(depth);
+			if (resultCategory.Find(0, resultCategory.Numof(), ct) == -1)
+			{
+				resultCategory.PushBack(ct);
+			}
+		}
+	}
+}
+
+bool isExistFunction(string r)
+{
+	if (g_allFunctions.Empty())
+	{
+		AFL_Debug_GetFunctionNameList(g_allFunctions);
+	}
+	return g_allFunctions.Find(0, g_allFunctions.Numof(), r) >= 0;
+}
+

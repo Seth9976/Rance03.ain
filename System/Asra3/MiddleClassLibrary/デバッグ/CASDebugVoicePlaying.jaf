@@ -1,0 +1,58 @@
+CASDebugVoicePlaying::CASDebugVoicePlaying()
+{
+	this.m_Show = false;
+	this.m_Play = false;
+	this.m_Text.Create();
+	this.SetFont(0, 24);
+	PARTS_SetWantSaveBackScene(this.m_Text.GetPartsNumber(), false);
+}
+
+void CASDebugVoicePlaying::SetFont(int Type, int Size)
+{
+	this.m_TextProperty.SetType(Type);
+	this.m_TextProperty.SetSize(Size);
+	this.m_TextProperty.SetEdgeWeight(1.5);
+	this.m_TextProperty.SetEdgeColor(CF_CASColor(64, 0, 0, 255));
+	this.m_Text.SetFontProperty(this.m_TextProperty, 1);
+}
+
+void CASDebugVoicePlaying::SetText(string Text, CASColor Color)
+{
+	this.m_Text.SetText(Text, 1);
+	this.m_Text.SetShow(false);
+}
+
+void CASDebugVoicePlaying::SetShow(bool Show)
+{
+	this.m_Show = Show;
+}
+
+bool CASDebugVoicePlaying::IsShow()
+{
+	return this.m_Show;
+}
+
+void CASDebugVoicePlaying::SetPlay(bool Play)
+{
+	this.m_Play = Play;
+}
+
+void CASDebugVoicePlaying::Update(int PosX, int PosY)
+{
+	Ｐ＿親設定(this.m_Text.GetPartsNumber(), PARTS_GetSystemOverlayLayer());
+	this.m_Text.SetShow(false);
+	if (!this.m_Show)
+	{
+		return;
+	}
+	this.m_Text.SetPos(PosX, PosY);
+	this.m_Text.SetShow(this.m_Play);
+	this.m_Text.SetZ(32767);
+}
+
+int CASDebugVoicePlaying::GetBottom()
+{
+	int Number = this.m_Text.GetPartsNumber();
+	return AFL_Parts_GetUpperLeftPosY(Number, 1) + AFL_Parts_GetHeight(Number, 1);
+}
+

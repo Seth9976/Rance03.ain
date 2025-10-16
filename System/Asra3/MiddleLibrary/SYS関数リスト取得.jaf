@@ -1,0 +1,358 @@
+void SYS_GetFuncNameList(ref array@string List, DG_IsSelectableFuncName DelegateObject)
+{
+	array@string FunctionNameList;
+	Sys43VM.GetFunctionNameList(FunctionNameList);
+	int Index;
+	for (Index = 0; Index < FunctionNameList.Numof(); ++Index)
+	{
+		if (!DelegateObject(FunctionNameList[Index]))
+		{
+			continue;
+		}
+		List.PushBack(FunctionNameList[Index]);
+	}
+	List.Sort();
+}
+
+bool SYS_IsNotifyFuncName(string FuncName)
+{
+	DG_NotifyHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsSetIntFuncName(string FuncName)
+{
+	DG_SetIntHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsGetIntFuncName(string FuncName)
+{
+	DG_GetIntHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsSetFloatFuncName(string FuncName)
+{
+	DG_SetFloatHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsGetFloatFuncName(string FuncName)
+{
+	DG_GetFloatHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsSetBoolFuncName(string FuncName)
+{
+	DG_SetBoolHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsGetBoolFuncName(string FuncName)
+{
+	DG_GetBoolHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsSetStringFuncName(string FuncName)
+{
+	DG_SetStringHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsGetStringFuncName(string FuncName)
+{
+	DG_GetStringHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsSetColorFuncName(string FuncName)
+{
+	DG_SetColorHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsGetColorFuncName(string FuncName)
+{
+	DG_GetColorHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsSetFontFuncName(string FuncName)
+{
+	DG_SetFontHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsGetFontFuncName(string FuncName)
+{
+	DG_GetFontHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsSetNumeralWidthFuncName(string FuncName)
+{
+	DG_SetNumeralWidthHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsGetNumeralWidthFuncName(string FuncName)
+{
+	DG_GetNumeralWidthHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsSetIntListFuncName(string FuncName)
+{
+	DG_SetIntListHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsGetIntListFuncName(string FuncName)
+{
+	DG_GetIntListHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsSetStringListFuncName(string FuncName)
+{
+	DG_SetStringListHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsGetStringListFuncName(string FuncName)
+{
+	DG_GetStringListHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsMouseEnterFuncName(string FuncName)
+{
+	if (SYS_IsNotifyFuncName(FuncName))
+	{
+		return true;
+	}
+	DG_MouseEnterHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsMouseMoveFuncName(string FuncName)
+{
+	if (SYS_IsNotifyFuncName(FuncName))
+	{
+		return true;
+	}
+	DG_MouseMoveHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsMouseLeaveFuncName(string FuncName)
+{
+	if (SYS_IsNotifyFuncName(FuncName))
+	{
+		return true;
+	}
+	DG_MouseLeaveHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsMouseWheelFuncName(string FuncName)
+{
+	if (SYS_IsNotifyFuncName(FuncName))
+	{
+		return true;
+	}
+	DG_MouseWheelHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsMouseClickFuncName(string FuncName)
+{
+	if (SYS_IsNotifyFuncName(FuncName))
+	{
+		return true;
+	}
+	DG_MouseClickHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsMouseOnFuncName(string FuncName)
+{
+	if (SYS_IsNotifyFuncName(FuncName))
+	{
+		return true;
+	}
+	DG_MouseOnHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsKeyTriggerFuncName(string FuncName)
+{
+	if (SYS_IsNotifyFuncName(FuncName))
+	{
+		return true;
+	}
+	DG_KeyTriggerHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsKeyDownFuncName(string FuncName)
+{
+	if (SYS_IsNotifyFuncName(FuncName))
+	{
+		return true;
+	}
+	DG_KeyDownHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsKeyPressFuncName(string FuncName)
+{
+	if (SYS_IsNotifyFuncName(FuncName))
+	{
+		return true;
+	}
+	DG_KeyPressHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsKeyUpFuncName(string FuncName)
+{
+	if (SYS_IsNotifyFuncName(FuncName))
+	{
+		return true;
+	}
+	DG_KeyUpHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsDragBeginFuncName(string FuncName)
+{
+	if (SYS_IsNotifyFuncName(FuncName))
+	{
+		return true;
+	}
+	DG_DragBeginHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsDragingFuncName(string FuncName)
+{
+	if (SYS_IsNotifyFuncName(FuncName))
+	{
+		return true;
+	}
+	DG_DragingHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsDragEndFuncName(string FuncName)
+{
+	if (SYS_IsNotifyFuncName(FuncName))
+	{
+		return true;
+	}
+	DG_DragEndHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsDropEnterFuncName(string FuncName)
+{
+	if (SYS_IsNotifyFuncName(FuncName))
+	{
+		return true;
+	}
+	DG_DropEnterHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsDropOnFuncName(string FuncName)
+{
+	if (SYS_IsNotifyFuncName(FuncName))
+	{
+		return true;
+	}
+	DG_DropOnHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsDroppedFuncName(string FuncName)
+{
+	if (SYS_IsNotifyFuncName(FuncName))
+	{
+		return true;
+	}
+	DG_DroppedHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsDropLeaveFuncName(string FuncName)
+{
+	if (SYS_IsNotifyFuncName(FuncName))
+	{
+		return true;
+	}
+	DG_DropLeaveHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsFocusFuncName(string FuncName)
+{
+	if (SYS_IsNotifyFuncName(FuncName))
+	{
+		return true;
+	}
+	DG_FocusHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+
+bool SYS_IsLostFocusFuncName(string FuncName)
+{
+	if (SYS_IsNotifyFuncName(FuncName))
+	{
+		return true;
+	}
+	DG_LostFocusHandler Func;
+	Func = FuncName;
+	return Func.Numof() != 0;
+}
+

@@ -1,0 +1,157 @@
+SaveDataManager::SaveDataManager()
+{
+	this.saveDataIndex_ = 0;
+	this.initSaveObject();
+}
+
+void SaveDataManager::initSaveObject()
+{
+	int i;
+	for (i = 0; i < this.saveObject_.Numof(); ++i)
+	{
+		this.saveObject_[i].init(i);
+	}
+}
+
+void SaveDataManager::setOnAutoSaveCallback(DG_OnSaveCallback callback)
+{
+	int i;
+	for (i = 80; i < this.saveObject_.Numof() - 1; ++i)
+	{
+		this.saveObject_[i].setOnSaveCallback(callback);
+	}
+}
+
+bool SaveDataManager::save(int index)
+{
+	string comment = createSaveComment();
+	if (0 <= index && index < 80)
+	{
+		this.copyAutoSaveData(this.saveDataIndex_, index);
+		this.saveDataIndex_ = index;
+		this.updateLatestSaveIndex(this.saveDataIndex_);
+		return this.saveObject_[this.saveDataIndex_].save(comment);
+	}
+	return false;
+}
+
+void SaveDataManager::updateLatestSaveIndex(int index)
+{
+	g_common_latestSaveIndex = index;
+	共有セーブ();
+}
+
+void SaveDataManager::load(int index)
+{
+	if (0 <= index && index < 80)
+	{
+		if (!this.saveObject_[index].isSaved())
+		{
+			pass("セーブデータがありません。%d" % index);
+		}
+		else
+		{
+			this.saveObject_[index].load();
+		}
+	}
+}
+
+bool SaveDataManager::saveAutoSave()
+{
+	this.updateLatestAutoSaveIndex(80 + this.saveDataIndex_);
+	return this.saveObject_[80 + this.saveDataIndex_].save("");
+}
+
+void SaveDataManager::updateLatestAutoSaveIndex(int index)
+{
+	g_common_latestAutoSaveIndex = index;
+	共有セーブ();
+}
+
+void SaveDataManager::copyAutoSaveData(int oldIndex, int newIndex)
+{
+	if (oldIndex != newIndex && AFL_GameSave_IsExistFile(80 + oldIndex))
+	{
+		this.updateLatestAutoSaveIndex(80 + newIndex);
+		AFL_GameSave_Copy(80 + newIndex, 80 + oldIndex);
+	}
+}
+
+void SaveDataManager::loadAutoSave()
+{
+	if (g_common_latestAutoSaveIndex != -1)
+	{
+		this.saveObject_[g_common_latestAutoSaveIndex].load();
+	}
+}
+
+bool SaveDataManager::replaySave()
+{
+	return this.saveObject_[this.saveObject_.Numof() - 1].save("");
+}
+
+void SaveDataManager::replayLoad()
+{
+	this.saveObject_[this.saveObject_.Numof() - 1].load();
+}
+
+string SaveDataManager::getSaveComment(int index)
+{
+	if (0 <= index && index < 80)
+	{
+		if (this.saveObject_[index].isSaved())
+		{
+			string s = "%s　%s" % this.saveObject_[index].getSaveTime() % this.saveObject_[index].getComment();
+			return s;
+		}
+	}
+	return "データがありません";
+}
+
+bool SaveDataManager::isSaved(int index)
+{
+	return 0 <= index && index < 80 && this.saveObject_[index].isSaved();
+}
+
+void SaveDataManager::loadLatestAutoSave()
+{
+	if (g_common_latestAutoSaveIndex != -1)
+	{
+		AFL_GameSave_Load(g_common_latestAutoSaveIndex);
+	}
+}
+
+int SaveDataManager::getSavedObjectCount()
+{
+	int c;
+	int i;
+	for (i = 0; i < 80; ++i)
+	{
+		if (this.saveObject_[i].isSaved())
+		{
+			++c;
+		}
+	}
+	return c;
+}
+
+string createSaveComment()
+{
+	string n = g_gameFlagMap.getString("俺のメモ");
+	string m;
+	int i;
+	while (m.Length() < 24 && i < n.Length())
+	{
+		if (n.GetPart(i, 1) != "|")
+		{
+			m += n.GetPart(i, 1);
+		}
+		++i;
+	}
+	if (n.Length() > 26)
+	{
+		m += "…";
+	}
+	return m;
+}
+

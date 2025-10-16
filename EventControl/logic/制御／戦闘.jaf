@@ -1,0 +1,1933 @@
+bool 制御／戦闘／ふいうち(ref array@string monsterIdList)
+{
+	BattleInfomation info;
+	info = g_battleResult.getBattleInfomation();
+	if (制御／パーティ／ゼロスリースキル確認("マリア"))
+	{
+		int monsterNum;
+		int consecutive;
+		int rank;
+		consecutive = getPlayerFromId("マリア").getConsecutiveBattleCount();
+		if (monsterIdList.Numof() > 3)
+		{
+			monsterNum = 3;
+		}
+		else
+		{
+			monsterNum = monsterIdList.Numof();
+		}
+		if (consecutive >= 10)
+		{
+			rank = 10;
+		}
+		else if (consecutive >= 5)
+		{
+			rank = 7;
+		}
+		else
+		{
+			rank = 5;
+		}
+		int i;
+		for (i = 0; i < monsterNum; ++i)
+		{
+			string mId;
+			mId = monsterIdList[i];
+			if (RAND(10) <= rank)
+			{
+				g_battleLog.add("マリアが%sを体力測定！%d！" % getMonsterFromId(mId).getName() % getMonsterFromId(mId).getHp(), 4);
+			}
+			else
+			{
+				g_battleLog.add("マリアが%sの体力測定に失敗！" % getMonsterFromId(mId).getName(), 7);
+			}
+		}
+	}
+	if (制御／パーティ／ゼロスリースキル確認("リック"))
+	{
+		int consecutive;
+		int rank;
+		consecutive = getPlayerFromId("リック").getConsecutiveBattleCount();
+		if (consecutive >= 10)
+		{
+			rank = 6;
+		}
+		else if (consecutive >= 5)
+		{
+			rank = 3;
+		}
+		else
+		{
+			rank = 1;
+		}
+		if (RAND(10) <= rank)
+		{
+			g_battleLog.add("リックは不退の誓いで手傷を無きものにした！", 4);
+			制御／ＨＰ回復／最大("リック");
+		}
+	}
+	if (制御／パーティ／ゼロスリースキル確認("ジュリア"))
+	{
+		int consecutive;
+		int rank;
+		consecutive = getPlayerFromId("ジュリア").getConsecutiveBattleCount();
+		if (consecutive >= 10)
+		{
+			rank = 9;
+		}
+		else if (consecutive >= 5)
+		{
+			rank = 6;
+		}
+		else
+		{
+			rank = 4;
+		}
+		if (RAND(10) <= rank)
+		{
+			g_battleLog.add("ジュリアがハイパー化！", 1);
+			制御／数値フラグ設定("ハイパー化", 1);
+		}
+	}
+	if (g_playerCommonParam.getBadConditionTurn("乱視") != 0)
+	{
+		g_battleLog.add("今は乱視で攻撃を当てにくい！", 2);
+	}
+	if (g_playerCommonParam.getBadConditionTurn("骨粗") != 0)
+	{
+		g_battleLog.add("今は骨粗鬆症でクリティカルを受けやすい！", 2);
+	}
+	if (RAND(16) == 1 || monsterIdList[0] == "スーパーハニー")
+	{
+		if (制御／パーティ／ゼロスリースキル確認("かなみ"))
+		{
+			int consecutive;
+			int rank;
+			consecutive = getPlayerFromId("かなみ").getConsecutiveBattleCount();
+			if (consecutive >= 10)
+			{
+				rank = 10;
+			}
+			else if (consecutive >= 5)
+			{
+				rank = 8;
+			}
+			else
+			{
+				rank = 5;
+			}
+			if (RAND(10) <= rank)
+			{
+				g_battleLog.add("かなみのシノビセンスで不意討ちを回避！", 1);
+				return false;
+			}
+		}
+		if (monsterIdList[0] == "スーパーハニー")
+		{
+			g_battleLog.add("スーパーハニーが速い！不意討ち！", 2);
+			return true;
+		}
+		else
+		{
+			int i;
+			int dexTotal;
+			int live;
+			for (i = 0; i < g_party.getCount(); ++i)
+			{
+				string pId;
+				pId = g_party.getPlayerId(i);
+				if (getPlayerFromId(pId).getHp() != 0)
+				{
+					dexTotal += getPlayerFromId(pId).getDexterity();
+					live++;
+				}
+			}
+			dexTotal /= live;
+			if (RAND(512) <= dexTotal || info.getExtraBattleFlag() == 1)
+			{
+				return false;
+			}
+			g_battleLog.add("敵の不意討ち！", 2);
+			return true;
+		}
+	}
+	return false;
+}
+
+int 制御／戦闘／プレイヤー攻撃(int turn, ref Player player, ref PlayerSkill skill, ref MonsterInstance monster, int index, int count, ref int type, ref string msg)
+{
+	string attrId = skill.getAttributeId();
+	string groupId = skill.getGroupId();
+	int val;
+	int monsterMaxHp;
+	int monsterHp;
+	int critSkill;
+	int hackGold;
+	int typeA;
+	int typeB;
+	int typeC;
+	int typeD;
+	float attrAdjust;
+	float defAdjust;
+	float critAdjust;
+	float fluctuation;
+	string monsterAttrId;
+	string monsterAtkAttrId;
+	string attrInfo;
+	string defInfo;
+	string critInfo;
+	array@string playerBuffIdList;
+	array@string monsterBuffIdList;
+	bool itazura = false;
+	bool assassinate = false;
+	bool glass = false;
+	bool fastCast = false;
+	Monster m;
+	m = getMonsterFromId(monster.getId());
+	monsterMaxHp = monster.getMaxHp();
+	monsterHp = monster.getHp();
+	monsterAttrId = m.getMonsterAttributeId();
+	attrAdjust = 1.0;
+	itazura = false;
+	assassinate = false;
+	player.getBuffIdList(playerBuffIdList, -1);
+	monster.getBuffIdList(monsterBuffIdList, -1);
+	if (attrId == "物理攻撃")
+	{
+		if (monsterAttrId == "物理弱点")
+		{
+			typeB = 10;
+			attrAdjust = 2.4;
+			attrInfo = "弱点を突いた";
+		}
+		else if (monsterAttrId == "物理耐性")
+		{
+			typeC = 100;
+			if (制御／戦闘／バフ／プレイヤー／確認("ランスチャージ", playerBuffIdList))
+			{
+				attrInfo = "耐性を破った";
+			}
+			else
+			{
+				attrAdjust = 0.4;
+				attrInfo = "抵抗されつつ";
+			}
+		}
+		else if (monsterAttrId == "物理無効")
+		{
+			typeC = 100;
+			if (制御／戦闘／バフ／プレイヤー／確認("ランスチャージ", playerBuffIdList))
+			{
+				attrInfo = "耐性を破った";
+			}
+			else
+			{
+				attrAdjust = 0.0;
+				attrInfo = "全く効かない";
+			}
+		}
+	}
+	else if (attrId == "爆裂攻撃")
+	{
+		if (monsterAttrId == "爆裂弱点")
+		{
+			typeB = 10;
+			attrAdjust = 2.4;
+			attrInfo = "弱点を突いた";
+		}
+		else if (monsterAttrId == "爆裂耐性")
+		{
+			typeC = 100;
+			if (制御／戦闘／バフ／プレイヤー／確認("ランスチャージ", playerBuffIdList))
+			{
+				attrInfo = "耐性を破った";
+			}
+			else
+			{
+				attrAdjust = 0.4;
+				attrInfo = "抵抗されつつ";
+			}
+		}
+		else if (monsterAttrId == "爆裂無効")
+		{
+			typeC = 100;
+			if (制御／戦闘／バフ／プレイヤー／確認("ランスチャージ", playerBuffIdList))
+			{
+				attrInfo = "耐性を破った";
+			}
+			else
+			{
+				attrAdjust = 0.0;
+				attrInfo = "全く効かない";
+			}
+		}
+	}
+	else if (attrId == "性的攻撃")
+	{
+		if (monsterAttrId == "性的弱点")
+		{
+			typeB = 10;
+			attrAdjust = 2.4;
+			attrInfo = "弱点を突いた";
+			itazura = true;
+		}
+		else if (monsterAttrId == "性的耐性")
+		{
+			typeC = 100;
+			if (制御／戦闘／バフ／プレイヤー／確認("ランスチャージ", playerBuffIdList))
+			{
+				attrInfo = "耐性を破った";
+			}
+			else
+			{
+				attrAdjust = 0.4;
+				attrInfo = "抵抗されつつ";
+			}
+		}
+		else if (monsterAttrId == "性的無効")
+		{
+			typeC = 100;
+			if (制御／戦闘／バフ／プレイヤー／確認("ランスチャージ", playerBuffIdList))
+			{
+				attrInfo = "むりやり";
+			}
+			else
+			{
+				attrAdjust = 0.0;
+				attrInfo = "全く効かない";
+			}
+		}
+	}
+	else if (attrId == "急所攻撃")
+	{
+		if (monsterAttrId == "急所弱点")
+		{
+			typeB = 10;
+			if (制御／戦闘／バフ／プレイヤー／確認("分身の術", playerBuffIdList))
+			{
+				attrAdjust = 2.8;
+				attrInfo = "かなり弱点を突いた";
+			}
+			else
+			{
+				attrAdjust = 2.4;
+				attrInfo = "弱点を突いた";
+			}
+		}
+		else if (monsterAttrId == "急所耐性")
+		{
+			typeC = 100;
+			attrAdjust = 0.4;
+			attrInfo = "抵抗されつつ";
+		}
+		else if (monsterAttrId == "急所無効")
+		{
+			typeC = 100;
+			attrAdjust = 0.0;
+			attrInfo = "全く効かない";
+		}
+	}
+	else if (attrId == "魔法攻撃")
+	{
+		if (monsterAttrId == "魔法弱点")
+		{
+			typeB = 10;
+			attrAdjust = 2.4;
+			attrInfo = "弱点を突いた";
+		}
+		else if (monsterAttrId == "魔法耐性")
+		{
+			typeC = 100;
+			if (制御／戦闘／バフ／プレイヤー／確認("魔想", playerBuffIdList))
+			{
+				attrInfo = "耐性を破った";
+			}
+			else
+			{
+				attrAdjust = 0.4;
+				attrInfo = "抵抗されつつ";
+			}
+		}
+		else if (monsterAttrId == "魔法無効")
+		{
+			typeC = 100;
+			if (制御／戦闘／バフ／プレイヤー／確認("魔想", playerBuffIdList))
+			{
+				attrInfo = "耐性を破った";
+			}
+			else
+			{
+				attrAdjust = 0.0;
+				attrInfo = "全く効かない";
+			}
+		}
+	}
+	MonsterAttack mattack;
+	mattack = monster.getAttack(turn);
+	MonsterAttackAttribute mattr;
+	mattr = getMonsterAttackAttributeFromId(mattack.getAttributeId());
+	monsterAtkAttrId = mattr.getName();
+	defAdjust = 1.0;
+	if (monsterAtkAttrId == "物理防御")
+	{
+		typeD = 1000;
+		if (groupId == "デビルアロー" || groupId == "幻夢剣" || 制御／戦闘／バフ／プレイヤー／確認("黒金砕き", playerBuffIdList))
+		{
+			defAdjust = 1.0;
+		}
+		else
+		{
+			defAdjust = 0.2;
+		}
+	}
+	pass("defad%f" % defAdjust);
+	critAdjust = 1.0;
+	if (制御／戦闘／バフ／プレイヤー／確認("死神無双", playerBuffIdList) || 制御／戦闘／バフ／プレイヤー／確認("無現軌道", playerBuffIdList))
+	{
+		critSkill = player.getDexterity();
+	}
+	else if (groupId == "リーザスの雷竜")
+	{
+		critSkill = player.getDexterity() * 15;
+	}
+	if (groupId != "神聖分解波")
+	{
+		if (RAND(16384) <= player.getDexterity() + critSkill)
+		{
+			typeA = 1;
+			critAdjust = 3.2;
+			critInfo = "ハイパークリティカル★★★";
+		}
+		else if (RAND(4096) <= player.getDexterity() + critSkill || groupId == "幻夢剣" && turn == 0 || player.getId() == "ランス" && 制御／パーティ／ゼロスリースキル確認("ランス") && (monster.getId() == "サファイアr" || monster.getId() == "トパーズr" || monster.getId() == "ガーネットs" || monster.getId() == "アイゼル" || monster.getId() == "ノスt1" || monster.getId() == "ノスt2" || monster.getId() == "ノスt3" || monster.getId() == "ノスt3左腕" || monster.getId() == "ノスt3右腕" || monster.getId() == "ジル"))
+		{
+			typeA = 1;
+			critAdjust = 2.4;
+			critInfo = "スーパークリティカル★★";
+		}
+		else if (RAND(1024) <= player.getDexterity() + critSkill || groupId == "健常者潰し" && monsterMaxHp == monsterHp)
+		{
+			typeA = 1;
+			critAdjust = 1.6;
+			critInfo = "クリティカル★";
+		}
+	}
+	player.getBuffIdList(playerBuffIdList, -1);
+	monster.getBuffIdList(monsterBuffIdList, -1);
+	if (attrId == "物理攻撃" || attrId == "爆裂攻撃" || attrId == "性的攻撃" || attrId == "急所攻撃")
+	{
+		if (groupId == "大号令")
+		{
+			int leazas;
+			if (制御／パーティ／プレイヤー確認／戦闘("マリス"))
+			{
+				leazas += getPlayerFromId("マリス").getStrength();
+			}
+			if (制御／パーティ／プレイヤー確認／戦闘("かなみ"))
+			{
+				leazas += getPlayerFromId("かなみ").getStrength();
+			}
+			if (制御／パーティ／プレイヤー確認／戦闘("バレス"))
+			{
+				leazas += getPlayerFromId("バレス").getStrength();
+			}
+			if (制御／パーティ／プレイヤー確認／戦闘("リック"))
+			{
+				leazas += getPlayerFromId("リック").getStrength();
+			}
+			if (制御／パーティ／プレイヤー確認／戦闘("レイラ"))
+			{
+				leazas += getPlayerFromId("レイラ").getStrength();
+			}
+			if (制御／パーティ／プレイヤー確認／戦闘("メナド"))
+			{
+				leazas += getPlayerFromId("メナド").getStrength();
+			}
+			if (制御／パーティ／プレイヤー確認／戦闘("ジュリア"))
+			{
+				leazas += getPlayerFromId("ジュリア").getStrength();
+			}
+			if (制御／パーティ／プレイヤー確認／戦闘("イェリコ"))
+			{
+				leazas += getPlayerFromId("イェリコ").getStrength();
+			}
+			fluctuation = ((player.getStrength() + leazas) * skill.getParam() * critAdjust * attrAdjust * defAdjust * (RAND(16) - 1)) / 100.0;
+			val = (player.getStrength() + leazas) * skill.getParam() * critAdjust * attrAdjust * defAdjust + fluctuation;
+		}
+		else
+		{
+			int strength;
+			strength = player.getStrength();
+			if (groupId == "バイ・ラ・ウェイ" && 制御／戦闘／バフ／プレイヤー／確認("斬り返し", playerBuffIdList))
+			{
+				strength += 制御／数値フラグ確認("斬り返しダメージ");
+				if (index == count - 1)
+				{
+					制御／数値フラグ設定("斬り返しダメージ", 0);
+				}
+			}
+			else if (groupId == "千人斬り")
+			{
+				if (player.getHp() <= (player.getMaxHp() * 10) / 100)
+				{
+					strength = (strength * 280) / 100;
+				}
+				else if (player.getHp() <= (player.getMaxHp() * 30) / 100)
+				{
+					strength = (strength * 240) / 100;
+				}
+				else if (player.getHp() <= (player.getMaxHp() * 50) / 100)
+				{
+					strength = (strength * 200) / 100;
+				}
+				else if (player.getHp() <= (player.getMaxHp() * 70) / 100)
+				{
+					strength = (strength * 160) / 100;
+				}
+				else if (player.getHp() <= (player.getMaxHp() * 90) / 100)
+				{
+					strength = (strength * 120) / 100;
+				}
+			}
+			else if (制御／数値フラグ確認("ハイパー化") == 1 && (groupId == "えいえい斬り" || groupId == "必殺えいえい"))
+			{
+				strength = (strength * 666) / 100;
+			}
+			else if (groupId == "幻獣アタック")
+			{
+				strength = player.getMind();
+			}
+			fluctuation = (strength * skill.getParam() * critAdjust * attrAdjust * defAdjust * (RAND(16) - 1)) / 100.0;
+			val = strength * skill.getParam() * critAdjust * attrAdjust * defAdjust + fluctuation;
+			val += 制御／戦闘／バフ／プレイヤー(playerBuffIdList, monsterBuffIdList, 0);
+			if (g_playerCommonParam.getBadConditionTurn("乱視") != 0 && RAND(3) == 1)
+			{
+				val = 0;
+				glass = true;
+			}
+			else if ((groupId == "背後からスー" || groupId == "スカルピアッサ") && player.getDexterity() * attrAdjust * 10.0 > monsterHp && defAdjust >= 1.0 && critAdjust >= 1.6)
+			{
+				val = monsterHp;
+				assassinate = true;
+			}
+		}
+	}
+	else
+	{
+		int mind;
+		mind = player.getMind();
+		if (制御／数値フラグ確認("ハイパー化") && (groupId == "魔法えいえい" || groupId == "全部えいえい"))
+		{
+			mind = (mind * 666) / 100;
+		}
+		if (groupId == "神聖分解波" && mind * 30 > monsterHp)
+		{
+			if (g_playerCommonParam.getBadConditionTurn("乱視") != 0 && RAND(3) == 1)
+			{
+				val = 0;
+				glass = true;
+			}
+			else
+			{
+				float decompose;
+				decompose = monsterHp / 2;
+				val = decompose * critAdjust * attrAdjust * defAdjust;
+			}
+		}
+		else
+		{
+			fluctuation = (mind * skill.getParam() * critAdjust * attrAdjust * defAdjust * (RAND(16) - 1)) / 100.0;
+			val = mind * skill.getParam() * critAdjust * attrAdjust * defAdjust + fluctuation;
+			val += 制御／戦闘／バフ／プレイヤー(playerBuffIdList, monsterBuffIdList, 1);
+			if (g_playerCommonParam.getBadConditionTurn("乱視") != 0 && RAND(3) == 1)
+			{
+				val = 0;
+				glass = true;
+			}
+		}
+	}
+	if ((groupId == "悔悛の錠" || groupId == "手加減攻撃") && val >= monsterHp)
+	{
+		val = monsterHp - 1;
+		if (val < 1)
+		{
+			val = 1;
+		}
+	}
+	if (val < 0)
+	{
+		val = 0;
+	}
+	if (groupId == "ハックスラッシュ")
+	{
+		int rate;
+		rate = 10 - turn * 3;
+		hackGold = (m.getGold() * rate) / 10;
+		if (hackGold < 0)
+		{
+			hackGold = 1;
+		}
+		if (!g_battleCalcMode)
+		{
+			g_playerCommonParam.addGold(hackGold);
+		}
+	}
+	制御／戦闘／ボーナス／ジャックポット(val);
+	if (player.getId() == "志津香" && 制御／パーティ／ゼロスリースキル確認("志津香") && index == count - 1)
+	{
+		int consecutive;
+		int rank;
+		consecutive = getPlayerFromId("志津香").getConsecutiveBattleCount();
+		if (consecutive >= 10)
+		{
+			rank = 25;
+		}
+		else if (consecutive >= 5)
+		{
+			rank = 15;
+		}
+		else
+		{
+			rank = 10;
+		}
+		if (RAND(100) <= rank)
+		{
+			player.setCoolTimeCancelSkillId(skill.getId());
+			fastCast = true;
+		}
+	}
+	if (glass)
+	{
+		g_battleLog.add("乱視で狙いが逸れている！", 2);
+	}
+	if (monsterAtkAttrId == "物理防御")
+	{
+		if (groupId == "デビルアロー" || groupId == "幻夢剣" || 制御／戦闘／バフ／プレイヤー／確認("黒金砕き", playerBuffIdList))
+		{
+			g_battleLog.add("%sの防御を貫通した！" % m.getName(), 4);
+		}
+		else
+		{
+			g_battleLog.add("%sは防御している！" % m.getName(), 2);
+		}
+	}
+	if (groupId == "大号令")
+	{
+		string leazasLog1;
+		string leazasLog2;
+		string leazasLog3;
+		g_battleLog.add("%sリアの%s！" % attrInfo % skill.getName(), 0);
+		if (制御／パーティ／プレイヤー確認／戦闘("バレス"))
+		{
+			leazasLog1 += "バレスが布陣！";
+		}
+		if (制御／パーティ／プレイヤー確認／戦闘("マリス"))
+		{
+			leazasLog1 += "マリスが突撃！";
+		}
+		if (制御／パーティ／プレイヤー確認／戦闘("かなみ"))
+		{
+			leazasLog1 += "かなみが遊撃！";
+		}
+		if (leazasLog1 != "")
+		{
+			g_battleLog.add(leazasLog1, 0);
+		}
+		if (制御／パーティ／プレイヤー確認／戦闘("リック"))
+		{
+			leazasLog2 += "リックが挟撃！";
+		}
+		if (制御／パーティ／プレイヤー確認／戦闘("レイラ"))
+		{
+			leazasLog2 += "レイラが挟撃！";
+		}
+		if (制御／パーティ／プレイヤー確認／戦闘("メナド"))
+		{
+			leazasLog2 += "メナドが迎撃！";
+		}
+		if (leazasLog2 != "")
+		{
+			g_battleLog.add(leazasLog2, 0);
+		}
+		if (制御／パーティ／プレイヤー確認／戦闘("ジュリア"))
+		{
+			leazasLog3 += "ジュリアがえいえい！";
+		}
+		if (制御／パーティ／プレイヤー確認／戦闘("イェリコ"))
+		{
+			leazasLog3 += "イェリコが金的！";
+		}
+		if (leazasLog3 != "")
+		{
+			g_battleLog.add(leazasLog3, 0);
+		}
+		if (critAdjust != 1.0)
+		{
+			g_battleLog.add("%s%sに%dダメージ！" % critInfo % m.getName() % val, 1);
+		}
+		else
+		{
+			g_battleLog.add("%sに%dダメージ！" % m.getName() % val, 0);
+		}
+	}
+	else if (assassinate)
+	{
+		if (groupId == "背後からスー")
+		{
+			g_battleLog.add("スーは首を刎ねた★%sは即死！" % m.getName() % val, 1);
+		}
+		else
+		{
+			g_battleLog.add("レイラは眉間を穿った★%sは即死！" % m.getName() % val, 1);
+		}
+	}
+	else if (critAdjust != 1.0)
+	{
+		g_battleLog.add("%s%sの%s！" % attrInfo % player.getShortName() % skill.getName(), 0);
+		g_battleLog.add("%s%sに%dダメージ！" % critInfo % m.getName() % val, 1);
+	}
+	else
+	{
+		g_battleLog.add("%s%sの%s！%sに%dダメージ！" % attrInfo % player.getShortName() % skill.getName() % m.getName() % val, 0);
+	}
+	if (hackGold != 0)
+	{
+		g_battleLog.add("ついでに%dGOLD掠め取った！" % hackGold, 4);
+	}
+	if (fastCast)
+	{
+		g_battleLog.add("高速詠唱！クールタイムが発生しない！", 4);
+	}
+	if (val >= monsterHp)
+	{
+		if (itazura && (m.getId() == "幸福きゃんきゃん" || m.getId() == "ちゃいむ" || m.getId() == "ちょーちん" || m.getId() == "ラーメン" || m.getId() == "金魚使い" || m.getId() == "ハチ女" || m.getId() == "うしドバーン" || m.getId() == "コンテ" || m.getId() == "デュラピー" || m.getId() == "フローズン" || m.getId() == "神風" || m.getId() == "ライカンスロープd1" || m.getId() == "ライカンスロープZt1" || m.getId() == "ワー村娘" || m.getId() == "ワークィーン" || m.getId() == "ワープアー" || m.getId() == "ワードッグ" || m.getId() == "ワーシィル" || m.getId() == "ワーかなみ" || m.getId() == "ワー志津香"))
+		{
+			g_battleResult.addExpBonus("スーパー非道タイム★", 20);
+			switch (m.getId())
+			{
+			case "幸福きゃんきゃん":
+				if (!EV("ＥＶ／女の子モンスター／幸福きゃんきゃん／初回", -2147483648))
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／幸福きゃんきゃん／初回");
+				}
+				else
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／幸福きゃんきゃん／汎用");
+				}
+				break;
+			case "ちゃいむ":
+				if (!EV("ＥＶ／女の子モンスター／ちゃいむ／初回", -2147483648))
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／ちゃいむ／初回");
+				}
+				else
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／ちゃいむ／汎用");
+				}
+				break;
+			case "ちょーちん":
+				if (!EV("ＥＶ／女の子モンスター／ちょーちん／初回", -2147483648))
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／ちょーちん／初回");
+				}
+				else
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／ちょーちん／汎用");
+				}
+				break;
+			case "ラーメン":
+				if (!EV("ＥＶ／女の子モンスター／ラーメン／初回", -2147483648))
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／ラーメン／初回");
+				}
+				else
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／ラーメン／汎用");
+				}
+				break;
+			case "金魚使い":
+				if (!EV("ＥＶ／女の子モンスター／金魚使い／初回", -2147483648))
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／金魚使い／初回");
+				}
+				else
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／金魚使い／汎用");
+				}
+				break;
+			case "ハチ女":
+				if (!EV("ＥＶ／女の子モンスター／ハチ女／初回", -2147483648))
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／ハチ女／初回");
+				}
+				else
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／ハチ女／汎用");
+				}
+				break;
+			case "うしドバーン":
+				if (!EV("ＥＶ／女の子モンスター／うしドバーン／初回", -2147483648))
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／うしドバーン／初回");
+				}
+				else
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／うしドバーン／汎用");
+				}
+				break;
+			case "コンテ":
+				if (!EV("ＥＶ／女の子モンスター／コンテ／初回", -2147483648))
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／コンテ／初回");
+				}
+				else
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／コンテ／汎用");
+				}
+				break;
+			case "デュラピー":
+				if (!EV("ＥＶ／女の子モンスター／デュラピー／初回", -2147483648))
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／デュラピー／初回");
+				}
+				else
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／デュラピー／汎用");
+				}
+				break;
+			case "フローズン":
+				if (!EV("ＥＶ／女の子モンスター／フローズン／初回", -2147483648))
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／フローズン／初回");
+				}
+				else
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／フローズン／汎用");
+				}
+				break;
+			case "神風":
+				if (!EV("ＥＶ／女の子モンスター／神風／初回", -2147483648))
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／神風／初回");
+				}
+				else
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／神風／汎用");
+				}
+				break;
+			case "ライカンスロープZt1":
+			case "ライカンスロープd1":
+				if (!EV("ＥＶ／女の子モンスター／ライカンスロープ／初回", -2147483648))
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／ライカンスロープ／初回");
+				}
+				else
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／ライカンスロープ／汎用");
+				}
+				break;
+			case "ワー村娘":
+				if (!EV("ＥＶ／女の子モンスター／ワー村娘／初回", -2147483648))
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／ワー村娘／初回");
+				}
+				else
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／ワー村娘／汎用");
+				}
+				break;
+			case "ワークィーン":
+				if (!EV("ＥＶ／女の子モンスター／ワークィーン／初回", -2147483648))
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／ワークィーン／初回");
+				}
+				else
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／ワークィーン／汎用");
+				}
+				break;
+			case "ワープアー":
+				if (!EV("ＥＶ／女の子モンスター／ワープアー／初回", -2147483648))
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／ワープアー／初回");
+				}
+				else
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／ワープアー／汎用");
+				}
+				break;
+			case "ワードッグ":
+				if (!EV("ＥＶ／女の子モンスター／ワードッグ／初回", -2147483648))
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／ワードッグ／初回");
+				}
+				else
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／ワードッグ／汎用");
+				}
+				break;
+			case "ワーシィル":
+				if (!EV("ＥＶ／女の子モンスター／ワーシィル／初回", -2147483648))
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／ワーシィル／初回");
+				}
+				else
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／ワーシィル／汎用");
+				}
+				break;
+			case "ワーかなみ":
+				if (!EV("ＥＶ／女の子モンスター／ワーかなみ／初回", -2147483648))
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／ワーかなみ／初回");
+				}
+				else
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／ワーかなみ／汎用");
+				}
+				break;
+			case "ワー志津香":
+				if (!EV("ＥＶ／女の子モンスター／ワー志津香／初回", -2147483648))
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／ワー志津香／初回");
+				}
+				else
+				{
+					g_battleResult.setBattleEndEvent("ＥＶ／女の子モンスター／ワー志津香／汎用");
+				}
+				break;
+			}
+		}
+		if (val >= monsterHp * 10)
+		{
+			g_battleResult.addExpBonus("オーバーキル", 40);
+		}
+		if (monsterHp * 1.2 >= val)
+		{
+			g_battleResult.addExpBonus("テクニシャン", 40);
+		}
+		if (attrAdjust == 2.8)
+		{
+			g_battleResult.addExpBonus("弱みは遠慮なく", 30);
+		}
+		if (attrAdjust == 0.3)
+		{
+			g_battleResult.addExpBonus("無駄な抵抗はやめろ", 20);
+		}
+		if (defAdjust == 0.1)
+		{
+			g_battleResult.addExpBonus("防御なんぞ無視", 20);
+		}
+		if (critAdjust == 3.2)
+		{
+			g_battleResult.addGoldBonus("クリティカル超ご祝儀", 70);
+			msg = 制御／戦闘／メッセージ(player.getId());
+		}
+		else if (critAdjust == 2.4)
+		{
+			g_battleResult.addGoldBonus("クリティカル大ご祝儀", 40);
+			msg = 制御／戦闘／メッセージ(player.getId());
+		}
+		else if (critAdjust == 1.6)
+		{
+			g_battleResult.addGoldBonus("クリティカルご祝儀", 20);
+			msg = 制御／戦闘／メッセージ(player.getId());
+		}
+	}
+	else if (val * 1.1 >= monsterHp)
+	{
+		g_battleResult.addGoldBonus("敢闘賞", 20);
+	}
+	type = typeA + typeB + typeC + typeD;
+	return val;
+}
+
+int 制御／戦闘／モンスター攻撃(int turn, ref MonsterInstance monster, ref MonsterAttack atk, ref Player target, int index, int count)
+{
+	string attrId = atk.getAttributeId();
+	BattleInfomation info;
+	info = g_battleResult.getBattleInfomation();
+	MonsterAttackAttribute attr;
+	attr = getMonsterAttackAttributeFromId(attrId);
+	int playerMaxHp;
+	int playerHp;
+	int attack;
+	int buffType;
+	int val;
+	int seed;
+	float fluctuation;
+	string turnOver;
+	string attackType;
+	bool critical = false;
+	bool bone = false;
+	Monster m;
+	m = getMonsterFromId(monster.getId());
+	playerMaxHp = target.getMaxHp();
+	playerHp = target.getHp();
+	attack = atk.getParam();
+	int limit;
+	if (info.getExtraBattleFlag() != 1)
+	{
+		limit = 30;
+	}
+	else
+	{
+		limit = 3000;
+	}
+	if (turn > limit)
+	{
+		attack = attack * (turn - limit);
+		turnOver = "怒りの";
+	}
+	if (info.getExtraBattleFlag() != 1)
+	{
+		seed = 64;
+	}
+	else
+	{
+		seed = 512;
+	}
+	if (制御／アイテム確認("守り神様ストラップ") != 0)
+	{
+		seed = seed + 制御／アイテム確認("守り神様ストラップ") * 8;
+	}
+	if (g_playerCommonParam.getBadConditionTurn("骨粗") != 0)
+	{
+		seed /= 32;
+		bone = true;
+	}
+	else
+	{
+		bone = false;
+	}
+	if (RAND(seed) == 1)
+	{
+		attack = (attack * 140) / 100;
+		critical = true;
+	}
+	else
+	{
+		critical = false;
+	}
+	fluctuation = (attack * (RAND(16) - 1)) / 100;
+	val = attack + fluctuation;
+	if (attrId == "物理攻撃")
+	{
+		buffType = 0;
+	}
+	else if (attrId == "魔法攻撃")
+	{
+		attackType = "魔法";
+		buffType = 1;
+	}
+	array@string playerBuffIdList;
+	array@string monsterBuffIdList;
+	target.getBuffIdList(playerBuffIdList, -1);
+	monster.getBuffIdList(monsterBuffIdList, -1);
+	val += 制御／戦闘／バフ／モンスター(monsterBuffIdList, playerBuffIdList, buffType);
+	if (val < 0)
+	{
+		val = 0;
+	}
+	if (制御／戦闘／バフ／プレイヤー／確認("斬り返し", playerBuffIdList))
+	{
+		int reverse;
+		reverse = 制御／数値フラグ確認("斬り返しダメージ") + val * 0.4;
+		if (reverse > getPlayerFromId("リック").getStrength())
+		{
+			reverse = getPlayerFromId("リック").getStrength();
+		}
+		制御／数値フラグ設定("斬り返しダメージ", reverse);
+	}
+	if (target.getId() != "メナド" && 制御／パーティ／ゼロスリースキル確認("メナド") && val >= playerHp && playerHp != 1)
+	{
+		int consecutive;
+		int rank;
+		consecutive = getPlayerFromId("メナド").getConsecutiveBattleCount();
+		if (consecutive >= 10)
+		{
+			rank = 6;
+		}
+		else if (consecutive >= 5)
+		{
+			rank = 3;
+		}
+		else
+		{
+			rank = 1;
+		}
+		if (RAND(10) <= rank)
+		{
+			g_battleLog.add("メナドは不撓の決意で%sを護った！" % target.getShortName(), 4);
+			val = playerHp - 1;
+		}
+		else
+		{
+			g_battleLog.add("メナドの不撓の決意は及ばなかった！", 7);
+		}
+	}
+	if (critical)
+	{
+		g_battleLog.add("%sの%s%s攻撃！" % m.getName() % turnOver % attackType, 3);
+		if (bone)
+		{
+			g_battleLog.add("骨が脆くてクリティカル★%sに%dダメージ！" % target.getShortName() % val, 3);
+		}
+		else
+		{
+			g_battleLog.add("クリティカル★%sに%dダメージ！" % target.getShortName() % val, 3);
+		}
+	}
+	else
+	{
+		g_battleLog.add("%sの%s%s攻撃！%sに%dダメージ！" % m.getName() % turnOver % attackType % target.getShortName() % val, 3);
+	}
+	if (val >= playerHp)
+	{
+		g_battleResult.addGoldBonus("ご香典", 90);
+	}
+	else if (val > playerMaxHp * 0.8)
+	{
+		g_battleResult.addGoldBonus("致命傷お見舞金", 60);
+	}
+	else if (val > playerMaxHp * 0.8)
+	{
+		g_battleResult.addGoldBonus("重傷お見舞金", 40);
+	}
+	return val;
+}
+
+int 制御／戦闘／プレイヤー回復(int turn, ref Player healer, ref Player target, ref PlayerSkill skill, int index, int count, ref int type, ref string msg)
+{
+	string attrId = skill.getAttributeId();
+	int val;
+	float rate;
+	float fluctuation;
+	rate = 1.0 - ((float(target.getHp()) / float(target.getMaxHp())) * 100.0) / 100.0;
+	if (rate < 0.1)
+	{
+		rate = 0.1;
+	}
+	if (attrId == "物理治療")
+	{
+		fluctuation = (healer.getStrength() * skill.getParam() * rate * (RAND(16) - 1)) / 100.0;
+		val = healer.getStrength() * skill.getParam() * rate + fluctuation;
+	}
+	else
+	{
+		fluctuation = (healer.getMind() * skill.getParam() * rate * (RAND(16) - 1)) / 100.0;
+		val = healer.getMind() * skill.getParam() * rate + fluctuation;
+	}
+	g_battleLog.add("%sの%s！%sは%d回復！" % healer.getShortName() % skill.getName() % target.getShortName() % val, 5);
+	return val;
+}
+
+int 制御／戦闘／モンスター回復(int turn, ref Monster healer, ref Monster target, ref MonsterAttack atk, int index, int count)
+{
+	int val;
+	float param;
+	float fluctuation;
+	param = atk.getParam();
+	if (制御／パーティ／ゼロスリースキル確認("フェリス"))
+	{
+		int consecutive;
+		float rank;
+		consecutive = getPlayerFromId("フェリス").getConsecutiveBattleCount();
+		if (consecutive >= 10)
+		{
+			rank = 0.1;
+		}
+		else if (consecutive >= 5)
+		{
+			rank = 0.3;
+		}
+		else
+		{
+			rank = 0.6;
+		}
+		param = param * rank;
+	}
+	fluctuation = (param * (RAND(16) - 1)) / 100.0;
+	val = param + fluctuation;
+	if (制御／パーティ／ゼロスリースキル確認("フェリス"))
+	{
+		g_battleLog.add("フェリスのエイドジャマーが回復を妨害！", 4);
+	}
+	g_battleLog.add("%sの治療！%sは%d回復！" % healer.getName() % target.getName() % val, 2);
+	return val;
+}
+
+void 制御／戦闘／モンスター待機(int turn, string monsterId, ref MonsterAttack monsterAttack)
+{
+	Monster m;
+	m = getMonsterFromId(monsterId);
+	g_battleLog.add("%sは隙を窺っていた" % m.getName(), 7);
+}
+
+bool 制御／戦闘／スキップ()
+{
+	if (制御／パーティ／ゼロスリースキル確認("マリス") && 制御／数値フラグ確認("順番シャッフル") < 4)
+	{
+		int consecutive;
+		int rank;
+		if (consecutive >= 10)
+		{
+			rank = 30;
+		}
+		else if (consecutive >= 5)
+		{
+			rank = 20;
+		}
+		else
+		{
+			rank = 10;
+		}
+		if (RAND(100) <= rank)
+		{
+			g_battleLog.add("マリスの順番シャッフルが発動！更に行動可能！", 4);
+			int count;
+			count = 制御／数値フラグ確認("順番シャッフル");
+			count++;
+			制御／数値フラグ設定("順番シャッフル", count);
+			return true;
+		}
+	}
+	return false;
+}
+
+int 制御／戦闘／アイテム確率設定(int val)
+{
+	if (制御／パーティ／ゼロスリースキル確認("ネカイ"))
+	{
+		int consecutive;
+		int rank;
+		consecutive = getPlayerFromId("ネカイ").getConsecutiveBattleCount();
+		if (consecutive >= 10)
+		{
+			val *= 4;
+		}
+		else if (consecutive >= 5)
+		{
+			val *= 3;
+		}
+		else
+		{
+			val *= 2;
+		}
+	}
+	if (RAND(64) == 1)
+	{
+		val *= 3;
+	}
+	else if (RAND(16) == 1)
+	{
+		val *= 2;
+	}
+	float fluctuation;
+	fluctuation = (val * (RAND(46) - 1)) / 100;
+	val += fluctuation;
+	if (val > 99)
+	{
+		val = 99;
+	}
+	return val;
+}
+
+int 制御／戦闘／アイテム確率減算設定(int val)
+{
+	float fall;
+	fall = val * 0.7;
+	if (fall < 1.0)
+	{
+		fall = 1.0;
+	}
+	return fall;
+}
+
+void 制御／戦闘／ボーナス／プレイヤー攻撃(int turn, int killCount)
+{
+	if (killCount == 2)
+	{
+		g_battleResult.addExpBonus("どっちも同時撃破", 20);
+	}
+	if (killCount == 3)
+	{
+		g_battleResult.addExpBonus("どっちもどっちも", 40);
+	}
+}
+
+void 制御／戦闘／ボーナス／ターン終了(int turn, int killCount, bool isFinalTurn)
+{
+	if (isFinalTurn)
+	{
+		switch (turn)
+		{
+		case 0:
+			g_battleResult.addExpBonus("光速でクリア", 80);
+			break;
+		case 1:
+			g_battleResult.addExpBonus("音速でクリア", 50);
+			break;
+		case 2:
+			g_battleResult.addExpBonus("ちゃっちゃとクリア", 30);
+			break;
+		default:
+			break;
+		}
+		if (制御／アイテム確認("丹下犬ストラップ") != 0)
+		{
+			g_battleResult.addExpBonus("丹下犬ボーナス", 18 + 制御／アイテム確認("丹下犬ストラップ") * 2);
+		}
+		if (制御／アイテム確認("毎度ありストラップ") != 0)
+		{
+			g_battleResult.addGoldBonus("毎度ありボーナス", 18 + 制御／アイテム確認("毎度ありストラップ") * 2);
+		}
+		if (制御／パーティ／ゼロスリースキル確認("バレス"))
+		{
+			int consecutive;
+			int rank;
+			consecutive = getPlayerFromId("バレス").getConsecutiveBattleCount();
+			if (consecutive >= 10)
+			{
+				rank = 100;
+			}
+			else if (consecutive >= 5)
+			{
+				rank = 70;
+			}
+			else
+			{
+				rank = 50;
+			}
+			g_battleResult.addGoldBonus("バレスの戦費調達", rank);
+		}
+		if (制御／パーティ／ゼロスリースキル確認("アテン"))
+		{
+			int consecutive;
+			int rank;
+			consecutive = getPlayerFromId("アテン").getConsecutiveBattleCount();
+			if (consecutive >= 10)
+			{
+				rank = 100;
+			}
+			else if (consecutive >= 5)
+			{
+				rank = 70;
+			}
+			else
+			{
+				rank = 50;
+			}
+			g_battleResult.addExpBonus("アテンの特別講義", rank);
+		}
+		if (g_monsterStrengthShifter.getLocalExpRatio() == 9.0)
+		{
+			g_battleResult.addExpBonus("TOWERレート", 900);
+			g_battleResult.addGoldBonus("TOWERレート", 300);
+		}
+		if (制御／パーティ／ゼロスリースキル確認("シィル"))
+		{
+			int consecutive;
+			int mind;
+			int val;
+			float rank;
+			consecutive = getPlayerFromId("シィル").getConsecutiveBattleCount();
+			mind = getPlayerFromId("シィル").getMind();
+			if (consecutive >= 10)
+			{
+				rank = 1.0;
+			}
+			else if (consecutive >= 5)
+			{
+				rank = 0.7;
+			}
+			else
+			{
+				rank = 0.5;
+			}
+			array@string n;
+			getAlivePlayerList(n);
+			ref Player p = getPlayerFromId(getMinHpPlayer(n));
+			float rate;
+			float fluctuation;
+			rate = 1.0 - ((float(p.getHp()) / float(p.getMaxHp())) * 100.0) / 100.0;
+			if (rate < 0.1)
+			{
+				rate = 0.1;
+			}
+			fluctuation = (mind * rank * rate * (RAND(16) - 1)) / 100.0;
+			val = mind * rank * rate + fluctuation;
+			p.setHp(p.getHp() + val);
+			g_battleResult.addBattleEndMessage("シィルの応急ヒール！%sは%d回復！" % p.getShortName() % val);
+		}
+		if (制御／パーティ／ゼロスリースキル確認("セル"))
+		{
+			int consecutive;
+			int mind;
+			int val;
+			float rank;
+			consecutive = getPlayerFromId("セル").getConsecutiveBattleCount();
+			mind = getPlayerFromId("セル").getMind();
+			if (consecutive >= 10)
+			{
+				rank = 0.6;
+			}
+			else if (consecutive >= 5)
+			{
+				rank = 0.3;
+			}
+			else
+			{
+				rank = 0.1;
+			}
+			array@string players;
+			g_party.getPlayerIdList(players);
+			int i;
+			for (i = 0; i < players.Numof(); ++i)
+			{
+				string pId;
+				pId = players[i];
+				if (getPlayerFromId(pId).getHp() != 0)
+				{
+					float rate;
+					float fluctuation;
+					rate = 1.0 - ((float(getPlayerFromId(pId).getHp()) / float(getPlayerFromId(pId).getMaxHp())) * 100.0) / 100.0;
+					if (rate < 0.1)
+					{
+						rate = 0.1;
+					}
+					fluctuation = (mind * rank * rate * (RAND(16) - 1)) / 100.0;
+					val = mind * rank * rate + fluctuation;
+					getPlayerFromId(pId).setHp(getPlayerFromId(pId).getHp() + val);
+					g_battleResult.addBattleEndMessage("セルの応急回復の雨！%sは%d回復！" % getPlayerFromId(pId).getShortName() % val);
+				}
+			}
+		}
+		if (制御／パーティ／ゼロスリースキル確認("リア"))
+		{
+			int consecutive;
+			int rank;
+			int val;
+			consecutive = getPlayerFromId("リア").getConsecutiveBattleCount();
+			if (consecutive >= 10)
+			{
+				rank = 6;
+			}
+			else if (consecutive >= 5)
+			{
+				rank = 3;
+			}
+			else
+			{
+				rank = 1;
+			}
+			if (RAND(10) <= rank)
+			{
+				int i;
+				for (i = 0; i < g_player.Numof(); ++i)
+				{
+					if (g_player[i].isJoin())
+					{
+						g_player[i].clearCoolTime("");
+					}
+				}
+				g_battleResult.addBattleEndMessage("リアがお茶会を開催！全員のクールタイムがリセット！");
+			}
+		}
+		制御／数値フラグ設定("斬り返しダメージ", 0);
+		制御／数値フラグ設定("順番シャッフル", 0);
+		制御／数値フラグ設定("ハイパー化", 0);
+		if (制御／パーティ／ゼロスリースキル確認("ユラン"))
+		{
+			制御／数値フラグ設定("スタア", 0);
+		}
+		if (制御／パーティ／ゼロスリースキル確認("イェリコ"))
+		{
+			制御／数値フラグ設定("みぃつけた！", 0);
+		}
+		if (制御／パーティ／ゼロスリースキル確認("バーニング"))
+		{
+			制御／数値フラグ設定("闇焔の波動", 0);
+		}
+	}
+}
+
+void 制御／戦闘／ボーナス／ジャックポット(int val)
+{
+	if (val > 9999)
+	{
+		if (val % 11111 == 0)
+		{
+			g_battleResult.addGoldBonus("ジャックポット超", 777);
+			g_battleLog.add("5ケタゾロ目ダメージおめでとう！", 1);
+		}
+	}
+	else if (val > 999)
+	{
+		if (val % 1111 == 0)
+		{
+			g_battleResult.addGoldBonus("ジャックポット大", 555);
+			g_battleLog.add("4ケタゾロ目ダメージおめでとう！", 1);
+		}
+	}
+	else if (val > 99)
+	{
+		if (val % 111 == 0)
+		{
+			g_battleResult.addGoldBonus("ジャックポット", 333);
+			g_battleLog.add("3ケタゾロ目ダメージおめでとう！", 1);
+		}
+	}
+}
+
+string 制御／戦闘／メッセージ(string id)
+{
+	string msg;
+	msg = "はっ！";
+	switch (id)
+	{
+	case "３号":
+		switch (RAND(3))
+		{
+		case 1:
+			msg = "今よ、てーーっ！！";
+			break;
+		case 2:
+			msg = "圧倒するわよ！";
+			break;
+		case 3:
+			msg = "ぽちっと、発射っ！";
+			break;
+		}
+		break;
+	case "ランス":
+		switch (RAND(15))
+		{
+		case 1:
+			msg = "俺様憲法で死刑だ！";
+			break;
+		case 2:
+			msg = "さっさと経験値になれ";
+			break;
+		case 3:
+			msg = "よーし、まずは死ね";
+			break;
+		case 4:
+			msg = "とーーーーーーっ！";
+			break;
+		case 5:
+			msg = "くたばれーー！";
+			break;
+		case 6:
+			msg = "こいつでとどめだ！";
+			break;
+		case 7:
+			msg = "よけたら許さんぞ";
+			break;
+		case 8:
+			msg = "全治100万年！";
+			break;
+		case 9:
+			msg = "ふん、あきらめろ！";
+			break;
+		case 10:
+			msg = "金をよこせーー！";
+			break;
+		case 11:
+			msg = "フルパワー全開！";
+			break;
+		case 12:
+			msg = "派手に飛び散れ！";
+			break;
+		case 13:
+			msg = "俺の技に泣け！";
+			break;
+		case 14:
+			msg = "一撃ひっさぁーつ！";
+			break;
+		case 15:
+			msg = "そろそろ終わりにするぞ";
+			break;
+		}
+		break;
+	case "シィル":
+		switch (RAND(6))
+		{
+		case 1:
+			msg = "炎の魔法なら……！";
+			break;
+		case 2:
+			msg = "やーーーーーーっ！";
+			break;
+		case 3:
+			msg = "やっつけちゃいます！";
+			break;
+		case 4:
+			msg = "集中して集中して……";
+			break;
+		case 5:
+			msg = "燃やします！";
+			break;
+		case 6:
+			msg = "し、シィルちゃん魔法";
+			break;
+		}
+		break;
+	case "リア":
+		switch (RAND(3))
+		{
+		case 1:
+			msg = "後悔は済んだ？";
+			break;
+		case 2:
+			msg = "見ててダーリン！";
+			break;
+		case 3:
+			msg = "消えて";
+			break;
+		}
+		break;
+	case "マリス":
+		switch (RAND(3))
+		{
+		case 1:
+			msg = "これでお引取りを";
+			break;
+		case 2:
+			msg = "さて……";
+			break;
+		case 3:
+			msg = "消しておきましょう";
+			break;
+		}
+		break;
+	case "かなみ":
+		switch (RAND(6))
+		{
+		case 1:
+			msg = "これで死んで……！";
+			break;
+		case 2:
+			msg = "仕留める……覚悟！";
+			break;
+		case 3:
+			msg = "忍びの技に情はないわ";
+			break;
+		case 4:
+			msg = "リーザスの為よ！";
+			break;
+		case 5:
+			msg = "けぇぇぃっ！！";
+			break;
+		case 6:
+			msg = "逃がさない";
+			break;
+		}
+		break;
+	case "フェリス":
+		switch (RAND(3))
+		{
+		case 1:
+			msg = "次から次へともう……";
+			break;
+		case 2:
+			msg = "悪魔の力、思い知れ";
+			break;
+		case 3:
+			msg = "これが悪魔の力よ";
+			break;
+		}
+		break;
+	case "マリア":
+		switch (RAND(3))
+		{
+		case 1:
+			msg = "チャンス到来よ！";
+			break;
+		case 2:
+			msg = "まるで七面鳥ね";
+			break;
+		case 3:
+			msg = "シューーーート！";
+			break;
+		}
+		break;
+	case "志津香":
+		switch (RAND(3))
+		{
+		case 1:
+			msg = "本気でいくわ";
+			break;
+		case 2:
+			msg = "容赦はしない！";
+			break;
+		case 3:
+			msg = "覚悟を決めて";
+			break;
+		}
+		break;
+	case "ミリ":
+		switch (RAND(6))
+		{
+		case 1:
+			msg = "お代は見てのお帰りだ";
+			break;
+		case 2:
+			msg = "据え膳は遠慮しないぜ";
+			break;
+		case 3:
+			msg = "えりゃぁぁっ！！";
+			break;
+		case 4:
+			msg = "つーっかまえた、っと";
+			break;
+		case 5:
+			msg = "隙だらけだと襲っちまうぞ";
+			break;
+		case 6:
+			msg = "さーて、やっちまうか";
+			break;
+		}
+		break;
+	case "ミル":
+		switch (RAND(3))
+		{
+		case 1:
+			msg = "いっちゃうよっ！";
+			break;
+		case 2:
+			msg = "あたたたーーっく！";
+			break;
+		case 3:
+			msg = "わんつーどーん！";
+			break;
+		}
+		break;
+	case "セル":
+		switch (RAND(3))
+		{
+		case 1:
+			msg = "神よ……！";
+			break;
+		case 2:
+			msg = "きてはぁっ！";
+			break;
+		case 3:
+			msg = "さあ、還りなさい";
+			break;
+		}
+		break;
+	case "バレス":
+		switch (RAND(3))
+		{
+		case 1:
+			msg = "これは待ったなしじゃ";
+			break;
+		case 2:
+			msg = "貴殿、詰んだぞ";
+			break;
+		case 3:
+			msg = "投了せぬなら、討つ！";
+			break;
+		}
+		break;
+	case "スー":
+		switch (RAND(3))
+		{
+		case 1:
+			msg = "ミーーーー！";
+			break;
+		case 2:
+			msg = "スキアリ、バイバイ";
+			break;
+		case 3:
+			msg = "ボテクルゾ！";
+			break;
+		}
+		break;
+	case "リック":
+		switch (RAND(9))
+		{
+		case 1:
+			msg = "ゥラアァァーーッ！！";
+			break;
+		case 2:
+			msg = "アアアアアアァッ！！";
+			break;
+		case 3:
+			msg = "間合いだ";
+			break;
+		case 4:
+			msg = "いざ……参る！";
+			break;
+		case 5:
+			msg = "……斬り開く！";
+			break;
+		case 6:
+			msg = "面白い……！";
+			break;
+		case 7:
+			msg = "斬り、捨てる……全て";
+			break;
+		case 8:
+			msg = "ならばここは強行突破";
+			break;
+		case 9:
+			msg = "バイ・ラ・ウェイ！";
+			break;
+		}
+		break;
+	case "メナド":
+		switch (RAND(3))
+		{
+		case 1:
+			msg = "やあああぁっ！";
+			break;
+		case 2:
+			msg = "ボクなりの全力でっ！";
+			break;
+		case 3:
+			msg = "退けない、絶対にっ！";
+			break;
+		}
+		break;
+	case "ユラン":
+		switch (RAND(7))
+		{
+		case 1:
+			msg = "出し惜しみはしない！";
+			break;
+		case 2:
+			msg = "見切ってごらん";
+			break;
+		case 3:
+			msg = "立っていられるかな";
+			break;
+		case 4:
+			msg = "ユラン、出る！";
+			break;
+		case 5:
+			msg = "必殺必中！";
+			break;
+		case 6:
+			msg = "外しはしないさ";
+			break;
+		case 7:
+			msg = "幻夢剣……決める！";
+			break;
+		}
+		break;
+	case "レイラ":
+		switch (RAND(3))
+		{
+		case 1:
+			msg = "……穿つ！";
+			break;
+		case 2:
+			msg = "見えたわ、そこっ！";
+			break;
+		case 3:
+			msg = "強くないわね";
+			break;
+		}
+		break;
+	case "ジュリア":
+		switch (RAND(3))
+		{
+		case 1:
+			msg = "えいえいえーいっ！";
+			break;
+		case 2:
+			msg = "きゅぴーん！";
+			break;
+		case 3:
+			msg = "右みて左みて、えい！";
+			break;
+		}
+		break;
+	case "アテン":
+		switch (RAND(6))
+		{
+		case 1:
+			msg = "確率的にこうなるわね";
+			break;
+		case 2:
+			msg = "やれやれだわ";
+			break;
+		case 3:
+			msg = "どいてくれない？";
+			break;
+		case 4:
+			msg = "これで、おわり！";
+			break;
+		case 5:
+			msg = "私でもこれくらいっ！";
+			break;
+		case 6:
+			msg = "全て試算どおりね";
+			break;
+		}
+		break;
+	case "ネカイ":
+		switch (RAND(6))
+		{
+		case 1:
+			msg = "隙だらけよん";
+			break;
+		case 2:
+			msg = "こーいうのは好き？";
+			break;
+		case 3:
+			msg = "もらっちゃうわね";
+			break;
+		case 4:
+			msg = "フィニッシュよん♪";
+			break;
+		case 5:
+			msg = "もうイっちゃいそうね";
+			break;
+		case 6:
+			msg = "がっぽりがっぽりっ";
+			break;
+		}
+		break;
+	case "バーニング":
+		switch (RAND(3))
+		{
+		case 1:
+			msg = "罷り通る！";
+			break;
+		case 2:
+			msg = "バーニング！";
+			break;
+		case 3:
+			msg = "俺の前に立つとはな";
+			break;
+		}
+		break;
+	case "イェリコ":
+		switch (RAND(6))
+		{
+		case 1:
+			msg = "しねーーーー！！";
+			break;
+		case 2:
+			msg = "うわーん、来るなー！";
+			break;
+		case 3:
+			msg = "ほろびろーーーー！！";
+			break;
+		case 4:
+			msg = "ぶっとばすぞーー！";
+			break;
+		case 5:
+			msg = "わー、顔がこわいぞ！";
+			break;
+		case 6:
+			msg = "なさけむよう！";
+			break;
+		}
+		break;
+	}
+	return msg;
+}
+

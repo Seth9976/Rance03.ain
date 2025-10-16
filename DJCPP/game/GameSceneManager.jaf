@@ -1,0 +1,125 @@
+void GameSceneManager::setAdv(string funcName)
+{
+	this.nextAdvFuncName_ = funcName;
+	this.nextScene_ = 4;
+}
+
+void GameSceneManager::init(DG_InitialFunction initialFunction)
+{
+	this.initialFunction_ = initialFunction;
+}
+
+void GameSceneManager::run()
+{
+	this.initialFunction_();
+	while (true)
+	{
+		if (this.nextScene_ == 1)
+		{
+			bool isLoad = !g_saveDataManager.saveAutoSave();
+			this.clear();
+			if (isLoad)
+			{
+				g_enquiteSender.innerGameSend();
+			}
+			g_playerCommonParam.setPlaceName(getMapPlaceFromId(this.nextPlaceId_).getCaption());
+			this.currentPlaceId_ = this.callMap(this.nextPlaceId_, isLoad);
+			this.mapCallback_.Add(getMapPlaceFromId(this.currentPlaceId_).getCallbackFunction());
+			this.nextScene_ = 3;
+		}
+		else if (this.nextScene_ == 2)
+		{
+			this.clear();
+			string currentDungeon = this.nextDungeonId_;
+			setGameMode(true);
+			openDungeon(currentDungeon, this.dungeonX_, this.dungeonY_);
+			restoreGameMode();
+			if (this.nextScene_ != 2)
+			{
+				g_playerCommonParam.setEnableExitDungeon(true);
+			}
+		}
+		else if (this.nextScene_ == 3)
+		{
+			this.clear();
+			g_playerCommonParam.setPlaceName(getMapPlaceFromId(this.currentPlaceId_).getCaption());
+			if (this.mapCallback_.Numof() == 0)
+			{
+				break;
+			}
+			this.mapCallback_();
+			this.mapCallback_.Clear();
+			if (this.nextScene_ == 0)
+			{
+				this.nextScene_ = 1;
+				this.nextPlaceId_ = this.currentPlaceId_;
+			}
+		}
+		else if (this.nextScene_ == 4)
+		{
+			this.clear();
+			DG_AdvCallbackFunction fn;
+			fn = this.nextAdvFuncName_;
+			fn();
+			fn.Clear();
+		}
+		else
+		{
+			pass("次のシーンが指定されませんでした。");
+			this.setMap(this.currentPlaceId_);
+		}
+	}
+}
+
+void GameSceneManager::clear()
+{
+	this.nextScene_ = 0;
+}
+
+string GameSceneManager::getCurrentPlaceId()
+{
+	return this.currentPlaceId_;
+}
+
+void GameSceneManager::setMap(string placeId)
+{
+	this.nextScene_ = 1;
+	this.nextPlaceId_ = placeId;
+}
+
+void GameSceneManager::setMapAdv(string placeId)
+{
+	this.nextScene_ = 3;
+	this.nextPlaceId_ = placeId;
+	this.mapCallback_.Add(getMapPlaceFromId(this.currentPlaceId_).getCallbackFunction());
+}
+
+void GameSceneManager::setDungeon(string dungeonId, int x, int y)
+{
+	this.nextScene_ = 2;
+	this.nextDungeonId_ = dungeonId;
+	this.dungeonX_ = x;
+	this.dungeonY_ = y;
+}
+
+string GameSceneManager::callMap(string nextPlaceId, bool isLoadAutoSave)
+{
+	setGameMode(true);
+	SceneWorldMap scene;
+	scene.init(nextPlaceId, isLoadAutoSave);
+	scene.run();
+	runScene(scene.update);
+	restoreGameMode();
+	return scene.getPlaceIdMoveTo();
+}
+
+bool GameSceneManager::isSetNextScene()
+{
+	return this.nextScene_ != 0;
+}
+
+void GameSceneManager::setCurrentPos(string currentPlaceId)
+{
+	this.currentPlaceId_ = currentPlaceId;
+}
+

@@ -1,0 +1,582 @@
+bool SYS_追加セーブ(int 番号, string ゲーム時間文字列, string コメント)
+{
+	セーブ２_t a;
+	AFL_GetTime(a.sys年, a.sys月, a.sys日, a.sys曜, a.sys時, a.sys分, a.sys秒);
+	a.ゲーム時間文字列 = ゲーム時間文字列;
+	a.コメント = コメント;
+	a.PlayMinuteTime = AFL_PlayTime_GetMinuteTime();
+	string フルパスファイル名 = system.GetSaveFolderName() + "\\" + SYS_追加セーブファイル名(番号);
+	if (!VSFile.OpenForWrite(フルパスファイル名))
+	{
+		return false;
+	}
+	if (!VSFile.WriteInt(a.sys年))
+	{
+		return false;
+	}
+	if (!VSFile.WriteInt(a.sys月))
+	{
+		return false;
+	}
+	if (!VSFile.WriteInt(a.sys日))
+	{
+		return false;
+	}
+	if (!VSFile.WriteInt(a.sys曜))
+	{
+		return false;
+	}
+	if (!VSFile.WriteInt(a.sys時))
+	{
+		return false;
+	}
+	if (!VSFile.WriteInt(a.sys分))
+	{
+		return false;
+	}
+	if (!VSFile.WriteInt(a.sys秒))
+	{
+		return false;
+	}
+	if (!VSFile.WriteString(a.ゲーム時間文字列))
+	{
+		return false;
+	}
+	if (!VSFile.WriteString(a.コメント))
+	{
+		return false;
+	}
+	if (!VSFile.WriteInt(a.PlayMinuteTime))
+	{
+		return false;
+	}
+	if (!VSFile.Close())
+	{
+		return false;
+	}
+	return true;
+}
+
+bool SYS_追加ロード(int nSaveNum, ref セーブ２_t Data)
+{
+	if (!SYS_セーブファイル存在(nSaveNum))
+	{
+		return false;
+	}
+	string フルパスファイル名 = system.GetSaveFolderName() + "\\" + SYS_追加セーブファイル名(nSaveNum);
+	if (!VSFile.OpenForRead(フルパスファイル名))
+	{
+		return false;
+	}
+	if (!VSFile.ReadInt(Data.sys年))
+	{
+		return false;
+	}
+	if (!VSFile.ReadInt(Data.sys月))
+	{
+		return false;
+	}
+	if (!VSFile.ReadInt(Data.sys日))
+	{
+		return false;
+	}
+	if (!VSFile.ReadInt(Data.sys曜))
+	{
+		return false;
+	}
+	if (!VSFile.ReadInt(Data.sys時))
+	{
+		return false;
+	}
+	if (!VSFile.ReadInt(Data.sys分))
+	{
+		return false;
+	}
+	if (!VSFile.ReadInt(Data.sys秒))
+	{
+		return false;
+	}
+	if (!VSFile.ReadString(Data.ゲーム時間文字列))
+	{
+		return false;
+	}
+	if (!VSFile.ReadString(Data.コメント))
+	{
+		return false;
+	}
+	if (!VSFile.ReadInt(Data.PlayMinuteTime))
+	{
+		return false;
+	}
+	if (!VSFile.Close())
+	{
+		return false;
+	}
+	return true;
+}
+
+string SYS_セーブファイル名(int _番号)
+{
+	string Prefix = EX_String("Ｅ＿セーブファイル名＿接頭語", "");
+	switch (_番号)
+	{
+	case -1:
+		return Prefix + "QC.asd";
+	case -2:
+		return "<memory>TempSelect_" + Prefix + ".asd";
+	case -3:
+		return "<memory>BackSelect1_" + Prefix + ".asd";
+	case -4:
+		return "<memory>BackSelect2_" + Prefix + ".asd";
+	case -5:
+		return "<memory>MemoryMode_" + Prefix + ".asd";
+	case -6:
+		return "SystemSuspend.asd";
+	}
+	return Prefix + "%02d.asd" % _番号;
+}
+
+string SYS_追加セーブファイル名(int _番号)
+{
+	string Prefix = EX_String("Ｅ＿セーブファイル名＿接頭語", "");
+	switch (_番号)
+	{
+	case -1:
+		return Prefix + "QC.vsf";
+	case -2:
+		return Prefix + "TempSelect.vsf";
+	case -3:
+		return Prefix + "BackSelect1.vsf";
+	case -4:
+		return Prefix + "BackSelect2.vsf";
+	case -5:
+		return Prefix + "MemoryMode.vsf";
+	case -6:
+		return "SystemSuspend.vsf";
+	}
+	return Prefix + "%02d.vsf" % _番号;
+}
+
+bool SYS_セーブファイル番号チェック(int SaveNumber)
+{
+	if (SaveNumber >= 0)
+	{
+		return true;
+	}
+	switch (SaveNumber)
+	{
+	case -6:
+	case -5:
+	case -4:
+	case -3:
+	case -2:
+	case -1:
+		return true;
+	}
+	return false;
+}
+
+bool SYS_セーブファイル存在(int _セーブ番号)
+{
+	if (!SYS_セーブファイル番号チェック(_セーブ番号))
+	{
+		return false;
+	}
+	if (!system.ExistSaveFile(SYS_セーブファイル名(_セーブ番号)))
+	{
+		return false;
+	}
+	if (!system.ExistSaveFile(SYS_追加セーブファイル名(_セーブ番号)))
+	{
+		return false;
+	}
+	return true;
+}
+
+bool SYS_セーブファイルコピー(int nDestNum, int nSrcNum)
+{
+	if (!system.CopySaveFile(SYS_セーブファイル名(nDestNum), SYS_セーブファイル名(nSrcNum)))
+	{
+		return false;
+	}
+	if (!system.CopySaveFile(SYS_追加セーブファイル名(nDestNum), SYS_追加セーブファイル名(nSrcNum)))
+	{
+		return false;
+	}
+	return true;
+}
+
+void SYS_セーブファイル削除(int nNum)
+{
+	system.DeleteSaveFile(SYS_セーブファイル名(nNum));
+	system.DeleteSaveFile(SYS_追加セーブファイル名(nNum));
+}
+
+void SYS_最終セーブ番号更新(int nNum)
+{
+	_最終セーブ番号 = nNum;
+}
+
+int SYS_最終セーブ番号取得()
+{
+	return _最終セーブ番号;
+}
+
+bool SYS_セーブ実行(int 番号, string ゲーム時間文字列, string コメント)
+{
+	if (!AnteaterADVEngine.ADVLogList_Save(g_ADVLogListForSaveData))
+	{
+		system.Error("バックログ用メモリの保存に失敗しました");
+	}
+	array@int PartsLibraryData;
+	if (!PARTS_Save(PartsLibraryData))
+	{
+		system.Error("パーツライブラリの保存に失敗しました");
+	}
+	SYS_共有セーブ();
+	SYS_コンフィグセーブ();
+	SYS_情報集計データセーブ();
+	string セーブファイル名 = SYS_セーブファイル名(番号);
+	string 追加セーブファイル名 = SYS_追加セーブファイル名(番号);
+	g_ASTimerManager.UpdateCurrentTime();
+	int nSucceeded;
+	bool bSaved = system.ResumeSave(SYS_セーブキー(), セーブファイル名, nSucceeded) != 0;
+	if (bSaved)
+	{
+		if (nSucceeded != 0)
+		{
+			if (!SYS_追加セーブ(番号, ゲーム時間文字列, コメント))
+			{
+				system.Error("追加セーブファイル\n【 %s 】\nの保存に失敗しました" % SYS_追加セーブファイル名(番号));
+			}
+		}
+		else
+		{
+			system.MsgBox("セーブファイル\n【 %s 】\nの保存に失敗しました" % セーブファイル名);
+		}
+	}
+	else
+	{
+		SYS_セーブ実行_ロード後復帰処理(PartsLibraryData);
+	}
+	SYS_セーブ実行_セーブロード後共通復帰処理();
+	return bSaved;
+}
+
+void SYS_セーブ実行_ロード後復帰処理(ref array@int PartsLibraryData)
+{
+	if (!g_bBeginSelect)
+	{
+		SYS_セーブファイル削除(-2);
+	}
+	SYS_セーブファイル削除(-3);
+	SYS_セーブファイル削除(-4);
+	g_bCanReturnBackSelect = false;
+	SYS_DeleteSuspendSaveFile();
+	if (g_ADVLogListForSaveData.Empty())
+	{
+		AnteaterADVEngine.ADVLogList_Clear();
+	}
+	else if (!AnteaterADVEngine.ADVLogList_Load(g_ADVLogListForSaveData))
+	{
+		system.Error("バックログ用メモリの復帰に失敗しました");
+	}
+	ChipmunkSpriteEngine.KeepPreviousView_SetMode(g_KeepPreviousViewMode);
+	SYS_共有ロード();
+	SYS_コンフィグロード();
+	SYS_情報集計データロード();
+	if (!PARTS_Load(PartsLibraryData))
+	{
+		system.Error("パーツライブラリの読み込みに失敗しました");
+	}
+	CAS3DSetting Setting;
+	if (!Setting.Load())
+	{
+		SYS_ERROR("３Ｄの設定読み込みに失敗しました", 0);
+		return;
+	}
+	Setting.Bind();
+	g_MessageWindowManager.Update(g_MessageWindowStatusManager);
+	g_MessageTextView.DrawAll(g_MessageTextModel);
+	SYS_セーブ実行_音楽復帰();
+	SYS_セーブ実行_ループ効果音復帰();
+	SYS_擬音復帰();
+	SYS_背景音声復帰();
+	_g_Ｍ送ホイール確認時刻 = -2147483648;
+	SYS_スキップモード設定(false);
+	SYS_オート設定(false);
+	g_ASTimerManager.Rebuild();
+	g_DebugMemorySize.Reset();
+	g_DebugVideoMemorySize.Reset();
+	SYS_PlayTime_Reset();
+	AFL_SetInvalidateFrameSkipWhileMessageSkip(g_InvalidateFrameSkipWhileMessageSkip);
+}
+
+void SYS_セーブ実行_セーブロード後共通復帰処理()
+{
+	g_ADVLogListForSaveData.Free();
+	g_ADVSceneListForSaveData.Free();
+	SYS_クイックセーブファイル存在フラグ更新();
+}
+
+void SYS_セーブ実行_音楽復帰()
+{
+	string PrevBGMName = g_BGM.GetSoundName();
+	int PrevPause = g_BGM.IsPause();
+	float PrevBGMVolume = g_BGM.GetVolume();
+	int PrevLoopCount = g_BGM.GetLoopCount();
+	音楽("", -1, -1);
+	g_BGM.PlayBGM(PrevBGMName, PrevLoopCount, 1, g_BGM.GetTransitionTotalTime(), PrevBGMVolume);
+	if (PrevPause)
+	{
+		Ａ＿音楽一時停止();
+	}
+}
+
+void SYS_セーブ実行_ループ効果音復帰()
+{
+	int i;
+	for (i = 0; i < 3; ++i)
+	{
+		string PrevSoundName = g_LoopSE[i].GetSoundName();
+		float PrevVolume = g_LoopSE[i].GetVolume();
+		int PrevLoopCount = g_LoopSE[i].GetLoopCount();
+		g_LoopSE[i].Stop();
+		if (!PrevSoundName.Empty())
+		{
+			g_LoopSE[i].PlayBGM(PrevSoundName, PrevLoopCount, g_LoopSE[i].GetTransitionType(), g_LoopSE[i].GetTransitionTotalTime(), PrevVolume);
+		}
+	}
+}
+
+void SYS_擬音復帰()
+{
+	BackSE_t Result;
+	Result = SYS_GetBackSE(20);
+	if (!Result.bStop)
+	{
+		SYS_PlayBackSE(SYS_SOUNDGROUP_SE(), Result.PlayList);
+	}
+}
+
+void SYS_背景音声復帰()
+{
+	int Count;
+	for (Count = 21; Count < 999; Count++)
+	{
+		BackSE_t Result;
+		Result = SYS_GetBackSE(Count);
+		if (Result.FadeChannel < 21)
+		{
+			break;
+		}
+		if (!Result.bStop)
+		{
+			SYS_PlayBackSE(Result.Group, Result.PlayList);
+		}
+	}
+}
+
+void SYS_ロード実行(int 番号)
+{
+	SYS_共有セーブ();
+	SYS_コンフィグセーブ();
+	SYS_情報集計データセーブ();
+	SYS_セーブファイルコピー(-2, 番号);
+	SYS_StopVoice();
+	SYS_擬音停止();
+	SYS_背景音声停止();
+	SYS_StopSE();
+	PARTS_StopSoundWithoutSystemsound();
+	system.ResumeLoad(SYS_セーブキー(), SYS_セーブファイル名(番号));
+	system.Error("ロードに失敗しました");
+}
+
+void SYS_擬音停止()
+{
+	Ａ＿擬音終了();
+}
+
+void SYS_背景音声停止()
+{
+	int Count;
+	for (Count = 21; Count < 999; Count++)
+	{
+		BackSE_t Result;
+		Result = SYS_GetBackSE(Count);
+		if (Result.FadeChannel < 21)
+		{
+			break;
+		}
+		Ａ＿背景音声終了(Result.Group);
+	}
+}
+
+int SYS_共有セーブ()
+{
+	int num;
+	string セーブキー = SYS_セーブキー();
+	string 共有データファイル名 = SYS_共有データファイル名();
+	string 共有データグループ名 = SYS_共有データグループ名();
+	int ok = system.GroupSave(セーブキー, 共有データファイル名, 共有データグループ名, num);
+	if (!ok)
+	{
+		system.Error("セーブファイル【 %s 】\nの保存に失敗しました" % 共有データファイル名);
+		return -1;
+	}
+	return num;
+}
+
+int SYS_共有ロード()
+{
+	int num;
+	string セーブキー = SYS_セーブキー();
+	string 共有データファイル名 = SYS_共有データファイル名();
+	string 共有データグループ名 = SYS_共有データグループ名();
+	if (!system.ExistSaveFile(共有データファイル名))
+	{
+		return 0;
+	}
+	int ok = system.GroupLoad(セーブキー, 共有データファイル名, 共有データグループ名, num);
+	if (!ok)
+	{
+		system.Error("セーブファイル【 %s 】\nの読み込みに失敗しました" % 共有データファイル名);
+		return -1;
+	}
+	return num;
+}
+
+int SYS_情報集計データセーブ()
+{
+	int num;
+	string セーブキー = SYS_セーブキー();
+	string 共有データファイル名 = SYS_情報集計データファイル名();
+	string 共有データグループ名 = SYS_情報集計データグループ名();
+	int ok = system.GroupSave(セーブキー, 共有データファイル名, 共有データグループ名, num);
+	if (!ok)
+	{
+		system.Error("セーブファイル【 %s 】\nの保存に失敗しました" % 共有データファイル名);
+		return -1;
+	}
+	return num;
+}
+
+int SYS_情報集計データロード()
+{
+	int num;
+	string セーブキー = SYS_セーブキー();
+	string 共有データファイル名 = SYS_情報集計データファイル名();
+	string 共有データグループ名 = SYS_情報集計データグループ名();
+	if (!system.ExistSaveFile(共有データファイル名))
+	{
+		return 0;
+	}
+	int ok = system.GroupLoad(セーブキー, 共有データファイル名, 共有データグループ名, num);
+	if (!ok)
+	{
+		system.Error("セーブファイル【 %s 】\nの読み込みに失敗しました" % 共有データファイル名);
+		return -1;
+	}
+	return num;
+}
+
+void SYS_コンフィグセーブ()
+{
+	int num;
+	string セーブキー = SYS_セーブキー();
+	string コンフィグデータファイル名 = SYS_コンフィグデータファイル名();
+	string コンフィグデータグループ名 = SYS_コンフィグデータグループ名();
+	int ok = system.GroupSave(セーブキー, コンフィグデータファイル名, コンフィグデータグループ名, num);
+	if (!ok)
+	{
+		system.Error("セーブファイル【 %s 】\nの保存に失敗しました" % コンフィグデータファイル名);
+	}
+}
+
+void SYS_コンフィグロード()
+{
+	int num;
+	string セーブキー = SYS_セーブキー();
+	string コンフィグデータファイル名 = SYS_コンフィグデータファイル名();
+	string コンフィグデータグループ名 = SYS_コンフィグデータグループ名();
+	if (!system.ExistSaveFile(コンフィグデータファイル名))
+	{
+		return;
+	}
+	int ok = system.GroupLoad(セーブキー, コンフィグデータファイル名, コンフィグデータグループ名, num);
+	if (!ok)
+	{
+		system.Error("セーブファイル【 %s 】\nの読み込みに失敗しました" % コンフィグデータファイル名);
+	}
+}
+
+void SYS_クイックセーブファイル存在フラグ更新()
+{
+	g_bExistQuickSaveFile = system.ExistSaveFile(SYS_セーブファイル名(-1));
+}
+
+void SYS_ゲームロード(int SaveNumber)
+{
+	SYS_ロード実行(SaveNumber);
+}
+
+string SYS_GameSave_GetThumbnailFileName(int SaveNumber)
+{
+	return "Thumb%04d.qnt" % SaveNumber;
+}
+
+string SYS_セーブキー()
+{
+	return "仮キー名";
+}
+
+string SYS_共有データファイル名()
+{
+	return EX_String("Ｅ＿セーブファイル名＿接頭語", "") + "AFCommon.asd";
+}
+
+string SYS_共有データグループ名()
+{
+	return "共有データ";
+}
+
+string SYS_情報集計データファイル名()
+{
+	return EX_String("Ｅ＿セーブファイル名＿接頭語", "") + "AFInfo.asd";
+}
+
+string SYS_情報集計データグループ名()
+{
+	return "情報集計データ";
+}
+
+string SYS_コンフィグデータファイル名()
+{
+	return "AFConfig.asd";
+}
+
+string SYS_コンフィグデータグループ名()
+{
+	return "コンフィグデータ";
+}
+
+bool SYS_IsSystemSuspended()
+{
+	return system.ExistSaveFile(SYS_セーブファイル名(-6));
+}
+
+void SYS_SystemSuspend()
+{
+	SYS_セーブ実行(-6, _ゲーム時間, "");
+}
+
+void SYS_SystemResume()
+{
+	SYS_ロード実行(-6);
+}
+
+void SYS_DeleteSuspendSaveFile()
+{
+	SYS_セーブファイル削除(-6);
+}
+

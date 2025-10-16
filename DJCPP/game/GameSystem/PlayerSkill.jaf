@@ -1,0 +1,94 @@
+void PlayerSkill::init(string id)
+{
+	this.id_ = id;
+	this.loadParam();
+}
+
+void PlayerSkill::loadParam()
+{
+	string key = "プレイヤー攻撃スキル情報";
+	this.characterId_ = EX_SA2String(key, this.id_, "characterId", "");
+	this.name_ = EX_SA2String(key, this.id_, "name", "");
+	this.desc_ = EX_SA2String(key, this.id_, "desc", "");
+	this.desc2_ = EX_SA2String(key, this.id_, "desc2", "");
+	this.iconImageName_ = EX_SA2String(key, this.id_, "iconImageName", "");
+	this.targetType_ = EX_SA2Int(key, this.id_, "targetType", 0);
+	this.attributeId_ = EX_SA2String(key, this.id_, "attributeId", "");
+	this.groupId_ = EX_SA2String(key, this.id_, "groupId", "");
+	this.groupRank_ = EX_SA2Int(key, this.id_, "groupRank", 0);
+	this.coolTime_ = EX_SA2Int(key, this.id_, "coolTime", 0);
+	this.param_ = EX_SA2Float(key, this.id_, "param", 0.0);
+	this.buffId_ = EX_SA2String(key, this.id_, "buffId", "");
+	this.flatName_ = EX_SA2String(key, this.id_, "flatName", "");
+}
+
+string PlayerSkill::getId()
+{
+	return this.id_;
+}
+
+string PlayerSkill::getPlayerId()
+{
+	return this.characterId_;
+}
+
+string PlayerSkill::getName()
+{
+	return this.name_;
+}
+
+string PlayerSkill::getDesc()
+{
+	return this.desc_;
+}
+
+string PlayerSkill::getDesc2()
+{
+	return this.desc2_;
+}
+
+int PlayerSkill::getTargetType()
+{
+	return this.targetType_;
+}
+
+string PlayerSkill::getAttributeId()
+{
+	return this.attributeId_;
+}
+
+string PlayerSkill::getGroupId()
+{
+	return this.groupId_;
+}
+
+int PlayerSkill::getGroupRank()
+{
+	return this.groupRank_;
+}
+
+int PlayerSkill::getCoolTime()
+{
+	return this.coolTime_;
+}
+
+float PlayerSkill::getParam()
+{
+	return this.param_;
+}
+
+string PlayerSkill::getIconImageName()
+{
+	return this.iconImageName_;
+}
+
+string PlayerSkill::getBuffId()
+{
+	return this.buffId_;
+}
+
+string PlayerSkill::getFlatName()
+{
+	return this.flatName_;
+}
+

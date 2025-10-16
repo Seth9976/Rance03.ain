@@ -1,0 +1,240 @@
+void SceneBattleResult::init()
+{
+	this.isFinish_ = false;
+	g_battleResult.getExpBonus(this.exp_);
+	g_battleResult.getGoldBonus(this.gold_);
+	if (g_battleResult.isGetItemByLot())
+	{
+		this.item_ = g_battleResult.getItemId();
+	}
+	this.initBackGround();
+	this.initStand();
+	this.bonusView_[0].init(this.exp_, g_battleResult.getExpCountedBonus(), g_battleResult.getExp(), true);
+	this.bonusView_[1].init(this.gold_, g_battleResult.getGoldCountedBonus(), g_battleResult.getGold(), false);
+	this.itemView_.init(this.item_);
+	this.msg_.init();
+	this.popup_.init(g_battleResult.getResultMessage());
+}
+
+void SceneBattleResult::initStand()
+{
+	string sn = getPlayerFromId(g_battleResult.getFinalAttacker()).getShortName();
+	this.parts_[1].init("trim_システム／立ち絵／%s" % sn, 0);
+	this.parts_[1].setOrigin(2);
+	this.parts_[1].setZ(3510.0);
+}
+
+void SceneBattleResult::initBackGround()
+{
+	this.parts_[0].initAsFlat("システム／リザルト／背景");
+	this.parts_[0].setZ(3500.0);
+}
+
+void SceneBattleResult::run()
+{
+	if (!this.exp_.Empty())
+	{
+		this.fadeInExpBonusBig();
+	}
+	else
+	{
+		this.fadeInExpBonus();
+	}
+	this.fadeInBg(true);
+	this.fadeInStand(true);
+	this.popup_.fadeIn(true);
+	string msg = g_battleResult.getResultMessage();
+	int num = getVoiceFinderFromId(g_battleResult.getFinalAttacker()).getFromText(msg);
+	g_sysSound.play(6, "効果音／リザルト");
+	g_sysSound.playVoice(num);
+}
+
+void SceneBattleResult::fadeInExpBonusBig()
+{
+	this.state_ = 0;
+	this.fadeInBonusBig(this.exp_, this.onFinishExpBonusViewBig);
+}
+
+void SceneBattleResult::onFinishExpBonusViewBig()
+{
+	this.fadeOutBonusViewBig(NULL);
+	this.fadeInExpBonus();
+}
+
+void SceneBattleResult::fadeInExpBonus()
+{
+	this.state_ = 1;
+	this.bonusView_[0].fadeIn(true, this.onFinishExpBonusFadeIn);
+}
+
+void SceneBattleResult::onFinishExpBonusFadeIn()
+{
+	if (!this.gold_.Empty())
+	{
+		this.fadeInGoldBonusBig();
+	}
+	else
+	{
+		this.fadeInGoldBonus();
+	}
+}
+
+void SceneBattleResult::fadeInGoldBonusBig()
+{
+	this.state_ = 2;
+	this.fadeInBonusBig(this.gold_, this.onFinishGoldBonusViewBig);
+}
+
+void SceneBattleResult::onFinishGoldBonusViewBig()
+{
+	this.fadeOutBonusViewBig(NULL);
+	this.fadeInGoldBonus();
+}
+
+void SceneBattleResult::fadeInGoldBonus()
+{
+	this.state_ = 3;
+	this.bonusView_[1].fadeIn(true, this.onFinishGoldBonusFadeIn);
+}
+
+void SceneBattleResult::onFinishGoldBonusFadeIn()
+{
+	this.state_ = 4;
+	this.itemView_.fadeIn(true, this.onFinishFadeInItemView);
+}
+
+void SceneBattleResult::onFinishFadeInItemView()
+{
+	this.state_ = 5;
+	this.msg_.fadeIn(true, NULL);
+}
+
+void SceneBattleResult::fadeInStand(bool val)
+{
+	if (val)
+	{
+		PartsMotion m;
+		m.setMove(1500, 980, 771, 980, 1);
+		this.parts_[1].setShow(true);
+		this.parts_[1].runMotion(m, NULL);
+	}
+	else
+	{
+		this.parts_[1].runMotion(getStandardMotion(1), NULL);
+	}
+}
+
+void SceneBattleResult::fadeInBg(bool val)
+{
+	if (val)
+	{
+		this.parts_[0].setShow(true);
+		this.parts_[0].startFlat(false, 1.0);
+	}
+	else
+	{
+		this.parts_[0].runMotion(getStandardMotion(1), NULL);
+	}
+}
+
+void SceneBattleResult::fadeInBonusBig(ref array@BattleBonus b, DG_GeneralCallback cb)
+{
+	this.bonusViewBig_.Alloc(b.Numof());
+	int h = 50 * b.Numof() - 8;
+	int i;
+	for (i = 0; i < this.bonusViewBig_.Numof(); ++i)
+	{
+		this.bonusViewBig_[i].init(b[i], true);
+		this.bonusViewBig_[i].setPos(92, ((384 - h / 2) + i * 50) - 21);
+		if (i == this.bonusViewBig_.Numof() - 1)
+		{
+			this.bonusViewBig_[i].fadeIn(true, i * 50, cb);
+		}
+		else
+		{
+			this.bonusViewBig_[i].fadeIn(true, i * 50, NULL);
+		}
+	}
+}
+
+void SceneBattleResult::fadeOutBonusViewBig(DG_GeneralCallback cb)
+{
+	int i;
+	for (i = 0; i < this.bonusViewBig_.Numof(); ++i)
+	{
+		if (i == this.bonusViewBig_.Numof() - 1)
+		{
+			this.bonusViewBig_[i].fadeIn(false, 0, cb);
+		}
+		else
+		{
+			this.bonusViewBig_[i].fadeIn(false, 0, NULL);
+		}
+	}
+}
+
+void SceneBattleResult::fadeOut()
+{
+	int i;
+	for (i = 0; i < this.bonusView_.Numof(); ++i)
+	{
+		this.bonusView_[i].fadeIn(false, NULL);
+	}
+	this.itemView_.fadeIn(false, NULL);
+	this.fadeInStand(false);
+	this.fadeInBg(false);
+	this.popup_.fadeIn(false);
+	this.msg_.fadeIn(false, NULL);
+}
+
+bool SceneBattleResult::update()
+{
+	if (g_mouse.isClick(0) || g_mouse.isClick(1))
+	{
+		if (this.state_ == 5)
+		{
+			this.state_ = 6;
+			this.fadeOut();
+			this.timerCb_.setTimer(300, this.onFinishFadeOut);
+		}
+		else
+		{
+			g_globalTimer.setScaling(8.0);
+		}
+	}
+	if (this.isFinish_)
+	{
+		g_globalTimer.setScaling(1.0);
+	}
+	return !this.isFinish_;
+}
+
+void SceneBattleResult::onFinishFadeOut()
+{
+	applyBattleResult(this.item_);
+	this.isFinish_ = true;
+}
+
+void applyBattleResult(string item)
+{
+	g_playerCommonParam.addGold(g_battleResult.getGoldCountedBonus());
+	array@string pId;
+	getAliveOrganizedPlayerId(pId);
+	int exp = g_battleResult.getExpCountedBonus();
+	int i;
+	for (i = 0; i < pId.Numof(); ++i)
+	{
+		getPlayerFromId(pId[i]).addExp(exp / pId.Numof());
+	}
+	if (item != "")
+	{
+		g_playerCommonParam.addItem(item);
+	}
+	gameAddBattleCount();
+	gameClearConsecutiveBattleCount();
+}
+
+void SceneBattleResult::onFinishItemFadeIn()
+{
+}
+

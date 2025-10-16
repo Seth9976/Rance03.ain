@@ -1,0 +1,67 @@
+bool SYS_ホイールバック即確認()
+{
+	int Forward;
+	int Back;
+	AFL_MouseWheel_GetCount(Forward, Back);
+	return Back != 0;
+}
+
+bool SYS_ホイールバック確認()
+{
+	if (!SYS_ホイールバック即確認())
+	{
+		return false;
+	}
+	int nCurrentTime = system.GetTime();
+	if (_g_Ｍ送ホイール確認時刻 == -2147483648)
+	{
+		_g_Ｍ送ホイール確認時刻 = nCurrentTime;
+		return true;
+	}
+	if (nCurrentTime > _g_Ｍ送ホイール確認時刻 + 200)
+	{
+		_g_Ｍ送ホイール確認時刻 = nCurrentTime;
+		return true;
+	}
+	return false;
+}
+
+bool SYS_ホイールフォア即確認()
+{
+	int Forward;
+	int Back;
+	AFL_MouseWheel_GetCount(Forward, Back);
+	return Forward != 0;
+}
+
+bool SYS_ホイールフォア確認()
+{
+	if (!SYS_ホイールフォア即確認())
+	{
+		return false;
+	}
+	int nCurrentTime = system.GetTime();
+	if (_g_Ｍ送ホイール確認時刻 == -2147483648)
+	{
+		_g_Ｍ送ホイール確認時刻 = nCurrentTime;
+		return true;
+	}
+	if (nCurrentTime > _g_Ｍ送ホイール確認時刻 + 200)
+	{
+		_g_Ｍ送ホイール確認時刻 = nCurrentTime;
+		return true;
+	}
+	return false;
+}
+
+void SYS_ホイール回転時刻クリア()
+{
+	int Forward;
+	int Back;
+	AFL_MouseWheel_GetCount(Forward, Back);
+	if (Forward != 0 || Back != 0)
+	{
+		_g_Ｍ送ホイール確認時刻 = system.GetTime();
+	}
+}
+

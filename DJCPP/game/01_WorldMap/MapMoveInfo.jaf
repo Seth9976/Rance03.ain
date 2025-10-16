@@ -1,0 +1,95 @@
+void MapMoveInfo::init(array@string route)
+{
+	this.reset();
+	if (route.Numof() <= 1)
+	{
+		return;
+	}
+	ref MapPlace start = getMapPlaceFromId(route[0]);
+	this.x_.PushBack(start.getX());
+	this.y_.PushBack(start.getY());
+	this.isEncount_.PushBack(false);
+	int i;
+	for (i = 1; i < route.Numof(); ++i)
+	{
+		ref MapPlace place = getMapPlaceFromId(route[i]);
+		this.x_.PushBack(place.getX());
+		this.y_.PushBack(place.getY());
+		this.isEncount_.PushBack(false);
+	}
+}
+
+bool MapMoveInfo::getNextNode(ref int fromX, ref int fromY, ref int toX, ref int toY, ref bool encount)
+{
+	if (0 <= this.currentIndex_ && this.currentIndex_ < this.getNodeCount())
+	{
+		this.getPos(this.currentIndex_, fromX, fromY, toX, toY);
+		encount = this.isEncount(this.currentIndex_);
+		++this.currentIndex_;
+		return true;
+	}
+	return false;
+}
+
+void MapMoveInfo::reset()
+{
+	this.x_.Free();
+	this.y_.Free();
+	this.isEncount_.Free();
+	this.currentIndex_ = 0;
+}
+
+int MapMoveInfo::getNodeCount()
+{
+	return this.x_.Numof() - 1;
+}
+
+void MapMoveInfo::addEncountPoint()
+{
+	int r = RAND(this.x_.Numof() - 1) - 1;
+	int sx = this.x_[r];
+	int sy = this.y_[r];
+	int ex = this.x_[r + 1];
+	int ey = this.y_[r + 1];
+	float n = RAND(100) / 100.0;
+	int newX = sx * n + ex * (1.0 - n);
+	int newY = sy * n + ey * (1.0 - n);
+	this.x_.Insert(r + 1, newX);
+	this.y_.Insert(r + 1, newY);
+	this.isEncount_.Insert(r + 1, true);
+}
+
+bool MapMoveInfo::isEncount(int nodeIndex)
+{
+	if (0 <= nodeIndex && nodeIndex < this.x_.Numof() - 1)
+	{
+		return this.isEncount_[nodeIndex + 1];
+	}
+	return false;
+}
+
+void MapMoveInfo::getPos(int nodeIndex, ref int fromX, ref int fromY, ref int toX, ref int toY)
+{
+	if (0 <= nodeIndex && nodeIndex < this.x_.Numof() - 1)
+	{
+		fromX = this.x_[nodeIndex];
+		fromY = this.y_[nodeIndex];
+		toX = this.x_[nodeIndex + 1];
+		toY = this.y_[nodeIndex + 1];
+	}
+}
+
+int MapMoveInfo::getDistance(int nodeIndex)
+{
+	int fx;
+	int fy;
+	int tx;
+	int ty;
+	int dx;
+	int dy;
+	this.getPos(nodeIndex, fx, fy, tx, ty);
+	dx = tx - fx;
+	dy = ty - fy;
+	return Math.Sqrt(dx * dx + dy * dy);
+}
+

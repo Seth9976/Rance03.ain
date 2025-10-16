@@ -1,0 +1,121 @@
+CAEPropertyItemCheckBox::CAEPropertyItemCheckBox()
+{
+}
+
+CAEPropertyItemCheckBox::~CAEPropertyItemCheckBox()
+{
+	this.Release();
+}
+
+int CAEPropertyItemCheckBox::Init(string Name, int LabelWidth, int ButtonWidth, ref CAEPropertyToolTip ToolTip)
+{
+	this.Release();
+	this.m_LayoutID = PARTS_GetFreeSystemPartsNumber();
+	this.m_Label = PARTS_GetFreeSystemPartsNumber();
+	this.m_CheckBox = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿レイアウトタイプ設定(this.m_LayoutID, 2);
+	Ｐ＿レイアウトボックス＿配置設定(this.m_LayoutID, 4);
+	Ｐ＿マージン設定(this.m_LayoutID, 1, 1, 3, 3);
+	Ｐ＿フォント設定(this.m_Label, 0, 14, 0, 0, 0, 0.0, 0, 0, 0, 0.0, 1);
+	Ｐ＿テキスト設定(this.m_Label, Name, 1);
+	Ｐ＿オンカーソル透過設定(this.m_Label, true);
+	Ｐ＿マージン設定(this.m_Label, 0, 0, 0, LabelWidth - AFL_Parts_GetWidth(this.m_Label, 1));
+	Ｐ＿レイアウトボックス＿追加(this.m_LayoutID, this.m_Label);
+	Ｐ＿チェックボックス＿ボタンサイズ設定(this.m_CheckBox, 18, 18);
+	Ｐ＿マージン設定(this.m_CheckBox, 0, 0, (ButtonWidth - 18) / 2, (ButtonWidth - 18) / 2);
+	Ｐ＿レイアウトボックス＿追加(this.m_LayoutID, this.m_CheckBox);
+	AFL_Parts_AddKeyDownEvent(this.m_LayoutID, this.KeyDownEvent);
+	AFL_Parts_AddKeyDownEvent(this.m_Label, this.KeyDownEvent);
+	AFL_Parts_AddKeyDownEvent(this.m_CheckBox, this.KeyDownEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_LayoutID, this.MouseWheelEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_Label, this.MouseWheelEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_CheckBox, this.MouseWheelEvent);
+	AFL_Parts_AddChangedFlgEvent(this.m_CheckBox, this.ChangedFlgEvent);
+	return this.m_LayoutID;
+}
+
+void CAEPropertyItemCheckBox::Release()
+{
+	this.m_dgChangedFlgEvent.Clear();
+	this.m_dgMouseWheelEvent.Clear();
+	this.m_dgKeyDownEvent.Clear();
+	PARTS_ReleaseWithInit(this.m_CheckBox);
+	PARTS_ReleaseWithInit(this.m_Label);
+	PARTS_ReleaseWithInit(this.m_LayoutID);
+}
+
+int CAEPropertyItemCheckBox::GetID()
+{
+	return this.m_LayoutID;
+}
+
+string CAEPropertyItemCheckBox::GetLabel()
+{
+	return Ｐ＿テキスト取得(this.m_Label, 1);
+}
+
+void CAEPropertyItemCheckBox::SetFlg(bool Flg)
+{
+	Ｐ＿チェックボックス＿チェック状態設定(this.m_CheckBox, Flg);
+}
+
+bool CAEPropertyItemCheckBox::GetFlg()
+{
+	return Ｐ＿チェックボックス＿チェック状態取得(this.m_CheckBox);
+}
+
+string CAEPropertyItemCheckBox::GetToolTipText()
+{
+	return "";
+}
+
+void CAEPropertyItemCheckBox::AddParts(int Number)
+{
+	Ｐ＿レイアウトボックス＿追加(this.m_LayoutID, Number);
+}
+
+void CAEPropertyItemCheckBox::ChangedFlgEvent(int ID, bool Check)
+{
+	this.m_dgChangedFlgEvent(ID, Check);
+}
+
+void CAEPropertyItemCheckBox::KeyDownEvent(int ID, int KeyID)
+{
+	this.m_dgKeyDownEvent(ID, KeyID);
+}
+
+void CAEPropertyItemCheckBox::MouseWheelEvent(int ID, int Forward, int Back)
+{
+	this.m_dgMouseWheelEvent(ID, Forward, Back);
+}
+
+void CAEPropertyItemCheckBox::AddKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent += DelegateObject;
+}
+
+void CAEPropertyItemCheckBox::EraseKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent -= DelegateObject;
+}
+
+void CAEPropertyItemCheckBox::AddMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent += DelegateObject;
+}
+
+void CAEPropertyItemCheckBox::EraseMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent -= DelegateObject;
+}
+
+void CAEPropertyItemCheckBox::AddChangedFlgEvent(DG_ChangedFlgHandler DelegateObject)
+{
+	this.m_dgChangedFlgEvent += DelegateObject;
+}
+
+void CAEPropertyItemCheckBox::EraseChangedFlgEvent(DG_ChangedFlgHandler DelegateObject)
+{
+	this.m_dgChangedFlgEvent -= DelegateObject;
+}
+

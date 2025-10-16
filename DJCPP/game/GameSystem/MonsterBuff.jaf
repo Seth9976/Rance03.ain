@@ -1,0 +1,34 @@
+void MonsterBuff::init(string id)
+{
+	this.id_ = id;
+	this.loadParam();
+}
+
+void MonsterBuff::loadParam()
+{
+	string key = "モンスターバフ情報";
+	this.name_ = EX_SA2String(key, this.id_, "name", "");
+	this.imageName_ = EX_SA2String(key, this.id_, "imageName", "");
+	this.type_ = EX_SA2Int(key, this.id_, "type", 0);
+}
+
+string MonsterBuff::getId()
+{
+	return this.id_;
+}
+
+string MonsterBuff::getName()
+{
+	return this.name_;
+}
+
+int MonsterBuff::getType()
+{
+	return this.type_;
+}
+
+string MonsterBuff::getImageName()
+{
+	return this.imageName_;
+}
+

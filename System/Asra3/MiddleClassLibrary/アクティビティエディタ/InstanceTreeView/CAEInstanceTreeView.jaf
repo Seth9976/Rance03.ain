@@ -1,0 +1,376 @@
+CAEInstanceTreeView::CAEInstanceTreeView()
+{
+	this.Init();
+}
+
+CAEInstanceTreeView::~CAEInstanceTreeView()
+{
+	this.Release();
+}
+
+int CAEInstanceTreeView::Init()
+{
+	this.Release();
+	this.m_MainLayoutBox = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿レイアウトタイプ設定(this.m_MainLayoutBox, 0);
+	Ｐ＿Ｚ座標設定(this.m_MainLayoutBox, 0);
+	this.m_ListLayoutBox = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿Ｚ座標設定(this.m_ListLayoutBox, 2);
+	Ｐ＿親設定(this.m_ListLayoutBox, this.m_MainLayoutBox);
+	this.m_VScroll = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿Ｚ座標設定(this.m_VScroll, 4);
+	Ｐ＿親設定(this.m_VScroll, this.m_MainLayoutBox);
+	this.m_HScroll = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿Ｚ座標設定(this.m_HScroll, 4);
+	Ｐ＿親設定(this.m_HScroll, this.m_MainLayoutBox);
+	this.m_Clip = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿Ｚ座標設定(this.m_Clip, 1);
+	Ｐ＿親設定(this.m_Clip, this.m_MainLayoutBox);
+	Ｐ＿アルファクリッパー設定(this.m_ListLayoutBox, this.m_Clip);
+	AFL_Parts_AddScrollEvent(this.m_VScroll, this.ScrollEvent);
+	AFL_Parts_AddScrollEvent(this.m_HScroll, this.ScrollEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_Clip, this.MouseWheelEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_VScroll, this.MouseWheelEvent);
+	AFL_Parts_AddMouseWheelEvent(this.m_HScroll, this.MouseWheelEvent);
+	this.SetSize(420, 256);
+	Ｐ＿座標設定(this.m_VScroll, AFL_Parts_GetWidth(this.m_Clip, 1), 0.0);
+	Ｐ＿座標設定(this.m_HScroll, 0.0, AFL_Parts_GetHeight(this.m_Clip, 1));
+	return this.m_MainLayoutBox;
+}
+
+void CAEInstanceTreeView::Release()
+{
+	PARTS_ReleaseWithInit(this.m_Clip);
+	PARTS_ReleaseWithInit(this.m_HScroll);
+	PARTS_ReleaseWithInit(this.m_VScroll);
+	PARTS_ReleaseWithInit(this.m_ListLayoutBox);
+	PARTS_ReleaseWithInit(this.m_MainLayoutBox);
+	this.m_dgUpdateTree.Clear();
+	this.m_dgMouseRClickEvent.Clear();
+	this.ReleaseTextList();
+}
+
+void CAEInstanceTreeView::SetSize(int Width, int Height)
+{
+	int ScrollSize = 16;
+	int ClipWidth = Width - ScrollSize;
+	int ClipHeight = Height - ScrollSize;
+	Ｐ＿構築手順＿初期化(this.m_Clip, 1);
+	Ｐ＿構築手順＿ピクセル作成(this.m_Clip, ClipWidth, ClipHeight, 1);
+	Ｐ＿構築手順＿色塗り(this.m_Clip, 0, 0, ClipWidth, ClipHeight, 255, 255, 255, -1, 1);
+	Ｐ＿構築ビルド(this.m_Clip, 1);
+	Ｐ＿縦スクロールバー＿サイズ設定(this.m_VScroll, ScrollSize, ClipHeight);
+	Ｐ＿横スクロールバー＿サイズ設定(this.m_HScroll, ClipWidth, ScrollSize);
+	this.UpdateScrollBar();
+}
+
+void CAEInstanceTreeView::SetShow(bool Show)
+{
+	Ｐ＿表示設定(this.m_Clip, Show);
+	Ｐ＿表示設定(this.m_ListLayoutBox, Show);
+	Ｐ＿表示設定(this.m_VScroll, Show);
+	Ｐ＿表示設定(this.m_HScroll, Show);
+}
+
+int CAEInstanceTreeView::GetLastZPos()
+{
+	int Z;
+	Z = Math.Max(Z, PARTS_GetAbsoluteMaxZ(this.m_ListLayoutBox));
+	Z = Math.Max(Z, PARTS_GetAbsoluteMaxZ(this.m_Clip));
+	Z = Math.Max(Z, PARTS_GetAbsoluteMaxZ(this.m_VScroll));
+	Z = Math.Max(Z, PARTS_GetAbsoluteMaxZ(this.m_HScroll));
+	return Z;
+}
+
+void CAEInstanceTreeView::UpdateScrollBar()
+{
+	int TreeWidth = AFL_Parts_GetWidth(this.m_ListLayoutBox, 1);
+	int TreeHeight = AFL_Parts_GetHeight(this.m_ListLayoutBox, 1);
+	int ClipWidth = AFL_Parts_GetWidth(this.m_Clip, 1);
+	int ClipHeight = AFL_Parts_GetHeight(this.m_Clip, 1);
+	Ｐ＿縦スクロールバー＿表示量設定(this.m_VScroll, ClipHeight);
+	Ｐ＿縦スクロールバー＿全体量設定(this.m_VScroll, TreeHeight);
+	Ｐ＿横スクロールバー＿表示量設定(this.m_HScroll, ClipWidth);
+	Ｐ＿横スクロールバー＿全体量設定(this.m_HScroll, TreeWidth);
+}
+
+void CAEInstanceTreeView::ScrollEvent(int ID, int ScrollSize, int Total)
+{
+	int VScrollSize = Ｐ＿縦スクロールバー＿スクロール位置取得(this.m_VScroll);
+	int HScrollSize = Ｐ＿横スクロールバー＿スクロール位置取得(this.m_HScroll);
+	Ｐ＿座標設定(this.m_ListLayoutBox, -HScrollSize, -VScrollSize);
+}
+
+void CAEInstanceTreeView::MouseRClickEvent(int ID, int MouseX, int MouseY)
+{
+	this.m_dgMouseRClickEvent(ID, MouseX, MouseY);
+}
+
+void CAEInstanceTreeView::CreateTree(ref CAEInstanceItemList InstanceItemList)
+{
+	if (InstanceItemList === NULL)
+	{
+		return;
+	}
+	int RootParts = InstanceItemList.GetRootParts();
+	if (!Ｐ＿存在確認(RootParts))
+	{
+		return;
+	}
+	this.m_InstanceItemList <- InstanceItemList;
+	bool Focus = this.IsFocusNode();
+	Ｐ＿レイアウトボックス＿全解放(this.m_ListLayoutBox);
+	this.ReleaseTextList();
+	int NumofChild = Ｐ＿子数取得(RootParts);
+	int Index;
+	for (Index = 0; Index < NumofChild; ++Index)
+	{
+		int Child = Ｐ＿子取得(RootParts, Index);
+		this.CreateNode(InstanceItemList, Child);
+	}
+	if (Focus)
+	{
+		Ｐ＿フォーカス設定(this.m_VScroll);
+	}
+	this.UpdateScrollBar();
+	this.ScrollByActiveItem();
+}
+
+void CAEInstanceTreeView::ScrollByActiveItem()
+{
+	ref CAEInstanceItem ActiveItem = this.m_InstanceItemList.GetActive();
+	if (ActiveItem === NULL)
+	{
+		return;
+	}
+	int i;
+	for (i = 0; i < this.m_NodeList.Numof(); ++i)
+	{
+		if (this.m_NodeList[i].GetItem() === ActiveItem)
+		{
+			break;
+		}
+	}
+	if (i == this.m_NodeList.Numof())
+	{
+		return;
+	}
+	AFL_View_Update(true);
+	int Offset = -Ｐ＿縦スクロールバー＿スクロール位置取得(this.m_VScroll);
+	int Top = Offset + this.m_NodeList[i].GetPosY();
+	int Bottom = Top + this.m_NodeList[i].GetHeight();
+	int ClipHeight = AFL_Parts_GetHeight(this.m_Clip, 1);
+	if (ClipHeight < Bottom)
+	{
+		Ｐ＿縦スクロールバー＿スクロール位置設定(this.m_VScroll, (-Offset + Bottom) - ClipHeight);
+	}
+	if (Top < 0)
+	{
+		Ｐ＿縦スクロールバー＿スクロール位置設定(this.m_VScroll, -Offset + Top);
+	}
+}
+
+void CAEInstanceTreeView::RefreshTree()
+{
+	this.m_dgUpdateTree();
+}
+
+void CAEInstanceTreeView::CreateNode(ref CAEInstanceItemList InstanceItemList, int Parts)
+{
+	if (InstanceItemList === NULL)
+	{
+		return;
+	}
+	if (!Ｐ＿存在確認(Parts))
+	{
+		return;
+	}
+	ref CAEInstanceItem Item = InstanceItemList.FindInstanceByNumber(Parts);
+	if (Item === NULL)
+	{
+		return;
+	}
+	this.m_NodeList.Realloc(this.m_NodeList.Numof() + 1);
+	this.m_NodeList[this.m_NodeList.Numof() - 1].Create(this.m_ListLayoutBox, this.m_Clip, Item, this.m_NodeList);
+	this.m_NodeList[this.m_NodeList.Numof() - 1].AddMouseWheelEvent(this.MouseWheelEvent);
+	this.m_NodeList[this.m_NodeList.Numof() - 1].AddRefreshTreeEvent(this.RefreshTree);
+	this.m_NodeList[this.m_NodeList.Numof() - 1].AddDropTopEvent(this.DropTopEvent);
+	this.m_NodeList[this.m_NodeList.Numof() - 1].AddDropEvent(this.DropEvent);
+	this.m_NodeList[this.m_NodeList.Numof() - 1].AddDropBottomEvent(this.DropBottomEvent);
+	this.m_NodeList[this.m_NodeList.Numof() - 1].AddMouseRClickEvent(this.MouseRClickEvent);
+	if (!Item.IsOpen())
+	{
+		return;
+	}
+	int NumofChild = Ｐ＿子数取得(Parts);
+	int Index;
+	for (Index = 0; Index < NumofChild; ++Index)
+	{
+		int Child = Ｐ＿子取得(Parts, Index);
+		this.CreateNode(InstanceItemList, Child);
+	}
+}
+
+void CAEInstanceTreeView::GetDragDropNode(int DragPanelNumber, int DropPanelNumber, ref int DragNumber, ref int DropNumber)
+{
+	DragNumber = 0;
+	DropNumber = 0;
+	ref CAEInstanceItem DragItem;
+	ref CAEInstanceItem DropItem;
+	int Index;
+	int Length = this.m_NodeList.Numof();
+	for (Index = 0; Index < Length; ++Index)
+	{
+		if (this.m_NodeList[Index].IsExist(DragPanelNumber))
+		{
+			DragItem <- this.m_NodeList[Index].GetItem();
+			if (DropItem !== NULL)
+			{
+				break;
+			}
+			continue;
+		}
+		if (this.m_NodeList[Index].IsExist(DropPanelNumber))
+		{
+			DropItem <- this.m_NodeList[Index].GetItem();
+			if (DragItem !== NULL)
+			{
+				break;
+			}
+			continue;
+		}
+	}
+	if (DragItem !== NULL)
+	{
+		DragNumber = DragItem.GetID();
+	}
+	if (DropItem !== NULL)
+	{
+		DropNumber = DropItem.GetID();
+	}
+}
+
+void CAEInstanceTreeView::DropTopEvent(int ID, int DragPartsNumber, int MouseX, int MouseY)
+{
+	int DragNumber;
+	int DropNumber;
+	this.GetDragDropNode(DragPartsNumber, ID, DragNumber, DropNumber);
+	if (DragNumber == 0)
+	{
+		return;
+	}
+	if (DropNumber == 0)
+	{
+		return;
+	}
+	int DragParent = Ｐ＿親設定取得(DragNumber);
+	int DropParent = Ｐ＿親設定取得(DropNumber);
+	bool SameParent = DragParent == DropParent;
+	int DragIndex = Ｐ＿子インデックス取得(DragParent, DragNumber);
+	int DropIndex = Ｐ＿子インデックス取得(DropParent, DropNumber);
+	if (!SameParent)
+	{
+		Ｐ＿子挿入(DropParent, DropIndex, DragNumber);
+	}
+	else if (SameParent && DropIndex < DragIndex)
+	{
+		Ｐ＿子挿入(DropParent, DropIndex, DragNumber);
+	}
+	else if (SameParent && DropIndex > DragIndex)
+	{
+		Ｐ＿子挿入(DropParent, DropIndex - 1, DragNumber);
+	}
+}
+
+void CAEInstanceTreeView::DropEvent(int ID, int DragPartsNumber, int MouseX, int MouseY)
+{
+	int DragNumber;
+	int DropNumber;
+	this.GetDragDropNode(DragPartsNumber, ID, DragNumber, DropNumber);
+	if (DragNumber == 0)
+	{
+		return;
+	}
+	if (DropNumber == 0)
+	{
+		return;
+	}
+	Ｐ＿親設定(DragNumber, DropNumber);
+}
+
+void CAEInstanceTreeView::DropBottomEvent(int ID, int DragPartsNumber, int MouseX, int MouseY)
+{
+	int DragNumber;
+	int DropNumber;
+	this.GetDragDropNode(DragPartsNumber, ID, DragNumber, DropNumber);
+	if (DragNumber == 0)
+	{
+		return;
+	}
+	if (DropNumber == 0)
+	{
+		return;
+	}
+	int DragParent = Ｐ＿親設定取得(DragNumber);
+	int DropParent = Ｐ＿親設定取得(DropNumber);
+	bool SameParent = DragParent == DropParent;
+	int DragIndex = Ｐ＿子インデックス取得(DragParent, DragNumber);
+	int DropIndex = Ｐ＿子インデックス取得(DropParent, DropNumber);
+	if (!SameParent)
+	{
+		Ｐ＿子挿入(DropParent, DropIndex + 1, DragNumber);
+	}
+	else if (SameParent && DropIndex < DragIndex)
+	{
+		Ｐ＿子挿入(DropParent, DropIndex + 1, DragNumber);
+	}
+	else if (SameParent && DropIndex > DragIndex)
+	{
+		Ｐ＿子挿入(DropParent, DropIndex, DragNumber);
+	}
+}
+
+bool CAEInstanceTreeView::IsFocusNode()
+{
+	int Index;
+	for (Index = 0; Index < this.m_NodeList.Numof(); ++Index)
+	{
+		if (this.m_NodeList[Index].IsFocus())
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void CAEInstanceTreeView::ReleaseTextList()
+{
+	this.m_NodeList.Free();
+}
+
+void CAEInstanceTreeView::MouseWheelEvent(int ID, int Forward, int Back)
+{
+	int Pos = Ｐ＿縦スクロールバー＿スクロール位置取得(this.m_VScroll);
+	Ｐ＿縦スクロールバー＿スクロール位置設定(this.m_VScroll, (Pos - Forward * 36) + Back * 36);
+}
+
+void CAEInstanceTreeView::AddMouseRClickEvent(DG_MouseClickHandler DelegateObject)
+{
+	this.m_dgMouseRClickEvent += DelegateObject;
+}
+
+void CAEInstanceTreeView::EraseMouseRClickEvent(DG_MouseClickHandler DelegateObject)
+{
+	this.m_dgMouseRClickEvent -= DelegateObject;
+}
+
+void CAEInstanceTreeView::AddUpdateTreeEvent(DG_NotifyHandler DelegateObject)
+{
+	this.m_dgUpdateTree += DelegateObject;
+}
+
+void CAEInstanceTreeView::EraseUpdateTreeEvent(DG_NotifyHandler DelegateObject)
+{
+	this.m_dgUpdateTree -= DelegateObject;
+}
+

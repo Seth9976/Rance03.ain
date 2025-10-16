@@ -1,0 +1,10 @@
+bool Ａ＿ゲームインストール確認(string ゲーム名)
+{
+	return InstallInfo.IsInstalledGame(ゲーム名);
+}
+
+int Ａ＿ゲームメディア確認()
+{
+	return InstallInfo.GetInstallMediaType();
+}
+

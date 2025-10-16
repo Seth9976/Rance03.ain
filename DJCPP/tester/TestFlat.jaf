@@ -1,0 +1,63 @@
+void test_Flat()
+{
+	int n = g_partsNumberProvider.getNumber();
+	g_gameObjectManager.update();
+	Parts p;
+	Parts flat;
+	Parts parent;
+	parent.initAsDummy();
+	parent.setAlpha(128.0);
+	parent.setShow(true);
+	p.initAsPlaneImage(1024, 768, 100, 100, 100, 255);
+	p.setShow(true);
+	parent.setZ(100.0);
+	parent.setScaling(10.0);
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		if (g_mouse.isClick(0))
+		{
+			flat.initAsFlat("システム／戦闘／フレーム／開始");
+			flat.setShow(true);
+			flat.setParent(parent.getPartsNumber());
+			flat.startFlat(false, 1.0);
+		}
+		if (g_keyboard.isPress(90))
+		{
+			flat.initAsFlat("システム／戦闘／フレーム／終了");
+			flat.setShow(true);
+			flat.setParent(parent.getPartsNumber());
+			flat.startFlat(false, 1.0);
+		}
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+	Ｐ＿削除(n);
+}
+
+void test_FullScreenFlat()
+{
+	FullScreenFlat flat;
+	flat.init("システム／エンカウント", "", false);
+	flat.run(1.0);
+	flat.join(100);
+}
+
+void test_Flat2()
+{
+	Parts p;
+	p.loadAndStartFlat("戦闘エフェクト/戦闘エフェクト／物理攻撃", 512, 384, 30000);
+	while (true)
+	{
+		if (g_mouse.isClick(1))
+		{
+			break;
+		}
+		g_gameObjectManager.update();
+		g_frameManager.updateFrame();
+	}
+}
+

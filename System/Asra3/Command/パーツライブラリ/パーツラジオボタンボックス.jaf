@@ -1,0 +1,30 @@
+bool Ｐ＿ラジオボタンボックス＿存在確認(int パーツ番号, int 番号)
+{
+	return PartsEngine.IsRadioButtonBoxExistGUI(パーツ番号, 番号);
+}
+
+void Ｐ＿ラジオボタンボックス＿開放(int パーツ番号)
+{
+	PartsEngine.ClearRadioButtonBoxChild(パーツ番号);
+}
+
+void Ｐ＿ラジオボタンボックス＿追加(int パーツ番号, int 番号)
+{
+	PartsEngine.AddRadioButtonBoxChild(パーツ番号, 番号);
+}
+
+void Ｐ＿ラジオボタンボックス＿削除(int パーツ番号, int 番号)
+{
+	PartsEngine.RemoveRadioButtonBoxChild(パーツ番号, 番号);
+}
+
+int Ｐ＿ラジオボタンボックス＿個数取得(int パーツ番号)
+{
+	return PartsEngine.NumofRadioButtonBoxChild(パーツ番号);
+}
+
+int Ｐ＿ラジオボタンボックス＿番号取得(int パーツ番号, int インデックス)
+{
+	return PartsEngine.GetRadioButtonBoxChild(パーツ番号, インデックス);
+}
+

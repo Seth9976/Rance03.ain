@@ -1,0 +1,22 @@
+void AdvSelectionButtonInfomation::init(string id, string caption, string imageName)
+{
+	this.id_ = id;
+	this.caption_ = caption;
+	this.imageName_ = imageName;
+}
+
+string AdvSelectionButtonInfomation::getId()
+{
+	return this.id_;
+}
+
+string AdvSelectionButtonInfomation::getCaption()
+{
+	return this.caption_;
+}
+
+string AdvSelectionButtonInfomation::getImageName()
+{
+	return this.imageName_;
+}
+

@@ -1,0 +1,102 @@
+void Item::init(int index)
+{
+	string key = "アイテム情報";
+	this.index_ = index;
+	this.id_ = EX_RA2String(key, index, "id", "");
+	this.name_ = EX_RA2String(key, index, "name", "");
+	this.desc_ = EX_RA2String(key, index, "desc", "");
+	this.type_ = EX_RA2Int(key, index, "type", 0);
+	this.targetType_ = EX_RA2Int(key, index, "targetType", 0);
+	this.price_ = EX_RA2Int(key, index, "price", 0);
+	this.iconImageName_ = EX_RA2String(key, index, "iconImageName", "");
+	this.labelImageName_ = EX_RA2String(key, index, "iconLabelName", "");
+	this.skillId_ = EX_RA2String(key, index, "skillId", "");
+	this.priceFunction_ = EX_RA2String(key, index, "priceFunction", "");
+	this.maxCount_ = EX_RA2Int(key, index, "maxCount", 99);
+}
+
+int Item::getMaxCount()
+{
+	return this.maxCount_;
+}
+
+string Item::getId()
+{
+	return this.id_;
+}
+
+string Item::getName()
+{
+	return this.name_;
+}
+
+string Item::getDesc()
+{
+	return this.desc_;
+}
+
+int Item::getType()
+{
+	return this.type_;
+}
+
+int Item::getPrice()
+{
+	return this.price_;
+}
+
+int Item::getShopPrice()
+{
+	int c = g_playerCommonParam.getItemCount(this.id_);
+	if (this.priceFunction_ != "")
+	{
+		DG_PriceFunction fn;
+		fn = this.priceFunction_;
+		return fn(this, c);
+		fn.Clear();
+	}
+	return this.price_;
+}
+
+string Item::getSkillId()
+{
+	return this.skillId_;
+}
+
+int Item::getTargetType()
+{
+	return this.targetType_;
+}
+
+string Item::getIconImageName()
+{
+	return this.iconImageName_;
+}
+
+int Item::getIndex()
+{
+	return this.index_;
+}
+
+int Item::getNarrowDownType()
+{
+	switch (this.type_)
+	{
+	case 0:
+		return 2 + getPlayerSkillFromId(this.skillId_).getGroupRank();
+		break;
+	case 1:
+		return 1;
+		break;
+	case 2:
+		return 2;
+		break;
+	}
+	return -1;
+}
+
+string Item::getLabelImageName()
+{
+	return this.labelImageName_;
+}
+

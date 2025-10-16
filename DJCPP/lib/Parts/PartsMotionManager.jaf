@@ -1,0 +1,82 @@
+void PartsMotionManager::add(PartsMotioner motioner)
+{
+	this.finalizeCurrentMotion(motioner.getPartsNumber());
+	this.motionerList_.PushBack(motioner);
+}
+
+void PartsMotionManager::update()
+{
+	int i;
+	while (i < this.motionerList_.Numof())
+	{
+		if (!this.motionerList_[i].isMotion())
+		{
+			this.motionerList_.Erase(i);
+		}
+		else
+		{
+			this.motionerList_[i].update();
+			++i;
+		}
+	}
+}
+
+int PartsMotionManager::findMotionFromPartsNumber(int partsNumber)
+{
+	int i;
+	for (i = 0; i < this.motionerList_.Numof(); ++i)
+	{
+		if (this.motionerList_[i].getPartsNumber() == partsNumber)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+void PartsMotionManager::finalizeCurrentMotion(int partsNumber)
+{
+	int index = this.findMotionFromPartsNumber(partsNumber);
+	if (index != -1)
+	{
+		this.motionerList_[index].finalize();
+		this.motionerList_.Erase(index);
+	}
+}
+
+bool PartsMotionManager::isEmpty()
+{
+	return this.motionerList_.Empty();
+}
+
+void PartsMotionManager::finalize(int partsNumber)
+{
+	int i;
+	if (partsNumber == -1)
+	{
+		for (i = 0; i < this.motionerList_.Numof(); ++i)
+		{
+			this.motionerList_[i].finalize();
+		}
+		this.motionerList_.Free();
+	}
+	else
+	{
+		for (i = 0; i < this.motionerList_.Numof(); ++i)
+		{
+			if (partsNumber == this.motionerList_[i].getPartsNumber())
+			{
+				this.motionerList_[i].finalize();
+				this.motionerList_.Erase(i);
+				pass("finalize erase %d" % partsNumber);
+				break;
+			}
+		}
+	}
+}
+
+bool PartsMotionManager::isMotion(int partsNumber)
+{
+	return this.findMotionFromPartsNumber(partsNumber) != -1;
+}
+

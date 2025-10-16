@@ -1,0 +1,338 @@
+PlayerCommonParam::PlayerCommonParam()
+{
+	this.isEnableLevelGod_ = false;
+	this.isEnableExitDungeon_ = false;
+	this.isEnableItem_ = true;
+	this.partyCoolTime_ = 0;
+}
+
+void PlayerCommonParam::setGold(int val)
+{
+	int old = this.gold_;
+	this.gold_ = Math.Max(0, val);
+	if (this.gold_ != old)
+	{
+		this.onChangeGold_();
+	}
+}
+
+int PlayerCommonParam::getGold()
+{
+	return this.gold_;
+}
+
+bool PlayerCommonParam::isEnableLevelGod()
+{
+	return this.isEnableLevelGod_;
+}
+
+bool PlayerCommonParam::isEnableExitDungeon()
+{
+	return this.isEnableExitDungeon_;
+}
+
+void PlayerCommonParam::addItem(string itemId)
+{
+	ref Item item = getItemFromId(itemId);
+	if (item === NULL)
+	{
+		pass("itemId:%sは存在しません" % itemId);
+		return;
+	}
+	int index = this.getItemCountIndex(itemId);
+	int count = 1;
+	if (index < 0)
+	{
+		ItemCount ic;
+		ic.id = itemId;
+		ic.count = 1;
+		this.itemCount_.PushBack(ic);
+	}
+	else
+	{
+		count = ++this.itemCount_[index].count;
+	}
+	this.onAddCallback_(itemId, count);
+	this.sortItem();
+}
+
+int PlayerCommonParam::getItemCountIndex(string itemId)
+{
+	int i;
+	for (i = 0; i < this.itemCount_.Numof(); ++i)
+	{
+		if (itemId == this.itemCount_[i].id)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+void PlayerCommonParam::useItem(string itemId)
+{
+	int index = this.getItemCountIndex(itemId);
+	if (index >= 0)
+	{
+		int count = --this.itemCount_[index].count;
+		if (this.itemCount_[index].count == 0)
+		{
+			this.itemCount_.Erase(index);
+		}
+		this.onUseCallback_(itemId, count);
+	}
+}
+
+void PlayerCommonParam::decItem(string itemId)
+{
+	int index = this.getItemCountIndex(itemId);
+	if (index >= 0)
+	{
+		int count = --this.itemCount_[index].count;
+		if (this.itemCount_[index].count == 0)
+		{
+			this.itemCount_.Erase(index);
+		}
+	}
+}
+
+void PlayerCommonParam::eraseItem(string itemId)
+{
+	int index = this.getItemCountIndex(itemId);
+	if (index >= 0)
+	{
+		this.itemCount_.Erase(index);
+	}
+}
+
+void PlayerCommonParam::getItemList(ref array@string itemList)
+{
+	if (itemList === NULL)
+	{
+		return;
+	}
+	itemList.Alloc(this.itemCount_.Numof());
+	int i;
+	for (i = 0; i < this.itemCount_.Numof(); ++i)
+	{
+		itemList[i] = this.itemCount_[i].id;
+	}
+}
+
+void PlayerCommonParam::setOnAddItemCallback(DG_OnChangeItemCallback cb)
+{
+	this.onAddCallback_ = cb;
+}
+
+void PlayerCommonParam::setOnUseItemCallback(DG_OnChangeItemCallback cb)
+{
+	this.onUseCallback_ = cb;
+}
+
+int PlayerCommonParam::getItemCount(string id)
+{
+	int index = this.getItemCountIndex(id);
+	if (index < 0)
+	{
+		return 0;
+	}
+	return this.itemCount_[index].count;
+}
+
+void PlayerCommonParam::setOnChangeGoldCallback(DG_GeneralCallback cb)
+{
+	this.onChangeGold_ += cb;
+}
+
+void PlayerCommonParam::addOnChangeBadConditionCallback(DG_GeneralCallback cb)
+{
+	this.onChangeBadCondition_ += cb;
+}
+
+void PlayerCommonParam::addOnChangeHelperCountCallback(DG_OnChangeHelperCallback cb)
+{
+	this.onChangeHelperCallback_ += cb;
+}
+
+void PlayerCommonParam::setPlaceName(string name)
+{
+	this.placeName_ = name;
+}
+
+string PlayerCommonParam::getPlaceName()
+{
+	return this.placeName_;
+}
+
+void PlayerCommonParam::addGold(int val)
+{
+	this.setGold(this.gold_ + val);
+}
+
+void PlayerCommonParam::setEnableLevelGod(bool val)
+{
+	this.isEnableLevelGod_ = val;
+}
+
+void PlayerCommonParam::setEnableExitDungeon(bool val)
+{
+	this.isEnableExitDungeon_ = val;
+}
+
+void PlayerCommonParam::setEnableItem(bool val)
+{
+	this.isEnableItem_ = val;
+}
+
+bool PlayerCommonParam::isEnableItem()
+{
+	return this.isEnableItem_;
+}
+
+void PlayerCommonParam::setPartyCoolTime(int val)
+{
+	this.partyCoolTime_ = 0;
+}
+
+int PlayerCommonParam::getPartyCoolTime()
+{
+	return this.partyCoolTime_;
+}
+
+void PlayerCommonParam::decPartyCoolTime()
+{
+	this.partyCoolTime_ = Math.Max(0, this.partyCoolTime_ - 1);
+}
+
+void PlayerCommonParam::sortItem()
+{
+	this.itemCount_.Sort(&sortFunctionItemCountByIndex);
+}
+
+int sortFunctionItemCountByIndex(ref ItemCount lhs, ref ItemCount rhs)
+{
+	ref Item iLhs = getItemFromId(lhs.id);
+	ref Item iRhs = getItemFromId(rhs.id);
+	if (iLhs.getIndex() > iRhs.getIndex())
+	{
+		return 1;
+	}
+	if (iLhs.getIndex() < iRhs.getIndex())
+	{
+		return -1;
+	}
+	return 0;
+}
+
+void PlayerCommonParam::addBadCondition(string id, int turn)
+{
+	int index = this.findBadCondition(id);
+	if (index < 0)
+	{
+		CurrentBadCondition bc;
+		bc.init(id, turn);
+		this.badCondition_.PushBack(bc);
+		this.onBeginEndBadConditionCallback_(id, true);
+	}
+	else
+	{
+		this.badCondition_[index].setTurn(turn);
+	}
+	this.onChangeBadCondition_();
+}
+
+void PlayerCommonParam::decBadCondition()
+{
+	int i;
+	while (i < this.badCondition_.Numof())
+	{
+		this.badCondition_[i].decTurn();
+		if (this.badCondition_[i].getTurn() == 0)
+		{
+			this.onBeginEndBadConditionCallback_(this.badCondition_[i].getId(), false);
+			this.badCondition_.Erase(i);
+		}
+		else
+		{
+			++i;
+		}
+	}
+	this.onChangeBadCondition_();
+}
+
+int PlayerCommonParam::findBadCondition(string id)
+{
+	int i;
+	for (i = 0; i < this.badCondition_.Numof(); ++i)
+	{
+		if (this.badCondition_[i].getId() == id)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+void PlayerCommonParam::getBadCondition(ref array@CurrentBadCondition current)
+{
+	current.Alloc(this.badCondition_.Numof());
+	current.Copy(0, this.badCondition_, 0, this.badCondition_.Numof());
+}
+
+int PlayerCommonParam::getBadConditionTurn(string id)
+{
+	int index = this.findBadCondition(id);
+	if (index < 0)
+	{
+		return 0;
+	}
+	return this.badCondition_[index].getTurn();
+}
+
+void PlayerCommonParam::clearBadCondition()
+{
+	int i;
+	for (i = 0; i < this.badCondition_.Numof(); ++i)
+	{
+		this.onBeginEndBadConditionCallback_(this.badCondition_[i].getId(), false);
+	}
+	this.badCondition_.Free();
+	this.onChangeBadCondition_();
+}
+
+void PlayerCommonParam::setBadConditionBeginEndHandler(DG_OnBadConditionBeginEndHandler handler)
+{
+	this.onBeginEndBadConditionCallback_ = handler;
+}
+
+void PlayerCommonParam::setMaxHelperCount(int val)
+{
+	int maxOld = this.maxHelperCount_;
+	int restOld = this.helperCount_;
+	this.maxHelperCount_ = val;
+	++this.helperCount_;
+	this.onChangeHelperCallback_(this.helperCount_, restOld, this.maxHelperCount_, maxOld);
+}
+
+int PlayerCommonParam::getMaxHelperCount()
+{
+	return this.maxHelperCount_;
+}
+
+void PlayerCommonParam::setHelperCount(int val)
+{
+	this.helperCount_ = val;
+}
+
+int PlayerCommonParam::getHelperCount()
+{
+	return this.helperCount_;
+}
+
+void PlayerCommonParam::decHelperCount(int val)
+{
+	int restOld = this.helperCount_;
+	this.helperCount_ -= val;
+	this.onChangeHelperCallback_(this.helperCount_, restOld, this.maxHelperCount_, this.maxHelperCount_);
+}
+

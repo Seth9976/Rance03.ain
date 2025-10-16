@@ -1,0 +1,163 @@
+SceneAdvSelection::SceneAdvSelection()
+{
+	this.isFinish_ = false;
+}
+
+void SceneAdvSelection::init(array@string selectionButtonId)
+{
+	this.partsModeMark_[0].init("システム／オートモード", 0);
+	this.partsModeMark_[0].setPos(601.0, 684.0);
+	this.partsModeMark_[0].setZ(3450.0);
+	this.partsModeMark_[1].init("システム／スキップモード", 0);
+	this.partsModeMark_[1].setPos(663.0, 684.0);
+	this.partsModeMark_[1].setZ(3450.0);
+	this.isCastleMode_ = g_gameSceneManager.getCurrentPlaceId() == "居館";
+	this.btn_.Alloc(selectionButtonId.Numof());
+	int lbc = this.getFreeLayoutButtonCount(selectionButtonId);
+	int i;
+	for (i = 0; i < this.btn_.Numof(); ++i)
+	{
+		this.btn_[i].init(selectionButtonId[i], i, lbc, this.isCastleMode_);
+		this.btn_[i].setOnClickCallback(this.onClick, i);
+	}
+	this.initParts();
+	this.initButtonOpenCamp();
+}
+
+int SceneAdvSelection::getFreeLayoutButtonCount(ref array@string selectionButtonId)
+{
+	int i;
+	int n;
+	for (i = 0; i < selectionButtonId.Numof(); ++i)
+	{
+		switch (selectionButtonId[i])
+		{
+		case "セーブの碑へ行く":
+		case "ロードの碑へ行く":
+		case "街を出る":
+		case "居館一階を出る":
+			break;
+		default:
+			++n;
+		}
+	}
+	return n;
+}
+
+void SceneAdvSelection::initButtonOpenCamp()
+{
+	this.btnOpenMenu_.init("システム／ボタン／メニュー", "", "", false);
+	this.btnOpenMenu_.setPos(950, 692);
+	this.btnOpenMenu_.setZ(3600);
+	this.btnOpenMenu_.setShow(true);
+	this.btnOpenMenu_.setClickCallback(this.onClickSystemMenu, 0);
+	this.btnOpenCamp_.init("システム／ボタン／幅１７０", "キャンプを開く", "", true);
+	this.btnOpenCamp_.setPos(775, 692);
+	this.btnOpenCamp_.setZ(3600);
+	this.btnOpenCamp_.setShow(true);
+	this.btnOpenCamp_.setClickCallback(this.onClick, 999);
+}
+
+void SceneAdvSelection::initParts()
+{
+	this.partsBase_.init("システム／場所移動／下地", 0);
+	this.partsBase_.setPos(391.0, 0.0);
+	this.partsBase_.setZ(3600.0);
+}
+
+void SceneAdvSelection::run()
+{
+	string pId = g_gameSceneManager.getCurrentPlaceId();
+	if (pId != "")
+	{
+		g_music.play(getMapPlaceFromId(pId).getMusicId(), -2147483648, false);
+	}
+	this.fadeIn(true);
+}
+
+bool SceneAdvSelection::update()
+{
+	if (this.isFinish_)
+	{
+		return false;
+	}
+	if (g_mouse.getWheel() > 0)
+	{
+		openBackLog();
+	}
+	this.partsModeMark_[0].setShow(Ａ＿オートモード中確認());
+	this.partsModeMark_[1].setShow(SYS_スキップモード確認());
+	return true;
+}
+
+void SceneAdvSelection::fadeIn(bool val)
+{
+	int i;
+	for (i = 0; i < this.btn_.Numof(); ++i)
+	{
+		this.btn_[i].fadeIn(val, val ? i * 50 : 0);
+	}
+	this.btnOpenCamp_.fadeIn(val);
+	this.btnOpenMenu_.fadeIn(val);
+	this.fadeBg(val);
+}
+
+void SceneAdvSelection::fadeBg(bool val)
+{
+	this.partsBase_.setShow(true);
+	if (val)
+	{
+		PartsMotion m;
+		m.setMove(1024, -50, 391, 0, 2);
+		m.setTime(600);
+		if (this.isCastleMode_)
+		{
+			m.setAlpha(0, 0, 0);
+		}
+		this.partsBase_.runMotion(m, NULL);
+	}
+	else
+	{
+		PartsMotion m;
+		m.setMove(391, 0, 1024, -50, 1);
+		m.setTime(200);
+		if (this.isCastleMode_)
+		{
+			m.setAlpha(0, 0, 0);
+		}
+		this.partsBase_.runMotion(m, this.onFinishFadeOut);
+	}
+}
+
+void SceneAdvSelection::onFinishFadeOut()
+{
+	this.isFinish_ = true;
+}
+
+void SceneAdvSelection::onClick(int index)
+{
+	if (this.clickedId_ != "")
+	{
+		return;
+	}
+	if (index == 999)
+	{
+		this.clickedId_ = "キャンプを開く";
+	}
+	else
+	{
+		this.clickedId_ = this.btn_[index].getId();
+	}
+	this.fadeIn(false);
+}
+
+void SceneAdvSelection::onClickSystemMenu(int index)
+{
+	openSystemMenu(true);
+}
+
+string SceneAdvSelection::getClickedId()
+{
+	return this.clickedId_;
+}
+

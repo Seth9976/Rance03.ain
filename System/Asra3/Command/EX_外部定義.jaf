@@ -1,0 +1,462 @@
+bool EX_ReloadDebugEXFile()
+{
+	return MainEXFile.ReloadDebugEXFile();
+}
+
+bool EX_AddEXFile(string FilePath)
+{
+	return MainEXFile.AddEXText(FilePath);
+}
+
+int EX_Height(string Name)
+{
+	return MainEXFile.Row(Name);
+}
+
+int EX_Width(string Name)
+{
+	return MainEXFile.Col(Name);
+}
+
+int EX_Type(string Name)
+{
+	return MainEXFile.Type(Name);
+}
+
+int EX_AType(string Name, int Index)
+{
+	return MainEXFile.AType(Name, Index);
+}
+
+int EX_A2Type(string Name, int LineX, int LineY)
+{
+	return MainEXFile.A2Type(Name, LineY, LineX);
+}
+
+int EX_IA2Type(string Name, int Key, string FormatName)
+{
+	return MainEXFile.IA2Type(Name, Key, FormatName);
+}
+
+int EX_SA2Type(string Name, string Key, string FormatName)
+{
+	return MainEXFile.SA2Type(Name, Key, FormatName);
+}
+
+int EX_RA2Type(string Name, int LineY, string FormatName)
+{
+	return MainEXFile.RA2Type(Name, LineY, FormatName);
+}
+
+bool EX_IsExist(string Name)
+{
+	return MainEXFile.Exists(Name);
+}
+
+bool EX_IsExistA(string Name, int Index)
+{
+	return MainEXFile.AExists(Name, Index);
+}
+
+bool EX_IsExistA2(string Name, int LineX, int LineY)
+{
+	return MainEXFile.A2Exists(Name, LineY, LineX);
+}
+
+bool EX_IsExistIA2(string Name, int Key, string FormatName)
+{
+	return MainEXFile.IA2Exists(Name, Key, FormatName);
+}
+
+bool EX_IsExistSA2(string Name, string Key, string FormatName)
+{
+	return MainEXFile.SA2Exists(Name, Key, FormatName);
+}
+
+bool EX_IsExistRA2(string Name, int LineY, string FormatName)
+{
+	return MainEXFile.RA2Exists(Name, LineY, FormatName);
+}
+
+bool EX_IsInt(string Name)
+{
+	return EX_Type(Name) == 1;
+}
+
+bool EX_IsAInt(string Name, int Index)
+{
+	return EX_AType(Name, Index) == 1;
+}
+
+bool EX_IsA2Int(string Name, int LineX, int LineY)
+{
+	return EX_A2Type(Name, LineX, LineY) == 1;
+}
+
+bool EX_IsIA2Int(string Name, int Key, string FormatName)
+{
+	return EX_IA2Type(Name, Key, FormatName) == 1;
+}
+
+bool EX_IsSA2Int(string Name, string Key, string FormatName)
+{
+	return EX_SA2Type(Name, Key, FormatName) == 1;
+}
+
+bool EX_IsRA2Int(string Name, int LineY, string FormatName)
+{
+	return EX_RA2Type(Name, LineY, FormatName) == 1;
+}
+
+bool EX_IsFloat(string Name)
+{
+	if (EX_Type(Name) == 2)
+	{
+		return true;
+	}
+	return EX_IsInt(Name);
+}
+
+bool EX_IsAFloat(string Name, int Index)
+{
+	if (EX_AType(Name, Index) == 2)
+	{
+		return true;
+	}
+	return EX_IsAInt(Name, Index);
+}
+
+bool EX_IsA2Float(string Name, int LineX, int LineY)
+{
+	if (EX_A2Type(Name, LineX, LineY) == 2)
+	{
+		return true;
+	}
+	return EX_IsA2Int(Name, LineY, LineX);
+}
+
+bool EX_IsIA2Float(string Name, int Key, string FormatName)
+{
+	if (EX_IA2Type(Name, Key, FormatName) == 2)
+	{
+		return true;
+	}
+	return EX_IsIA2Int(Name, Key, FormatName);
+}
+
+bool EX_IsSA2Float(string Name, string Key, string FormatName)
+{
+	if (EX_SA2Type(Name, Key, FormatName) == 2)
+	{
+		return true;
+	}
+	return EX_IsSA2Int(Name, Key, FormatName);
+}
+
+bool EX_IsRA2Float(string Name, int LineY, string FormatName)
+{
+	if (EX_RA2Type(Name, LineY, FormatName) == 2)
+	{
+		return true;
+	}
+	return EX_IsRA2Int(Name, LineY, FormatName);
+}
+
+bool EX_IsString(string Name)
+{
+	return EX_Type(Name) == 3;
+}
+
+bool EX_IsAString(string Name, int Index)
+{
+	return EX_AType(Name, Index) == 3;
+}
+
+bool EX_IsA2String(string Name, int LineX, int LineY)
+{
+	return EX_A2Type(Name, LineX, LineY) == 3;
+}
+
+bool EX_IsIA2String(string Name, int Key, string FormatName)
+{
+	return EX_IA2Type(Name, Key, FormatName) == 3;
+}
+
+bool EX_IsSA2String(string Name, string Key, string FormatName)
+{
+	return EX_SA2Type(Name, Key, FormatName) == 3;
+}
+
+bool EX_IsRA2String(string Name, int LineY, string FormatName)
+{
+	return EX_RA2Type(Name, LineY, FormatName) == 3;
+}
+
+bool EX_IsArray2(string Name)
+{
+	return EX_Type(Name) == 4;
+}
+
+bool EX_IsA2Array2(string Name, int LineX, int LineY)
+{
+	return EX_A2Type(Name, LineX, LineY) == 4;
+}
+
+bool EX_IsIA2Array2(string Name, int Key, string FormatName)
+{
+	return EX_IA2Type(Name, Key, FormatName) == 4;
+}
+
+bool EX_IsSA2Array2(string Name, string Key, string FormatName)
+{
+	return EX_SA2Type(Name, Key, FormatName) == 4;
+}
+
+bool EX_IsRA2Array2(string Name, int LineY, string FormatName)
+{
+	return EX_RA2Type(Name, LineY, FormatName) == 4;
+}
+
+bool EX_IsArray(string Name)
+{
+	return EX_Type(Name) == 5;
+}
+
+int EX_Int(string Name, int Default)
+{
+	int Data;
+	if (!MainEXFile.Int(Name, Data))
+	{
+		return Default;
+	}
+	return Data;
+}
+
+float EX_Float(string Name, float Default)
+{
+	if (EX_IsInt(Name))
+	{
+		return EX_Int(Name, 0);
+	}
+	float Data;
+	if (!MainEXFile.Float(Name, Data))
+	{
+		return Default;
+	}
+	return Data;
+}
+
+string EX_String(string Name, string Default)
+{
+	string Data;
+	if (!MainEXFile.String(Name, Data))
+	{
+		return Default;
+	}
+	return Data;
+}
+
+int EX_AInt(string Name, int Index, int Default)
+{
+	int Data;
+	if (!MainEXFile.AInt(Name, Index, Data))
+	{
+		return Default;
+	}
+	return Data;
+}
+
+float EX_AFloat(string Name, int Index, float Default)
+{
+	if (EX_IsAInt(Name, Index))
+	{
+		return EX_AInt(Name, Index, 0);
+	}
+	float Data;
+	if (!MainEXFile.AFloat(Name, Index, Data))
+	{
+		return Default;
+	}
+	return Data;
+}
+
+string EX_AString(string Name, int Index, string Default)
+{
+	string Data;
+	if (!MainEXFile.AString(Name, Index, Data))
+	{
+		return Default;
+	}
+	return Data;
+}
+
+int EX_A2Int(string Name, int LineX, int LineY, int Default)
+{
+	int Data;
+	if (!MainEXFile.A2Int(Name, LineY, LineX, Data))
+	{
+		return Default;
+	}
+	return Data;
+}
+
+float EX_A2Float(string Name, int LineX, int LineY, float Default)
+{
+	if (EX_IsA2Int(Name, LineX, LineY))
+	{
+		return EX_A2Int(Name, LineX, LineY, 0);
+	}
+	float Data;
+	if (!MainEXFile.A2Float(Name, LineY, LineX, Data))
+	{
+		return Default;
+	}
+	return Data;
+}
+
+string EX_A2String(string Name, int LineX, int LineY, string Default)
+{
+	string Data;
+	if (!MainEXFile.A2String(Name, LineY, LineX, Data))
+	{
+		return Default;
+	}
+	return Data;
+}
+
+int EX_IA2LineY(string Name, int Key)
+{
+	return MainEXFile.GetRowAtIntKey(Name, Key);
+}
+
+float EX_SA2LineY(string Name, string Key)
+{
+	return MainEXFile.GetRowAtStringKey(Name, Key);
+}
+
+int EX_IA2Int(string Name, int Key, string FormatName, int Default)
+{
+	int Data;
+	if (!MainEXFile.IA2Int(Name, Key, FormatName, Data))
+	{
+		return Default;
+	}
+	return Data;
+}
+
+float EX_IA2Float(string Name, int Key, string FormatName, float Default)
+{
+	if (EX_IsIA2Int(Name, Key, FormatName))
+	{
+		return EX_IA2Int(Name, Key, FormatName, 0);
+	}
+	float Data;
+	if (!MainEXFile.IA2Float(Name, Key, FormatName, Data))
+	{
+		return Default;
+	}
+	return Data;
+}
+
+string EX_IA2String(string Name, int Key, string FormatName, string Default)
+{
+	string Data;
+	if (!MainEXFile.IA2String(Name, Key, FormatName, Data))
+	{
+		return Default;
+	}
+	return Data;
+}
+
+int EX_SA2Int(string Name, string Key, string FormatName, int Default)
+{
+	int Data;
+	if (!MainEXFile.SA2Int(Name, Key, FormatName, Data))
+	{
+		return Default;
+	}
+	return Data;
+}
+
+float EX_SA2Float(string Name, string Key, string FormatName, float Default)
+{
+	if (EX_IsSA2Int(Name, Key, FormatName))
+	{
+		return EX_SA2Int(Name, Key, FormatName, 0);
+	}
+	float Data;
+	if (!MainEXFile.SA2Float(Name, Key, FormatName, Data))
+	{
+		return Default;
+	}
+	return Data;
+}
+
+string EX_SA2String(string Name, string Key, string FormatName, string Default)
+{
+	string Data;
+	if (!MainEXFile.SA2String(Name, Key, FormatName, Data))
+	{
+		return Default;
+	}
+	return Data;
+}
+
+int EX_RA2Int(string Name, int LineY, string FormatName, int Default)
+{
+	int Data;
+	if (!MainEXFile.RA2Int(Name, LineY, FormatName, Data))
+	{
+		return Default;
+	}
+	return Data;
+}
+
+float EX_RA2Float(string Name, int LineY, string FormatName, float Default)
+{
+	if (EX_IsRA2Int(Name, LineY, FormatName))
+	{
+		return EX_RA2Int(Name, LineY, FormatName, 0);
+	}
+	float Data;
+	if (!MainEXFile.RA2Float(Name, LineY, FormatName, Data))
+	{
+		return Default;
+	}
+	return Data;
+}
+
+string EX_RA2String(string Name, int LineY, string FormatName, string Default)
+{
+	string Data;
+	if (!MainEXFile.RA2String(Name, LineY, FormatName, Data))
+	{
+		return Default;
+	}
+	return Data;
+}
+
+void EX_GetNodeNameList(string TreePath, ref array@string NodeList)
+{
+	int NodeNameListCount = MainEXFile.GetNodeNameCount(TreePath);
+	int Count;
+	for (Count = 0; Count < NodeNameListCount; ++Count)
+	{
+		string NodeName;
+		MainEXFile.GetNodeName(TreePath, Count, NodeName);
+		NodeList.PushBack(NodeName);
+	}
+}
+
+void EX_GetEXNameList(string TreePath, ref array@string EXList)
+{
+	int NodeNameListCount = MainEXFile.GetEXNameCount(TreePath);
+	int Count;
+	for (Count = 0; Count < NodeNameListCount; ++Count)
+	{
+		string EXName;
+		MainEXFile.GetEXName(TreePath, Count, EXName);
+		EXList.PushBack(EXName);
+	}
+}
+

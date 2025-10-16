@@ -1,0 +1,718 @@
+void AFL_Parts_AddWholeMouseMoveEvent(DG_MouseMoveHandler DelegateObject)
+{
+	g_PartsMessageManager.AddMouseMoveEvent(0, DelegateObject);
+}
+
+void AFL_Parts_EraseWholeMouseMoveEvent(DG_MouseMoveHandler DelegateObject)
+{
+	g_PartsMessageManager.EraseMouseMoveEvent(0, DelegateObject);
+}
+
+void AFL_Parts_AddWholeMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	g_PartsMessageManager.AddMouseWheelEvent(0, DelegateObject);
+}
+
+void AFL_Parts_EraseWholeMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	g_PartsMessageManager.EraseMouseWheelEvent(0, DelegateObject);
+}
+
+void AFL_Parts_AddWholeMouseLClickEvent(DG_MouseClickHandler DelegateObject)
+{
+	g_PartsMessageManager.AddMouseLClickEvent(0, DelegateObject);
+}
+
+void AFL_Parts_EraseWholeMouseLClickEvent(DG_MouseClickHandler DelegateObject)
+{
+	g_PartsMessageManager.EraseMouseLClickEvent(0, DelegateObject);
+}
+
+void AFL_Parts_AddWholeMouseRClickEvent(DG_MouseClickHandler DelegateObject)
+{
+	g_PartsMessageManager.AddMouseRClickEvent(0, DelegateObject);
+}
+
+void AFL_Parts_EraseWholeMouseRClickEvent(DG_MouseClickHandler DelegateObject)
+{
+	g_PartsMessageManager.EraseMouseRClickEvent(0, DelegateObject);
+}
+
+void AFL_Parts_AddWholeMouseMClickEvent(DG_MouseClickHandler DelegateObject)
+{
+	g_PartsMessageManager.AddMouseMClickEvent(0, DelegateObject);
+}
+
+void AFL_Parts_EraseWholeMouseMClickEvent(DG_MouseClickHandler DelegateObject)
+{
+	g_PartsMessageManager.EraseMouseMClickEvent(0, DelegateObject);
+}
+
+void AFL_Parts_AddWholeKeyTriggerEvent(DG_KeyTriggerHandler DelegateObject)
+{
+	g_PartsMessageManager.AddKeyTriggerEvent(0, DelegateObject);
+}
+
+void AFL_Parts_EraseWholeKeyTriggerEvent(DG_KeyTriggerHandler DelegateObject)
+{
+	g_PartsMessageManager.EraseKeyTriggerEvent(0, DelegateObject);
+}
+
+void AFL_Parts_AddWholeKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	g_PartsMessageManager.AddKeyDownEvent(0, DelegateObject);
+}
+
+void AFL_Parts_EraseWholeKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	g_PartsMessageManager.EraseKeyDownEvent(0, DelegateObject);
+}
+
+void AFL_Parts_AddWholeKeyPressEvent(DG_KeyPressHandler DelegateObject)
+{
+	g_PartsMessageManager.AddKeyPressEvent(0, DelegateObject);
+}
+
+void AFL_Parts_EraseWholeKeyPressEvent(DG_KeyPressHandler DelegateObject)
+{
+	g_PartsMessageManager.EraseKeyPressEvent(0, DelegateObject);
+}
+
+void AFL_Parts_AddWholeKeyUpEvent(DG_KeyUpHandler DelegateObject)
+{
+	g_PartsMessageManager.AddKeyUpEvent(0, DelegateObject);
+}
+
+void AFL_Parts_EraseWholeKeyUpEvent(DG_KeyUpHandler DelegateObject)
+{
+	g_PartsMessageManager.EraseKeyUpEvent(0, DelegateObject);
+}
+
+void AFL_Parts_AddMouseEnterEvent(int PartsNumber, DG_MouseEnterHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.AddMouseEnterEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_EraseMouseEnterEvent(int PartsNumber, DG_MouseEnterHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.EraseMouseEnterEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_AddMouseMoveEvent(int PartsNumber, DG_MouseMoveHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.AddMouseMoveEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_EraseMouseMoveEvent(int PartsNumber, DG_MouseMoveHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.EraseMouseMoveEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_AddMouseLeaveEvent(int PartsNumber, DG_MouseLeaveHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.AddMouseLeaveEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_EraseMouseLeaveEvent(int PartsNumber, DG_MouseLeaveHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.EraseMouseLeaveEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_AddMouseWheelEvent(int PartsNumber, DG_MouseWheelHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.AddMouseWheelEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_EraseMouseWheelEvent(int PartsNumber, DG_MouseWheelHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.EraseMouseWheelEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_AddMouseLClickEvent(int PartsNumber, DG_MouseClickHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.AddMouseLClickEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_EraseMouseLClickEvent(int PartsNumber, DG_MouseClickHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.EraseMouseLClickEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_AddMouseRClickEvent(int PartsNumber, DG_MouseClickHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.AddMouseRClickEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_EraseMouseRClickEvent(int PartsNumber, DG_MouseClickHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.EraseMouseRClickEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_AddMouseMClickEvent(int PartsNumber, DG_MouseClickHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.AddMouseMClickEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_EraseMouseMClickEvent(int PartsNumber, DG_MouseClickHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.EraseMouseMClickEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_AddMouseOnEvent(int PartsNumber, DG_MouseOnHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.AddMouseOnEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_EraseMouseOnEvent(int PartsNumber, DG_MouseOnHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.EraseMouseOnEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_AddKeyTriggerEvent(int PartsNumber, DG_KeyTriggerHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.AddKeyTriggerEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_EraseKeyTriggerEvent(int PartsNumber, DG_KeyTriggerHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.EraseKeyTriggerEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_AddKeyDownEvent(int PartsNumber, DG_KeyDownHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.AddKeyDownEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_EraseKeyDownEvent(int PartsNumber, DG_KeyDownHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.EraseKeyDownEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_AddKeyPressEvent(int PartsNumber, DG_KeyPressHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.AddKeyPressEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_EraseKeyPressEvent(int PartsNumber, DG_KeyPressHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.EraseKeyPressEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_AddKeyUpEvent(int PartsNumber, DG_KeyUpHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.AddKeyUpEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_EraseKeyUpEvent(int PartsNumber, DG_KeyUpHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.EraseKeyUpEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_AddDragBeginEvent(int PartsNumber, DG_DragBeginHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.AddDragBeginEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_EraseDragBeginEvent(int PartsNumber, DG_DragBeginHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.EraseDragBeginEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_AddDragingEvent(int PartsNumber, DG_DragingHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.AddDragingEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_EraseDragingEvent(int PartsNumber, DG_DragingHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.EraseDragingEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_AddDragEndEvent(int PartsNumber, DG_DragEndHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.AddDragEndEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_EraseDragEndEvent(int PartsNumber, DG_DragEndHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.EraseDragEndEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_AddDropEnterEvent(int PartsNumber, DG_DropEnterHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.AddDropEnterEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_EraseDropEnterEvent(int PartsNumber, DG_DropEnterHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.EraseDropEnterEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_AddDropOnEvent(int PartsNumber, DG_DropOnHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.AddDropOnEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_EraseDropOnEvent(int PartsNumber, DG_DropOnHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.EraseDropOnEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_AddDroppedEvent(int PartsNumber, DG_DroppedHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.AddDroppedEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_EraseDroppedEvent(int PartsNumber, DG_DroppedHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.EraseDroppedEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_AddDropLeaveEvent(int PartsNumber, DG_DropLeaveHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.AddDropLeaveEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_EraseDropLeaveEvent(int PartsNumber, DG_DropLeaveHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.EraseDropLeaveEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_AddFocusEvent(int PartsNumber, DG_FocusHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.AddFocusEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_EraseFocusEvent(int PartsNumber, DG_FocusHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.EraseFocusEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_AddLostFocusEvent(int PartsNumber, DG_LostFocusHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.AddLostFocusEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_EraseLostFocusEvent(int PartsNumber, DG_LostFocusHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.EraseLostFocusEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_AddScrollEvent(int PartsNumber, DG_ScrollHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.AddScrollEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_EraseScrollEvent(int PartsNumber, DG_ScrollHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.EraseScrollEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_AddCreatedEvent(int PartsNumber, DG_CreatedHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.AddCreatedEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_EraseCreatedEvent(int PartsNumber, DG_CreatedHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.EraseCreatedEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_AddDeletedEvent(int PartsNumber, DG_DeletedHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.AddDeletedEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_EraseDeletedEvent(int PartsNumber, DG_DeletedHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.EraseDeletedEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_AddSelectedEvent(int PartsNumber, DG_SelectedHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.AddSelectedEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_EraseSelectedEvent(int PartsNumber, DG_SelectedHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.EraseSelectedEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_AddChangedEvent(int PartsNumber, DG_ChangedHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.AddChangedEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_EraseChangedEvent(int PartsNumber, DG_ChangedHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.EraseChangedEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_AddChangedFlgEvent(int PartsNumber, DG_ChangedFlgHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.AddChangedFlgEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_EraseChangedFlgEvent(int PartsNumber, DG_ChangedFlgHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.EraseChangedFlgEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_AddFixedEvent(int PartsNumber, DG_FixedHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.AddFixedEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_EraseFixedEvent(int PartsNumber, DG_FixedHandler DelegateObject)
+{
+	if (PartsNumber == 0)
+	{
+		PARTS_Event_Warning();
+		return;
+	}
+	g_PartsMessageManager.EraseFixedEvent(PartsNumber, DelegateObject);
+}
+
+void AFL_Parts_AddErasingLayerEvent(DG_PARTS_LayerHandler DelegateObject)
+{
+	g_dgPartsErasingLayerEvent += DelegateObject;
+}
+
+void AFL_Parts_EraseErasingLayerEvent(DG_PARTS_LayerHandler DelegateObject)
+{
+	g_dgPartsErasingLayerEvent -= DelegateObject;
+}
+
+void AFL_Parts_AddChangedActiveLayerEvent(DG_PARTS_LayerChangedHandler DelegateObject)
+{
+	g_dgPartsChangedActiveLayerEvent += DelegateObject;
+}
+
+void AFL_Parts_EraseChangedActiveLayerEvent(DG_PARTS_LayerChangedHandler DelegateObject)
+{
+	g_dgPartsChangedActiveLayerEvent -= DelegateObject;
+}
+
+void AFL_Parts_AddBeginUpdateEvent(DG_PARTS_UpdateHandler DelegateObject)
+{
+	if (g_IsInPartsBeginUpdate)
+	{
+		string Text = "パーツ更新前デリゲートを呼び出している最中に、";
+		Text += "パーツ更新前デリゲートオブジェクトの変更を行おうとしています。\n";
+		system.Error(Text);
+		return;
+	}
+	g_dgPartsBeginUpdateEvent += DelegateObject;
+}
+
+void AFL_Parts_EraseBeginUpdateEvent(DG_PARTS_UpdateHandler DelegateObject)
+{
+	if (g_IsInPartsBeginUpdate)
+	{
+		string Text = "パーツ更新前デリゲートを呼び出している最中に、";
+		Text += "パーツ更新前デリゲートオブジェクトの変更を行おうとしています。\n";
+		system.Error(Text);
+		return;
+	}
+	g_dgPartsBeginUpdateEvent -= DelegateObject;
+}
+
+void AFL_Parts_AddEndUpdateEvent(DG_PARTS_UpdateHandler DelegateObject)
+{
+	if (g_IsInPartsEndUpdate)
+	{
+		string Text = "パーツ更新後デリゲートを呼び出している最中に、";
+		Text += "パーツ更新後デリゲートオブジェクトの変更を行おうとしています。\n";
+		system.Error(Text);
+		return;
+	}
+	g_dgPartsEndUpdateEvent += DelegateObject;
+}
+
+void AFL_Parts_EraseEndUpdateEvent(DG_PARTS_UpdateHandler DelegateObject)
+{
+	if (g_IsInPartsEndUpdate)
+	{
+		string Text = "パーツ更新後デリゲートを呼び出している最中に、";
+		Text += "パーツ更新後デリゲートオブジェクトの変更を行おうとしています。\n";
+		system.Error(Text);
+		return;
+	}
+	g_dgPartsEndUpdateEvent -= DelegateObject;
+}
+

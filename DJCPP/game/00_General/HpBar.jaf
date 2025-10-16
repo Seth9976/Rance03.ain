@@ -1,0 +1,183 @@
+HpBar::HpBar()
+{
+	this.gameObjectId_ = g_gameObjectManager.addObject(this.update);
+}
+
+void HpBar::init(int current, int max, bool isShowNumber, string baseCgName)
+{
+	this.current_ = current;
+	this.max_ = max;
+	this.isShowNumber_ = isShowNumber;
+	this.baseCgName_ = baseCgName;
+	this.initParts();
+}
+
+void HpBar::initAsPlayer(ref Player player)
+{
+	this.init(player.getHp(), player.getMaxHp(), true, "システム／ＨＰ／下地／%s" % player.getShortName());
+	player.setOnChangeHpCallback(this.onChangeHpCallback);
+}
+
+void HpBar::update()
+{
+}
+
+void HpBar::changeValue(int to, DG_GeneralCallback onFinish)
+{
+	this.onFinish_ = onFinish;
+	this.updateValue(true, this.current_, to);
+	this.current_ = to;
+}
+
+void HpBar::onChangeHpCallback(int val)
+{
+	this.onFinish_.Clear();
+	this.updateValue(true, this.current_, val);
+	this.current_ = val;
+}
+
+void HpBar::setPos(int x, int y)
+{
+	this.x_ = x;
+	this.y_ = y;
+	this.parent_.setPos(x, y);
+}
+
+void HpBar::move(int x, int y)
+{
+	PartsMotion m;
+	m.setMove(this.x_, this.y_, x, y, 1);
+	this.parent_.runMotion(m, NULL);
+	this.x_ = x;
+	this.y_ = y;
+}
+
+int HpBar::getX()
+{
+	return this.x_;
+}
+
+int HpBar::getY()
+{
+	return this.y_;
+}
+
+void HpBar::setZ(int z)
+{
+	this.parent_.setZ(z);
+}
+
+void HpBar::initParts()
+{
+	this.parts_[0].init(this.baseCgName_, 0);
+	this.parts_[1].init("システム／ＨＰ／バー", 0);
+	NumberPartsInfomation n;
+	n.setSameWidth(15);
+	n.setSpan(-2);
+	this.parts_[2].initAsNumber("システム／数字／幅１５／白", n);
+	createPartsGroup(this.parent_, this.parts_, 2750);
+	this.barHeight_ = this.parts_[1].getHeight();
+	if (this.current_ == 0)
+	{
+		this.setPartsFadeState();
+	}
+	this.setPartsPos();
+}
+
+void HpBar::setPartsShow()
+{
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setShow(true);
+	}
+	this.parts_[2].setShow(this.isShowNumber_);
+	this.parent_.setShow(true);
+}
+
+void HpBar::setPartsPos()
+{
+	this.parts_[1].setPos(11.0, 25.0);
+	this.parts_[2].setPos(110.0, 35.0);
+	this.parts_[2].setOrigin(9);
+}
+
+void HpBar::updateValue(bool isMotion, int valueFrom, int valueTo)
+{
+	if (isMotion)
+	{
+		PartsMotion m1;
+		m1.setKey(15, valueFrom, valueTo, 0);
+		this.parts_[2].runMotion(m1, NULL);
+		PartsMotion m2;
+		int to = this.getBarWidth(valueTo);
+		m2.setCgRangeMove(0, 0, this.getBarWidth(valueFrom), this.barHeight_, 0, 0, this.getBarWidth(valueTo), this.barHeight_, 1);
+		this.parts_[1].runMotion(m2, this.onFinishMotion);
+	}
+	else
+	{
+		this.parts_[2].setNumber(valueTo);
+		this.parts_[1].setCgRange(0, 0, this.getBarWidth(valueTo), this.barHeight_);
+		this.setPartsFadeState();
+	}
+}
+
+void HpBar::onFinishMotion()
+{
+	this.onFinish_();
+	this.onFinish_.Clear();
+	this.setPartsFadeState();
+}
+
+void HpBar::setPartsFadeState()
+{
+	int v = 255;
+	if (this.parts_[2].getNumber() == 0)
+	{
+		v = 140;
+	}
+	int i;
+	for (i = 0; i < this.parts_.Numof(); ++i)
+	{
+		this.parts_[i].setMultiColorValue(v, v, v);
+	}
+}
+
+int HpBar::getBarWidth(int value)
+{
+	float r = float(value) / float(this.max_);
+	int w = this.parts_[1].getWidth() * r;
+	if (w == 0 && value > 0)
+	{
+		return 1;
+	}
+	return w;
+}
+
+void HpBar::setShow(bool val)
+{
+	this.parent_.setShow(val);
+}
+
+void HpBar::setParent(int parentPartsNumber)
+{
+	this.parent_.setParent(parentPartsNumber);
+}
+
+void HpBar::fadeIn(bool val, ref PartsMotion m)
+{
+	this.setPartsShow();
+	if (val)
+	{
+		this.updateValue(true, 0, this.current_);
+	}
+	if (m === NULL)
+	{
+		this.parent_.runMotion(getStandardMotion(val ? 0 : 1), NULL);
+	}
+	else
+	{
+		this.parent_.runMotion(m, NULL);
+	}
+}
+

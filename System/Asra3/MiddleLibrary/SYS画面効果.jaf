@@ -1,0 +1,298 @@
+void SYS_画面更新(int 効果番号, int 効果時間, int デフォルト効果番号, int デフォルト効果時間, bool FirstKeyDownCancel)
+{
+	if (効果番号 < 0)
+	{
+		効果番号 = デフォルト効果番号;
+	}
+	if (効果時間 < 0)
+	{
+		効果時間 = デフォルト効果時間;
+	}
+	if (効果番号 == 0 || 効果時間 <= 0)
+	{
+		AFL_View_Update(true);
+		return;
+	}
+	SYS_効果番号チェック(効果番号);
+	if (SYS_全文スキップ中確認())
+	{
+		AFL_View_Update(true);
+		return;
+	}
+	if (SYS_スキップ中確認())
+	{
+		AFL_View_Update(true);
+		return;
+	}
+	ChipmunkSpriteEngine.TRANS_Begin(効果番号);
+	CASEffectKeyCancelChecker ASEffectKeyCancelChecker;
+	ASEffectKeyCancelChecker.Init(FirstKeyDownCancel);
+	CASTimer Timer;
+	Timer.Reset();
+	for (; ; )
+	{
+		int nTime = Timer.Get();
+		if (nTime >= 効果時間)
+		{
+			break;
+		}
+		if (SYS_全文スキップ中確認())
+		{
+			break;
+		}
+		if (SYS_スキップ中確認())
+		{
+			break;
+		}
+		if (ASEffectKeyCancelChecker.IsCancel())
+		{
+			if (ASEffectKeyCancelChecker.IsClickCanceled())
+			{
+				SYS_ReleaseModeByClickCancel();
+			}
+			break;
+		}
+		float fRate = float(nTime) / float(効果時間);
+		SYS_View_Update(false, true, fRate);
+	}
+	ChipmunkSpriteEngine.TRANS_End();
+	AFL_View_Update(true);
+}
+
+void SYS_効果番号チェック(ref int 効果番号)
+{
+	switch (効果番号)
+	{
+	case 1:
+	case 6:
+	case 7:
+	case 8:
+	case 9:
+	case 12:
+	case 13:
+	case 14:
+	case 15:
+	case 16:
+	case 17:
+	case 20:
+	case 21:
+	case 22:
+	case 23:
+	case 24:
+	case 25:
+	case 26:
+	case 28:
+	case 29:
+	case 31:
+	case 34:
+	case 35:
+	case 36:
+	case 37:
+	case 39:
+	case 40:
+	case 41:
+	case 43:
+	case 44:
+	case 45:
+	case 46:
+	case 47:
+	case 48:
+	case 49:
+	case 50:
+	case 51:
+	case 54:
+	case 55:
+	case 56:
+	case 57:
+	case 58:
+	case 59:
+	case 60:
+		break;
+	default:
+		system.Output("未実装の画面エフェクトです【 %d 】\n" % 効果番号);
+		効果番号 = 1;
+	}
+}
+
+void SYS_View_Update(bool 未読既読スキップ, bool Transition, float TransitionRate)
+{
+	if (!Transition)
+	{
+		SYS_メッセージモード更新();
+	}
+	g_BGM.UpdateReserve();
+	int i;
+	for (i = 0; i < 3; ++i)
+	{
+		g_LoopSE[i].UpdateReserve();
+	}
+	g_SE.UpdateReserve();
+	g_BGMVolumeCapManager.UpdateBGMFade();
+	g_SoundVolumeCapManager.UpdateSound();
+	ChipmunkSpriteEngine.SYSTEM_SetReadMessageSkipping(SYS_スキップ中確認() || SYS_全文スキップ中確認());
+	if (system.IsDebugMode())
+	{
+		ChipmunkSpriteEngine.SYSTEM_SetConfigFrameSkipAllWhileMessageSkip(g_FrameSkipAll);
+		int MouseX = -1;
+		int MouseY = -1;
+		AFL_Mouse_GetPos(MouseX, MouseY);
+		bool IsShowLeft = MouseX >= AFL_View_GetWidth() / 2;
+		g_DebugFPS.Update(IsShowLeft, 0);
+		g_DebugMemorySize.Update(IsShowLeft, g_DebugFPS.GetBottom());
+		if (!Transition)
+		{
+			g_DebugFillRate.Update(IsShowLeft, g_DebugMemorySize.GetBottom());
+			g_DebugVoicePlaying.SetPlay(SYS_IsPlayVoice());
+			g_DebugVoicePlaying.Update(0, 0);
+			g_DebugGimicSEPlaying.SetPlay(SYS_IsPlayGimicSE());
+			g_DebugGimicSEPlaying.Update(0, g_DebugVoicePlaying.GetBottom());
+			g_DebugBackVoicePlaying.SetPlay(SYS_IsPlayBackVoice());
+			g_DebugBackVoicePlaying.Update(0, g_DebugGimicSEPlaying.GetBottom());
+			g_DebugVideoMemorySize.Update(IsShowLeft, g_DebugFillRate.GetBottom());
+		}
+	}
+	SealEngine.SetMagSpeed(未読既読スキップ && (全文スキップ中確認() || 既読スキップ中確認()) ? 3 : 1);
+	MarmotModelEngine.Update();
+	PARTS_Update(未読既読スキップ);
+	SYS_PlayTime_Update();
+	if (Transition)
+	{
+		ChipmunkSpriteEngine.TRANS_Update(TransitionRate);
+	}
+	else
+	{
+		ChipmunkSpriteEngine.Update();
+	}
+	SystemService.UpdateView();
+	if (!Transition)
+	{
+		ChipmunkSpriteEngine.KeepPreviousView();
+	}
+	ChipmunkSpriteEngine.Sleep();
+	AFL_MouseWheel_ClearCount();
+	system.Peek();
+	PARTS_UpdateMessage();
+	SYS_ProcessSystemMessage();
+	SYS_PostCallUpdateView();
+	IbisInputEngine.Joystick_ClearCaptureFlag();
+}
+
+void SYS_全画面色(int Ｒ, int Ｇ, int Ｂ)
+{
+	if (Ｒ != -2147483648 && Ｇ != -2147483648 && Ｂ != -2147483648)
+	{
+		g_ColorLayerSprite.Create();
+		Ｐ＿構築手順＿初期化(g_ColorLayerSprite.GetPartsNumber(), 1);
+		Ｐ＿構築手順＿作成(g_ColorLayerSprite.GetPartsNumber(), AFL_View_GetWidth(), AFL_View_GetHeight(), 1);
+		Ｐ＿構築手順＿色塗り(g_ColorLayerSprite.GetPartsNumber(), 0, 0, AFL_View_GetWidth(), AFL_View_GetHeight(), Ｒ, Ｇ, Ｂ, 255, 1);
+		Ｐ＿構築ビルド(g_ColorLayerSprite.GetPartsNumber(), 1);
+		g_ColorLayerSprite.SetPos(0, 0);
+		g_ColorLayerSprite.SetZ(0);
+		g_ColorLayerSprite.SetShow(true);
+		Ｐ＿親設定(g_ColorLayerSprite.GetPartsNumber(), PARTS_GetSystemOverlayLayer());
+	}
+	else
+	{
+		g_ColorLayerSprite.Release();
+	}
+}
+
+void SYS_画面揺らし(int nQuakeWidth, int nQuakeHeight, int nTotalTime)
+{
+	CASEffectKeyCancelChecker ASEffectKeyCancelChecker;
+	ASEffectKeyCancelChecker.Init(true);
+	int _nBeginTime = system.GetTime();
+	for (; ; )
+	{
+		int _nTime = system.GetTime() - _nBeginTime;
+		if (_nTime >= nTotalTime)
+		{
+			break;
+		}
+		if (ASEffectKeyCancelChecker.IsCancel())
+		{
+			if (ASEffectKeyCancelChecker.IsClickCanceled())
+			{
+				SYS_ReleaseModeByClickCancel();
+			}
+			break;
+		}
+		if (SYS_全文スキップ中確認())
+		{
+			break;
+		}
+		if (SYS_スキップ中確認())
+		{
+			break;
+		}
+		float _fMag = 1.0 - float(_nTime) / float(nTotalTime);
+		int _nX;
+		if (nQuakeWidth == 0)
+		{
+			_nX = 0;
+		}
+		else
+		{
+			_nX = (Math.Rand() % nQuakeWidth - nQuakeWidth / 2) * _fMag;
+		}
+		int _nY;
+		if (nQuakeHeight == 0)
+		{
+			_nY = 0;
+		}
+		else
+		{
+			_nY = (Math.Rand() % nQuakeHeight - nQuakeHeight / 2) * _fMag;
+		}
+		ChipmunkSpriteEngine.VIEW_SetOffsetPos(_nX, _nY);
+		AFL_View_Update(true);
+	}
+	ChipmunkSpriteEngine.VIEW_SetOffsetPos(0, 0);
+	AFL_View_Update(true);
+}
+
+void SYS_画面揺らし終了待ち(int nQuakeWidth, int nQuakeHeight, int nTotalTime)
+{
+	CASEffectKeyCancelChecker ASEffectKeyCancelChecker;
+	ASEffectKeyCancelChecker.Init(true);
+	int _nBeginTime = system.GetTime();
+	for (; ; )
+	{
+		int _nTime = system.GetTime() - _nBeginTime;
+		if (_nTime >= nTotalTime)
+		{
+			break;
+		}
+		float _fMag = 1.0 - float(_nTime) / float(nTotalTime);
+		int _nX;
+		if (nQuakeWidth == 0)
+		{
+			_nX = 0;
+		}
+		else
+		{
+			_nX = (Math.Rand() % nQuakeWidth - nQuakeWidth / 2) * _fMag;
+		}
+		int _nY;
+		if (nQuakeHeight == 0)
+		{
+			_nY = 0;
+		}
+		else
+		{
+			_nY = (Math.Rand() % nQuakeHeight - nQuakeHeight / 2) * _fMag;
+		}
+		ChipmunkSpriteEngine.VIEW_SetOffsetPos(_nX, _nY);
+		AFL_View_Update(true);
+	}
+	ChipmunkSpriteEngine.VIEW_SetOffsetPos(0, 0);
+	AFL_View_Update(true);
+}
+
+void SYS_文字表示後画面揺らしクリア()
+{
+	_文字表示後画面揺らし横 = 0;
+	_文字表示後画面揺らし縦 = 0;
+	_文字表示後画面揺らし時 = 0;
+}
+

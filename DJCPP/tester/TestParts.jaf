@@ -1,0 +1,261 @@
+void test_Parts_Init()
+{
+	'CG初期化' A;
+	Parts p;
+	p.init("システム／ボタン／幅２００", 0);
+	p.setShow(true);
+	キー待ち(false);
+	'プレーン初期化' A;
+	p.initAsPlaneImage(100, 200, 64, 128, 255, 255);
+	p.setShow(true);
+	キー待ち(false);
+	'テキスト初期化' A;
+	p.initAsText("テキスト", 40, false, 0, 255, 128, 64);
+	p.setShow(true);
+	キー待ち(false);
+	'CGプレーン初期化' A;
+	p.initAsCgPlaneImage("システム／ボタン／幅２００", 64, 128, 255);
+	p.setShow(true);
+	キー待ち(false);
+	'数値初期化' A;
+	NumberPartsInfomation n;
+	n.setSameWidth(18);
+	p.initAsNumber("システム／数字／幅１８／白", n);
+	p.setShow(true);
+	p.setNumber(1234567936.0);
+	キー待ち(false);
+}
+
+void test_Parts_Method()
+{
+	Parts base;
+	base.initAsPlaneImage(1024, 768, 32, 32, 128, 255);
+	base.setShow(true);
+	base.setZ(1.0);
+	Parts p;
+	p.init("システム／ボタン／幅２００", 0);
+	p.setShow(true);
+	p.setZ(100.0);
+	'setOriginテスト' A;
+	p.setPos(512.0, 384.0);
+	int i;
+	for (i = 1; i <= 9; ++i)
+	{
+		p.setOrigin(i);
+		キー待ち(false);
+	}
+	p.setOrigin(7);
+	p.setPos(0.0, 0.0);
+	'setX/getXテスト' A;
+	p.setX(100.0);
+	assert(p.getX() == 100.0);
+	'setY/getYテスト' A;
+	p.setY(200.0);
+	assert(p.getY() == 200.0);
+	'setZ/getZテスト' A;
+	p.setZ(300.0);
+	assert(p.getZ() == 300);
+	'setScaling/getScalingテスト' A;
+	p.setPos(512.0, 384.0);
+	p.setOrigin(5);
+	for (i = -1; i <= 15; ++i)
+	{
+		float s = i * 10.0;
+		p.setScaling(s);
+		assert(s == p.getScaling());
+		'' N(s, 0, 0);
+		A();
+	}
+	p.setPos(512.0, 384.0);
+	p.setOrigin(5);
+	p.setScaling(100.0);
+	'setXYRot/getXYRotテスト' A;
+	for (i = -1; i <= 6; ++i)
+	{
+		float s = i * 60.0;
+		p.setXYRot(s);
+		assert(s == p.getXYRot());
+		'' N(s, 0, 0);
+		'度' A;
+	}
+	p.setXYRot(0.0);
+	'setYZRot/getYZRotテスト' A;
+	for (i = -1; i <= 36; ++i)
+	{
+		float s = i * 10.0;
+		p.setYZRot(s);
+		assert(s == p.getYZRot());
+		'' N(s, 0, 0);
+		'度' A;
+	}
+	p.setYZRot(0.0);
+	'setXZRot/getXZRotテスト' A;
+	for (i = -1; i <= 36; ++i)
+	{
+		float s = i * 10.0;
+		p.setXZRot(s);
+		assert(s == p.getXZRot());
+		'' N(s, 0, 0);
+		'度' A;
+	}
+	p.setXZRot(0.0);
+	'setAlpha/getAlphaテスト' A;
+	for (i = -1; i <= 17; ++i)
+	{
+		int n = i * 16;
+		p.setAlpha(n);
+		'アルファ' N(n, 0, 0);
+		A();
+	}
+	p.setAlpha(255.0);
+	'setFilterTypeテスト' A;
+	for (i = 0; i < 4; ++i)
+	{
+		p.setFilterType(i);
+		'フィルタ' N(i, 0, 0);
+		A();
+	}
+	'setParentテスト' A;
+	Parts pp;
+	p.setOrigin(7);
+	pp.initAsDummy();
+	p.setParent(pp.getPartsNumber());
+	pp.setShow(true);
+	p.setPos(100.0, 100.0);
+	pp.setPos(100.0, 200.0);
+	'getScreenXYテスト1' A;
+	assert(p.getScreenX() == 200);
+	assert(p.getScreenY() == 300);
+	p.setParent(0);
+	p.setPos(0.0, 0.0);
+	p.setOrigin(5);
+	'getScreenXYテスト2' A;
+	assert(p.getScreenX() == -p.getWidth() / 2);
+	assert(p.getScreenY() == -p.getHeight() / 2);
+	'getScreenXYテスト1' A;
+	'setShow/isShowテスト1' A;
+	assert(pp.isShow() == true);
+	assert(p.isShow() == true);
+	'setShow/isShowテスト2' A;
+	pp.setShow(false);
+	assert(pp.isShow() == false);
+	assert(p.isShow() == true);
+	'setShow/isShowテスト3' A;
+	pp.setShow(true);
+	p.setShow(false);
+	assert(pp.isShow() == true);
+	assert(p.isShow() == false);
+}
+
+void test_Parts_Motion()
+{
+	Parts num;
+	NumberPartsInfomation n;
+	n.setSameWidth(18);
+	num.initAsNumber("システム／数字／幅１８／白", n);
+	num.setShow(true);
+	Parts p;
+	p.init("システム／ボタン／幅２００", 0);
+	p.setShow(true);
+	p.setZ(100.0);
+	p.setOrigin(7);
+	'パーツモーション：EXロード' A;
+	p.runMotionFromEx("モーション／テスト／振動", NULL);
+	while (!g_partsMotionManager.isEmpty())
+	{
+		g_frameManager.updateFrame();
+	}
+	'パーツモーション：EXロード' A;
+	p.runMotionFromEx("モーション／テスト", NULL);
+	while (!g_partsMotionManager.isEmpty())
+	{
+		g_frameManager.updateFrame();
+	}
+	'パーツモーション：アルファ' A;
+	PartsMotion m;
+	m.setTime(2000);
+	m.setKey(2, 0, 255, 0);
+	m.setMove(0, 0, 1024 - p.getWidth(), 100, 0);
+	p.runMotion(m, NULL);
+	while (!g_partsMotionManager.isEmpty())
+	{
+		g_frameManager.updateFrame();
+	}
+	p.setPos(512.0, 384.0);
+	p.setOrigin(5);
+	'パーツモーション：ROT,Chain' A;
+	array@PartsMotion mota[3];
+	int i;
+	for (i = 0; i < 3; ++i)
+	{
+		mota[i].setTime(1500);
+	}
+	mota[0].setKey(3, 0, 360, 0);
+	mota[1].setKey(4, 0, 90, 0);
+	mota[1].setKey(5, 0, 360, 0);
+	mota[2].setKey(4, 0, 360, 0);
+	p.runMotionArray(mota, NULL);
+	while (!g_partsMotionManager.isEmpty())
+	{
+		g_frameManager.updateFrame();
+	}
+	mota.Free();
+	'パーツモーション：Scaling' A;
+	PartsMotion m;
+	m.setTime(2000);
+	m.setKey(6, 0, 200, 1);
+	p.runMotion(m, NULL);
+	while (!g_partsMotionManager.isEmpty())
+	{
+		g_frameManager.updateFrame();
+	}
+	array@PartsMotion ma[3];
+	ma[0].setMove(0, 100, 1024, 0, 1);
+	ma[0].setKey(6, 50, 100, 0);
+	ma[0].setKey(3, 0, 60, 0);
+	ma[0].setKey(4, 0, 60, 0);
+	ma[0].setKey(5, 0, 60, 0);
+	ma[0].setTime(2000);
+	ma[1].setKey(4, 60, 120, 0);
+	ma[1].setKey(5, 60, 120, 0);
+	ma[1].setTime(2000);
+	ma[2].setMove(1024, 0, 0, 100, 1);
+	ma[2].setKey(6, 100, 50, 0);
+	ma[2].setKey(3, 60, 0, 0);
+	ma[2].setKey(4, 60, 0, 0);
+	ma[2].setKey(5, 60, 0, 0);
+	ma[2].setTime(2000);
+	bool isExit = false;
+	while (!isExit)
+	{
+		p.runMotionArray(ma, NULL);
+		while (!g_partsMotionManager.isEmpty())
+		{
+			g_frameManager.updateFrame();
+			if (g_mouse.isClick(0))
+			{
+				g_partsMotionManager.finalize(-1);
+				キー待ち(false);
+			}
+			else if (g_mouse.isClick(1))
+			{
+				g_partsMotionManager.finalize(-1);
+				isExit = true;
+				break;
+			}
+		}
+	}
+	ma.Free();
+}
+
+void test_Scene_WorldMap()
+{
+	debugSetMapAllChain();
+	debugPlayerJoinAll();
+	test_Party_Organize();
+	SceneWorldMap wm;
+	wm.init(g_mapPlace[0].getId(), true);
+	wm.run();
+	runScene(wm.update);
+}
+

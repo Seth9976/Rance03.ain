@@ -1,0 +1,73 @@
+void 字枠(int Ｍ番号, int 動作, int 効果番号, int 効果時間)
+{
+	if (Ｍ番号 != 0)
+	{
+		SYS_ASSERTE_AREA_ID(Ｍ番号);
+	}
+	CMessageWindowModel a;
+	if (Ｍ番号 == 0)
+	{
+		a = g_MessageWindowModelManager.GetMessageWindow(g_MessageWindowStatusManager.GetActiveMessageWindowNumber());
+	}
+	else
+	{
+		a = g_MessageWindowModelManager.GetMessageWindow(Ｍ番号);
+	}
+	字枠セット(Ｍ番号, 動作);
+	SYS_画面更新(効果番号, 効果時間, a.効果番号, a.効果時間, false);
+}
+
+void 字枠セット(int Ｍ番号, int 動作)
+{
+	SYS_字枠セット(Ｍ番号, 動作);
+}
+
+void メッセージウィンドウ非表示()
+{
+	SYS_メッセージウィンドウ非表示();
+}
+
+void Ａ＿メッセージ置換設定(string 元テキスト, string 後テキスト)
+{
+	int i;
+	for (i = 0; i < g_ReplacePair.Numof(); ++i)
+	{
+		if (g_ReplacePair[i].GetSrc() == 元テキスト)
+		{
+			break;
+		}
+	}
+	if (i == g_ReplacePair.Numof())
+	{
+		g_ReplacePair.Realloc(i + 1);
+	}
+	g_ReplacePair[i].SetPair(元テキスト, 後テキスト);
+}
+
+void Ａ＿メッセージ置換解除(string 元テキスト)
+{
+	int i;
+	for (i = 0; i < g_ReplacePair.Numof(); ++i)
+	{
+		if (g_ReplacePair[i].GetSrc() != 元テキスト)
+		{
+			continue;
+		}
+		g_ReplacePair.Erase(i);
+		return;
+	}
+}
+
+bool Ａ＿メッセージ置換確認(string 元テキスト)
+{
+	int i;
+	for (i = 0; i < g_ReplacePair.Numof(); ++i)
+	{
+		if (g_ReplacePair[i].GetSrc() == 元テキスト)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+

@@ -1,0 +1,55 @@
+void AFL_Config_SetBeginEvent(DG_NotifyHandler dgObject)
+{
+	g_ConfigView.SetBeginEvent(dgObject);
+}
+
+void AFL_Config_SetEndEvent(DG_NotifyHandler dgObject)
+{
+	g_ConfigView.SetEndEvent(dgObject);
+}
+
+void AFL_Config_SetLoadedActivityEvent(DG_PARTS_LoadedActivityHandler dgObject)
+{
+	g_ConfigView.SetLoadedActivityEvent(dgObject);
+}
+
+void AFL_Config_SetReleasingActivityEvent(DG_PARTS_ReleasingActivityHandler dgObject)
+{
+	g_ConfigView.SetReleasingActivityEvent(dgObject);
+}
+
+void AFL_Config_SetAsraDataForPartsEvent(DG_NotifyConfigUpdateHandler dgObject)
+{
+	g_ConfigView.SetAsraDataForPartsEvent(dgObject);
+}
+
+void AFL_Config_SetPartsDataForAsraEvent(DG_NotifyConfigUpdateHandler dgObject)
+{
+	g_ConfigView.SetPartsDataForAsraEvent(dgObject);
+}
+
+int AFL_GetKeyConfigMouseWheelForwardMode()
+{
+	return g_nKeyConfigMouseWheelForward;
+}
+
+bool AFL_GetConfigQuickSaveConfirm()
+{
+	return g_ConfigQuickSaveConfirm;
+}
+
+bool AFL_GetConfigQuickLoadConfirm()
+{
+	return g_ConfigQuickLoadConfirm;
+}
+
+bool AFL_GetConfigSaveConfirm()
+{
+	return g_ConfigSaveConfirm;
+}
+
+bool AFL_GetConfigLoadConfirm()
+{
+	return g_ConfigLoadConfirm;
+}
+

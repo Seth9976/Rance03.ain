@@ -1,0 +1,441 @@
+CAEPropertyItem::CAEPropertyItem()
+{
+}
+
+CAEPropertyItem::~CAEPropertyItem()
+{
+	this.Release();
+}
+
+void CAEPropertyItem::Release()
+{
+	this.m_RefToolTip <- NULL;
+	this.ReleaseUnit();
+	this.ReleaseEvent();
+}
+
+void CAEPropertyItem::ReleaseUnit()
+{
+	this.m_dgSelectedComboBoxEvent.Clear();
+	this.m_dgChangedCheckBoxEvent.Clear();
+	this.m_dgMouseClickEvent.Clear();
+	this.m_dgChangeTextEvent.Clear();
+	this.m_LabelItem.Release();
+	this.m_ComboBoxItem.Release();
+	this.m_CheckBoxItem.Release();
+	this.m_ButtonItem.Release();
+	this.m_TextBox.Release();
+	this.m_LabelMode = false;
+	this.m_ComboBoxMode = false;
+	this.m_CheckBoxMode = false;
+	this.m_ButtonMode = false;
+	this.m_TextBoxMode = false;
+}
+
+void CAEPropertyItem::ReleaseEvent()
+{
+	this.m_dgMouseWheelEvent.Clear();
+	this.m_dgKeyDownEvent.Clear();
+}
+
+int CAEPropertyItem::GetID()
+{
+	if (this.m_TextBoxMode)
+	{
+		return this.m_TextBox.GetID();
+	}
+	if (this.m_ButtonMode)
+	{
+		return this.m_ButtonItem.GetID();
+	}
+	if (this.m_CheckBoxMode)
+	{
+		return this.m_CheckBoxItem.GetID();
+	}
+	if (this.m_ComboBoxMode)
+	{
+		return this.m_ComboBoxItem.GetID();
+	}
+	if (this.m_LabelMode)
+	{
+		return this.m_LabelItem.GetID();
+	}
+	return 0;
+}
+
+bool CAEPropertyItem::IsExistParts(int PartsNumber)
+{
+	return this.IsExistPartsWithChild(this.GetID(), PartsNumber);
+}
+
+bool CAEPropertyItem::IsExistPartsWithChild(int ParentNumber, int FindNumber)
+{
+	if (ParentNumber == FindNumber)
+	{
+		return true;
+	}
+	int NumofChild = Ｐ＿子数取得(ParentNumber);
+	int Index;
+	for (Index = 0; Index < NumofChild; ++Index)
+	{
+		if (this.IsExistPartsWithChild(Ｐ＿子取得(ParentNumber, Index), FindNumber))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void CAEPropertyItem::AddParts(int Number)
+{
+	if (this.m_TextBoxMode)
+	{
+		this.m_TextBox.AddParts(Number);
+	}
+	if (this.m_ButtonMode)
+	{
+		this.m_ButtonItem.AddParts(Number);
+	}
+	if (this.m_CheckBoxMode)
+	{
+		this.m_CheckBoxItem.AddParts(Number);
+	}
+	if (this.m_ComboBoxMode)
+	{
+		this.m_ComboBoxItem.AddParts(Number);
+	}
+	if (this.m_LabelMode)
+	{
+		this.m_LabelItem.AddParts(Number);
+	}
+}
+
+string CAEPropertyItem::GetLabel()
+{
+	if (this.m_TextBoxMode)
+	{
+		return this.m_TextBox.GetLabel();
+	}
+	if (this.m_ButtonMode)
+	{
+		return this.m_ButtonItem.GetLabel();
+	}
+	if (this.m_CheckBoxMode)
+	{
+		return this.m_CheckBoxItem.GetLabel();
+	}
+	if (this.m_ComboBoxMode)
+	{
+		return this.m_ComboBoxItem.GetLabel();
+	}
+	if (this.m_LabelMode)
+	{
+		return this.m_LabelItem.GetLabel();
+	}
+	return "";
+}
+
+int CAEPropertyItem::SetTextBox(string Name, int LabelWidth, int TextBoxWidth, bool OpenIMEGainFocus)
+{
+	this.ReleaseUnit();
+	this.m_TextBoxMode = true;
+	int LayoutID = this.m_TextBox.Init(Name, LabelWidth, TextBoxWidth, this.m_RefToolTip, OpenIMEGainFocus);
+	this.m_TextBox.AddKeyDownEvent(this.KeyDownEvent);
+	this.m_TextBox.AddMouseWheelEvent(this.MouseWheelEvent);
+	this.m_TextBox.AddChangeTextEvent(this.ChangeTextEvent);
+	return LayoutID;
+}
+
+int CAEPropertyItem::GetTextBoxID()
+{
+	if (!this.m_TextBoxMode)
+	{
+		return 0;
+	}
+	return this.m_TextBox.GetTextBoxID();
+}
+
+void CAEPropertyItem::SetTextBoxText(string Text)
+{
+	if (!this.m_TextBoxMode)
+	{
+		return;
+	}
+	if (this.m_TextBox.GetText() == Text)
+	{
+		return;
+	}
+	this.m_TextBox.SetText(Text);
+}
+
+string CAEPropertyItem::GetTextBoxText()
+{
+	if (!this.m_TextBoxMode)
+	{
+		return "";
+	}
+	return this.m_TextBox.GetText();
+}
+
+int CAEPropertyItem::GetTextBoxInt()
+{
+	if (!this.m_TextBoxMode)
+	{
+		return 0;
+	}
+	return this.m_TextBox.GetInt();
+}
+
+float CAEPropertyItem::GetTextBoxFloat()
+{
+	if (!this.m_TextBoxMode)
+	{
+		return 0.0;
+	}
+	return this.m_TextBox.GetFloat();
+}
+
+void CAEPropertyItem::SetTextBoxReadOnly(bool Flg)
+{
+	if (!this.m_TextBoxMode)
+	{
+		return;
+	}
+	this.m_TextBox.SetReadOnly(Flg);
+}
+
+int CAEPropertyItem::SetButtonItem(string Name, int LabelWidth, int ButtonWidth, int TextPos)
+{
+	this.ReleaseUnit();
+	this.m_ButtonMode = true;
+	int LayoutID = this.m_ButtonItem.Init(Name, LabelWidth, ButtonWidth, TextPos, this.m_RefToolTip);
+	this.m_ButtonItem.AddKeyDownEvent(this.KeyDownEvent);
+	this.m_ButtonItem.AddMouseWheelEvent(this.MouseWheelEvent);
+	this.m_ButtonItem.AddMouseClickEvent(this.MouseLClickEvent);
+	return LayoutID;
+}
+
+void CAEPropertyItem::SetButtonText(string Text)
+{
+	if (!this.m_ButtonMode)
+	{
+		return;
+	}
+	this.m_ButtonItem.SetText(Text);
+}
+
+string CAEPropertyItem::GetButtonText()
+{
+	if (!this.m_ButtonMode)
+	{
+		return "";
+	}
+	return this.m_ButtonItem.GetText();
+}
+
+int CAEPropertyItem::SetCheckBoxItem(string Name, int LabelWidth, int CheckBoxWidth)
+{
+	this.ReleaseUnit();
+	this.m_CheckBoxMode = true;
+	int LayoutID = this.m_CheckBoxItem.Init(Name, LabelWidth, CheckBoxWidth, this.m_RefToolTip);
+	this.m_CheckBoxItem.AddKeyDownEvent(this.KeyDownEvent);
+	this.m_CheckBoxItem.AddMouseWheelEvent(this.MouseWheelEvent);
+	this.m_CheckBoxItem.AddChangedFlgEvent(this.ChangedCheckBoxEvent);
+	return LayoutID;
+}
+
+void CAEPropertyItem::SetFlg(bool Flg)
+{
+	if (!this.m_CheckBoxMode)
+	{
+		return;
+	}
+	this.m_CheckBoxItem.SetFlg(Flg);
+}
+
+bool CAEPropertyItem::GetFlg()
+{
+	if (!this.m_CheckBoxMode)
+	{
+		return false;
+	}
+	return this.m_CheckBoxItem.GetFlg();
+}
+
+int CAEPropertyItem::SetComboBoxItem(string Name, int LabelWidth, int ComboBoxWidth, int ComboBoxHeight)
+{
+	this.ReleaseUnit();
+	this.m_ComboBoxMode = true;
+	int LayoutID = this.m_ComboBoxItem.Init(Name, LabelWidth, ComboBoxWidth, ComboBoxHeight, this.m_RefToolTip);
+	this.m_ComboBoxItem.AddKeyDownEvent(this.KeyDownEvent);
+	this.m_ComboBoxItem.AddMouseWheelEvent(this.MouseWheelEvent);
+	this.m_ComboBoxItem.AddSelectedEvent(this.SelectedComboBoxEvent);
+	return LayoutID;
+}
+
+void CAEPropertyItem::SetComboBoxItemList(array@string ItemList)
+{
+	if (!this.m_ComboBoxMode)
+	{
+		return;
+	}
+	this.m_ComboBoxItem.SetItemList(ItemList);
+}
+
+void CAEPropertyItem::GetComboBoxItemList(ref array@string ItemList)
+{
+	if (!this.m_ComboBoxMode)
+	{
+		return;
+	}
+	this.m_ComboBoxItem.GetItemList(ItemList);
+}
+
+void CAEPropertyItem::SetComboBoxIndex(int Index)
+{
+	if (!this.m_ComboBoxMode)
+	{
+		return;
+	}
+	this.m_ComboBoxItem.SetIndex(Index);
+}
+
+int CAEPropertyItem::GetComboBoxIndex()
+{
+	if (!this.m_ComboBoxMode)
+	{
+		return -1;
+	}
+	return this.m_ComboBoxItem.GetIndex();
+}
+
+int CAEPropertyItem::SetLabelItem(string Name, int LabelWidth)
+{
+	this.ReleaseUnit();
+	this.m_LabelMode = true;
+	int LayoutID = this.m_LabelItem.Init(Name, LabelWidth, this.m_RefToolTip);
+	this.m_LabelItem.AddKeyDownEvent(this.KeyDownEvent);
+	this.m_LabelItem.AddMouseWheelEvent(this.MouseWheelEvent);
+	return LayoutID;
+}
+
+void CAEPropertyItem::SetToolTip(ref CAEPropertyToolTip ToolTip)
+{
+	this.m_RefToolTip <- ToolTip;
+}
+
+string CAEPropertyItem::GetToolTipText()
+{
+	if (this.m_TextBoxMode)
+	{
+		return this.m_TextBox.GetToolTipText();
+	}
+	if (this.m_ButtonMode)
+	{
+		return this.m_ButtonItem.GetToolTipText();
+	}
+	if (this.m_CheckBoxMode)
+	{
+		return this.m_CheckBoxItem.GetToolTipText();
+	}
+	if (this.m_ComboBoxMode)
+	{
+		return this.m_ComboBoxItem.GetToolTipText();
+	}
+	if (this.m_LabelMode)
+	{
+		return this.m_LabelItem.GetToolTipText();
+	}
+	return "";
+}
+
+void CAEPropertyItem::KeyDownEvent(int ID, int KeyID)
+{
+	this.m_dgKeyDownEvent(this.GetID(), KeyID);
+}
+
+void CAEPropertyItem::MouseWheelEvent(int ID, int Forward, int Back)
+{
+	this.m_dgMouseWheelEvent(this.GetID(), Forward, Back);
+}
+
+void CAEPropertyItem::ChangeTextEvent(int ID)
+{
+	this.m_dgChangeTextEvent(this.GetID());
+}
+
+void CAEPropertyItem::MouseLClickEvent(int ID, int MouseX, int MouseY)
+{
+	this.m_dgMouseClickEvent(this.GetID(), MouseX, MouseY);
+}
+
+void CAEPropertyItem::ChangedCheckBoxEvent(int ID, bool Check)
+{
+	this.m_dgChangedCheckBoxEvent(this.GetID(), Check);
+}
+
+void CAEPropertyItem::SelectedComboBoxEvent(int ID, int Index)
+{
+	this.m_dgSelectedComboBoxEvent(this.GetID(), Index);
+}
+
+void CAEPropertyItem::AddKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent += DelegateObject;
+}
+
+void CAEPropertyItem::EraseKeyDownEvent(DG_KeyDownHandler DelegateObject)
+{
+	this.m_dgKeyDownEvent -= DelegateObject;
+}
+
+void CAEPropertyItem::AddMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent += DelegateObject;
+}
+
+void CAEPropertyItem::EraseMouseWheelEvent(DG_MouseWheelHandler DelegateObject)
+{
+	this.m_dgMouseWheelEvent -= DelegateObject;
+}
+
+void CAEPropertyItem::AddChangeTextEvent(DG_ChangedHandler DelegateObject)
+{
+	this.m_dgChangeTextEvent += DelegateObject;
+}
+
+void CAEPropertyItem::EraseChangeTextEvent(DG_ChangedHandler DelegateObject)
+{
+	this.m_dgChangeTextEvent -= DelegateObject;
+}
+
+void CAEPropertyItem::AddMouseClickEvent(DG_MouseClickHandler DelegateObject)
+{
+	this.m_dgMouseClickEvent += DelegateObject;
+}
+
+void CAEPropertyItem::EraseMouseClickEvent(DG_MouseClickHandler DelegateObject)
+{
+	this.m_dgMouseClickEvent -= DelegateObject;
+}
+
+void CAEPropertyItem::AddChangedCheckBoxEvent(DG_ChangedFlgHandler DelegateObject)
+{
+	this.m_dgChangedCheckBoxEvent += DelegateObject;
+}
+
+void CAEPropertyItem::EraseChangedCheckBoxEvent(DG_ChangedFlgHandler DelegateObject)
+{
+	this.m_dgChangedCheckBoxEvent -= DelegateObject;
+}
+
+void CAEPropertyItem::AddSelectedComboBoxEvent(DG_SelectedHandler DelegateObject)
+{
+	this.m_dgSelectedComboBoxEvent += DelegateObject;
+}
+
+void CAEPropertyItem::EraseSelectedComboBoxEvent(DG_SelectedHandler DelegateObject)
+{
+	this.m_dgSelectedComboBoxEvent -= DelegateObject;
+}
+

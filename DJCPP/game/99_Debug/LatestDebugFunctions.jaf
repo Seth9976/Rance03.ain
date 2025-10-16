@@ -1,0 +1,40 @@
+void LatestDebugFunctions::update(string functionName)
+{
+	int r = this.functionName_.Find(0, this.functionName_.Numof(), functionName);
+	if (r != -1)
+	{
+		this.functionName_.Erase(r);
+		if (this.functionName_.Empty())
+		{
+			this.functionName_.PushBack(functionName);
+		}
+		else
+		{
+			this.functionName_.Insert(0, functionName);
+		}
+	}
+	else
+	{
+		this.functionName_.Insert(0, functionName);
+		if (this.functionName_.Numof() > 10)
+		{
+			this.functionName_.PopBack();
+		}
+	}
+	共有セーブ();
+}
+
+int LatestDebugFunctions::getCount()
+{
+	return this.functionName_.Numof();
+}
+
+string LatestDebugFunctions::getFunctionName(int index)
+{
+	if (0 <= index && index < this.functionName_.Numof())
+	{
+		return this.functionName_[index];
+	}
+	return "";
+}
+

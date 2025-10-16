@@ -1,0 +1,87 @@
+string AdvBackground::getCgName()
+{
+	return this.cgName_;
+}
+
+void AdvBackground::show(string cg, int panDirection, int time, bool immidiate)
+{
+	if (this.cgName_ == cg)
+	{
+		advErr("ADVエラー同じ背景画像を連続で表示しようとしました。%s" % cg);
+	}
+	this.cgName_ = cg;
+	this.partsCg_.init("背景／" + this.cgName_, 0);
+	this.partsCg_.setPos(512.0, 384.0);
+	this.partsCg_.setZ(3000.0);
+	this.partsCg_.setOrigin(5);
+	this.partsCg_.setShow(true);
+	this.partsCg_.runMotion(this.getPartsMotionCameraPan(1, panDirection, time), NULL);
+	if (immidiate)
+	{
+		RunPartsMotion();
+	}
+}
+
+PartsMotion AdvBackground::getPartsMotionCameraPan(int fadeType, int panDirection, int time)
+{
+	PartsMotion m;
+	if (fadeType == 1)
+	{
+		m.setAlpha(0, 255, 0);
+	}
+	else if (fadeType == 2)
+	{
+		m.setAlpha(255, 0, 0);
+	}
+	m.setTime(time);
+	int now = this.partsCg_.getX();
+	int y = this.partsCg_.getY();
+	if (panDirection == 0)
+	{
+		if (this.pos_ != 1)
+		{
+			this.pos_ += 1;
+			m.setMove(now, y, now - 50, y, 7);
+		}
+	}
+	else if (panDirection == 1)
+	{
+		if (this.pos_ != -1)
+		{
+			this.pos_ -= 1;
+			m.setMove(now, y, now + 50, y, 7);
+		}
+	}
+	return m;
+}
+
+void AdvBackground::hide(int panDirection, int time, bool immidiate)
+{
+	this.partsCg_.runMotion(this.getPartsMotionCameraPan(2, panDirection, time), this.release);
+	if (immidiate)
+	{
+		RunPartsMotion();
+	}
+}
+
+void AdvBackground::move(bool toRight, int time, bool immidiate)
+{
+	this.partsCg_.runMotion(this.getPartsMotionCameraPan(0, toRight ? 0 : 1, time), NULL);
+	if (immidiate)
+	{
+		RunPartsMotion();
+	}
+}
+
+void AdvBackground::release()
+{
+	this.cgName_ = "";
+	this.partsCg_.release();
+	this.pos_ = 0;
+}
+
+bool AdvBackground::isShow()
+{
+	return this.partsCg_.isInitialized();
+}
+

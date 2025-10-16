@@ -1,0 +1,191 @@
+CAESelectFontDialog::CAESelectFontDialog()
+{
+}
+
+void CAESelectFontDialog::Show(int ID, int PosX, int PosY, CASCharSpriteProperty Font, DG_ChangedFont dgChangedFont)
+{
+	AFL_Parts_AddLayer(-1);
+	this.m_dgChangedFont = dgChangedFont;
+	this.m_Font = Font;
+	this.m_ParentID = ID;
+	int LayoutBox = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿パディング設定(LayoutBox, 6, 6, 6, 6);
+	Ｐ＿レイアウトボックス＿配置設定(LayoutBox, 3);
+	CASColor Color;
+	Color = Font.GetColor();
+	CASColor EdgeColor;
+	EdgeColor = Font.GetEdgeColor();
+	array@string FontNameList;
+	PARTS_GetFontNameList(FontNameList);
+	int Find = FontNameList.Find(0, FontNameList.Numof(), PARTS_GetFontName(Font.GetType()));
+	this.m_Panel.Init(LayoutBox);
+	this.m_Panel.AddChangeTextEvent(this.ChangeTextEvent);
+	this.m_Panel.AddMouseClickEvent(this.MouseLClickEvent);
+	this.m_Panel.AddSelectedEvent(this.SelectedComboBoxEvent);
+	this.m_Panel.AddComboBoxItem("種類", 100, 135, 100, FontNameList, Find);
+	this.m_Panel.AddTextBoxItem("サイズ", 155, string(Font.GetSize()), 80, false);
+	this.m_Panel.AddButtonItem("色", 155, "%d,%d,%d" % Color.GetR() % Color.GetG() % Color.GetB(), 80, 5);
+	this.m_Panel.AddTextBoxItem("太字幅", 155, Font.GetBoldWeight().String(), 80, false);
+	this.m_Panel.AddTextBoxItem("縁取り幅", 155, Font.GetEdgeWeight().String(), 80, false);
+	this.m_Panel.AddButtonItem("縁取り色", 155, "%d,%d,%d" % EdgeColor.GetR() % EdgeColor.GetG() % EdgeColor.GetB(), 80, 5);
+	int ButtonLayout = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿レイアウトボックス＿レイアウトタイプ設定(ButtonLayout, 2);
+	Ｐ＿レイアウトボックス＿パディング設定(ButtonLayout, 3, 3, 3, 3);
+	Ｐ＿レイアウトボックス＿追加(LayoutBox, ButtonLayout);
+	int OKButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(OKButton, "決定");
+	Ｐ＿ボタン＿サイズ設定(OKButton, 65, 22);
+	Ｐ＿マージン設定(OKButton, 0, 0, 3, 0);
+	Ｐ＿レイアウトボックス＿追加(ButtonLayout, OKButton);
+	AFL_Parts_AddMouseLClickEvent(OKButton, this.ClickOKButtonEvent);
+	int CancelButton = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿ボタン＿テキスト設定(CancelButton, "キャンセル");
+	Ｐ＿ボタン＿サイズ設定(CancelButton, 100, 22);
+	Ｐ＿マージン設定(CancelButton, 0, 0, 3, 0);
+	Ｐ＿レイアウトボックス＿追加(ButtonLayout, CancelButton);
+	AFL_Parts_AddMouseLClickEvent(CancelButton, this.ClickCancelButtonEvent);
+	int Width = AFL_Parts_GetWidth(LayoutBox, 1);
+	int Height = AFL_Parts_GetHeight(LayoutBox, 1);
+	int BG = PARTS_GetFreeSystemPartsNumber();
+	Ｐ＿構築手順＿ピクセル作成(BG, Width, Height, 1);
+	Ｐ＿構築手順＿色塗り(BG, 0, 0, Width, Height, 200, 200, 200, -1, 1);
+	Ｐ＿構築ビルド(BG, 1);
+	Ｐ＿ドラッグ可能設定(BG, true);
+	Ｐ＿親設定(LayoutBox, BG);
+	PosX = Math.Max(0, Math.Min(AFL_View_GetWidth() - Width, PosX));
+	PosY = Math.Max(0, Math.Min(AFL_View_GetHeight() - Height, PosY));
+	Ｐ＿座標設定(BG, PosX, PosY);
+	AFL_Parts_AddDragEndEvent(BG, this.DragEndEvent);
+	this.m_OK = false;
+	this.m_Cancel = false;
+	PARTS_BeginInput();
+	CASCharSpriteProperty PrevFont;
+	PrevFont = Font;
+	for (; ; )
+	{
+		if (!PrevFont.Equal(this.m_Font))
+		{
+			dgChangedFont(ID, this.m_Font);
+			PrevFont = this.m_Font;
+		}
+		AFL_View_Update(true);
+		if (this.m_OK)
+		{
+			break;
+		}
+		if (this.m_Cancel)
+		{
+			dgChangedFont(ID, Font);
+			break;
+		}
+	}
+	PARTS_EndInput();
+	this.m_Panel.Release();
+	PARTS_ReleaseWithInit(LayoutBox);
+	PARTS_ReleaseWithInit(CancelButton);
+	PARTS_ReleaseWithInit(OKButton);
+	PARTS_ReleaseWithInit(ButtonLayout);
+	PARTS_ReleaseWithInit(BG);
+	AFL_Parts_EraseLayer(-1);
+}
+
+void CAESelectFontDialog::ChangeTextEvent(int ID)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	if (Item.GetLabel() == "サイズ")
+	{
+		this.m_Font.SetSize(Item.GetTextBoxInt());
+	}
+	else if (Item.GetLabel() == "太字幅")
+	{
+		this.m_Font.SetBoldWeight(Item.GetTextBoxFloat());
+	}
+	else if (Item.GetLabel() == "縁取り幅")
+	{
+		this.m_Font.SetEdgeWeight(Item.GetTextBoxFloat());
+	}
+}
+
+void CAESelectFontDialog::ClickOKButtonEvent(int ID, int MouseX, int MouseY)
+{
+	this.m_OK = true;
+}
+
+void CAESelectFontDialog::ClickCancelButtonEvent(int ID, int MouseX, int MouseY)
+{
+	this.m_Cancel = true;
+}
+
+void CAESelectFontDialog::MouseLClickEvent(int ID, int MouseX, int MouseY)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	CASColor Color;
+	Color = this.m_Font.GetColor();
+	CASColor EdgeColor;
+	EdgeColor = this.m_Font.GetEdgeColor();
+	if (Item.GetLabel() == "色")
+	{
+		CAESelectColorDialog Form;
+		Form.Show(ID, MouseX, MouseY, Color.GetR(), Color.GetG(), Color.GetB(), this.ChangedColorEvent);
+	}
+	else if (Item.GetLabel() == "縁取り色")
+	{
+		CAESelectColorDialog Form;
+		Form.Show(ID, MouseX, MouseY, EdgeColor.GetR(), EdgeColor.GetG(), EdgeColor.GetB(), this.ChangedColorEvent);
+	}
+}
+
+void CAESelectFontDialog::ChangedColorEvent(int ID, int Red, int Green, int Blue)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	if (Item.GetLabel() == "色")
+	{
+		this.m_Font.SetColor(CF_CASColor(Red, Green, Blue, 255));
+		Item.SetButtonText("%d,%d,%d" % Red % Green % Blue);
+	}
+	else if (Item.GetLabel() == "縁取り色")
+	{
+		this.m_Font.SetEdgeColor(CF_CASColor(Red, Green, Blue, 255));
+		Item.SetButtonText("%d,%d,%d" % Red % Green % Blue);
+	}
+	this.m_dgChangedFont(this.m_ParentID, this.m_Font);
+}
+
+void CAESelectFontDialog::DragEndEvent(int ID)
+{
+	int PosX = Ｐ＿Ｘ座標取得(ID);
+	int PosY = Ｐ＿Ｙ座標取得(ID);
+	int Width = AFL_Parts_GetWidth(ID, 1);
+	int Height = AFL_Parts_GetHeight(ID, 1);
+	PosX = Math.Max(0, Math.Min(AFL_View_GetWidth() - Width, PosX));
+	PosY = Math.Max(0, Math.Min(AFL_View_GetHeight() - Height, PosY));
+	Ｐ＿座標設定(ID, PosX, PosY);
+}
+
+void CAESelectFontDialog::SelectedComboBoxEvent(int ID, int Index)
+{
+	ref CAEPropertyItem Item = this.m_Panel.GetItem(ID);
+	if (Item === NULL)
+	{
+		return;
+	}
+	array@string List;
+	Item.GetComboBoxItemList(List);
+	if (Item.GetLabel() == "種類")
+	{
+		this.m_Font.SetType(PARTS_GetFontNumber(List[Index]));
+	}
+}
+

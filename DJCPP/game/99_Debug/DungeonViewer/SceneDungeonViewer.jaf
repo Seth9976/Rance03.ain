@@ -1,0 +1,61 @@
+void SceneDungeonViewer::init(string dungeonId)
+{
+	this.isCardClicked_ = false;
+	ref Dungeon d = getDungeonFromId(dungeonId);
+	d.reset();
+	this.depth_ = d.getDepth();
+	this.width_ = d.getWidth();
+	this.scroller_.init(0, 0, 1024, 768, this.depth_ * 154 - 768, 154, true);
+	this.view_.Alloc(this.depth_ * this.width_);
+	int i;
+	for (i = 0; i < this.depth_; ++i)
+	{
+		DungeonLine line;
+		line = d.getDungeonLine(i);
+		int j;
+		for (j = 0; j < this.width_; ++j)
+		{
+			int index = i * this.width_ + j;
+			this.view_[index].init(line.getDungeonCard(j), j - this.width_ / 2, i, this.depth_);
+			this.view_[index].setParent(this.scroller_.getPartsNumber());
+			this.view_[index].setOnClickCallback(this.onClick);
+		}
+	}
+}
+
+void SceneDungeonViewer::run()
+{
+	this.scroller_.setPos(this.depth_ * 154 - 768);
+}
+
+bool SceneDungeonViewer::update()
+{
+	if (g_mouse.isClick(1) || this.isCardClicked_)
+	{
+		return false;
+	}
+	return true;
+}
+
+void SceneDungeonViewer::onClick(int x, int y)
+{
+	this.clickedX_ = x;
+	this.clickedY_ = y;
+	this.isCardClicked_ = true;
+}
+
+int SceneDungeonViewer::getClickedX()
+{
+	return this.clickedX_;
+}
+
+int SceneDungeonViewer::getClickedY()
+{
+	return this.clickedY_;
+}
+
+bool SceneDungeonViewer::isCardClicked()
+{
+	return this.isCardClicked_;
+}
+
